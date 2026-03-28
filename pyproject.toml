@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jobads-dashboard"
+version = "0.1.0"
+description = "Standalone labor-market dashboard built from Vicinity job ads aggregates."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "duckdb>=1.1.0",
+  "pandas>=2.2.0",
+  "plotly>=5.24.0",
+  "pyarrow>=17.0.0",
+  "streamlit>=1.39.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+]
+
+[project.scripts]
+jobads-dashboard-refresh = "jobads_dashboard.dashboard.prepare:main"
+jobads-dashboard = "jobads_dashboard.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

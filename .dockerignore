@@ -1,0 +1,14 @@
+.git
+.DS_Store
+.pytest_cache
+.tmp
+.venv
+__pycache__
+*.pyc
+
+build
+dist
+logs
+output
+tmp
+

@@ -1,0 +1,2 @@
+"""jobads-dashboard package."""
+
