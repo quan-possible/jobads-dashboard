@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import pandas as pd
 from streamlit.testing.v1 import AppTest
 
@@ -18,6 +21,29 @@ def headline_metrics(app: AppTest) -> dict[str, str]:
 
 def info_messages(app: AppTest) -> list[str]:
     return [message.value for message in app.info]
+
+
+def test_partial_bundle_shows_operator_guidance(tmp_path: Path, monkeypatch) -> None:
+    data_root = tmp_path / "partial-bundle"
+    data_root.mkdir()
+    (data_root / "metadata.json").write_text(
+        json.dumps({"source_window": {"min_date": "2016-01-01", "max_date": "2025-07-31"}}),
+        encoding="utf-8",
+    )
+    pd.DataFrame({"month": pd.to_datetime(["2025-07-01"]), "postings_total": [1]}).to_parquet(
+        data_root / "monthly_overall.parquet"
+    )
+
+    monkeypatch.setenv("JOBADS_DASHBOARD_DATA_ROOT", str(data_root))
+
+    app = AppTest.from_file("streamlit_app.py")
+    app.run(timeout=120)
+
+    assert len(app.exception) == 0
+    assert len(app.error) == 1
+    assert "jobads-dashboard refresh" in app.error[0].value
+    assert any("Dashboard bundle needs a refresh before the app can load." in block.value for block in app.markdown)
+    assert "monthly_filter_cube.parquet" in app.code[0].value
 
 
 def test_filtered_province_views_stay_populated() -> None:

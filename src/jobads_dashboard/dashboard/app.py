@@ -12,16 +12,11 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from .constants import ALL_CANADA, ALL_INDUSTRIES, ALL_OCCUPATIONS, PLOTLY_SEQUENCE, THEME
-from .data import load_metadata, load_tables
+from .data import DashboardDataError, load_metadata, load_tables
 from .metrics import format_int, format_pct, safe_pct, summarize_headlines
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-DATA_ROOT = Path(
-    os.environ.get(
-        "JOBADS_DASHBOARD_DATA_ROOT",
-        str(REPO_ROOT / "data" / "derived" / "labor_market_dashboard_v1"),
-    )
-)
+DEFAULT_DATA_ROOT = REPO_ROOT / "data" / "derived" / "labor_market_dashboard_v1"
 
 COMPARISON_MONTHS = 3
 MAX_LIST_ITEMS = 10
@@ -622,6 +617,70 @@ div[data-testid="stCaptionContainer"] p,
   max-width: 90ch;
 }}
 
+.aclmr-load-alert {{
+  margin: 1.2rem 0 1.5rem;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--aclmr-gradient);
+  padding: 1px;
+  box-shadow: var(--aclmr-shadow);
+}}
+
+.aclmr-load-alert__inner {{
+  background: linear-gradient(160deg, rgba(4, 28, 44, 0.96), rgba(6, 31, 47, 0.92));
+  color: var(--aclmr-white);
+  padding: 1.6rem 1.7rem 1.5rem;
+}}
+
+.aclmr-load-alert__eyebrow {{
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 0.55rem;
+}}
+
+.aclmr-load-alert__title {{
+  font-size: clamp(1.8rem, 2.4vw, 2.3rem);
+  line-height: 1.02;
+  margin: 0 0 0.85rem;
+  color: #fff;
+}}
+
+.aclmr-load-alert__body {{
+  max-width: 56rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0 0 1rem;
+}}
+
+.aclmr-load-alert__meta {{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 0;
+}}
+
+.aclmr-load-alert__pill {{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(195, 158, 128, 0.4);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.88);
+}}
+
+.aclmr-load-alert__pill strong {{
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.73rem;
+  color: rgba(255, 255, 255, 0.72);
+}}
+
 @media (max-width: 1100px) {{
   .aclmr-hero {{
     grid-template-columns: 1fr;
@@ -742,12 +801,17 @@ def plotly_layout() -> dict:
 
 
 @st.cache_data(show_spinner=False)
-def load_dashboard_assets() -> tuple[dict, dict[str, pd.DataFrame]]:
-    return load_metadata(DATA_ROOT), load_tables(DATA_ROOT)
+def load_dashboard_assets(data_root: str) -> tuple[dict, dict[str, pd.DataFrame]]:
+    resolved_root = Path(data_root)
+    return load_metadata(resolved_root), load_tables(resolved_root)
 
 
 def inject_global_styles() -> None:
     st.markdown(GLOBAL_STYLES, unsafe_allow_html=True)
+
+
+def resolve_data_root() -> Path:
+    return Path(os.environ.get("JOBADS_DASHBOARD_DATA_ROOT", str(DEFAULT_DATA_ROOT)))
 
 
 def month_label(value: pd.Timestamp | str | None) -> str:
@@ -854,6 +918,42 @@ def render_footer_note(metadata: dict) -> None:
         </section>
         """,
         unsafe_allow_html=True,
+    )
+
+
+def render_data_bundle_error(data_root: Path, error: DashboardDataError) -> None:
+    st.markdown(
+        f"""
+        <section class="aclmr-load-alert">
+          <div class="aclmr-load-alert__inner">
+            <div class="aclmr-load-alert__eyebrow">Operator guidance</div>
+            <h1 class="aclmr-load-alert__title">Dashboard bundle needs a refresh before the app can load.</h1>
+            <p class="aclmr-load-alert__body">
+              {escape(str(error))} This usually means the local derived package is only partially present,
+              out of date, or was interrupted during a refresh.
+            </p>
+            <div class="aclmr-load-alert__meta">
+              <span class="aclmr-load-alert__pill"><strong>Data root</strong> {escape(str(data_root))}</span>
+              <span class="aclmr-load-alert__pill"><strong>Missing files</strong> {len(error.missing_files)}</span>
+              <span class="aclmr-load-alert__pill"><strong>Read errors</strong> {len(error.read_errors)}</span>
+            </div>
+          </div>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.error("Run `jobads-dashboard refresh`, then `jobads-dashboard validate`, and reopen the dashboard.")
+    if error.missing_files:
+        visible_missing = list(error.missing_files[:8])
+        if len(error.missing_files) > len(visible_missing):
+            visible_missing.append(f"... and {len(error.missing_files) - len(visible_missing)} more")
+        st.markdown("**Missing bundle files**")
+        st.code("\n".join(visible_missing), language="text")
+    if error.read_errors:
+        st.markdown("**Unreadable bundle files**")
+        st.code("\n".join(error.read_errors), language="text")
+    st.caption(
+        "This app reads only from the local derived dashboard bundle; it does not fall back to scanning the upstream processed corpus at runtime."
     )
 
 
@@ -1961,13 +2061,20 @@ def main() -> None:
     )
     inject_global_styles()
 
-    if not DATA_ROOT.exists():
+    data_root = resolve_data_root()
+
+    if not data_root.exists():
         st.error(
-            "Derived dashboard data is missing. Run `jobads-dashboard refresh` first to build `data/derived/labor_market_dashboard_v1/`."
+            f"Derived dashboard data is missing at `{data_root}`. Run `jobads-dashboard refresh` first to build the local bundle."
         )
         st.stop()
 
-    metadata, tables = load_dashboard_assets()
+    try:
+        metadata, tables = load_dashboard_assets(str(data_root))
+    except DashboardDataError as exc:
+        render_data_bundle_error(data_root, exc)
+        st.stop()
+
     monthly = tables["monthly_overall"].copy()
     monthly["month"] = pd.to_datetime(monthly["month"])
     date_values = sorted(monthly["month"].unique())

@@ -30,6 +30,9 @@
 3. Build the aggregate layer first, then the UI layer.
 4. Store project-local derived dashboard data in this repo rather than writing aggregates back into the upstream data repo.
 5. Update `MEMORY.md` and the relevant `memory/YYYY-MM-DD.md` file after material project changes.
+6. After any page/dashboard UI change or page bug fix, deploy the updated page through the project ngrok path before sign-off.
+7. Treat `http://127.0.0.1:8520` plus the current live ngrok URL as the canonical deployment target for this repo. Reuse that exact live URL whenever the existing tunnel is still active instead of creating a fresh tunnel.
+8. If the canonical ngrok tunnel is no longer active and the URL must rotate, bring the page back up on port `8520`, create or reconnect the tunnel, and explicitly report the new live URL in the handoff instead of implying the old URL still works.
 
 ## Scope Guardrails
 1. Do not implement dashboard logic inside `jobads-data/main` or `ai_labor`.
