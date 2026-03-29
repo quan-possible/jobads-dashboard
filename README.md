@@ -42,6 +42,55 @@ Launch the Streamlit app:
 jobads-dashboard app
 ```
 
+## Render Hosting
+
+This repo is set up to deploy as a Docker-based Render web service.
+
+Render-specific files:
+
+- `Dockerfile`
+- `render.yaml`
+
+Local preflight:
+
+```bash
+python -m pip install -e '.[dev]'
+PYTHONPATH=src pytest -q
+jobads-dashboard app -- --server.headless true --server.port 8520
+```
+
+Render deployment options:
+
+1. Blueprint flow:
+
+```bash
+render login
+render blueprints validate render.yaml
+```
+
+Then create or sync the service from the Render dashboard using the repo's root-level `render.yaml`.
+
+2. Direct CLI flow:
+
+```bash
+render login
+render services create \
+  --type web_service \
+  --runtime docker \
+  --name jobads-dashboard \
+  --plan free \
+  --repo https://github.com/quan-possible/jobads-dashboard \
+  --branch main \
+  --health-check-path /_stcore/health \
+  --output json
+```
+
+Notes:
+
+- The container honors Render's dynamic `PORT` environment variable.
+- The default blueprint uses the free plan, which can idle out after inactivity.
+- Upgrading the plan on Render avoids free-tier sleep behavior.
+
 The app reads only from:
 
 - `data/derived/labor_market_dashboard_v1/`

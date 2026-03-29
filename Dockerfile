@@ -2,7 +2,8 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    PORT=10000
 
 WORKDIR /app
 
@@ -12,6 +13,6 @@ COPY data/derived/labor_market_dashboard_v1 /app/data/derived/labor_market_dashb
 
 RUN pip install --upgrade pip && pip install .
 
-EXPOSE 8501
+EXPOSE 10000
 
-CMD ["streamlit", "run", "streamlit_app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+CMD ["sh", "-c", "streamlit run streamlit_app.py --server.address=0.0.0.0 --server.port=${PORT:-10000} --server.headless=true"]

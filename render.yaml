@@ -1,0 +1,12 @@
+services:
+  - name: jobads-dashboard
+    type: web
+    runtime: docker
+    plan: free
+    region: oregon
+    repo: https://github.com/quan-possible/jobads-dashboard
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /_stcore/health
+    autoDeployTrigger: commit
