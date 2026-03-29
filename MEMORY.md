@@ -22,12 +22,15 @@ Last updated: 2026-03-27
 - A follow-up same-day polish loop now also closes the remaining partial-bundle operator rough edge: the app validates the local derived bundle at load time, stops early with a branded ACLMR guidance panel when required parquet files are missing or unreadable, and carries a regression test for that failure mode while the healthy bundle still passes the full suite and build.
 - The page is now redeployed through the project’s ngrok path after the latest fix, and the project instruction now makes that deploy step mandatory after any future page/dashboard UI change or page bug fix.
 - The current canonical live dashboard URL is `https://3ce3-2001-56a-f068-c900-99a3-5b2a-192-b1e4.ngrok-free.app` on local app port `8520`; future work should reuse that exact live URL whenever the tunnel is still active, and only rotate it when the tunnel has actually been lost.
+- Render hosting is now live for this repo on `https://jobads-dashboard.onrender.com`, using a Docker-based free-tier Render web service that deploys from GitHub branch `codex/render-hosting`.
+- The repo now has first-class Render deployment assets: the Docker entrypoint honors Render's dynamic `PORT`, and root `render.yaml` defines the web service with `/_stcore/health` as the health check.
 
 ## Active Focus
 - Preserve the standalone project boundary: `jobads-dashboard` owns dashboard implementation, while `jobads-data/main` remains the upstream data source.
 - Keep the implementation contract aligned with upstream data caveats, especially `2025` provenance and sparse-field coverage limits.
 - Keep the aggregate refresh contract stable so the app continues to load only local derived parquet tables.
 - Keep validation strong enough to catch source drift and schema regressions before future handoffs claim the dashboard is complete.
+- Keep the hosted Render service aligned with repo state until the deployment branch is merged or the service is repointed to `main`.
 
 ## Next Actions
 1. Add saved screenshots or inspection artifacts under `docs/analyses/labor_market_dashboard/` when a polished visual handoff is needed.
@@ -36,6 +39,7 @@ Last updated: 2026-03-27
 4. Use `docs/jobs/archive/2026-03-25-jobads-dashboard-extensive-verification-rerun.md` as the current trust checkpoint for the data/logic surface, and the archived 2026-03-26 redesign job as the UI polish checkpoint.
 5. Treat the `10-item` presentation cap plus the compact tab-ribbon/mobile-toggle treatment as the default UI contract unless a future redesign explicitly reopens them.
 6. Treat the off-canvas mobile sidebar and hidden chart modebar as part of the default polish contract unless a future interaction redesign reopens those choices.
+7. Merge `codex/render-hosting` or repoint the Render service to `main` after the deployment changes are accepted, so hosting no longer depends on a temporary branch.
 
 ## Risks/Blockers
 - `../jobads-data/main` 2025 raw fetch provenance remains imperfect, so freshness messaging must remain cautious.
@@ -46,6 +50,7 @@ Last updated: 2026-03-27
 - A fresh full-source `jobads-dashboard validate` pass was started during the 2026-03-27 polishing rerun but did not return within the verification window against the cloud-backed upstream source, so that specific reconciliation check was not used as the blocking gate for the UI-only fix.
 - Lower-priority follow-ups remain after sign-off: compensation views still use latest-month medians instead of fuller distribution views, startup is still heavier than the spec ideal, same-dimension filters are still not fully global for the Occupations and Industries tabs, and wheel-installed default paths are still layout-sensitive unless users pass explicit roots.
 - The new selector cap intentionally hides some long-tail geography/occupation/industry options from the sidebar; that matches the current request, but it is now a product choice rather than an incidental implementation detail.
+- The live Render service currently deploys from `codex/render-hosting`, not `main`, so branch drift would matter until that branch is merged or the Render config is updated.
 
 ## Sources
 - `docs/analyses/labor_market_dashboard_spec/report.md`

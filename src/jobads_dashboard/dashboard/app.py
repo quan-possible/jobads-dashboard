@@ -23,6 +23,100 @@ MAX_LIST_ITEMS = 10
 UNKNOWN_OCCUPATION_GROUP = "Unknown occupation group"
 UNKNOWN_INDUSTRY_GROUP = "Unknown industry group"
 
+FIELD_DISPLAY_NAMES: dict[str, str] = {
+    "remoteWorkOptions": "Remote work",
+    "remunerationHrly": "Hourly wage",
+    "remunerationMin": "Minimum wage",
+    "remunerationMax": "Maximum wage",
+    "primaryPostingLanguage": "Posting language",
+    "englishLanguageRequirement": "English requirement",
+    "frenchLanguageRequirement": "French requirement",
+    "experienceDetails": "Experience details",
+    "advertisedBy": "Advertised by",
+    "noc": "Occupation code (NOC)",
+    "naics": "Industry code (NAICS)",
+    "education": "Education",
+    "skills": "Skills",
+    "type": "Employment type",
+    "duration": "Duration",
+    "experience": "Experience",
+    "certs": "Certifications",
+    "cips": "CIP codes",
+    "description": "Description",
+}
+
+LEGEND_TITLE_MAP: dict[str, str] = {
+    "province_scope": "Province",
+    "occupation_scope": "Occupation",
+    "industry_scope": "Industry",
+    "growth_type": "Growth metric",
+    "field_name": "Field",
+    "dimension": "Dimension",
+    "category": "Category",
+    "market_label": "Market",
+    "market": "Market",
+}
+
+GROWTH_TYPE_LABELS: dict[str, str] = {
+    "mom_pct": "Month-over-month",
+    "yoy_pct": "Year-over-year",
+}
+
+
+def humanize_field_name(name: str) -> str:
+    """Convert a raw field name to a human-readable display label."""
+    return FIELD_DISPLAY_NAMES.get(name, name)
+
+
+# Short labels for occupation groups used in chart legends and compact displays
+OCCUPATION_SHORT_LABELS: dict[str, str] = {
+    "0 | Legislative and senior management occupations": "0 | Management",
+    "1 | Business, finance and administration occupations": "1 | Business & Admin",
+    "2 | Natural and applied sciences and related occupations": "2 | Sciences & Tech",
+    "3 | Health occupations": "3 | Health",
+    "4 | Occupations in education, law and social, community and government services": "4 | Education & Govt",
+    "5 | Occupations in art, culture, recreation and sport": "5 | Arts & Culture",
+    "6 | Sales and service occupations": "6 | Sales & Service",
+    "7 | Trades, transport and equipment operators and related occupations": "7 | Trades & Transport",
+    "8 | Natural resources, agriculture and related production occupations": "8 | Resources & Agri",
+    "9 | Occupations in manufacturing and utilities": "9 | Manufacturing",
+}
+
+# Short labels for industry groups used in chart legends
+INDUSTRY_SHORT_LABELS: dict[str, str] = {
+    "11 | Agriculture, forestry, fishing and hunting": "11 | Agriculture",
+    "21 | Mining, quarrying, and oil and gas extraction": "21 | Mining & Oil",
+    "22 | Utilities": "22 | Utilities",
+    "23 | Construction": "23 | Construction",
+    "31-33 | Manufacturing": "31-33 | Manufacturing",
+    "41 | Wholesale trade": "41 | Wholesale",
+    "44-45 | Retail trade": "44-45 | Retail",
+    "48-49 | Transportation and warehousing": "48-49 | Transport",
+    "51 | Information and cultural industries": "51 | Info & Culture",
+    "52 | Finance and insurance": "52 | Finance",
+    "53 | Real estate and rental and leasing": "53 | Real Estate",
+    "54 | Professional, scientific and technical services": "54 | Professional Svcs",
+    "55 | Management of companies and enterprises": "55 | Management",
+    "56 | Administrative and support, waste management and remediation services": "56 | Admin & Waste Mgmt",
+    "61 | Educational services": "61 | Education",
+    "62 | Health care and social assistance": "62 | Health Care",
+    "71 | Arts, entertainment and recreation": "71 | Arts & Rec",
+    "72 | Accommodation and food services": "72 | Food & Hospitality",
+    "81 | Other services (except public administration)": "81 | Other Services",
+    "91 | Public administration": "91 | Public Admin",
+}
+
+
+def shorten_scope_label(label: str) -> str:
+    """Return a compact version of an occupation or industry scope label for chart legends."""
+    short = OCCUPATION_SHORT_LABELS.get(label)
+    if short:
+        return short
+    short = INDUSTRY_SHORT_LABELS.get(label)
+    if short:
+        return short
+    return label
+
 GLOBAL_STYLES = f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
@@ -49,25 +143,13 @@ GLOBAL_STYLES = f"""
 .stApp {{
   position: relative !important;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top right, rgba(207, 119, 48, 0.12), transparent 22%),
-    linear-gradient(180deg, #f7efe8 0%, var(--aclmr-canvas) 100%);
+  background: var(--aclmr-white);
   color: var(--aclmr-text);
   font-family: "PT Sans", sans-serif;
   overflow: visible !important;
 }}
 
-.stApp::before {{
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: clamp(28rem, 45vw, 34rem);
-  background:
-    radial-gradient(circle at top right, rgba(195, 158, 128, 0.26), transparent 30%),
-    linear-gradient(180deg, rgba(4, 28, 44, 0.99) 0%, rgba(6, 31, 47, 0.96) 58%, rgba(6, 31, 47, 0.14) 100%);
-  pointer-events: none;
-  z-index: 0;
-}}
+
 
 html,
 body,
@@ -78,17 +160,27 @@ body,
   overflow: visible !important;
 }}
 
+[data-testid="stAppViewContainer"] > .main {{
+  background: linear-gradient(
+    to bottom,
+    var(--aclmr-canvas) 0%,
+    var(--aclmr-canvas) 30%,
+    var(--aclmr-white) 45%
+  ) !important;
+  background-attachment: scroll !important;
+  position: relative;
+  z-index: 1;
+}}
+
 [data-testid="stAppViewContainer"] {{
   position: relative !important;
   min-height: 100vh;
   overflow: visible !important;
+  background: var(--aclmr-canvas) !important;
 }}
 
-[data-testid="stAppViewContainer"] > .main {{
-  background: transparent;
-  position: relative;
-  z-index: 1;
-}}
+
+
 
 .block-container {{
   max-width: 1450px;
@@ -153,6 +245,13 @@ section[data-testid="stSidebar"] {{
   z-index: 2;
 }}
 
+section[data-testid="stSidebar"] button[kind="headerNoPadding"],
+section[data-testid="stSidebar"] [data-testid="stBaseButton-headerNoPadding"] {{
+  color: transparent !important;
+  font-size: 0 !important;
+  overflow: hidden !important;
+}}
+
 section[data-testid="stSidebar"] * {{
   color: #fff !important;
 }}
@@ -161,7 +260,9 @@ section[data-testid="stSidebar"] [data-baseweb="select"] > div,
 section[data-testid="stSidebar"] .stSlider,
 section[data-testid="stSidebar"] input {{
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.92rem;
 }}
 
 section[data-testid="stSidebar"] label {{
@@ -180,6 +281,13 @@ section[data-testid="stSidebar"] [data-baseweb="select"] > div {{
 
 section[data-testid="stSidebar"] [data-baseweb="select"] [role="combobox"] {{
   color: #fff !important;
+}}
+
+section[data-testid="stSidebar"] [data-baseweb="select"] [data-baseweb="tag"],
+section[data-testid="stSidebar"] [data-baseweb="select"] span,
+section[data-testid="stSidebar"] [data-baseweb="select"] * {{
+  background-color: transparent !important;
+  background: transparent !important;
 }}
 
 section[data-testid="stSidebar"] [data-baseweb="select"] svg {{
@@ -281,7 +389,7 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
 }}
 
 .aclmr-hero p {{
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.82) !important;
   font-size: 1.05rem;
   line-height: 1.45;
   margin: 1rem 0 0;
@@ -436,33 +544,41 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
 }}
 
 .stTabs [data-baseweb="tab-list"] {{
-  gap: 0.45rem;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   align-items: stretch;
-  background: linear-gradient(90deg, rgba(4, 28, 44, 0.98), rgba(6, 31, 47, 0.96));
+  background: rgba(4, 28, 44, 0.98);
   padding: 0.5rem;
-  border-radius: 28px;
+  border-radius: 20px;
   box-shadow: var(--aclmr-shadow);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}}
+
+.stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {{
+  display: none;
 }}
 
 .stTabs [data-baseweb="tab"] {{
-  width: 100%;
+  width: auto;
+  flex-shrink: 0;
   border-radius: 999px;
-  padding: 0.72rem 0.9rem;
-  min-height: 3rem;
+  padding: 0.72rem 1.05rem;
+  min-height: 2.5rem;
   color: rgba(255, 255, 255, 0.75);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  white-space: normal;
+  white-space: nowrap;
   text-align: center;
   line-height: 1.18;
 }}
 
 .stTabs [aria-selected="true"] {{
-  background: var(--aclmr-gradient) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
   color: #fff !important;
 }}
 
@@ -481,14 +597,14 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
 }}
 
 .aclmr-section-heading h2 {{
-  color: var(--aclmr-white);
+  color: var(--aclmr-navy-deep);
   font-size: clamp(1.65rem, 1.4rem + 0.6vw, 2.1rem);
   line-height: 1;
   margin: 0;
 }}
 
 .aclmr-section-heading p {{
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--aclmr-text);
   font-size: 1rem;
   line-height: 1.5;
   margin: 0.55rem 0 0;
@@ -500,18 +616,14 @@ div[data-testid="stMetric"] {{
   min-height: 8.5rem;
   background: var(--aclmr-surface);
   border: 1px solid var(--aclmr-border);
-  border-radius: 26px;
-  padding: 1rem 1rem 0.9rem;
-  box-shadow: var(--aclmr-shadow);
+  border-radius: 12px;
+  padding: 1.2rem 1rem 1rem;
+  box-shadow: 0 4px 12px rgba(6, 31, 47, 0.04);
   overflow: hidden;
 }}
 
 div[data-testid="stMetric"]::before {{
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 0.38rem;
-  background: var(--aclmr-gradient);
+  display: none;
 }}
 
 div[data-testid="stMetricLabel"] {{
@@ -520,11 +632,22 @@ div[data-testid="stMetricLabel"] {{
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  white-space: normal;
+  word-break: break-word;
 }}
 
 div[data-testid="stMetricValue"] {{
   color: var(--aclmr-navy-deep);
-  font-size: clamp(1.7rem, 1.2rem + 1vw, 2.6rem);
+  font-size: clamp(1.4rem, 1vw + 1rem, 2.1rem);
+  white-space: normal;
+  word-break: break-word;
+}}
+
+div[data-testid="stMetricValue"] > div {{
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
 }}
 
 div[data-testid="stPlotlyChart"],
@@ -533,9 +656,9 @@ div[data-testid="stAlert"],
 div[data-testid="stTable"] {{
   background: var(--aclmr-surface);
   border: 1px solid var(--aclmr-border);
-  border-radius: 26px;
-  padding: 0.65rem;
-  box-shadow: var(--aclmr-shadow);
+  border-radius: 12px;
+  padding: 0.85rem;
+  box-shadow: 0 4px 12px rgba(6, 31, 47, 0.04);
 }}
 
 div[data-testid="stDataFrame"] {{
@@ -544,16 +667,31 @@ div[data-testid="stDataFrame"] {{
 
 div[data-testid="stPlotlyChart"] {{
   padding: 0.85rem 0.9rem 0.45rem;
-  overflow: visible !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}}
+
+div[data-testid="stPlotlyChart"]::-webkit-scrollbar {{
+  display: none;
 }}
 
 div[data-testid="stPlotlyChart"] > div,
+div[data-testid="stPlotlyChart"] iframe,
 div[data-testid="stPlotlyChart"] .js-plotly-plot,
 div[data-testid="stPlotlyChart"] .plot-container,
 div[data-testid="stPlotlyChart"] .svg-container {{
   width: 100% !important;
   max-width: 100% !important;
-  overflow: visible !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}}
+
+div[data-testid="stPlotlyChart"] > div::-webkit-scrollbar,
+div[data-testid="stPlotlyChart"] iframe::-webkit-scrollbar,
+div[data-testid="stPlotlyChart"] .js-plotly-plot::-webkit-scrollbar,
+div[data-testid="stPlotlyChart"] .plot-container::-webkit-scrollbar,
+div[data-testid="stPlotlyChart"] .svg-container::-webkit-scrollbar {{
+  display: none !important;
 }}
 
 div[data-testid="stPlotlyChart"] .modebar {{
@@ -561,14 +699,39 @@ div[data-testid="stPlotlyChart"] .modebar {{
   top: 0.2rem !important;
 }}
 
+div[data-testid="stAlert"] {{
+  border-left: 4px solid var(--aclmr-teal) !important;
+  padding: 1rem !important;
+}}
+
+div[data-testid="stAlert"] > div {{
+  background: transparent !important;
+  color: var(--aclmr-text) !important;
+}}
+div[data-testid="stAlert"] svg {{
+  fill: var(--aclmr-teal) !important;
+}}
+
 div[data-testid="stTable"] {{
   padding: 0.25rem 0.85rem 0.8rem;
-  overflow: visible !important;
+  overflow: auto !important;
+}}
+
+div[data-testid="stTable"] th:nth-child(2),
+div[data-testid="stTable"] td:nth-child(2) {{
+  min-width: 250px;
+  max-width: 350px;
 }}
 
 div[data-testid="stTable"] table {{
   width: 100%;
   border-collapse: collapse;
+}}
+
+div[data-testid="stTable"] thead tr th:first-child,
+div[data-testid="stTable"] tbody tr th:first-child,
+div[data-testid="stTable"] tbody tr td:first-child {{
+  display: none;
 }}
 
 div[data-testid="stTable"] thead tr {{
@@ -591,7 +754,7 @@ div[data-testid="stTable"] td {{
 div[data-testid="stCaptionContainer"] p,
 .stMarkdown p,
 .st-emotion-cache-10trblm p {{
-  color: var(--aclmr-muted);
+  color: inherit;
 }}
 
 .aclmr-footer {{
@@ -780,8 +943,9 @@ def plotly_layout() -> dict:
         "plot_bgcolor": THEME.surface,
         "font": {"color": THEME.text, "family": "PT Sans, sans-serif"},
         "legend": {"orientation": "h", "y": 1.02, "x": 0, "font": {"size": 12}},
-        "margin": {"l": 20, "r": 20, "t": 44, "b": 20},
-        "title": {"font": {"size": 18, "color": THEME.navy_deep}},
+        "margin": {"l": 20, "r": 20, "t": 60, "b": 20},
+        "height": 550,
+        "title": {"font": {"size": 15, "color": THEME.navy_deep}},
         "hoverlabel": {"bgcolor": THEME.navy_deep, "font": {"color": THEME.white}},
         "xaxis": {
             "title": None,
@@ -1017,26 +1181,33 @@ def finalize_figure(
     horizontal_bar: bool = False,
 ) -> go.Figure:
     fig.update_layout(**plotly_layout())
-    fig.update_layout(height=430, hovermode="x unified" if is_timeseries else "closest")
+    fig.update_layout(hovermode="closest")
+
+    # Clean up legend title from raw column names
+    current_legend = fig.layout.legend
+    if current_legend and current_legend.title and current_legend.title.text:
+        raw_title = current_legend.title.text
+        clean_title = LEGEND_TITLE_MAP.get(raw_title, raw_title)
+        fig.update_layout(legend_title_text=clean_title)
 
     if len(fig.data) >= 5:
         fig.update_layout(
             legend={
-                "orientation": "v",
-                "y": 1,
+                "orientation": "h",
+                "y": -0.2,
                 "yanchor": "top",
-                "x": 1.02,
-                "xanchor": "left",
+                "x": 0.5,
+                "xanchor": "center",
                 "font": {"size": 11},
                 "bgcolor": "rgba(255, 255, 255, 0.88)",
                 "bordercolor": THEME.card_border,
                 "borderwidth": 1,
             },
-            margin={"l": 20, "r": 170, "t": 44, "b": 20},
+            margin={"l": 20, "r": 20, "t": 60, "b": 40},
         )
 
     if horizontal_bar:
-        fig.update_layout(margin={"l": 170, "r": 20, "t": 44, "b": 20})
+        fig.update_layout(margin={"l": 170, "r": 20, "t": 60, "b": 20})
 
     fig.update_xaxes(title=None, automargin=True)
     fig.update_yaxes(title=None, automargin=True)
@@ -1106,14 +1277,21 @@ def make_bar_chart(
 def plot_chart(fig: go.Figure, key: str | None = None) -> None:
     st.plotly_chart(
         fig,
-        width="stretch",
+        use_container_width=True,
+        theme=None,
         key=key,
         config={"displaylogo": False, "displayModeBar": False, "responsive": True},
     )
 
 
 def show_table(frame: pd.DataFrame) -> None:
-    st.table(frame.reset_index(drop=True))
+    display = frame.reset_index(drop=True).copy()
+    for col in display.columns:
+        if pd.api.types.is_float_dtype(display[col]):
+            display[col] = display[col].apply(lambda v: f"{v:,.1f}" if pd.notna(v) else "—")
+        elif pd.api.types.is_integer_dtype(display[col]):
+            display[col] = display[col].apply(lambda v: f"{v:,}" if pd.notna(v) else "—")
+    st.table(display)
 
 
 def show_empty(message: str) -> None:
@@ -1371,7 +1549,7 @@ def render_overview(
             ("Province count covered", format_int(latest_province_count)),
             ("Latest refresh month", metadata.get("source_window", {}).get("max_date", "n/a")[:7]),
         ],
-        columns=4,
+        columns=3,
     )
 
     growth = monthly[["month", "postings_total"]].copy()
@@ -1386,6 +1564,7 @@ def render_overview(
         )
     with growth_col:
         growth_long = growth.melt(id_vars="month", value_vars=["mom_pct", "yoy_pct"], var_name="growth_type", value_name="growth_pct")
+        growth_long["growth_type"] = growth_long["growth_type"].map(GROWTH_TYPE_LABELS).fillna(growth_long["growth_type"])
         plot_chart(
             make_line_chart(growth_long, x="month", y="growth_pct", color="growth_type", title="MoM and YoY growth"),
             key="overview-growth",
@@ -1414,6 +1593,7 @@ def render_overview(
     ]
     top_occupations = top_ranked_values(occupation_mix, "occupation_scope")
     occupation_mix = compute_top_group_shares(occupation_mix, "occupation_scope", top_n=len(top_occupations))
+    occupation_mix["occupation_scope"] = occupation_mix["occupation_scope"].map(shorten_scope_label)
 
     coverage = apply_date_window(
         apply_selector_filters(tables["coverage_by_field_monthly"], province_scope, occupation_scope, industry_scope),
@@ -1422,6 +1602,7 @@ def render_overview(
     coverage = coverage.loc[coverage["field_name"].isin(["remunerationHrly", "noc", "remoteWorkOptions", "primaryPostingLanguage"])]
     coverage = latest_slice(coverage)
     coverage["coverage_pct"] = 100.0 * coverage["populated_postings"] / coverage["postings_total"].clip(lower=1)
+    coverage["field_name"] = coverage["field_name"].map(humanize_field_name)
     coverage = rank_and_limit(coverage, sort_col="coverage_pct", ascending=True, tie_breakers=["field_name"])
 
     share_col, occ_col = st.columns(2)
@@ -1571,7 +1752,9 @@ def render_occupations(
     latest_counts["share_pct"] = 100.0 * latest_counts["postings_total"] / latest_total
     trend_top = latest_counts.head(MAX_LIST_ITEMS)["occupation_scope"].tolist()
     trend_frame = compute_top_group_shares(trend, "occupation_scope", top_n=len(trend_top))
+    trend_frame["occupation_scope"] = trend_frame["occupation_scope"].map(shorten_scope_label)
     change_table = recent_vs_prior(trend, "occupation_scope").head(MAX_LIST_ITEMS)
+    change_table["occupation_scope"] = change_table["occupation_scope"].map(shorten_scope_label)
 
     mix_frame = frame.loc[frame["province_scope"] != ALL_CANADA].copy()
     mix_frame = summarize_selected_window(mix_frame, ["province_scope", "occupation_scope"])
@@ -1589,6 +1772,7 @@ def render_occupations(
         .fillna(0)
         .round(1)
     )
+    mix_pivot.columns = [shorten_scope_label(c) for c in mix_pivot.columns]
 
     hhi, top5_share = concentration_metrics(latest_counts)
     indicator_col, change_col = st.columns([1, 2])
@@ -1661,6 +1845,7 @@ def render_industries(
     national_trend["share_in_coded_pct"] = 100.0 * national_trend["postings_total"] / national_trend["industry_coded_postings"].clip(lower=1)
     top_industries = top_ranked_values(national_trend, "industry_scope")
     national_trend = national_trend.loc[national_trend["industry_scope"].isin(top_industries)]
+    national_trend["industry_scope"] = national_trend["industry_scope"].map(shorten_scope_label)
     coverage_series = national_denom.copy()
     coverage_series["coverage_pct"] = 100.0 * coverage_series["industry_coded_postings"] / coverage_series["all_postings_total"].clip(lower=1)
 
@@ -1673,6 +1858,7 @@ def render_industries(
     ).rename(columns={"industry_coded_postings": "province_coded_total"})
     province_mix = province_mix.merge(province_denoms, on="province_scope", how="left")
     province_mix["share_in_coded_pct"] = 100.0 * province_mix["postings_total"] / province_mix["province_coded_total"].clip(lower=1)
+    province_mix["industry_scope"] = province_mix["industry_scope"].map(shorten_scope_label)
     province_mix = rank_and_limit(province_mix, sort_col="postings_total", tie_breakers=["province_scope", "industry_scope"])
 
     change_table = recent_vs_prior(
@@ -1735,6 +1921,7 @@ def render_industries(
                     "province_scope": "Province",
                     "industry_scope": "Industry group",
                     "postings_total": "Industry-coded postings",
+                    "province_coded_total": "Province coded total",
                     "share_in_coded_pct": "Share within coded postings (%)",
                 },
             )
@@ -1783,7 +1970,7 @@ def render_compensation_and_conditions(
             show_empty("Wage coverage series is empty for the current filters.")
         else:
             plot_chart(
-                make_line_chart(denominator_frame, x="month", y="wage_coverage_pct", title="Wage coverage in the same filtered denominator"),
+                make_line_chart(denominator_frame, x="month", y="wage_coverage_pct", title="Wage coverage over time"),
                 key="compensation-wage-coverage",
             )
     st.caption(
@@ -1811,6 +1998,7 @@ def render_compensation_and_conditions(
         (wage_occupation["occupation_scope"] != ALL_OCCUPATIONS)
         & (wage_occupation["occupation_scope"] != UNKNOWN_OCCUPATION_GROUP)
     ]
+    wage_occupation["occupation_scope"] = wage_occupation["occupation_scope"].map(shorten_scope_label)
     wage_occupation = rank_and_limit(
         latest_slice(wage_occupation),
         sort_col="wage_median",
@@ -1835,7 +2023,7 @@ def render_compensation_and_conditions(
                     wage_occupation,
                     x="occupation_scope",
                     y="wage_median",
-                    title="Latest-month wage median by broad occupation",
+                    title="Wage median by occupation",
                     orientation="h",
                 ),
                 key="compensation-wage-by-occupation",
@@ -1995,6 +2183,8 @@ def render_quality(
     )
     coverage = latest_slice(coverage)
     coverage["coverage_pct"] = 100.0 * coverage["populated_postings"] / coverage["postings_total"].clip(lower=1)
+    coverage["field_name"] = coverage["field_name"].map(humanize_field_name)
+    coverage["coverage_pct"] = coverage["coverage_pct"].round(1)
     coverage = rank_and_limit(coverage, sort_col="coverage_pct", ascending=True, tie_breakers=["field_name"])
 
     language = apply_date_window(
