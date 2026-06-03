@@ -6,6 +6,7 @@ from html import escape
 import os
 from pathlib import Path
 
+import duckdb
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -17,6 +18,7 @@ from .metrics import format_int, format_pct, safe_pct, summarize_headlines
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_DATA_ROOT = REPO_ROOT / "data" / "derived" / "labor_market_dashboard_v1"
+POSTING_LOOKUP_FILE = "posting_lookup.parquet"
 
 COMPARISON_MONTHS = 3
 MAX_LIST_ITEMS = 10
@@ -138,6 +140,8 @@ GLOBAL_STYLES = f"""
   --aclmr-border: {THEME.card_border};
   --aclmr-shadow: {THEME.shadow};
   --aclmr-gradient: {THEME.gradient};
+  --aclmr-sidebar-width: min(22rem, 88vw);
+  --aclmr-filter-toggle-z: 2147483500;
 }}
 
 .stApp {{
@@ -146,18 +150,25 @@ GLOBAL_STYLES = f"""
   background: var(--aclmr-white);
   color: var(--aclmr-text);
   font-family: "PT Sans", sans-serif;
-  overflow: visible !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }}
 
 
 
 html,
-body,
+body {{
+  min-height: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}}
+
 [data-testid="stAppViewContainer"],
 [data-testid="stAppViewContainer"] > section,
 [data-testid="stAppViewContainer"] .main {{
-  height: auto !important;
-  overflow: visible !important;
+  min-width: 0 !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
 }}
 
 [data-testid="stAppViewContainer"] > .main {{
@@ -170,12 +181,33 @@ body,
   background-attachment: scroll !important;
   position: relative;
   z-index: 1;
+  overflow-y: auto !important;
+}}
+
+[data-testid="stMain"] {{
+  transition:
+    margin-left 180ms ease,
+    width 180ms ease,
+    max-width 180ms ease;
+}}
+
+body:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="stMain"] {{
+  margin-left: var(--aclmr-sidebar-width) !important;
+  width: calc(100vw - var(--aclmr-sidebar-width)) !important;
+  max-width: calc(100vw - var(--aclmr-sidebar-width)) !important;
+}}
+
+body:has(section[data-testid="stSidebar"][aria-expanded="false"]) [data-testid="stMain"],
+body:not(:has(section[data-testid="stSidebar"][aria-expanded="true"])) [data-testid="stMain"] {{
+  margin-left: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
 }}
 
 [data-testid="stAppViewContainer"] {{
   position: relative !important;
   min-height: 100vh;
-  overflow: visible !important;
+  overflow-x: hidden !important;
   background: var(--aclmr-canvas) !important;
 }}
 
@@ -196,10 +228,39 @@ h1, h2, h3, h4, h5, h6, p, span, label {{
 
 [data-testid="stHeader"] {{
   background: transparent;
-  height: 0;
+  height: 0 !important;
+  pointer-events: auto;
 }}
 
-[data-testid="stToolbar"],
+[data-testid="stToolbar"] {{
+  display: flex !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: visible !important;
+  pointer-events: none;
+  background: transparent !important;
+}}
+
+#codex-browser-sidebar-comments-root {{
+  pointer-events: none !important;
+}}
+
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"] {{
+  position: fixed !important;
+  top: 0.75rem !important;
+  left: 0.85rem !important;
+  z-index: var(--aclmr-filter-toggle-z) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 7.6rem !important;
+  height: 2.625rem !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}}
+
 [data-testid="stMainMenuButton"],
 [data-testid="stBaseButton-header"] {{
   display: none !important;
@@ -207,23 +268,29 @@ h1, h2, h3, h4, h5, h6, p, span, label {{
 
 [data-testid="stBaseButton-headerNoPadding"],
 [data-testid="stExpandSidebarButton"] {{
-  position: fixed;
-  top: 0.75rem;
-  left: 0.85rem;
-  z-index: 1000;
+  position: fixed !important;
+  top: 0.75rem !important;
+  left: 0.85rem !important;
+  z-index: 2147483501 !important;
   display: inline-flex !important;
-  margin-left: 0.4rem;
-  margin-top: 0.4rem;
+  margin: 0 !important;
   padding: 0.5rem 0.85rem;
-  min-width: auto !important;
-  width: auto !important;
-  height: auto !important;
+  box-sizing: border-box !important;
+  min-width: 7.6rem !important;
+  width: 7.6rem !important;
+  min-height: 2.625rem !important;
+  height: 2.625rem !important;
   border-radius: 999px;
   border: 1px solid rgba(195, 158, 128, 0.38);
   background: rgba(6, 31, 47, 0.92);
   box-shadow: var(--aclmr-shadow);
   color: transparent !important;
   font-size: 0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  align-items: center;
+  justify-content: center;
 }}
 
 [data-testid="stBaseButton-headerNoPadding"]::after,
@@ -236,6 +303,55 @@ h1, h2, h3, h4, h5, h6, p, span, label {{
   text-transform: uppercase;
 }}
 
+[data-testid="stExpandSidebarButton"]::after {{
+  content: "Open filters";
+}}
+
+[data-testid="stSidebarCollapsedControl"] [data-testid="stBaseButton-headerNoPadding"]::after {{
+  content: "Open filters";
+}}
+
+[data-testid="stSidebarCollapseButton"] [data-testid="stBaseButton-headerNoPadding"]::after {{
+  content: "Close filters";
+}}
+
+[data-testid="stExpandSidebarButton"] {{
+  z-index: 2147483501 !important;
+}}
+
+body:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="stExpandSidebarButton"] {{
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}}
+
+body:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="stSidebarCollapsedControl"] {{
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}}
+
+body:has(section[data-testid="stSidebar"][aria-expanded="false"]) [data-testid="stSidebarCollapseButton"],
+body:not(:has(section[data-testid="stSidebar"][aria-expanded="true"])) [data-testid="stSidebarCollapseButton"] {{
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}}
+
+[data-testid="stMainMenu"] [data-testid="stBaseButton-headerNoPadding"],
+body:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="stSidebarCollapsedControl"] [data-testid="stBaseButton-headerNoPadding"] {{
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}}
+
+[data-testid="stBaseButton-headerNoPadding"] > span,
+[data-testid="stBaseButton-headerNoPadding"] [data-testid="stIconMaterial"],
+[data-testid="stExpandSidebarButton"] > span,
+[data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"] {{
+  display: none !important;
+}}
+
 section[data-testid="stSidebar"] {{
   background:
     linear-gradient(180deg, rgba(4, 28, 44, 0.96), rgba(6, 31, 47, 0.92)),
@@ -243,6 +359,59 @@ section[data-testid="stSidebar"] {{
   border-right: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
   z-index: 2;
+}}
+
+section[data-testid="stSidebar"] > div {{
+  padding: 3.95rem 1rem 0.85rem !important;
+  overflow: hidden !important;
+}}
+
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{
+  gap: 0.46rem !important;
+}}
+
+section[data-testid="stSidebar"][aria-expanded="false"] {{
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  flex-basis: 0 !important;
+  overflow: hidden !important;
+  border-right: 0 !important;
+}}
+
+section[data-testid="stSidebar"][aria-expanded="false"] > div {{
+  width: 0 !important;
+  min-width: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}}
+
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stBaseButton-headerNoPadding"] {{
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}}
+
+section[data-testid="stSidebar"][aria-expanded="true"] {{
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: min(22rem, 88vw) !important;
+  min-width: min(22rem, 88vw) !important;
+  max-width: min(22rem, 88vw) !important;
+  height: 100vh !important;
+  z-index: 1001 !important;
+  overflow: hidden !important;
+  box-shadow: 16px 0 40px rgba(0, 0, 0, 0.24);
+}}
+
+section[data-testid="stSidebar"][aria-expanded="true"] > div {{
+  width: 100% !important;
+  min-width: 100% !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }}
 
 section[data-testid="stSidebar"] button[kind="headerNoPadding"],
@@ -257,16 +426,40 @@ section[data-testid="stSidebar"] * {{
 }}
 
 section[data-testid="stSidebar"] [data-baseweb="select"] > div,
-section[data-testid="stSidebar"] .stSlider,
 section[data-testid="stSidebar"] input {{
   background: rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  padding: 0.35rem 0.65rem;
-  font-size: 0.92rem;
+  padding: 0.35rem 0.65rem 0.5rem;
+  font-size: 0.88rem;
+}}
+
+section[data-testid="stSidebar"] .stSlider {{
+  margin: 0 !important;
+  padding: 0.7rem 0.7rem 0.55rem !important;
+  overflow: visible !important;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(195, 158, 128, 0.42);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+}}
+
+section[data-testid="stSidebar"] .stSlider [data-testid="stWidgetLabel"],
+section[data-testid="stSidebar"] [data-testid="stSliderTickBar"],
+section[data-testid="stSidebar"] [data-testid="stSliderThumbValue"] {{
+  display: none !important;
+  visibility: hidden !important;
+}}
+
+section[data-testid="stSidebar"] [data-baseweb="slider"] {{
+  margin: 0.25rem 0.16rem 0.05rem;
+}}
+
+section[data-testid="stSidebar"] [data-baseweb="slider"] [aria-hidden="true"] {{
+  display: none !important;
 }}
 
 section[data-testid="stSidebar"] label {{
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -276,11 +469,38 @@ section[data-testid="stSidebar"] [data-baseweb="select"] > div {{
   border: 1px solid rgba(195, 158, 128, 0.58) !important;
   background: rgba(255, 255, 255, 0.07) !important;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-  min-height: 3rem;
+  align-items: center !important;
+  min-height: 4rem !important;
+  height: 4rem !important;
+  overflow: visible !important;
+  padding: 0 0.68rem !important;
 }}
 
 section[data-testid="stSidebar"] [data-baseweb="select"] [role="combobox"] {{
+  align-items: center !important;
   color: #fff !important;
+  display: flex !important;
+  min-height: 3rem !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}}
+
+section[data-testid="stSidebar"] [data-baseweb="select"] [role="combobox"] > div {{
+  align-items: center !important;
+  display: flex !important;
+  min-height: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}}
+
+section[data-testid="stSidebar"] [data-baseweb="select"] [role="combobox"] span {{
+  display: block !important;
+  line-height: 1.22 !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }}
 
 section[data-testid="stSidebar"] [data-baseweb="select"] [data-baseweb="tag"],
@@ -292,6 +512,7 @@ section[data-testid="stSidebar"] [data-baseweb="select"] * {{
 
 section[data-testid="stSidebar"] [data-baseweb="select"] svg {{
   color: rgba(255, 255, 255, 0.82) !important;
+  flex: 0 0 auto !important;
 }}
 
 section[data-testid="stSidebar"] [data-baseweb="slider"] > div > div > div:last-child {{
@@ -308,8 +529,73 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
   box-shadow: 0 0 0 4px rgba(207, 119, 48, 0.16);
 }}
 
+.aclmr-sidebar-range {{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin: 0.3rem 0 0.52rem;
+  padding: 0.45rem 0.62rem;
+  border-radius: 999px;
+  border: 1px solid rgba(195, 158, 128, 0.35);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.8rem;
+}}
+
+.aclmr-date-header {{
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.1rem 0 0;
+  padding: 0.62rem 0.72rem 0.52rem;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid rgba(195, 158, 128, 0.42);
+  border-bottom: 0;
+  background: rgba(255, 255, 255, 0.08);
+}}
+
+.aclmr-date-header strong {{
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}}
+
+.aclmr-date-value {{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.65rem;
+  border-radius: 999px;
+  background: rgba(6, 31, 47, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0.18rem 0.36rem;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+}}
+
+.aclmr-sidebar-range strong {{
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}}
+
+.aclmr-sidebar-range span {{
+  color: #fff;
+  font-weight: 700;
+  white-space: nowrap;
+}}
+
 .aclmr-sidebar-brand {{
-  padding: 0.5rem 0 1rem;
+  padding: 0 0 0.42rem;
 }}
 
 .aclmr-sidebar-kicker {{
@@ -318,11 +604,11 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.72);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.45rem;
 }}
 
 .aclmr-sidebar-brand h2 {{
-  font-size: 1.45rem;
+  font-size: 1.32rem;
   line-height: 1.05;
   margin: 0;
   color: #fff;
@@ -330,9 +616,9 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
 
 .aclmr-sidebar-brand p {{
   color: rgba(255, 255, 255, 0.78);
-  font-size: 0.95rem;
-  line-height: 1.4;
-  margin: 0.8rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  margin: 0.55rem 0 0;
 }}
 
 .aclmr-hero {{
@@ -545,9 +831,9 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
 
 .stTabs [data-baseweb="tab-list"] {{
   gap: 0.35rem;
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
   align-items: stretch;
   background: rgba(4, 28, 44, 0.98);
   padding: 0.5rem;
@@ -562,8 +848,8 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
 }}
 
 .stTabs [data-baseweb="tab"] {{
-  width: auto;
-  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
   border-radius: 999px;
   padding: 0.72rem 1.05rem;
   min-height: 2.5rem;
@@ -572,9 +858,14 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
   text-align: center;
   line-height: 1.18;
+  justify-content: center;
+}}
+
+.stTabs [data-baseweb="tab-highlight"] {{
+  display: none !important;
 }}
 
 .stTabs [aria-selected="true"] {{
@@ -714,24 +1005,19 @@ div[data-testid="stAlert"] svg {{
 
 div[data-testid="stTable"] {{
   padding: 0.25rem 0.85rem 0.8rem;
-  overflow: auto !important;
+  overflow: hidden !important;
 }}
 
 div[data-testid="stTable"] th:nth-child(2),
 div[data-testid="stTable"] td:nth-child(2) {{
-  min-width: 250px;
-  max-width: 350px;
+  min-width: 0;
+  max-width: none;
 }}
 
 div[data-testid="stTable"] table {{
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-}}
-
-div[data-testid="stTable"] thead tr th:first-child,
-div[data-testid="stTable"] tbody tr th:first-child,
-div[data-testid="stTable"] tbody tr td:first-child {{
-  display: none;
 }}
 
 div[data-testid="stTable"] thead tr {{
@@ -744,11 +1030,15 @@ div[data-testid="stTable"] th {{
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }}
 
 div[data-testid="stTable"] td {{
   color: var(--aclmr-text);
   font-size: 0.92rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }}
 
 div[data-testid="stCaptionContainer"] p,
@@ -878,18 +1168,18 @@ div[data-testid="stCaptionContainer"] p,
   }}
 
   .stTabs [data-baseweb="tab-list"] {{
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
     border-radius: 24px;
     padding-bottom: 0.35rem;
   }}
 
   .stTabs [data-baseweb="tab"] {{
-    width: auto;
-    min-width: 172px;
-    font-size: 0.74rem;
-    padding: 0.7rem 0.85rem;
+    width: 100%;
+    min-width: 0;
+    font-size: 0.7rem;
+    padding: 0.62rem 0.7rem;
   }}
 
   section[data-testid="stSidebar"][aria-expanded="false"] {{
@@ -931,6 +1221,14 @@ div[data-testid="stCaptionContainer"] p,
     min-width: 100% !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+  }}
+
+  body:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="stMain"],
+  body:has(section[data-testid="stSidebar"][aria-expanded="false"]) [data-testid="stMain"],
+  body:not(:has(section[data-testid="stSidebar"][aria-expanded="true"])) [data-testid="stMain"] {{
+    margin-left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
   }}
 }}
 </style>
@@ -978,6 +1276,83 @@ def resolve_data_root() -> Path:
     return Path(os.environ.get("JOBADS_DASHBOARD_DATA_ROOT", str(DEFAULT_DATA_ROOT)))
 
 
+@st.cache_data(show_spinner=False)
+def query_posting_lookup(
+    data_root: str,
+    *,
+    start_date: str,
+    end_date: str,
+    province_scope: str,
+    occupation_scope: str,
+    industry_scope: str,
+    search_term: str,
+    limit: int,
+) -> pd.DataFrame:
+    path = Path(data_root) / POSTING_LOOKUP_FILE
+    if not path.exists() or path.stat().st_size == 0:
+        return pd.DataFrame()
+
+    where = ["date_found BETWEEN ? AND ?"]
+    params: list[object] = [start_date, end_date]
+    if province_scope != ALL_CANADA:
+        where.append("province_scope = ?")
+        params.append(province_scope)
+    if occupation_scope != ALL_OCCUPATIONS:
+        where.append("occupation_scope = ?")
+        params.append(occupation_scope)
+    if industry_scope != ALL_INDUSTRIES:
+        where.append("industry_scope = ?")
+        params.append(industry_scope)
+
+    term = search_term.strip().lower()
+    if term:
+        pattern = f"%{term}%"
+        where.append(
+            """
+            (
+                lower(coalesce(posting_id, '')) LIKE ?
+                OR lower(coalesce(job_title, '')) LIKE ?
+                OR lower(coalesce(employer, '')) LIKE ?
+                OR lower(coalesce(market, '')) LIKE ?
+                OR lower(coalesce(noc_label, '')) LIKE ?
+                OR lower(coalesce(naics_label, '')) LIKE ?
+                OR lower(coalesce(description_excerpt, '')) LIKE ?
+            )
+            """
+        )
+        params.extend([pattern] * 7)
+
+    query = f"""
+SELECT
+    posting_id,
+    date_found,
+    job_title,
+    employer,
+    province_scope,
+    market,
+    occupation_scope,
+    industry_scope,
+    wage_hourly,
+    employment_type,
+    duration,
+    experience,
+    education,
+    remote_class,
+    data_source,
+    has_description,
+    description_excerpt
+FROM read_parquet(?)
+WHERE {' AND '.join(where)}
+ORDER BY date_found DESC, posting_id DESC
+LIMIT ?
+"""
+    con = duckdb.connect()
+    result = con.execute(query, [path.as_posix(), *params, int(limit)]).df()
+    if "date_found" in result.columns:
+        result["date_found"] = pd.to_datetime(result["date_found"])
+    return result
+
+
 def month_label(value: pd.Timestamp | str | None) -> str:
     if value is None:
         return "n/a"
@@ -1010,15 +1385,15 @@ def render_dashboard_shell(
         f"""
         <section class="aclmr-hero">
           <div class="aclmr-hero__copy">
-            <div class="aclmr-kicker">ACLMR dashboard surface</div>
+            <div class="aclmr-kicker">Canadian job postings</div>
             <h1>Labour demand in Canadian job postings</h1>
             <p>
-              A descriptive, economics-driven monitoring surface for Vicinity job ads,
-              redesigned to feel like ACLMR while keeping the dashboard useful for operators and researchers.
+              Track how job postings change over time by location, occupation, industry,
+              wages, and job requirements.
             </p>
             <div class="aclmr-chip-row">
               <span class="aclmr-chip"><strong>Window</strong> {escape(window_start)} to {escape(window_end)}</span>
-              <span class="aclmr-chip"><strong>Refresh</strong> {escape(refresh_month)}</span>
+              <span class="aclmr-chip"><strong>Updated</strong> {escape(refresh_month)}</span>
               <span class="aclmr-chip"><strong>Frame</strong> Postings, not employment</span>
             </div>
           </div>
@@ -1030,26 +1405,26 @@ def render_dashboard_shell(
                 <span></span><span></span><span></span><span></span>
                 <span></span><span></span><span></span><span></span>
               </div>
-              <div class="aclmr-callout-title">Research frame</div>
+              <div class="aclmr-callout-title">How to read this dashboard</div>
               <p>
-                Read the dashboard as a disciplined summary of posted labour demand, with
-                explicit coverage caveats and cautious freshness messaging.
+                Counts show job postings, not employment. Use the trends and shares to
+                compare where posted hiring demand is changing.
               </p>
               <div class="aclmr-callout-grid">
                 <div class="aclmr-statbox">
                   <div class="aclmr-statbox-label">Months in view</div>
                   <div class="aclmr-statbox-value">{months_in_window(date_window)}</div>
-                  <div class="aclmr-statbox-note">Selected analysis window.</div>
+                  <div class="aclmr-statbox-note">Months selected.</div>
                 </div>
                 <div class="aclmr-statbox">
-                  <div class="aclmr-statbox-label">Source window</div>
+                  <div class="aclmr-statbox-label">First month</div>
                   <div class="aclmr-statbox-value">{escape(month_label(source_window.get("min_date")))}</div>
-                  <div class="aclmr-statbox-note">Beginning of processed coverage.</div>
+                  <div class="aclmr-statbox-note">Earliest month in the dashboard.</div>
                 </div>
                 <div class="aclmr-statbox">
-                  <div class="aclmr-statbox-label">Latest source month</div>
+                  <div class="aclmr-statbox-label">Latest month</div>
                   <div class="aclmr-statbox-value">{escape(refresh_month)}</div>
-                  <div class="aclmr-statbox-note">Upstream endpoint, still caveat-aware.</div>
+                  <div class="aclmr-statbox-note">Most recent month in the dashboard.</div>
                 </div>
               </div>
             </div>
@@ -1058,7 +1433,7 @@ def render_dashboard_shell(
         <section class="aclmr-filter-ribbon">
           <div class="aclmr-filter-ribbon__title">Active filters</div>
           <div class="aclmr-filter-ribbon__body">
-            <span class="aclmr-filter-pill"><strong>Geography</strong> {escape(compact_scope_label(province_scope, ALL_CANADA, "National frame"))}</span>
+            <span class="aclmr-filter-pill"><strong>Geography</strong> {escape(compact_scope_label(province_scope, ALL_CANADA, "All Canada"))}</span>
             <span class="aclmr-filter-pill"><strong>Occupation</strong> {escape(compact_scope_label(occupation_scope, ALL_OCCUPATIONS, "All occupations"))}</span>
             <span class="aclmr-filter-pill"><strong>Industry</strong> {escape(compact_scope_label(industry_scope, ALL_INDUSTRIES, "All industries"))}</span>
           </div>
@@ -1073,11 +1448,11 @@ def render_footer_note(metadata: dict) -> None:
     st.markdown(
         f"""
         <section class="aclmr-footer">
-          <h3>Interpret with labour-market caution</h3>
+          <h3>About the data</h3>
           <p>
-            Latest processed month: {escape(max_date)}. The dashboard summarizes posting activity in Vicinity data.
-            Wage, remote-work, language, and detailed requirement fields still need denominator context, and 2025 provenance
-            remains a visible caution rather than a hidden footnote.
+            Data are available through {escape(max_date)}. Counts are job postings. Wage,
+            remote-work, language, and requirement charts use only postings where those
+            fields are available.
           </p>
         </section>
         """,
@@ -1117,7 +1492,7 @@ def render_data_bundle_error(data_root: Path, error: DashboardDataError) -> None
         st.markdown("**Unreadable bundle files**")
         st.code("\n".join(error.read_errors), language="text")
     st.caption(
-        "This app reads only from the local derived dashboard bundle; it does not fall back to scanning the upstream processed corpus at runtime."
+        "The dashboard uses prebuilt tables so the page can load quickly."
     )
 
 
@@ -1277,7 +1652,7 @@ def make_bar_chart(
 def plot_chart(fig: go.Figure, key: str | None = None) -> None:
     st.plotly_chart(
         fig,
-        use_container_width=True,
+        width="stretch",
         theme=None,
         key=key,
         config={"displaylogo": False, "displayModeBar": False, "responsive": True},
@@ -1287,11 +1662,13 @@ def plot_chart(fig: go.Figure, key: str | None = None) -> None:
 def show_table(frame: pd.DataFrame) -> None:
     display = frame.reset_index(drop=True).copy()
     for col in display.columns:
-        if pd.api.types.is_float_dtype(display[col]):
+        if pd.api.types.is_datetime64_any_dtype(display[col]):
+            display[col] = pd.to_datetime(display[col]).dt.strftime("%Y-%m")
+        elif pd.api.types.is_float_dtype(display[col]):
             display[col] = display[col].apply(lambda v: f"{v:,.1f}" if pd.notna(v) else "—")
         elif pd.api.types.is_integer_dtype(display[col]):
             display[col] = display[col].apply(lambda v: f"{v:,}" if pd.notna(v) else "—")
-    st.table(display)
+    st.table(display.style.hide(axis="index"))
 
 
 def show_empty(message: str) -> None:
@@ -1547,7 +1924,7 @@ def render_overview(
             ("Wage coverage", format_pct(safe_pct(latest["wage_postings"], latest["postings_total"]))),
             ("Occupation coverage", format_pct(safe_pct(latest["noc_postings"], latest["postings_total"]))),
             ("Province count covered", format_int(latest_province_count)),
-            ("Latest refresh month", metadata.get("source_window", {}).get("max_date", "n/a")[:7]),
+            ("Latest month", metadata.get("source_window", {}).get("max_date", "n/a")[:7]),
         ],
         columns=3,
     )
@@ -1721,6 +2098,299 @@ def render_geography(
                     },
                 )
             )
+
+
+def render_explore(
+    tables: dict[str, pd.DataFrame],
+    metadata: dict,
+    data_root: Path,
+    date_window: tuple[pd.Timestamp, pd.Timestamp],
+    province_scope: str,
+    occupation_scope: str,
+    industry_scope: str,
+) -> None:
+    section_header(
+        "Curated query workspace",
+        "Ask common aggregate questions from the local dashboard bundle. This page does not expose raw postings, raw text, or arbitrary SQL.",
+    )
+    st.caption("Choose a common question below. Results update using the filters in the sidebar.")
+
+    query_options = {
+        "Posting trend": "Monthly posting activity for the selected scope.",
+        "Top local markets": "Largest local markets in the selected window.",
+        "Top occupation groups": "Broad NOC groups ranked by postings.",
+        "Top industry groups": "Broad NAICS sectors ranked by postings.",
+        "Advertised wage coverage": "Latest wage coverage and median advertised hourly wage where available.",
+        "Field coverage": "How often key fields are available in the selected data.",
+        "Specific postings": "Search individual postings in the private lookup index.",
+    }
+    selected_query = st.selectbox(
+        "Question",
+        options=list(query_options),
+        help="Choose one of the dashboard's common questions.",
+    )
+    st.info(query_options[selected_query])
+
+    source_window = metadata.get("source_window", {})
+    render_metric_rows(
+        [
+            ("Selected window", f"{month_label(pd.Timestamp(date_window[0]))} to {month_label(pd.Timestamp(date_window[1]))}"),
+            ("Latest month", month_label(source_window.get("max_date"))),
+            ("Result type", "Posting lookup" if selected_query == "Specific postings" else "Aggregates only"),
+        ],
+        columns=3,
+    )
+
+    if selected_query == "Specific postings":
+        lookup_path = data_root / POSTING_LOOKUP_FILE
+        if not lookup_path.exists() or lookup_path.stat().st_size == 0:
+            st.warning(
+                "Posting lookup is not built yet. Run `jobads-dashboard posting-lookup` on the private deployment host, then reload the app."
+            )
+            st.code(
+                "\n".join(
+                    [
+                        "jobads-dashboard posting-lookup \\",
+                        "  --source-root /Volumes/ACLMR/jobads-data/main/data/processed \\",
+                        "  --output-root /Volumes/ACLMR/jobads-dashboard/data/derived/labor_market_dashboard_v1",
+                    ]
+                ),
+                language="bash",
+            )
+            return
+
+        search_term = st.text_input(
+            "Posting search",
+            placeholder="Search posting ID, title, employer, market, occupation, industry, or description excerpt",
+        )
+        row_limit = st.selectbox("Rows to show", options=[10, 25, 50, 100], index=1)
+        result = query_posting_lookup(
+            str(data_root),
+            start_date=pd.Timestamp(date_window[0]).strftime("%Y-%m-%d"),
+            end_date=pd.Timestamp(date_window[1]).strftime("%Y-%m-%d"),
+            province_scope=province_scope,
+            occupation_scope=occupation_scope,
+            industry_scope=industry_scope,
+            search_term=search_term,
+            limit=int(row_limit),
+        )
+        if result.empty:
+            show_empty("No indexed postings match the current filters and search term.")
+            return
+
+        table_cols = [
+            "posting_id",
+            "date_found",
+            "job_title",
+            "employer",
+            "province_scope",
+            "market",
+            "occupation_scope",
+            "industry_scope",
+            "wage_hourly",
+            "data_source",
+        ]
+        show_table(
+            rename_for_display(
+                result[table_cols],
+                {
+                    "posting_id": "Posting ID",
+                    "date_found": "Date",
+                    "job_title": "Title",
+                    "employer": "Employer",
+                    "province_scope": "Province",
+                    "market": "Market",
+                    "occupation_scope": "Occupation",
+                    "industry_scope": "Industry",
+                    "wage_hourly": "Hourly wage",
+                    "data_source": "Source",
+                },
+            )
+        )
+
+        detail_options = {
+            f"{row.posting_id} | {str(row.job_title)[:70]} | {str(row.employer)[:45]}": idx
+            for idx, row in result.iterrows()
+        }
+        selected_detail = st.selectbox("Inspect posting", options=list(detail_options))
+        detail = result.loc[detail_options[selected_detail]]
+        st.markdown("#### Posting details")
+        detail_left, detail_right = st.columns(2)
+        with detail_left:
+            st.markdown(f"**Posting ID:** `{escape(str(detail['posting_id']))}`")
+            st.markdown(f"**Title:** {escape(str(detail['job_title']))}")
+            st.markdown(f"**Employer:** {escape(str(detail['employer']))}")
+            st.markdown(f"**Date:** {month_label(pd.Timestamp(detail['date_found']))}")
+        with detail_right:
+            st.markdown(f"**Market:** {escape(str(detail['province_scope']))} | {escape(str(detail['market']))}")
+            st.markdown(f"**Occupation:** {escape(str(detail['occupation_scope']))}")
+            st.markdown(f"**Industry:** {escape(str(detail['industry_scope']))}")
+            st.markdown(f"**Has description:** {'yes' if bool(detail['has_description']) else 'no'}")
+        excerpt = str(detail.get("description_excerpt") or "").strip()
+        if excerpt:
+            st.text_area("Description excerpt", value=excerpt, height=180, disabled=True)
+        else:
+            st.caption("No description excerpt is available for this indexed posting.")
+        st.caption("This private view shows a bounded excerpt for inspection, not a bulk raw-text export.")
+        return
+
+    if selected_query == "Posting trend":
+        frame = apply_date_window(
+            apply_selector_filters(tables["monthly_filter_cube"], province_scope, occupation_scope, industry_scope),
+            date_window,
+        )
+        frame = frame.groupby("month", as_index=False)["postings_total"].sum().sort_values("month")
+        if frame.empty:
+            show_empty("No monthly postings match the selected scope.")
+            return
+        plot_chart(
+            make_line_chart(frame, x="month", y="postings_total", title="Monthly postings for selected scope"),
+            key="explore-posting-trend",
+        )
+        show_table(rename_for_display(frame.tail(MAX_LIST_ITEMS), {"month": "Month", "postings_total": "Postings"}))
+        return
+
+    if selected_query == "Top local markets":
+        frame = apply_date_window(
+            apply_selector_filters(tables["monthly_by_market"], province_scope, occupation_scope, industry_scope),
+            date_window,
+        )
+        result = compute_market_concentration_summary(frame)
+        if result.empty:
+            show_empty("No local-market rows match the selected scope.")
+            return
+        label_col = "market_label" if province_scope == ALL_CANADA else "market"
+        plot_chart(
+            make_bar_chart(result, x=label_col, y="postings_total", title="Top local markets", orientation="h"),
+            key="explore-top-markets",
+        )
+        show_table(
+            rename_for_display(
+                result,
+                {
+                    "market_province": "Province",
+                    "market": "Market",
+                    "market_label": "National label",
+                    "postings_total": "Postings",
+                    "window_share_pct": "Selected-window share (%)",
+                    "cumulative_share_pct": "Cumulative share (%)",
+                },
+            )
+        )
+        return
+
+    if selected_query == "Top occupation groups":
+        frame = apply_date_window(
+            apply_selector_filters(tables["monthly_filter_cube"], province_scope, None, industry_scope),
+            date_window,
+        )
+        frame = frame.loc[
+            (frame["occupation_scope"] != ALL_OCCUPATIONS)
+            & (frame["occupation_scope"] != UNKNOWN_OCCUPATION_GROUP)
+        ]
+        result = rank_and_limit(
+            summarize_selected_window(frame, ["occupation_scope"]),
+            sort_col="postings_total",
+            tie_breakers=["occupation_scope"],
+        )
+        if result.empty:
+            show_empty("No occupation rows match the selected scope.")
+            return
+        result["occupation_scope"] = result["occupation_scope"].map(shorten_scope_label)
+        plot_chart(
+            make_bar_chart(result, x="occupation_scope", y="postings_total", title="Top occupation groups", orientation="h"),
+            key="explore-top-occupations",
+        )
+        show_table(rename_for_display(result, {"occupation_scope": "Occupation group", "postings_total": "Postings"}))
+        return
+
+    if selected_query == "Top industry groups":
+        frame = apply_date_window(
+            apply_selector_filters(tables["monthly_filter_cube"], province_scope, occupation_scope, None),
+            date_window,
+        )
+        frame = frame.loc[
+            (frame["industry_scope"] != ALL_INDUSTRIES)
+            & (frame["industry_scope"] != UNKNOWN_INDUSTRY_GROUP)
+        ]
+        result = rank_and_limit(
+            summarize_selected_window(frame, ["industry_scope"]),
+            sort_col="postings_total",
+            tie_breakers=["industry_scope"],
+        )
+        if result.empty:
+            show_empty("No industry rows match the selected scope.")
+            return
+        result["industry_scope"] = result["industry_scope"].map(shorten_scope_label)
+        plot_chart(
+            make_bar_chart(result, x="industry_scope", y="postings_total", title="Top industry groups", orientation="h"),
+            key="explore-top-industries",
+        )
+        show_table(rename_for_display(result, {"industry_scope": "Industry group", "postings_total": "Postings"}))
+        return
+
+    if selected_query == "Advertised wage coverage":
+        frame = apply_date_window(
+            apply_selector_filters(tables["monthly_wage_cube"], province_scope, occupation_scope, industry_scope),
+            date_window,
+        ).sort_values("month")
+        posting_frame = apply_date_window(
+            apply_selector_filters(tables["monthly_filter_cube"], province_scope, occupation_scope, industry_scope),
+            date_window,
+        ).groupby("month", as_index=False)["postings_total"].sum()
+        frame = frame.groupby("month", as_index=False).agg(
+            wage_postings=("wage_postings", "sum"),
+            wage_median=("wage_median", "median"),
+        )
+        frame = frame.merge(posting_frame, on="month", how="left")
+        frame["wage_coverage_pct"] = 100.0 * frame["wage_postings"] / frame["postings_total"].clip(lower=1)
+        if frame.empty:
+            show_empty("No wage rows match the selected scope.")
+            return
+        plot_chart(
+            make_line_chart(frame, x="month", y="wage_coverage_pct", title="Advertised wage coverage"),
+            key="explore-wage-coverage",
+        )
+        show_table(
+            rename_for_display(
+                frame.tail(MAX_LIST_ITEMS),
+                {
+                    "month": "Month",
+                    "wage_postings": "Wage postings",
+                    "wage_median": "Median hourly wage",
+                    "postings_total": "Postings",
+                    "wage_coverage_pct": "Wage coverage (%)",
+                },
+            )
+        )
+        return
+
+    coverage = apply_date_window(
+        apply_selector_filters(tables["coverage_by_field_monthly"], province_scope, occupation_scope, industry_scope),
+        date_window,
+    )
+    coverage = latest_slice(coverage)
+    coverage["coverage_pct"] = 100.0 * coverage["populated_postings"] / coverage["postings_total"].clip(lower=1)
+    coverage["field_name"] = coverage["field_name"].map(humanize_field_name)
+    result = rank_and_limit(coverage, sort_col="coverage_pct", ascending=True, tie_breakers=["field_name"])
+    if result.empty:
+        show_empty("No field-coverage rows match the selected scope.")
+        return
+    plot_chart(
+        make_bar_chart(result, x="field_name", y="coverage_pct", title="Latest field coverage", orientation="h"),
+        key="explore-field-coverage",
+    )
+    show_table(
+        rename_for_display(
+            result[["field_name", "postings_total", "populated_postings", "coverage_pct"]],
+            {
+                "field_name": "Field",
+                "postings_total": "Postings",
+                "populated_postings": "Populated postings",
+                "coverage_pct": "Coverage (%)",
+            },
+        )
+    )
 
 
 def render_occupations(
@@ -2167,15 +2837,15 @@ def render_quality(
     industry_scope: str,
 ) -> None:
     section_header(
-        "Data Quality And Freshness",
-        "Coverage notes, freshness limits, and interpretation guardrails that keep the dashboard trustworthy.",
+        "Data Coverage",
+        "What is included, what is missing, and how to read fields with partial coverage.",
     )
     latest_processed = metadata.get("source_window", {}).get("max_date", "n/a")
     earliest_processed = metadata.get("source_window", {}).get("min_date", "n/a")
     cards = st.columns(3)
-    cards[0].metric("Latest processed month", latest_processed[:7] if isinstance(latest_processed, str) else "n/a")
-    cards[1].metric("Source window start", earliest_processed)
-    cards[2].metric("Source window end", latest_processed)
+    cards[0].metric("Latest month", latest_processed[:7] if isinstance(latest_processed, str) else "n/a")
+    cards[1].metric("First month", earliest_processed)
+    cards[2].metric("Last month", latest_processed)
 
     coverage = apply_date_window(
         apply_selector_filters(tables["coverage_by_field_monthly"], province_scope, occupation_scope, industry_scope),
@@ -2198,19 +2868,14 @@ def render_quality(
     notes_col, table_col = st.columns([1, 2])
     with notes_col:
         st.warning(
-            "Interpretation guardrail: postings measure hiring demand in the Vicinity data, not employment, unemployment, or total economy-wide vacancies."
-        )
-        st.info(
-            "2025 provenance note: the processed source currently runs through 2025-07, but the upstream 2025 raw-fetch provenance remains under audit."
+            "Posting counts show advertised hiring demand in this data, not employment, unemployment, or total vacancies."
         )
         st.caption(
-            "Wage coverage note: wage series describe only postings with hourly wage data in the same filtered denominator."
+            "Wage charts include only postings with hourly wage data."
         )
         st.caption(
-            "Remote and language availability note: remote-work and language fields are historically sparse and should be read as partial-coverage indicators."
+            "Remote-work and language fields are not available on every posting."
         )
-        for caveat in metadata.get("known_caveats", []):
-            st.markdown(f"- {caveat}")
     with table_col:
         if coverage.empty:
             show_empty("Coverage table is empty for the current filters.")
@@ -2308,22 +2973,56 @@ def main() -> None:
             <div class="aclmr-sidebar-brand">
               <div class="aclmr-sidebar-kicker">ACLMR</div>
               <h2>Job ads dashboard</h2>
-              <p>Use the controls below to set the research frame. The main page keeps the narrative and caveats visible.</p>
+              <p>Use the controls below to choose the months, places, occupations, and industries shown on the page.</p>
             </div>
             """,
             unsafe_allow_html=True,
         )
         st.subheader("Filters")
+        current_date_window = st.session_state.get("date_window", (min_month, max_month))
+        current_start = month_label(pd.Timestamp(current_date_window[0]))
+        current_end = month_label(pd.Timestamp(current_date_window[1]))
+        st.markdown(
+            f"""
+            <div class="aclmr-date-header">
+              <strong>Date range</strong>
+              <span class="aclmr-date-value">{escape(current_start)}</span>
+              <span class="aclmr-date-value">{escape(current_end)}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         date_window = st.slider(
             "Date range",
             min_value=min_month,
             max_value=max_month,
             value=(min_month, max_month),
             format="YYYY-MM",
+            key="date_window",
+            label_visibility="collapsed",
+        )
+        st.markdown(
+            f"""
+            <div class="aclmr-sidebar-range">
+              <strong>Selected</strong>
+              <span>{escape(month_label(pd.Timestamp(date_window[0])))} to {escape(month_label(pd.Timestamp(date_window[1])))}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
         province_scope = st.selectbox("Geography", options=province_options, index=province_options.index(ALL_CANADA))
-        occupation_scope = st.selectbox("Occupation group", options=occupation_options, index=occupation_options.index(ALL_OCCUPATIONS))
-        industry_scope = st.selectbox("Industry group", options=industry_options, index=industry_options.index(ALL_INDUSTRIES))
+        occupation_scope = st.selectbox(
+            "Occupation group",
+            options=occupation_options,
+            index=occupation_options.index(ALL_OCCUPATIONS),
+            format_func=shorten_scope_label,
+        )
+        industry_scope = st.selectbox(
+            "Industry group",
+            options=industry_options,
+            index=industry_options.index(ALL_INDUSTRIES),
+            format_func=shorten_scope_label,
+        )
         st.markdown("#### Notes")
         st.caption("Wages, remote-work fields, and language fields always require coverage context.")
         st.caption("Industry charts are shown relative to postings with usable industry codes.")
@@ -2338,6 +3037,7 @@ def main() -> None:
             "Industries",
             "Compensation and Conditions",
             "Skills, Education, and Requirements",
+            "Explore",
             "Data Quality",
         ]
     )
@@ -2355,6 +3055,8 @@ def main() -> None:
     with tabs[5]:
         render_requirements(tables, date_window, province_scope, occupation_scope, industry_scope)
     with tabs[6]:
+        render_explore(tables, metadata, data_root, date_window, province_scope, occupation_scope, industry_scope)
+    with tabs[7]:
         render_quality(tables, metadata, date_window, province_scope, occupation_scope, industry_scope)
 
     render_footer_note(metadata)

@@ -4,7 +4,7 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
-from jobads_dashboard.dashboard.prepare import discover_source_root, normalized_view_sql, validate_derived_package
+from jobads_dashboard.dashboard.prepare import SOURCE_GLOB, discover_source_root, normalized_view_sql, validate_derived_package
 
 
 def write_minimal_bundle(tmp_path: Path, source_glob: str | None = None, source_total: int = 3) -> None:
@@ -124,6 +124,23 @@ def test_validate_derived_package_uses_source_root_override_instead_of_stale_met
     assert result["validated"] is True
 
 
+def test_validate_derived_package_ignores_backup_like_processed_dirs(tmp_path: Path) -> None:
+    source_root = tmp_path / "upstream"
+    canonical_dir = source_root / "2025"
+    backup_dir = source_root / "2025.previous_20260503T195500Z"
+    canonical_dir.mkdir(parents=True)
+    backup_dir.mkdir(parents=True)
+    pd.DataFrame({"dateFound": ["2025-07-01"] * 3}).to_parquet(canonical_dir / "processed_test.parquet")
+    pd.DataFrame({"dateFound": ["2025-07-01"] * 99}).to_parquet(backup_dir / "processed_test.parquet")
+
+    write_minimal_bundle(tmp_path, source_glob=str(source_root / SOURCE_GLOB), source_total=3)
+
+    result = validate_derived_package(tmp_path, source_root=source_root)
+
+    assert result["source_postings_total"] == 3
+    assert result["validated"] is True
+
+
 def test_discover_source_root_walks_up_to_find_sibling_repo(tmp_path: Path) -> None:
     source_root = tmp_path / "Projects" / "Vicinity Data" / "jobads-data" / "main" / "data" / "processed"
     source_root.mkdir(parents=True)
@@ -138,6 +155,12 @@ def test_normalized_view_sql_maps_two_digit_noc_rows_to_broad_group(tmp_path: Pa
     source_dir.mkdir(parents=True)
     pd.DataFrame(
         {
+            "id": [1, 2, 3, 4],
+            "jobTitle": ["A", "B", "C", "D"],
+            "jobTitleText": ["A", "B", "C", "D"],
+            "employer": ["Employer A", "Employer B", "Employer C", "Employer D"],
+            "dataSource": ["test", "test", "test", "test"],
+            "description": ["Desc A", "Desc B", "Desc C", "Desc D"],
             "dateFound": ["2025-07-01", "2025-07-01", "2025-07-01", "2025-07-01"],
             "province": ["ON", "ON", "AB", "BC"],
             "location": ["Toronto", "Toronto", "Calgary", "Vancouver"],

@@ -20,7 +20,7 @@ from .constants import (
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "data" / "derived" / "labor_market_dashboard_v1"
-SOURCE_GLOB = "20*/processed_*.parquet"
+SOURCE_GLOB = "20[0-9][0-9]/processed_*.parquet"
 
 
 def discover_source_root(repo_root: Path) -> Path:
@@ -71,8 +71,13 @@ WITH raw AS (
     SELECT * FROM read_parquet({sql_literal(source_glob)}, union_by_name=True)
 )
 SELECT
+    CAST(id AS VARCHAR) AS posting_id,
     CAST(date_trunc('month', CAST(dateFound AS DATE)) AS DATE) AS month,
     CAST(dateFound AS DATE) AS date_found,
+    NULLIF(TRIM(jobTitle), '') AS job_title,
+    NULLIF(TRIM(jobTitleText), '') AS job_title_text,
+    NULLIF(TRIM(employer), '') AS employer,
+    NULLIF(TRIM(dataSource), '') AS data_source,
     COALESCE(NULLIF(TRIM(province), ''), 'Unknown') AS province,
     COALESCE(NULLIF(TRIM(location), ''), 'Unknown') AS location,
     COALESCE(NULLIF(TRIM("cma-ca"), ''), NULLIF(TRIM(location), ''), 'Unknown market') AS market,
@@ -123,6 +128,7 @@ SELECT
     NULLIF(TRIM(skills), '') AS skills,
     NULLIF(TRIM(certs), '') AS certs,
     NULLIF(TRIM(cips), '') AS cips,
+    NULLIF(TRIM(description), '') AS description,
     noc,
     naics
 FROM raw
@@ -503,6 +509,202 @@ ORDER BY month, province_scope, occupation_scope, industry_scope, postings_total
     write_query_to_parquet(con, query, output_root / "monthly_skills_topk.parquet")
 
 
+def build_posting_lookup_table(
+    con: duckdb.DuckDBPyConnection,
+    output_root: Path,
+    *,
+    posting_lookup_limit: int,
+    posting_lookup_recent_months: int,
+) -> None:
+    where_clauses: list[str] = []
+    if posting_lookup_recent_months > 0:
+        where_clauses.append(
+            f"""
+date_found >= (
+    SELECT date_trunc('month', max(date_found)) - INTERVAL {int(posting_lookup_recent_months - 1)} MONTH
+    FROM normalized_postings
+)
+"""
+        )
+    where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+    limit_sql = f"LIMIT {int(posting_lookup_limit)}" if posting_lookup_limit > 0 else ""
+    query = f"""
+SELECT
+    posting_id,
+    month,
+    date_found,
+    COALESCE(job_title, job_title_text, 'Untitled posting') AS job_title,
+    COALESCE(employer, 'Unknown employer') AS employer,
+    province AS province_scope,
+    market,
+    noc_broad_label AS occupation_scope,
+    COALESCE(naics_sector_label, 'Unknown industry group') AS industry_scope,
+    noc_code,
+    noc AS noc_label,
+    naics_code,
+    naics AS naics_label,
+    remunerationHrly AS wage_hourly,
+    remunerationMin AS wage_min,
+    remunerationMax AS wage_max,
+    remunerationUnit AS wage_unit,
+    employment_type,
+    duration,
+    experience,
+    experience_details,
+    education,
+    remote_class,
+    primary_posting_language,
+    data_source,
+    description IS NOT NULL AS has_description,
+    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt
+FROM normalized_postings
+{where_sql}
+ORDER BY date_found DESC, posting_id DESC
+{limit_sql}
+"""
+    write_query_to_parquet(con, query, output_root / "posting_lookup.parquet")
+
+
+def posting_lookup_source_plan(
+    source_root: Path,
+    output_root: Path,
+    posting_lookup_recent_months: int,
+) -> tuple[str, str]:
+    if posting_lookup_recent_months <= 0:
+        return sql_literal((source_root / SOURCE_GLOB).as_posix()), ""
+
+    metadata_path = output_root / "metadata.json"
+    if not metadata_path.exists():
+        source_sql = sql_literal((source_root / SOURCE_GLOB).as_posix())
+        recent_filter = f"""
+AND CAST(dateFound AS DATE) >= (
+    SELECT date_trunc('month', max(CAST(dateFound AS DATE))) - INTERVAL {int(posting_lookup_recent_months - 1)} MONTH
+    FROM read_parquet({source_sql}, union_by_name=True)
+    WHERE dateFound IS NOT NULL
+)
+"""
+        return source_sql, recent_filter
+
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    max_date = datetime.fromisoformat(metadata["source_window"]["max_date"]).date()
+    month_index = max_date.year * 12 + max_date.month - int(posting_lookup_recent_months - 1)
+    cutoff_year = (month_index - 1) // 12
+    cutoff_month = (month_index - 1) % 12 + 1
+    cutoff_date = f"{cutoff_year:04d}-{cutoff_month:02d}-01"
+
+    source_files = sorted(
+        path
+        for path in source_root.glob(SOURCE_GLOB)
+        if path.parent.name.isdigit() and cutoff_year <= int(path.parent.name) <= max_date.year
+    )
+    if not source_files:
+        source_sql = sql_literal((source_root / SOURCE_GLOB).as_posix())
+    else:
+        source_sql = "[" + ", ".join(sql_literal(path.as_posix()) for path in source_files) + "]"
+    max_date_sql = sql_literal(max_date.isoformat())
+    return source_sql, f"AND CAST(dateFound AS DATE) >= DATE {sql_literal(cutoff_date)} AND CAST(dateFound AS DATE) <= DATE {max_date_sql}"
+
+
+def build_posting_lookup_from_source(
+    source_root: Path,
+    output_root: Path,
+    *,
+    posting_lookup_limit: int,
+    posting_lookup_recent_months: int,
+) -> Path:
+    output_path = output_root / "posting_lookup.parquet"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    noc_case = build_noc_case()
+    naics_case = build_naics_case()
+    source_sql, recent_filter = posting_lookup_source_plan(
+        source_root,
+        output_root,
+        posting_lookup_recent_months,
+    )
+    limit_sql = f"LIMIT {int(posting_lookup_limit)}" if posting_lookup_limit > 0 else ""
+    query = f"""
+WITH base AS (
+    SELECT
+        CAST(id AS VARCHAR) AS posting_id,
+        CAST(date_trunc('month', CAST(dateFound AS DATE)) AS DATE) AS month,
+        CAST(dateFound AS DATE) AS date_found,
+        COALESCE(NULLIF(TRIM(CAST(jobTitle AS VARCHAR)), ''), NULLIF(TRIM(CAST(jobTitleText AS VARCHAR)), ''), 'Untitled posting') AS job_title,
+        COALESCE(NULLIF(TRIM(CAST(employer AS VARCHAR)), ''), 'Unknown employer') AS employer,
+        COALESCE(NULLIF(TRIM(CAST(province AS VARCHAR)), ''), 'Unknown') AS province_scope,
+        COALESCE(NULLIF(TRIM(CAST("cma-ca" AS VARCHAR)), ''), NULLIF(TRIM(CAST(location AS VARCHAR)), ''), 'Unknown market') AS market,
+        NULLIF(regexp_extract(CAST(noc AS VARCHAR), '^([0-9]{{5}})', 1), '') AS noc_code,
+        NULLIF(regexp_extract(CAST(noc AS VARCHAR), '^([0-9])', 1), '') AS noc_broad_code,
+        NULLIF(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), '') AS naics_code,
+        CASE
+            WHEN NULLIF(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), '') IS NULL THEN NULL
+            WHEN substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2) IN ('31', '32', '33') THEN '31-33'
+            WHEN substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2) IN ('44', '45') THEN '44-45'
+            WHEN substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2) IN ('48', '49') THEN '48-49'
+            ELSE substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2)
+        END AS naics_sector_code,
+        CAST(noc AS VARCHAR) AS noc_label,
+        CAST(naics AS VARCHAR) AS naics_label,
+        remunerationHrly AS wage_hourly,
+        remunerationMin AS wage_min,
+        remunerationMax AS wage_max,
+        remunerationUnit AS wage_unit,
+        COALESCE(NULLIF(TRIM(CAST(type AS VARCHAR)), ''), 'Unknown') AS employment_type,
+        COALESCE(NULLIF(TRIM(CAST(duration AS VARCHAR)), ''), 'Unknown') AS duration,
+        COALESCE(NULLIF(TRIM(CAST(experience AS VARCHAR)), ''), 'Unknown') AS experience,
+        NULLIF(TRIM(CAST(experienceDetails AS VARCHAR)), '') AS experience_details,
+        COALESCE(NULLIF(TRIM(CAST(education AS VARCHAR)), ''), 'Unknown') AS education,
+        CASE
+            WHEN remoteWorkOptions IS NULL OR TRIM(CAST(remoteWorkOptions AS VARCHAR)) = '' THEN 'Not reported'
+            WHEN lower(CAST(remoteWorkOptions AS VARCHAR)) LIKE '%hybrid%' THEN 'Hybrid'
+            WHEN lower(CAST(remoteWorkOptions AS VARCHAR)) LIKE '%not available%' THEN 'On-site / unspecified'
+            WHEN lower(CAST(remoteWorkOptions AS VARCHAR)) LIKE '%remote%' THEN 'Remote'
+            ELSE TRIM(CAST(remoteWorkOptions AS VARCHAR))
+        END AS remote_class,
+        NULLIF(TRIM(CAST(primaryPostingLanguage AS VARCHAR)), '') AS primary_posting_language,
+        NULLIF(TRIM(CAST(dataSource AS VARCHAR)), '') AS data_source,
+        NULLIF(TRIM(CAST(description AS VARCHAR)), '') AS description
+    FROM read_parquet({source_sql}, union_by_name=True)
+    WHERE dateFound IS NOT NULL
+    {recent_filter}
+)
+SELECT
+    posting_id,
+    month,
+    date_found,
+    job_title,
+    employer,
+    province_scope,
+    market,
+    {noc_case} AS occupation_scope,
+    COALESCE({naics_case}, 'Unknown industry group') AS industry_scope,
+    noc_code,
+    noc_label,
+    naics_code,
+    naics_label,
+    wage_hourly,
+    wage_min,
+    wage_max,
+    wage_unit,
+    employment_type,
+    duration,
+    experience,
+    experience_details,
+    education,
+    remote_class,
+    primary_posting_language,
+    data_source,
+    description IS NOT NULL AS has_description,
+    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt
+FROM base
+ORDER BY date_found DESC, posting_id DESC
+{limit_sql}
+"""
+    con = duckdb.connect()
+    con.execute("PRAGMA threads=4")
+    write_query_to_parquet(con, query, output_path)
+    return output_path
+
+
 def collect_metadata(
     con: duckdb.DuckDBPyConnection,
     source_root: Path,
@@ -543,6 +745,7 @@ FROM normalized_postings
             "Job ads measure posted labor demand, not employment or unemployment.",
             "The 2025 upstream raw fetch provenance remains under audit; freshness should be read with caution.",
             "Wages, remote work, language, and detailed experience fields are sparse or historically unstable.",
+            "Posting-level lookup is private and may be bounded by the configured lookup window and row limit.",
         ],
     }
 
@@ -662,6 +865,8 @@ def refresh_dashboard_data(
     output_root: Path,
     top_markets_per_province: int,
     skills_top_k: int,
+    posting_lookup_limit: int = 100_000,
+    posting_lookup_recent_months: int = 24,
 ) -> Path:
     def log(message: str) -> None:
         print(message, flush=True)
@@ -696,6 +901,13 @@ def refresh_dashboard_data(
     build_coverage_table(con, output_root)
     log("Building monthly_skills_topk.parquet ...")
     build_skills_table(con, output_root, skills_top_k=skills_top_k)
+    log("Building posting_lookup.parquet ...")
+    build_posting_lookup_table(
+        con,
+        output_root,
+        posting_lookup_limit=posting_lookup_limit,
+        posting_lookup_recent_months=posting_lookup_recent_months,
+    )
 
     log("Writing metadata.json ...")
     metadata = collect_metadata(con, source_root=source_root, output_root=output_root)
@@ -711,6 +923,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--top-markets-per-province", type=int, default=10)
     parser.add_argument("--skills-top-k", type=int, default=10)
+    parser.add_argument("--posting-lookup-limit", type=int, default=100_000)
+    parser.add_argument("--posting-lookup-recent-months", type=int, default=24)
     return parser.parse_args()
 
 
@@ -721,6 +935,8 @@ def main() -> None:
         output_root=args.output_root,
         top_markets_per_province=args.top_markets_per_province,
         skills_top_k=args.skills_top_k,
+        posting_lookup_limit=args.posting_lookup_limit,
+        posting_lookup_recent_months=args.posting_lookup_recent_months,
     )
     print(json.dumps(validate_derived_package(output_root, source_root=args.source_root), indent=2))
 

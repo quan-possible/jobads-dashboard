@@ -11,3 +11,4 @@ dist/
 logs/
 output/
 tmp/
+data/derived/labor_market_dashboard_v1/posting_lookup.parquet

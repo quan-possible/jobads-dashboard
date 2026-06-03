@@ -23,6 +23,13 @@ def info_messages(app: AppTest) -> list[str]:
     return [message.value for message in app.info]
 
 
+def selectbox_by_label(app: AppTest, label: str):
+    for box in app.selectbox:
+        if box.label == label:
+            return box
+    raise AssertionError(f"Missing selectbox with label {label!r}")
+
+
 def test_partial_bundle_shows_operator_guidance(tmp_path: Path, monkeypatch) -> None:
     data_root = tmp_path / "partial-bundle"
     data_root.mkdir()
@@ -50,8 +57,8 @@ def test_filtered_province_views_stay_populated() -> None:
     app = AppTest.from_file("streamlit_app.py")
     app.run(timeout=120)
 
-    app.selectbox[1].set_value("6 | Sales and service occupations")
-    app.selectbox[2].set_value("72 | Accommodation and food services")
+    selectbox_by_label(app, "Occupation group").set_value("6 | Sales and service occupations")
+    selectbox_by_label(app, "Industry group").set_value("72 | Accommodation and food services")
     app.run(timeout=120)
 
     assert len(app.exception) == 0
@@ -61,11 +68,20 @@ def test_filtered_province_views_stay_populated() -> None:
     assert "Province shares are empty for the current filters." not in info_messages(app)
 
 
+def test_explore_tab_renders_curated_query_surface() -> None:
+    app = AppTest.from_file("streamlit_app.py")
+    app.run(timeout=120)
+
+    assert len(app.exception) == 0
+    assert any("Choose a common question below." in block.value for block in app.caption)
+    assert "Question" in [box.label for box in app.selectbox]
+
+
 def test_selecting_province_does_not_duplicate_plotly_ids() -> None:
     app = AppTest.from_file("streamlit_app.py")
     app.run(timeout=120)
 
-    app.selectbox[0].set_value("ON")
+    selectbox_by_label(app, "Geography").set_value("ON")
     app.run(timeout=120)
 
     assert len(app.exception) == 0
@@ -75,7 +91,7 @@ def test_province_filtered_wage_by_occupation_stays_populated() -> None:
     app = AppTest.from_file("streamlit_app.py")
     app.run(timeout=120)
 
-    app.selectbox[0].set_value("ON")
+    selectbox_by_label(app, "Geography").set_value("ON")
     app.run(timeout=120)
 
     assert len(app.exception) == 0
@@ -86,17 +102,17 @@ def test_sidebar_filters_hide_synthetic_unknown_groups() -> None:
     app = AppTest.from_file("streamlit_app.py")
     app.run(timeout=120)
 
-    assert "Unknown occupation group" not in list(app.selectbox[1].options)
-    assert "Unknown industry group" not in list(app.selectbox[2].options)
+    assert "Unknown occupation group" not in list(selectbox_by_label(app, "Occupation group").options)
+    assert "Unknown industry group" not in list(selectbox_by_label(app, "Industry group").options)
 
 
 def test_sidebar_filters_cap_options_at_ten_items() -> None:
     app = AppTest.from_file("streamlit_app.py")
     app.run(timeout=120)
 
-    assert len(app.selectbox[0].options) <= MAX_LIST_ITEMS
-    assert len(app.selectbox[1].options) <= MAX_LIST_ITEMS
-    assert len(app.selectbox[2].options) <= MAX_LIST_ITEMS
+    assert len(selectbox_by_label(app, "Geography").options) <= MAX_LIST_ITEMS
+    assert len(selectbox_by_label(app, "Occupation group").options) <= MAX_LIST_ITEMS
+    assert len(selectbox_by_label(app, "Industry group").options) <= MAX_LIST_ITEMS
 
 
 def test_compute_top_group_shares_uses_full_month_denominator() -> None:

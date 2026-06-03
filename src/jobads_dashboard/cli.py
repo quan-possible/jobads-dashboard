@@ -37,6 +37,17 @@ def validate_derived_package(*args, **kwargs):
     return _validate_derived_package(*args, **kwargs)
 
 
+def build_posting_lookup(*args, **kwargs):
+    from jobads_dashboard.dashboard.prepare import build_posting_lookup_from_source as _build_posting_lookup_from_source
+
+    return _build_posting_lookup_from_source(
+        kwargs["source_root"],
+        kwargs["output_root"],
+        posting_lookup_limit=kwargs["posting_lookup_limit"],
+        posting_lookup_recent_months=kwargs["posting_lookup_recent_months"],
+    )
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="jobads-dashboard")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -46,6 +57,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     refresh.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     refresh.add_argument("--top-markets-per-province", type=int, default=10)
     refresh.add_argument("--skills-top-k", type=int, default=10)
+    refresh.add_argument("--posting-lookup-limit", type=int, default=100_000)
+    refresh.add_argument("--posting-lookup-recent-months", type=int, default=24)
+
+    posting_lookup = subparsers.add_parser(
+        "posting-lookup",
+        help="Build only the private posting-level lookup index from upstream processed parquet.",
+    )
+    posting_lookup.add_argument("--source-root", type=Path, default=DEFAULT_SOURCE_ROOT)
+    posting_lookup.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
+    posting_lookup.add_argument("--posting-lookup-limit", type=int, default=100_000)
+    posting_lookup.add_argument("--posting-lookup-recent-months", type=int, default=24)
 
     validate = subparsers.add_parser("validate", help="Check the derived dashboard package.")
     validate.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
@@ -71,6 +93,8 @@ def main() -> None:
             output_root=args.output_root,
             top_markets_per_province=args.top_markets_per_province,
             skills_top_k=args.skills_top_k,
+            posting_lookup_limit=args.posting_lookup_limit,
+            posting_lookup_recent_months=args.posting_lookup_recent_months,
         )
         validation = validate_derived_package(args.output_root, source_root=args.source_root)
         print(validation)
@@ -83,6 +107,16 @@ def main() -> None:
         print(validation)
         if not validation.get("validated", False):
             raise SystemExit(1)
+        return
+
+    if args.command == "posting-lookup":
+        path = build_posting_lookup(
+            source_root=args.source_root,
+            output_root=args.output_root,
+            posting_lookup_limit=args.posting_lookup_limit,
+            posting_lookup_recent_months=args.posting_lookup_recent_months,
+        )
+        print({"posting_lookup": path.as_posix()})
         return
 
     if args.command == "app":

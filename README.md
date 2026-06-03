@@ -42,6 +42,21 @@ Launch the Streamlit app:
 jobads-dashboard app
 ```
 
+## Private Mac Mini Deployment
+
+For ACLMR-private supervisor access, use the existing dashboard app rather than a second query system:
+
+1. Mirror this repo to `/Volumes/ACLMR/jobads-dashboard`.
+2. Keep `/Volumes/ACLMR/jobads-dashboard` beside `/Volumes/ACLMR/jobads-data/main`.
+3. Run the Streamlit app on the Mac mini on local port `8520`.
+4. Share access through Tailscale or an SSH tunnel, not a public URL.
+
+The supervisor-facing `Explore` tab exposes curated aggregate queries plus a private posting lookup built from a local `posting_lookup.parquet` index. It does not provide arbitrary SQL, raw posting downloads, or bulk raw text browsing.
+
+Detailed runbook:
+
+- `docs/analyses/private_query_dashboard/runbook.md`
+
 ## Render Hosting
 
 This repo is set up to deploy as a Docker-based Render web service.

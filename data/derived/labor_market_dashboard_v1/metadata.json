@@ -1,23 +1,24 @@
 {
-  "generated_at_utc": "2026-03-25T02:54:27.107140+00:00",
-  "source_root": "/content/drive/MyDrive/Projects/Vicinity Data/jobads-data/main/data/processed",
-  "source_glob": "/content/drive/MyDrive/Projects/Vicinity Data/jobads-data/main/data/processed/20*/processed_*.parquet",
-  "output_root": "/content/drive/.shortcut-targets-by-id/1a-GAk3Gjm8NrUVuUjiETXwUeaNkjhHgq/codex-aclmr/tmp/jobads-dashboard-extensive-verification-20260325T020600Z/review-copy/data/derived/labor_market_dashboard_v1",
-  "source_file_count": 135,
+  "generated_at_utc": "2026-06-03T00:51:57.149283+00:00",
+  "source_root": "/Volumes/ACLMR/jobads-data/main/data/processed",
+  "source_glob": "/Volumes/ACLMR/jobads-data/main/data/processed/20[0-9][0-9]/processed_*.parquet",
+  "output_root": "/Volumes/ACLMR/jobads-dashboard/data/derived/labor_market_dashboard_v1",
+  "source_file_count": 164,
   "source_window": {
     "min_date": "2016-01-01",
-    "max_date": "2025-07-31"
+    "max_date": "2026-03-31"
   },
   "headline_counts": {
-    "postings_total": 23618893,
-    "wage_postings": 6422654,
-    "naics_postings": 10894508,
-    "noc_postings": 19637508,
-    "remote_field_postings": 561403
+    "postings_total": 25356735,
+    "wage_postings": 7012606,
+    "naics_postings": 11848662,
+    "noc_postings": 21064188,
+    "remote_field_postings": 735850
   },
   "known_caveats": [
     "Job ads measure posted labor demand, not employment or unemployment.",
     "The 2025 upstream raw fetch provenance remains under audit; freshness should be read with caution.",
-    "Wages, remote work, language, and detailed experience fields are sparse or historically unstable."
+    "Wages, remote work, language, and detailed experience fields are sparse or historically unstable.",
+    "Posting-level lookup is private and may be bounded by the configured lookup window and row limit."
   ]
 }
