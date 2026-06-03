@@ -41,6 +41,7 @@ Last updated: 2026-06-02
 - The dashboard is now also hosted privately on `bruces-mac-mini` from `/Users/brucenguyen/jobads-dashboard`, using Python 3.12 and a copied local derived bundle. The remote app listens on `127.0.0.1:8520`; the current local SSH tunnel listens on `http://127.0.0.1:8521` and forwards to the Mini.
 - The Mac Mini did not have `/Volumes/ACLMR` mounted during deployment, so the remote app can serve the copied dashboard bundle but cannot refresh from `../jobads-data/main` until the ACLMR data path is mounted or copied there.
 - The public Render website deploy now launches through `jobads-dashboard app --output-root /app/data/derived/labor_market_dashboard_v1`, fixing the old container path issue where Streamlit looked for data under Python's site-package directory.
+- While Render remained on the old container, the public-safe website was served through the project ngrok path at `https://d5e4-162-156-88-90.ngrok-free.app`, backed by a temporary aggregate bundle that excludes private `posting_lookup.parquet`.
 
 ## Active Focus
 - Preserve the standalone project boundary: `jobads-dashboard` owns dashboard implementation, while `jobads-data/main` remains the upstream data source.
@@ -75,6 +76,7 @@ Last updated: 2026-06-02
 - The private `Explore` tab is intentionally a first safe query surface. Full raw text, arbitrary SQL, and `ai-labor` research-output ingest still require separate governance and derived-table design before exposure.
 - The Mac Mini deployment currently uses a copied derived bundle whose metadata still records the local build path under `/Volumes/ACLMR`; this is acceptable for serving but should be regenerated on the Mini once the upstream data path is present.
 - If the public website shows the branded missing-bundle panel, first check the Docker entrypoint and `JOBADS_DASHBOARD_DATA_ROOT`; the expected container data root is `/app/data/derived/labor_market_dashboard_v1`.
+- The current ngrok website intentionally omits `posting_lookup.parquet`; the Explore tab can still show aggregate queries, but posting lookup should remain private unless explicitly approved for public exposure.
 
 ## Sources
 - `docs/analyses/labor_market_dashboard_spec/report.md`
