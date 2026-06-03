@@ -42,6 +42,7 @@ Last updated: 2026-06-02
 - The Mac Mini did not have `/Volumes/ACLMR` mounted during deployment, so the remote app can serve the copied dashboard bundle but cannot refresh from `../jobads-data/main` until the ACLMR data path is mounted or copied there.
 - The public Render website deploy now launches through `jobads-dashboard app --output-root /app/data/derived/labor_market_dashboard_v1`, fixing the old container path issue where Streamlit looked for data under Python's site-package directory.
 - While Render remained on the old container, the public-safe website was served through the project ngrok path at `https://d5e4-162-156-88-90.ngrok-free.app`, backed by a temporary aggregate bundle that excludes private `posting_lookup.parquet`.
+- The persistent public website is now hosted from `bruces-mac-mini` using LaunchAgents for Streamlit, ngrok, and `caffeinate`; current public URL is `https://047e-2001-56a-f068-c900-dc77-45fd-2bfb-31da.ngrok-free.app`.
 
 ## Active Focus
 - Preserve the standalone project boundary: `jobads-dashboard` owns dashboard implementation, while `jobads-data/main` remains the upstream data source.
@@ -77,6 +78,7 @@ Last updated: 2026-06-02
 - The Mac Mini deployment currently uses a copied derived bundle whose metadata still records the local build path under `/Volumes/ACLMR`; this is acceptable for serving but should be regenerated on the Mini once the upstream data path is present.
 - If the public website shows the branded missing-bundle panel, first check the Docker entrypoint and `JOBADS_DASHBOARD_DATA_ROOT`; the expected container data root is `/app/data/derived/labor_market_dashboard_v1`.
 - The current ngrok website intentionally omits `posting_lookup.parquet`; the Explore tab can still show aggregate queries, but posting lookup should remain private unless explicitly approved for public exposure.
+- The Mac Mini public website depends on the Mini being powered on, logged into the `brucenguyen` user session, and the ngrok free tunnel staying valid. LaunchAgents keep the app/tunnel awake and restarted, but free ngrok URLs can rotate after tunnel restarts unless a reserved domain is configured.
 
 ## Sources
 - `docs/analyses/labor_market_dashboard_spec/report.md`
