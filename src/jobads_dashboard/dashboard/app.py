@@ -8,7 +8,9 @@ import hmac
 from html import escape
 import os
 from pathlib import Path
+import re
 import secrets
+import time
 
 import duckdb
 import pandas as pd
@@ -28,12 +30,19 @@ COMPARISON_MONTHS = 3
 MAX_LIST_ITEMS = 10
 UNKNOWN_OCCUPATION_GROUP = "Unknown occupation group"
 UNKNOWN_INDUSTRY_GROUP = "Unknown industry group"
+UNKNOWN_PROVINCE = "Unknown"
 AUTH_REQUIRED_ENV = "JOBADS_DASHBOARD_AUTH_REQUIRED"
 PASSWORD_HASH_ENV = "JOBADS_DASHBOARD_PASSWORD_HASH"
 AUTH_SESSION_KEY = "jobads_dashboard_authenticated"
 AUTH_FAILURE_KEY = "jobads_dashboard_auth_failed"
+AUTH_ATTEMPTS_KEY = "jobads_dashboard_auth_attempts"
+AUTH_LOCKED_UNTIL_KEY = "jobads_dashboard_auth_locked_until"
+AUTH_MAX_ATTEMPTS = 5
+AUTH_LOCKOUT_SECONDS = 60
 PASSWORD_HASH_PREFIX = "pbkdf2_sha256"
 PASSWORD_HASH_ITERATIONS = 240_000
+PASSWORD_HASH_MIN_ITERATIONS = 10_000
+PASSWORD_HASH_MAX_ITERATIONS = 1_000_000
 
 FIELD_DISPLAY_NAMES: dict[str, str] = {
     "remoteWorkOptions": "Remote work",
@@ -159,6 +168,7 @@ GLOBAL_STYLES = f"""
   min-height: 100vh;
   background: var(--aclmr-white);
   color: var(--aclmr-text);
+  color-scheme: light;
   font-family: "PT Sans", sans-serif;
   overflow-x: hidden !important;
   overflow-y: auto !important;
@@ -952,7 +962,7 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
 
 div[data-testid="stMetric"] {{
   position: relative;
-  min-height: 8.5rem;
+  min-height: 6rem;
   background: var(--aclmr-surface);
   border: 1px solid var(--aclmr-border);
   border-radius: 12px;
@@ -966,7 +976,6 @@ div[data-testid="stMetric"]::before {{
 }}
 
 div[data-testid="stMetricLabel"] {{
-  color: var(--aclmr-muted);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -975,13 +984,20 @@ div[data-testid="stMetricLabel"] {{
   word-break: break-word;
 }}
 
+div[data-testid="stMetricLabel"],
+div[data-testid="stMetricLabel"] p,
+div[data-testid="stMetricLabel"] [data-testid="stMarkdownContainer"] {{
+  color: var(--aclmr-muted) !important;
+}}
+
 div[data-testid="stMetricValue"] {{
-  color: var(--aclmr-navy-deep);
+  color: var(--aclmr-navy-deep) !important;
   font-size: clamp(1.4rem, 1vw + 1rem, 2.1rem);
   white-space: normal;
   word-break: break-word;
 }}
 
+div[data-testid="stMetricValue"],
 div[data-testid="stMetricValue"] > div {{
   white-space: normal !important;
   word-break: break-word !important;
@@ -1053,7 +1069,8 @@ div[data-testid="stAlert"] svg {{
 
 div[data-testid="stTable"] {{
   padding: 0.25rem 0.85rem 0.8rem;
-  overflow: hidden !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
 }}
 
 div[data-testid="stTable"] th:nth-child(2),
@@ -1063,8 +1080,8 @@ div[data-testid="stTable"] td:nth-child(2) {{
 }}
 
 div[data-testid="stTable"] table {{
-  width: 100%;
-  table-layout: fixed;
+  width: auto;
+  min-width: 100%;
   border-collapse: collapse;
 }}
 
@@ -1078,15 +1095,15 @@ div[data-testid="stTable"] th {{
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  padding-right: 1.1rem;
 }}
 
 div[data-testid="stTable"] td {{
   color: var(--aclmr-text);
   font-size: 0.92rem;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  padding-right: 1.1rem;
 }}
 
 div[data-testid="stCaptionContainer"] p,
@@ -1310,7 +1327,7 @@ def plotly_layout() -> dict:
     }
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=600)
 def load_dashboard_assets(data_root: str) -> tuple[dict, dict[str, pd.DataFrame]]:
     resolved_root = Path(data_root)
     return load_metadata(resolved_root), load_tables(resolved_root)
@@ -1346,6 +1363,8 @@ def verify_dashboard_password(password: str, password_hash: str) -> bool:
 
     try:
         iterations = int(parts[1])
+        if not (PASSWORD_HASH_MIN_ITERATIONS <= iterations <= PASSWORD_HASH_MAX_ITERATIONS):
+            return False
         salt = base64.urlsafe_b64decode(parts[2].encode("ascii"))
         expected = base64.urlsafe_b64decode(parts[3].encode("ascii"))
     except (ValueError, TypeError):
@@ -1377,24 +1396,44 @@ def require_dashboard_authentication() -> None:
         unsafe_allow_html=True,
     )
     st.caption("Enter the dashboard password to continue.")
-    with st.form("dashboard_password_form"):
-        password = st.text_input("Password", type="password")
-        submitted = st.form_submit_button("Unlock dashboard")
 
-    if submitted:
+    locked_until = float(st.session_state.get(AUTH_LOCKED_UNTIL_KEY, 0.0))
+    now = time.monotonic()
+    locked = now < locked_until
+
+    with st.form("dashboard_password_form"):
+        password = st.text_input("Password", type="password", disabled=locked)
+        submitted = st.form_submit_button("Unlock dashboard", disabled=locked)
+
+    if submitted and not locked:
         if verify_dashboard_password(password, password_hash):
             st.session_state[AUTH_SESSION_KEY] = True
             st.session_state.pop(AUTH_FAILURE_KEY, None)
+            st.session_state.pop(AUTH_ATTEMPTS_KEY, None)
+            st.session_state.pop(AUTH_LOCKED_UNTIL_KEY, None)
             st.rerun()
         st.session_state[AUTH_FAILURE_KEY] = True
+        attempts = int(st.session_state.get(AUTH_ATTEMPTS_KEY, 0)) + 1
+        st.session_state[AUTH_ATTEMPTS_KEY] = attempts
+        if attempts >= AUTH_MAX_ATTEMPTS:
+            st.session_state[AUTH_LOCKED_UNTIL_KEY] = now + AUTH_LOCKOUT_SECONDS
+            st.session_state[AUTH_ATTEMPTS_KEY] = 0
+            locked = True
 
-    if st.session_state.get(AUTH_FAILURE_KEY):
+    if locked:
+        wait_seconds = max(1, int(float(st.session_state.get(AUTH_LOCKED_UNTIL_KEY, 0.0)) - time.monotonic()))
+        st.error(f"Too many attempts. Try again in about {wait_seconds} seconds.")
+    elif st.session_state.get(AUTH_FAILURE_KEY):
         st.error("Incorrect password.")
 
+    st.caption(
+        "Note: this in-app gate slows guessing but is not a substitute for network-edge "
+        "access control; place the deployment behind an authenticating proxy for strong protection."
+    )
     st.stop()
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=600)
 def query_posting_lookup(
     data_root: str,
     *,
@@ -1428,7 +1467,8 @@ def query_posting_lookup(
 
     term = search_term.strip().lower()
     if term:
-        pattern = f"%{term}%"
+        escaped_term = term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        pattern = f"%{escaped_term}%"
         search_columns = [
             "posting_id",
             "job_title",
@@ -1440,7 +1480,9 @@ def query_posting_lookup(
         ]
         if has_full_description:
             search_columns.append("description_full")
-        search_sql = " OR ".join(f"lower(coalesce({column}, '')) LIKE ?" for column in search_columns)
+        search_sql = " OR ".join(
+            f"lower(coalesce({column}, '')) LIKE ? ESCAPE '\\'" for column in search_columns
+        )
         where.append(
             f"""
             ({search_sql})
@@ -1490,8 +1532,22 @@ def posting_lookup_date_bounds(date_window: tuple[pd.Timestamp, pd.Timestamp]) -
     return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
 
 
+_MARKDOWN_SPECIALS = re.compile(r"([\\`*_{}\[\]()#+\-.!|>~])")
+
+
+def escape_markdown(value: object) -> str:
+    """Render corpus text literally inside ``st.markdown``.
+
+    ``st.markdown`` neutralizes raw HTML by default but still interprets Markdown
+    syntax, so unescaped corpus text like ``[x](http://y)`` or ``# Foo`` would render
+    as a live link or heading. Backslash-escaping the Markdown metacharacters keeps the
+    text literal.
+    """
+    return _MARKDOWN_SPECIALS.sub(r"\\\1", str(value))
+
+
 def month_label(value: pd.Timestamp | str | None) -> str:
-    if value is None:
+    if value is None or pd.isna(value):
         return "n/a"
     if isinstance(value, pd.Timestamp):
         return value.strftime("%Y-%m")
@@ -1702,8 +1758,9 @@ def finalize_figure(
         clean_title = LEGEND_TITLE_MAP.get(raw_title, raw_title)
         fig.update_layout(legend_title_text=clean_title)
 
-    if len(fig.data) >= 5:
+    if len(fig.data) >= 2:
         fig.update_layout(
+            showlegend=True,
             legend={
                 "orientation": "h",
                 "y": -0.2,
@@ -1796,6 +1853,23 @@ def plot_chart(fig: go.Figure, key: str | None = None) -> None:
     )
 
 
+SIGNED_CHANGE_COLUMNS = {
+    "Absolute change",
+    "Percent change (%)",
+    "YoY change",
+    "MoM change",
+}
+
+
+def _signed_change_style(value: object) -> str:
+    text = str(value).strip()
+    if text.startswith("-"):
+        return "color: var(--aclmr-orange); font-weight: 600;"
+    if any(ch.isdigit() for ch in text) and text not in {"0", "0.0", "—"}:
+        return "color: var(--aclmr-teal); font-weight: 600;"
+    return ""
+
+
 def show_table(frame: pd.DataFrame) -> None:
     display = frame.reset_index(drop=True).copy()
     for col in display.columns:
@@ -1805,7 +1879,11 @@ def show_table(frame: pd.DataFrame) -> None:
             display[col] = display[col].apply(lambda v: f"{v:,.1f}" if pd.notna(v) else "—")
         elif pd.api.types.is_integer_dtype(display[col]):
             display[col] = display[col].apply(lambda v: f"{v:,}" if pd.notna(v) else "—")
-    st.table(display.style.hide(axis="index"))
+    styler = display.style.hide(axis="index")
+    signed_cols = [col for col in display.columns if col in SIGNED_CHANGE_COLUMNS]
+    if signed_cols:
+        styler = styler.map(_signed_change_style, subset=signed_cols)
+    st.table(styler)
 
 
 def show_empty(message: str) -> None:
@@ -1815,7 +1893,8 @@ def show_empty(message: str) -> None:
 def latest_month(frame: pd.DataFrame) -> pd.Timestamp | None:
     if frame.empty or "month" not in frame.columns:
         return None
-    return pd.Timestamp(frame["month"].max())
+    newest = frame["month"].max()
+    return None if pd.isna(newest) else pd.Timestamp(newest)
 
 
 def add_share(frame: pd.DataFrame, group_cols: list[str], value_col: str = "postings_total", share_col: str = "share_pct") -> pd.DataFrame:
@@ -2133,7 +2212,7 @@ def render_overview(
             show_empty("Occupation mix is empty for the current filters.")
         else:
             plot_chart(
-                make_area_chart(occupation_mix, x="month", y="share_pct", color="occupation_scope", title="Broad occupation mix over time"),
+                make_area_chart(occupation_mix, x="month", y="share_pct", color="occupation_scope", title="Broad occupation mix over time (share of NOC-coded postings)"),
                 key="overview-occupation-mix",
             )
 
@@ -2224,11 +2303,10 @@ def render_geography(
         else:
             show_table(
                 rename_for_display(
-                    market_summary,
+                    market_summary.drop(columns=["market_label"], errors="ignore"),
                     {
                         "market_province": "Province",
                         "market": "Local area / market",
-                        "market_label": "National label",
                         "postings_total": "Postings",
                         "window_share_pct": "Selected-window share (%)",
                         "cumulative_share_pct": "Cumulative share (%)",
@@ -2271,11 +2349,12 @@ def render_explore(
     source_window = metadata.get("source_window", {})
     render_metric_rows(
         [
-            ("Selected window", f"{month_label(pd.Timestamp(date_window[0]))} to {month_label(pd.Timestamp(date_window[1]))}"),
+            ("Window start", month_label(pd.Timestamp(date_window[0]))),
+            ("Window end", month_label(pd.Timestamp(date_window[1]))),
             ("Latest month", month_label(source_window.get("max_date"))),
             ("Result type", "Posting lookup" if selected_query == "Specific postings" else "Aggregates only"),
         ],
-        columns=3,
+        columns=4,
     )
 
     if selected_query == "Specific postings":
@@ -2302,18 +2381,35 @@ def render_explore(
                 placeholder="Search posting ID, title, employer, market, occupation, industry, or description text",
             )
             row_limit = st.selectbox("Rows to show", options=[10, 25, 50, 100], index=1)
-            st.form_submit_button("Search postings")
-        lookup_start_date, lookup_end_date = posting_lookup_date_bounds(date_window)
+            submitted = st.form_submit_button("Search postings")
+        if submitted:
+            lookup_start_date, lookup_end_date = posting_lookup_date_bounds(date_window)
+            st.session_state["posting_lookup_query"] = {
+                "search_term": search_term,
+                "row_limit": int(row_limit),
+                "start_date": lookup_start_date,
+                "end_date": lookup_end_date,
+                "province_scope": province_scope,
+                "occupation_scope": occupation_scope,
+                "industry_scope": industry_scope,
+            }
+        search_state = st.session_state.get("posting_lookup_query")
+        if not search_state:
+            st.caption(
+                "Set the sidebar filters, enter a search, then press “Search postings” to query the bounded posting index."
+            )
+            return
         result = query_posting_lookup(
             str(data_root),
-            start_date=lookup_start_date,
-            end_date=lookup_end_date,
-            province_scope=province_scope,
-            occupation_scope=occupation_scope,
-            industry_scope=industry_scope,
-            search_term=search_term,
-            limit=int(row_limit),
+            start_date=search_state["start_date"],
+            end_date=search_state["end_date"],
+            province_scope=search_state["province_scope"],
+            occupation_scope=search_state["occupation_scope"],
+            industry_scope=search_state["industry_scope"],
+            search_term=search_state["search_term"],
+            limit=search_state["row_limit"],
         )
+        st.caption("Results reflect the filters and search applied when you last pressed “Search postings”.")
         if result.empty:
             show_empty("No indexed postings match the current filters and search term.")
             return
@@ -2348,23 +2444,23 @@ def render_explore(
             )
         )
 
-        detail_options = {
-            f"{row.posting_id} | {str(row.job_title)[:70]} | {str(row.employer)[:45]}": idx
-            for idx, row in result.iterrows()
-        }
-        selected_detail = st.selectbox("Inspect posting", options=list(detail_options))
-        detail = result.loc[detail_options[selected_detail]]
+        selected_index = st.selectbox(
+            "Inspect posting",
+            options=list(result.index),
+            format_func=lambda i: f"{result.loc[i, 'posting_id']} | {str(result.loc[i, 'job_title'])[:70]} | {str(result.loc[i, 'employer'])[:45]}",
+        )
+        detail = result.loc[selected_index]
         st.markdown("#### Posting details")
         detail_left, detail_right = st.columns(2)
         with detail_left:
             st.markdown(f"**Posting ID:** `{escape(str(detail['posting_id']))}`")
-            st.markdown(f"**Title:** {escape(str(detail['job_title']))}")
-            st.markdown(f"**Employer:** {escape(str(detail['employer']))}")
+            st.markdown(f"**Title:** {escape_markdown(detail['job_title'])}")
+            st.markdown(f"**Employer:** {escape_markdown(detail['employer'])}")
             st.markdown(f"**Date:** {month_label(pd.Timestamp(detail['date_found']))}")
         with detail_right:
-            st.markdown(f"**Market:** {escape(str(detail['province_scope']))} | {escape(str(detail['market']))}")
-            st.markdown(f"**Occupation:** {escape(str(detail['occupation_scope']))}")
-            st.markdown(f"**Industry:** {escape(str(detail['industry_scope']))}")
+            st.markdown(f"**Market:** {escape_markdown(detail['province_scope'])} | {escape_markdown(detail['market'])}")
+            st.markdown(f"**Occupation:** {escape_markdown(detail['occupation_scope'])}")
+            st.markdown(f"**Industry:** {escape_markdown(detail['industry_scope'])}")
             st.markdown(f"**Has description:** {'yes' if bool(detail['has_description']) else 'no'}")
         full_description = str(detail.get("description_full") or "").strip()
         excerpt = str(detail.get("description_excerpt") or "").strip()
@@ -2619,9 +2715,15 @@ def render_occupations(
                 key="occupations-share-trend",
             )
     with mix_col:
-        if mix_pivot.empty:
+        if province_scope != ALL_CANADA:
+            show_empty("Select “All Canada” to compare the occupation mix across provinces.")
+        elif mix_pivot.empty:
             show_empty("Occupation mix by province is empty for the current filters.")
         else:
+            st.caption(
+                "Each cell is the occupation group's share of that province's total postings, "
+                "so province columns need not sum to 100%."
+            )
             show_table(mix_pivot)
 
 
@@ -2724,7 +2826,9 @@ def render_industries(
                 key="industries-coverage",
             )
 
-    if province_mix.empty:
+    if province_scope != ALL_CANADA:
+        show_empty("Select “All Canada” to compare the industry mix across provinces.")
+    elif province_mix.empty:
         show_empty("Industry-by-province view is empty for the current filters.")
     else:
         show_table(
@@ -2796,7 +2900,10 @@ def render_compensation_and_conditions(
         apply_selector_filters(tables["monthly_wage_cube"], None, occupation_scope, industry_scope),
         date_window,
     )
-    wage_province = wage_province.loc[wage_province["province_scope"] != ALL_CANADA]
+    wage_province = wage_province.loc[
+        (wage_province["province_scope"] != ALL_CANADA)
+        & (wage_province["province_scope"] != UNKNOWN_PROVINCE)
+    ]
     wage_province = latest_slice(wage_province).sort_values(["wage_median", "province_scope"], ascending=[False, True])
     if province_scope != ALL_CANADA:
         wage_province = wage_province.loc[wage_province["province_scope"] == province_scope]
@@ -2985,10 +3092,9 @@ def render_quality(
     )
     latest_processed = metadata.get("source_window", {}).get("max_date", "n/a")
     earliest_processed = metadata.get("source_window", {}).get("min_date", "n/a")
-    cards = st.columns(3)
-    cards[0].metric("Latest month", latest_processed[:7] if isinstance(latest_processed, str) else "n/a")
-    cards[1].metric("First month", earliest_processed)
-    cards[2].metric("Last month", latest_processed)
+    cards = st.columns(2)
+    cards[0].metric("First month", earliest_processed[:7] if isinstance(earliest_processed, str) else "n/a")
+    cards[1].metric("Latest month", latest_processed[:7] if isinstance(latest_processed, str) else "n/a")
 
     coverage = apply_date_window(
         apply_selector_filters(tables["coverage_by_field_monthly"], province_scope, occupation_scope, industry_scope),
@@ -3074,10 +3180,20 @@ def main() -> None:
         render_data_bundle_error(data_root, exc)
         st.stop()
 
+    # ``load_tables`` (data.py) already coerces ``month`` to datetime; no re-cast here.
     monthly = tables["monthly_overall"].copy()
-    monthly["month"] = pd.to_datetime(monthly["month"])
     date_values = sorted(monthly["month"].unique())
     month_options = [pd.Timestamp(value).to_pydatetime() for value in date_values]
+    if not month_options:
+        render_data_bundle_error(
+            data_root,
+            DashboardDataError(
+                "Derived dashboard data has no monthly rows to display.",
+                data_root=data_root,
+                read_errors=("monthly_overall.parquet: no rows",),
+            ),
+        )
+        st.stop()
     min_month = month_options[0]
     max_month = month_options[-1]
 
@@ -3090,6 +3206,7 @@ def main() -> None:
             "occupation_scope": ALL_OCCUPATIONS,
             "industry_scope": ALL_INDUSTRIES,
         },
+        exclude_values={UNKNOWN_PROVINCE},
     )
     occupation_options = build_selector_options(
         cube,
@@ -3182,8 +3299,8 @@ def main() -> None:
             "Geography",
             "Occupations",
             "Industries",
-            "Compensation and Conditions",
-            "Skills, Education, and Requirements",
+            "Compensation",
+            "Skills & requirements",
             "Explore",
             "Data Quality",
         ]

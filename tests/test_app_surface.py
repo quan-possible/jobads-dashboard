@@ -14,8 +14,12 @@ from jobads_dashboard.dashboard.app import (
     PASSWORD_HASH_ENV,
     compute_market_concentration_summary,
     compute_top_group_shares,
+    escape_markdown,
     filter_skills_frame,
     hash_dashboard_password,
+    latest_month,
+    month_label,
+    verify_dashboard_password,
 )
 
 
@@ -67,6 +71,35 @@ def test_dashboard_password_gate_blocks_dashboard_until_unlocked(monkeypatch) ->
     assert len(app.exception) == 0
     assert "Password" not in [field.label for field in app.text_input]
     assert headline_metrics(app)["Postings in window"] != "0"
+
+
+def test_escape_markdown_neutralizes_links_and_headings() -> None:
+    rendered = escape_markdown("[click](http://x) # Heading ![](http://y)")
+    assert "[click](http://x)" not in rendered
+    assert "\\[click\\]\\(http://x\\)" in rendered
+    assert "\\#" in rendered
+    assert "\\!" in rendered
+
+
+def test_verify_dashboard_password_rejects_out_of_range_iterations() -> None:
+    valid_hash = hash_dashboard_password("secret", salt=b"test-salt-123456")
+    assert verify_dashboard_password("secret", valid_hash) is True
+
+    prefix, _iterations, salt, digest = valid_hash.split("$")
+    weak_hash = f"{prefix}$1${salt}${digest}"
+    assert verify_dashboard_password("secret", weak_hash) is False
+
+    huge_hash = f"{prefix}$5000000${salt}${digest}"
+    assert verify_dashboard_password("secret", huge_hash) is False
+
+
+def test_month_label_and_latest_month_handle_nat() -> None:
+    assert month_label(pd.NaT) == "n/a"
+    assert month_label(None) == "n/a"
+    assert month_label(pd.Timestamp("2025-07-15")) == "2025-07"
+
+    empty_months = pd.DataFrame({"month": pd.to_datetime([pd.NaT, pd.NaT])})
+    assert latest_month(empty_months) is None
 
 
 def test_partial_bundle_shows_operator_guidance(tmp_path: Path, monkeypatch) -> None:
