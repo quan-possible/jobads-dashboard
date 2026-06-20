@@ -65,6 +65,8 @@ def build_naics_case() -> str:
 def normalized_view_sql(source_glob: str) -> str:
     noc_case = build_noc_case()
     naics_case = build_naics_case()
+    noc_trim = "TRIM(CAST(noc AS VARCHAR))"
+    naics_trim = "TRIM(CAST(naics AS VARCHAR))"
     return f"""
 CREATE OR REPLACE TEMP VIEW normalized_postings AS
 WITH raw AS (
@@ -83,16 +85,16 @@ SELECT
     COALESCE(NULLIF(TRIM("cma-ca"), ''), NULLIF(TRIM(location), ''), 'Unknown market') AS market,
     COALESCE(NULLIF(TRIM(district), ''), 'Unknown') AS district,
     COALESCE(NULLIF(TRIM(devRegion), ''), 'Unknown') AS dev_region,
-    NULLIF(regexp_extract(noc, '^([0-9]{{5}})', 1), '') AS noc_code,
-    NULLIF(regexp_extract(noc, '^([0-9])', 1), '') AS noc_broad_code,
+    NULLIF(regexp_extract({noc_trim}, '^([0-9]{{5}})', 1), '') AS noc_code,
+    NULLIF(regexp_extract({noc_trim}, '^([0-9])', 1), '') AS noc_broad_code,
     {noc_case} AS noc_broad_label,
-    NULLIF(regexp_extract(naics, '^([0-9]{{2,6}})', 1), '') AS naics_code,
+    NULLIF(regexp_extract({naics_trim}, '^([0-9]{{2,6}})', 1), '') AS naics_code,
     CASE
-        WHEN NULLIF(regexp_extract(naics, '^([0-9]{{2,6}})', 1), '') IS NULL THEN NULL
-        WHEN substr(regexp_extract(naics, '^([0-9]{{2,6}})', 1), 1, 2) IN ('31', '32', '33') THEN '31-33'
-        WHEN substr(regexp_extract(naics, '^([0-9]{{2,6}})', 1), 1, 2) IN ('44', '45') THEN '44-45'
-        WHEN substr(regexp_extract(naics, '^([0-9]{{2,6}})', 1), 1, 2) IN ('48', '49') THEN '48-49'
-        ELSE substr(regexp_extract(naics, '^([0-9]{{2,6}})', 1), 1, 2)
+        WHEN NULLIF(regexp_extract({naics_trim}, '^([0-9]{{2,6}})', 1), '') IS NULL THEN NULL
+        WHEN substr(regexp_extract({naics_trim}, '^([0-9]{{2,6}})', 1), 1, 2) IN ('31', '32', '33') THEN '31-33'
+        WHEN substr(regexp_extract({naics_trim}, '^([0-9]{{2,6}})', 1), 1, 2) IN ('44', '45') THEN '44-45'
+        WHEN substr(regexp_extract({naics_trim}, '^([0-9]{{2,6}})', 1), 1, 2) IN ('48', '49') THEN '48-49'
+        ELSE substr(regexp_extract({naics_trim}, '^([0-9]{{2,6}})', 1), 1, 2)
     END AS naics_sector_code,
     {naics_case} AS naics_sector_label,
     remunerationHrly,
@@ -466,6 +468,11 @@ def build_coverage_table(con: duckdb.DuckDBPyConnection, output_root: Path) -> N
         "duration": "duration_postings",
         "advertisedBy": "advertised_by_postings",
     }
+    if tuple(field_columns) != COVERAGE_FIELDS:
+        raise ValueError(
+            "build_coverage_table field set is out of sync with constants.COVERAGE_FIELDS; "
+            "update both so coverage stays consistent."
+        )
     union_queries = []
     source_path = output_root / "monthly_filter_cube.parquet"
     for field, column in field_columns.items():
@@ -503,6 +510,7 @@ SELECT
 FROM normalized_postings,
 LATERAL UNNEST(string_split(skills, '|')) AS skill_value(skill_code)
 WHERE skills IS NOT NULL
+  AND NULLIF(TRIM(skill_value.skill_code), '') IS NOT NULL
 GROUP BY month, province_scope, occupation_scope, industry_scope, skill_code
 ORDER BY month, province_scope, occupation_scope, industry_scope, postings_total DESC, skill_code
 """
@@ -516,20 +524,18 @@ def build_posting_lookup_table(
     posting_lookup_limit: int,
     posting_lookup_recent_months: int,
 ) -> None:
-    where_clauses: list[str] = []
+    cutoff_cte = ""
+    where_sql = ""
     if posting_lookup_recent_months > 0:
-        where_clauses.append(
-            f"""
-date_found >= (
-    SELECT date_trunc('month', max(date_found)) - INTERVAL {int(posting_lookup_recent_months - 1)} MONTH
+        cutoff_cte = f"""WITH cutoff AS MATERIALIZED (
+    SELECT date_trunc('month', max(date_found)) - INTERVAL {int(posting_lookup_recent_months - 1)} MONTH AS cutoff_month
     FROM normalized_postings
 )
 """
-        )
-    where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+        where_sql = "WHERE date_found >= (SELECT cutoff_month FROM cutoff)"
     limit_sql = f"LIMIT {int(posting_lookup_limit)}" if posting_lookup_limit > 0 else ""
     query = f"""
-SELECT
+{cutoff_cte}SELECT
     posting_id,
     month,
     date_found,
@@ -633,15 +639,15 @@ WITH base AS (
         COALESCE(NULLIF(TRIM(CAST(employer AS VARCHAR)), ''), 'Unknown employer') AS employer,
         COALESCE(NULLIF(TRIM(CAST(province AS VARCHAR)), ''), 'Unknown') AS province_scope,
         COALESCE(NULLIF(TRIM(CAST("cma-ca" AS VARCHAR)), ''), NULLIF(TRIM(CAST(location AS VARCHAR)), ''), 'Unknown market') AS market,
-        NULLIF(regexp_extract(CAST(noc AS VARCHAR), '^([0-9]{{5}})', 1), '') AS noc_code,
-        NULLIF(regexp_extract(CAST(noc AS VARCHAR), '^([0-9])', 1), '') AS noc_broad_code,
-        NULLIF(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), '') AS naics_code,
+        NULLIF(regexp_extract(TRIM(CAST(noc AS VARCHAR)), '^([0-9]{{5}})', 1), '') AS noc_code,
+        NULLIF(regexp_extract(TRIM(CAST(noc AS VARCHAR)), '^([0-9])', 1), '') AS noc_broad_code,
+        NULLIF(regexp_extract(TRIM(CAST(naics AS VARCHAR)), '^([0-9]{{2,6}})', 1), '') AS naics_code,
         CASE
-            WHEN NULLIF(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), '') IS NULL THEN NULL
-            WHEN substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2) IN ('31', '32', '33') THEN '31-33'
-            WHEN substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2) IN ('44', '45') THEN '44-45'
-            WHEN substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2) IN ('48', '49') THEN '48-49'
-            ELSE substr(regexp_extract(CAST(naics AS VARCHAR), '^([0-9]{{2,6}})', 1), 1, 2)
+            WHEN NULLIF(regexp_extract(TRIM(CAST(naics AS VARCHAR)), '^([0-9]{{2,6}})', 1), '') IS NULL THEN NULL
+            WHEN substr(regexp_extract(TRIM(CAST(naics AS VARCHAR)), '^([0-9]{{2,6}})', 1), 1, 2) IN ('31', '32', '33') THEN '31-33'
+            WHEN substr(regexp_extract(TRIM(CAST(naics AS VARCHAR)), '^([0-9]{{2,6}})', 1), 1, 2) IN ('44', '45') THEN '44-45'
+            WHEN substr(regexp_extract(TRIM(CAST(naics AS VARCHAR)), '^([0-9]{{2,6}})', 1), 1, 2) IN ('48', '49') THEN '48-49'
+            ELSE substr(regexp_extract(TRIM(CAST(naics AS VARCHAR)), '^([0-9]{{2,6}})', 1), 1, 2)
         END AS naics_sector_code,
         CAST(noc AS VARCHAR) AS noc_label,
         CAST(naics AS VARCHAR) AS naics_label,
@@ -775,15 +781,36 @@ def validate_derived_package(output_root: Path, *, source_root: Path | None = No
     metadata_path = output_root / "metadata.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {}
     con = duckdb.connect()
+    scope_keys = {"month", "province_scope", "occupation_scope", "industry_scope"}
+    # Count-cube family (monthly_overall + the sliced cubes) shares one wide schema.
+    count_cube_columns = scope_keys | {
+        "postings_total",
+        "wage_postings",
+        "noc_postings",
+        "naics_postings",
+        "remote_field_postings",
+        "primary_language_postings",
+        "skills_postings",
+        "employment_type_postings",
+        "duration_postings",
+        "advertised_by_postings",
+    }
+    wage_cube_columns = scope_keys | {"wage_postings", "wage_p25", "wage_median", "wage_p75"}
+    dimension_columns = scope_keys | {"dimension", "category", "postings_total"}
     schema_requirements = {
-        "monthly_skills_topk.parquet": {
-            "month",
-            "province_scope",
-            "occupation_scope",
-            "industry_scope",
-            "skill_code",
-            "postings_total",
-        },
+        "monthly_overall.parquet": count_cube_columns,
+        "monthly_filter_cube.parquet": count_cube_columns,
+        "monthly_by_province.parquet": count_cube_columns,
+        "monthly_by_noc_broad.parquet": count_cube_columns,
+        "monthly_by_naics_broad.parquet": count_cube_columns,
+        "monthly_wage_cube.parquet": wage_cube_columns,
+        "monthly_wage_by_province.parquet": wage_cube_columns,
+        "monthly_wage_by_noc_broad.parquet": wage_cube_columns,
+        "monthly_conditions.parquet": dimension_columns,
+        "monthly_language.parquet": dimension_columns,
+        "monthly_requirements.parquet": dimension_columns,
+        "coverage_by_field_monthly.parquet": scope_keys | {"field_name", "postings_total", "populated_postings"},
+        "monthly_skills_topk.parquet": scope_keys | {"skill_code", "postings_total"},
         "monthly_by_market.parquet": {
             "month",
             "province_scope",
@@ -793,6 +820,14 @@ def validate_derived_package(output_root: Path, *, source_root: Path | None = No
             "market",
             "market_label",
             "postings_total",
+        },
+        "geography_top_markets.parquet": {
+            "province",
+            "market",
+            "market_label",
+            "postings_total",
+            "first_month",
+            "last_month",
         },
     }
     schema_issues: dict[str, list[str]] = {}
@@ -840,7 +875,7 @@ WHERE dateFound IS NOT NULL
             source_error = str(exc)
 
     metadata_total = metadata.get("headline_counts", {}).get("postings_total")
-    totals_match = metadata_total == int(overall_total or -1)
+    totals_match = metadata_total == (int(overall_total) if overall_total is not None else -1)
     source_reconciliation_ok = not source_glob or (
         source_error is None and source_total is not None and source_window_match is True
     )

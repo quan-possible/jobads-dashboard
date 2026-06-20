@@ -15,31 +15,33 @@ def write_minimal_bundle(tmp_path: Path, source_glob: str | None = None, source_
         "industry_scope": ["All industries"],
         "postings_total": [3],
     }
-    pd.DataFrame(
-        {
-            **shared_scope,
-            "wage_postings": [1],
-            "noc_postings": [2],
-            "naics_postings": [2],
-            "remote_field_postings": [1],
-            "primary_language_postings": [1],
-            "english_requirement_postings": [1],
-            "french_requirement_postings": [1],
-            "experience_detail_postings": [1],
-            "education_postings": [1],
-            "skills_postings": [1],
-            "employment_type_postings": [1],
-            "duration_postings": [1],
-            "advertised_by_postings": [1],
-        }
-    ).to_parquet(tmp_path / "monthly_filter_cube.parquet")
-    pd.DataFrame(shared_scope).to_parquet(tmp_path / "monthly_overall.parquet")
-    pd.DataFrame(shared_scope).to_parquet(tmp_path / "monthly_by_province.parquet")
+    # The count-cube family (monthly_overall + the sliced cubes) all share this wide
+    # schema in the real bundle, so the fixtures must carry it too.
+    count_cube = {
+        **shared_scope,
+        "wage_postings": [1],
+        "noc_postings": [2],
+        "naics_postings": [2],
+        "remote_field_postings": [1],
+        "remote_or_hybrid_postings": [1],
+        "primary_language_postings": [1],
+        "english_requirement_postings": [1],
+        "french_requirement_postings": [1],
+        "experience_detail_postings": [1],
+        "education_postings": [1],
+        "skills_postings": [1],
+        "employment_type_postings": [1],
+        "duration_postings": [1],
+        "advertised_by_postings": [1],
+    }
+    pd.DataFrame(count_cube).to_parquet(tmp_path / "monthly_filter_cube.parquet")
+    pd.DataFrame(count_cube).to_parquet(tmp_path / "monthly_overall.parquet")
+    pd.DataFrame(count_cube).to_parquet(tmp_path / "monthly_by_province.parquet")
     pd.DataFrame({**shared_scope, "market_province": ["ON"], "market": ["Toronto"], "market_label": ["ON | Toronto"]}).to_parquet(
         tmp_path / "monthly_by_market.parquet"
     )
-    pd.DataFrame(shared_scope).to_parquet(tmp_path / "monthly_by_noc_broad.parquet")
-    pd.DataFrame(shared_scope).to_parquet(tmp_path / "monthly_by_naics_broad.parquet")
+    pd.DataFrame(count_cube).to_parquet(tmp_path / "monthly_by_noc_broad.parquet")
+    pd.DataFrame(count_cube).to_parquet(tmp_path / "monthly_by_naics_broad.parquet")
     pd.DataFrame({**shared_scope, "wage_postings": [1], "wage_p25": [10.0], "wage_median": [12.0], "wage_p75": [14.0]}).to_parquet(
         tmp_path / "monthly_wage_cube.parquet"
     )

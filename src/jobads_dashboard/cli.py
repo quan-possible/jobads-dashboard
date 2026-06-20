@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.resources as resources
+import json
 import os
 import subprocess
 import sys
@@ -97,14 +98,14 @@ def main() -> None:
             posting_lookup_recent_months=args.posting_lookup_recent_months,
         )
         validation = validate_derived_package(args.output_root, source_root=args.source_root)
-        print(validation)
+        print(json.dumps(validation, indent=2, default=str))
         if not validation.get("validated", False):
             raise SystemExit(1)
         return
 
     if args.command == "validate":
         validation = validate_derived_package(args.output_root, source_root=args.source_root)
-        print(validation)
+        print(json.dumps(validation, indent=2, default=str))
         if not validation.get("validated", False):
             raise SystemExit(1)
         return
@@ -116,7 +117,7 @@ def main() -> None:
             posting_lookup_limit=args.posting_lookup_limit,
             posting_lookup_recent_months=args.posting_lookup_recent_months,
         )
-        print({"posting_lookup": path.as_posix()})
+        print(json.dumps({"posting_lookup": path.as_posix()}, indent=2, default=str))
         return
 
     if args.command == "app":
@@ -127,7 +128,12 @@ def main() -> None:
         with ExitStack() as stack:
             app_path = Path(stack.enter_context(resources.as_file(package_app)))
             cmd = [sys.executable, "-m", "streamlit", "run", app_path.as_posix(), *extra]
-            subprocess.run(cmd, check=True, env=env)
+            try:
+                result = subprocess.run(cmd, env=env)
+            except KeyboardInterrupt:
+                return
+            if result.returncode:
+                raise SystemExit(result.returncode)
         return
 
 

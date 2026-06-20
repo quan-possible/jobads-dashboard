@@ -1,5 +1,7 @@
+import json
 from argparse import Namespace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -39,6 +41,25 @@ def test_validate_exits_nonzero_when_bundle_is_invalid(monkeypatch: pytest.Monke
     assert "validated" in captured.out
 
 
+def test_validate_output_is_valid_json(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    payload = {"validated": True, "missing_files": [], "schema_issues": {}}
+    monkeypatch.setattr(
+        cli,
+        "parse_args",
+        lambda: Namespace(command="validate", output_root="ignored", source_root="source", streamlit_args=[]),
+    )
+    monkeypatch.setattr(
+        cli,
+        "validate_derived_package",
+        lambda _output_root, *, source_root=None: payload,
+    )
+
+    cli.main()
+
+    captured = capsys.readouterr()
+    assert json.loads(captured.out) == payload
+
+
 def test_app_honors_explicit_output_root(monkeypatch: pytest.MonkeyPatch) -> None:
     called: dict[str, object] = {}
 
@@ -49,15 +70,14 @@ def test_app_honors_explicit_output_root(monkeypatch: pytest.MonkeyPatch) -> Non
     )
     monkeypatch.setenv("JOBADS_DASHBOARD_DATA_ROOT", "/ambient/output")
 
-    def fake_run(cmd: list[str], *, check: bool, env: dict[str, str]) -> None:
+    def fake_run(cmd: list[str], *, env: dict[str, str]) -> SimpleNamespace:
         called["cmd"] = cmd
-        called["check"] = check
         called["env"] = env
+        return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(cli.subprocess, "run", fake_run)
 
     cli.main()
 
-    assert called["check"] is True
     assert called["env"]["JOBADS_DASHBOARD_DATA_ROOT"] == "/expected/output"
     assert str(called["cmd"][4]).endswith("streamlit_app.py")

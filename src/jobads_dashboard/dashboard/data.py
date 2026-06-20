@@ -53,9 +53,9 @@ def load_metadata(data_root: Path) -> dict:
     try:
         with metadata_path.open("r", encoding="utf-8") as handle:
             return json.load(handle)
-    except JSONDecodeError as exc:
+    except (JSONDecodeError, OSError, UnicodeDecodeError) as exc:
         raise DashboardDataError(
-            "Derived dashboard metadata could not be parsed.",
+            "Derived dashboard metadata could not be read.",
             data_root=data_root,
             read_errors=(f"metadata.json: {exc}",),
         ) from exc

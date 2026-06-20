@@ -101,6 +101,49 @@ def test_query_posting_lookup_searches_full_description_when_available(tmp_path:
     ]
 
 
+def test_query_posting_lookup_treats_like_wildcards_literally(tmp_path: Path) -> None:
+    data_root = tmp_path / "bundle"
+    data_root.mkdir()
+    pd.DataFrame(
+        {
+            "posting_id": ["1", "2"],
+            "month": pd.to_datetime(["2025-07-01", "2025-07-01"]),
+            "date_found": pd.to_datetime(["2025-07-01", "2025-07-01"]),
+            "job_title": ["50% remote analyst", "Cook"],
+            "employer": ["ACME Analytics", "Cafe Example"],
+            "province_scope": ["ON", "ON"],
+            "market": ["Toronto", "Toronto"],
+            "occupation_scope": ["1 | Business, finance and administration occupations", "6 | Sales and service occupations"],
+            "industry_scope": ["54 | Professional, scientific and technical services", "72 | Accommodation and food services"],
+            "noc_label": ["11200 - Professional occupations", "63200 - Cooks"],
+            "naics_label": ["54 - Professional services", "72 - Accommodation and food services"],
+            "wage_hourly": [32.0, 20.0],
+            "employment_type": ["Full-time", "Part-time"],
+            "duration": ["Permanent", "Permanent"],
+            "experience": ["Experience an asset", "Will train"],
+            "education": ["Bachelor's degree", "No degree"],
+            "remote_class": ["Hybrid", "On-site / unspecified"],
+            "data_source": ["vicinity", "vicinity"],
+            "has_description": [True, True],
+            "description_excerpt": ["Dashboard work", "Kitchen prep"],
+        }
+    ).to_parquet(data_root / "posting_lookup.parquet")
+
+    # A literal "%" must match only the row that actually contains "%", not every row.
+    result = query_posting_lookup(
+        str(data_root),
+        start_date="2025-01-01",
+        end_date="2025-12-31",
+        province_scope=ALL_CANADA,
+        occupation_scope=ALL_OCCUPATIONS,
+        industry_scope=ALL_INDUSTRIES,
+        search_term="%",
+        limit=10,
+    )
+
+    assert result["posting_id"].tolist() == ["1"]
+
+
 def test_query_posting_lookup_returns_empty_when_index_missing(tmp_path: Path) -> None:
     result = query_posting_lookup(
         str(tmp_path),
