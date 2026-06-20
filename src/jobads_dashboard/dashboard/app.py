@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 from html import escape
 import os
 from pathlib import Path
+import secrets
 
 import duckdb
 import pandas as pd
@@ -24,6 +28,12 @@ COMPARISON_MONTHS = 3
 MAX_LIST_ITEMS = 10
 UNKNOWN_OCCUPATION_GROUP = "Unknown occupation group"
 UNKNOWN_INDUSTRY_GROUP = "Unknown industry group"
+AUTH_REQUIRED_ENV = "JOBADS_DASHBOARD_AUTH_REQUIRED"
+PASSWORD_HASH_ENV = "JOBADS_DASHBOARD_PASSWORD_HASH"
+AUTH_SESSION_KEY = "jobads_dashboard_authenticated"
+AUTH_FAILURE_KEY = "jobads_dashboard_auth_failed"
+PASSWORD_HASH_PREFIX = "pbkdf2_sha256"
+PASSWORD_HASH_ITERATIONS = 240_000
 
 FIELD_DISPLAY_NAMES: dict[str, str] = {
     "remoteWorkOptions": "Remote work",
@@ -229,7 +239,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {{
 [data-testid="stHeader"] {{
   background: transparent;
   height: 0 !important;
-  pointer-events: auto;
+  pointer-events: none !important;
 }}
 
 [data-testid="stToolbar"] {{
@@ -254,7 +264,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {{
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 7.6rem !important;
+  width: 2.75rem !important;
   height: 2.625rem !important;
   visibility: visible !important;
   opacity: 1 !important;
@@ -274,10 +284,10 @@ h1, h2, h3, h4, h5, h6, p, span, label {{
   z-index: 2147483501 !important;
   display: inline-flex !important;
   margin: 0 !important;
-  padding: 0.5rem 0.85rem;
+  padding: 0 !important;
   box-sizing: border-box !important;
-  min-width: 7.6rem !important;
-  width: 7.6rem !important;
+  min-width: 2.75rem !important;
+  width: 2.75rem !important;
   min-height: 2.625rem !important;
   height: 2.625rem !important;
   border-radius: 999px;
@@ -293,26 +303,46 @@ h1, h2, h3, h4, h5, h6, p, span, label {{
   justify-content: center;
 }}
 
+[data-testid="stBaseButton-headerNoPadding"]::before,
 [data-testid="stBaseButton-headerNoPadding"]::after,
+[data-testid="stExpandSidebarButton"]::before,
 [data-testid="stExpandSidebarButton"]::after {{
-  content: "Filters";
-  color: #fff;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  content: "" !important;
+  position: absolute;
+  display: block;
+  pointer-events: none;
 }}
 
-[data-testid="stExpandSidebarButton"]::after {{
-  content: "Open filters";
+[data-testid="stExpandSidebarButton"]::before,
+[data-testid="stSidebarCollapsedControl"] [data-testid="stBaseButton-headerNoPadding"]::before {{
+  width: 0.68rem;
+  height: 0.68rem;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+  transform: translateX(-0.08rem) rotate(45deg);
 }}
 
+[data-testid="stExpandSidebarButton"]::after,
 [data-testid="stSidebarCollapsedControl"] [data-testid="stBaseButton-headerNoPadding"]::after {{
-  content: "Open filters";
+  display: none;
+}}
+
+[data-testid="stSidebarCollapseButton"] [data-testid="stBaseButton-headerNoPadding"]::before,
+[data-testid="stSidebarCollapseButton"] [data-testid="stBaseButton-headerNoPadding"]::after {{
+  width: 0.68rem;
+  height: 0.68rem;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+  background: transparent;
+  box-shadow: none;
+}}
+
+[data-testid="stSidebarCollapseButton"] [data-testid="stBaseButton-headerNoPadding"]::before {{
+  transform: translateX(0.08rem) rotate(-135deg);
 }}
 
 [data-testid="stSidebarCollapseButton"] [data-testid="stBaseButton-headerNoPadding"]::after {{
-  content: "Close filters";
+  display: none;
 }}
 
 [data-testid="stExpandSidebarButton"] {{
@@ -347,9 +377,12 @@ body:has(section[data-testid="stSidebar"][aria-expanded="true"]) [data-testid="s
 
 [data-testid="stBaseButton-headerNoPadding"] > span,
 [data-testid="stBaseButton-headerNoPadding"] [data-testid="stIconMaterial"],
+[data-testid="stBaseButton-headerNoPadding"] svg,
 [data-testid="stExpandSidebarButton"] > span,
-[data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"] {{
+[data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
+[data-testid="stExpandSidebarButton"] svg {{
   display: none !important;
+  visibility: hidden !important;
 }}
 
 section[data-testid="stSidebar"] {{
@@ -435,7 +468,7 @@ section[data-testid="stSidebar"] input {{
 
 section[data-testid="stSidebar"] .stSlider {{
   margin: 0 !important;
-  padding: 0.7rem 0.7rem 0.55rem !important;
+  padding: 0.88rem 0.78rem 0.72rem !important;
   overflow: visible !important;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(195, 158, 128, 0.42);
@@ -451,7 +484,7 @@ section[data-testid="stSidebar"] [data-testid="stSliderThumbValue"] {{
 }}
 
 section[data-testid="stSidebar"] [data-baseweb="slider"] {{
-  margin: 0.25rem 0.16rem 0.05rem;
+  margin: 0.32rem 0.28rem 0.1rem;
 }}
 
 section[data-testid="stSidebar"] [data-baseweb="slider"] [aria-hidden="true"] {{
@@ -543,20 +576,18 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
   font-size: 0.8rem;
 }}
 
-.aclmr-date-header {{
+.aclmr-date-slider-head {{
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
   margin: 0.1rem 0 0;
-  padding: 0.62rem 0.72rem 0.52rem;
+  padding: 0.68rem 0.72rem 0.62rem;
   border-radius: 8px 8px 0 0;
   border: 1px solid rgba(195, 158, 128, 0.42);
   border-bottom: 0;
   background: rgba(255, 255, 255, 0.08);
 }}
 
-.aclmr-date-header strong {{
+.aclmr-date-slider-title {{
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.7rem;
   font-weight: 700;
@@ -564,17 +595,34 @@ section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
   text-transform: uppercase;
 }}
 
-.aclmr-date-value {{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 4.65rem;
-  border-radius: 999px;
-  background: rgba(6, 31, 47, 0.68);
+.aclmr-date-slider-values {{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}}
+
+.aclmr-date-slider-pill {{
+  display: grid;
+  gap: 0.08rem;
+  min-width: 0;
+  border-radius: 8px;
+  background: rgba(6, 31, 47, 0.54);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 0.18rem 0.36rem;
+  padding: 0.42rem 0.5rem;
+}}
+
+.aclmr-date-slider-pill small {{
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}}
+
+.aclmr-date-slider-pill span {{
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.1;
 }}
@@ -1276,6 +1324,76 @@ def resolve_data_root() -> Path:
     return Path(os.environ.get("JOBADS_DASHBOARD_DATA_ROOT", str(DEFAULT_DATA_ROOT)))
 
 
+def env_flag_enabled(name: str) -> bool:
+    value = os.environ.get(name, "").strip().lower()
+    return value in {"1", "true", "yes", "on"}
+
+
+def hash_dashboard_password(password: str, *, salt: bytes | None = None) -> str:
+    """Return a salted PBKDF2 hash string suitable for JOBADS_DASHBOARD_PASSWORD_HASH."""
+    if salt is None:
+        salt = secrets.token_bytes(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, PASSWORD_HASH_ITERATIONS)
+    encoded_salt = base64.urlsafe_b64encode(salt).decode("ascii")
+    encoded_digest = base64.urlsafe_b64encode(digest).decode("ascii")
+    return f"{PASSWORD_HASH_PREFIX}${PASSWORD_HASH_ITERATIONS}${encoded_salt}${encoded_digest}"
+
+
+def verify_dashboard_password(password: str, password_hash: str) -> bool:
+    parts = password_hash.split("$")
+    if len(parts) != 4 or parts[0] != PASSWORD_HASH_PREFIX:
+        return False
+
+    try:
+        iterations = int(parts[1])
+        salt = base64.urlsafe_b64decode(parts[2].encode("ascii"))
+        expected = base64.urlsafe_b64decode(parts[3].encode("ascii"))
+    except (ValueError, TypeError):
+        return False
+
+    candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+    return hmac.compare_digest(candidate, expected)
+
+
+def require_dashboard_authentication() -> None:
+    password_hash = os.environ.get(PASSWORD_HASH_ENV, "").strip()
+    auth_required = env_flag_enabled(AUTH_REQUIRED_ENV) or bool(password_hash)
+
+    if not auth_required:
+        return
+
+    if st.session_state.get(AUTH_SESSION_KEY) is True:
+        return
+
+    if not password_hash:
+        st.error("Dashboard access is locked, but no password hash is configured.")
+        st.stop()
+
+    st.markdown(
+        """
+        <div class="section-kicker">Restricted access</div>
+        <h1 class="page-title">ACLMR Job Ads Labor Market Dashboard</h1>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption("Enter the dashboard password to continue.")
+    with st.form("dashboard_password_form"):
+        password = st.text_input("Password", type="password")
+        submitted = st.form_submit_button("Unlock dashboard")
+
+    if submitted:
+        if verify_dashboard_password(password, password_hash):
+            st.session_state[AUTH_SESSION_KEY] = True
+            st.session_state.pop(AUTH_FAILURE_KEY, None)
+            st.rerun()
+        st.session_state[AUTH_FAILURE_KEY] = True
+
+    if st.session_state.get(AUTH_FAILURE_KEY):
+        st.error("Incorrect password.")
+
+    st.stop()
+
+
 @st.cache_data(show_spinner=False)
 def query_posting_lookup(
     data_root: str,
@@ -1292,6 +1410,10 @@ def query_posting_lookup(
     if not path.exists() or path.stat().st_size == 0:
         return pd.DataFrame()
 
+    con = duckdb.connect()
+    available_columns = set(con.execute("SELECT * FROM read_parquet(?) LIMIT 0", [path.as_posix()]).df().columns)
+    has_full_description = "description_full" in available_columns
+
     where = ["date_found BETWEEN ? AND ?"]
     params: list[object] = [start_date, end_date]
     if province_scope != ALL_CANADA:
@@ -1307,20 +1429,28 @@ def query_posting_lookup(
     term = search_term.strip().lower()
     if term:
         pattern = f"%{term}%"
+        search_columns = [
+            "posting_id",
+            "job_title",
+            "employer",
+            "market",
+            "noc_label",
+            "naics_label",
+            "description_excerpt",
+        ]
+        if has_full_description:
+            search_columns.append("description_full")
+        search_sql = " OR ".join(f"lower(coalesce({column}, '')) LIKE ?" for column in search_columns)
         where.append(
-            """
-            (
-                lower(coalesce(posting_id, '')) LIKE ?
-                OR lower(coalesce(job_title, '')) LIKE ?
-                OR lower(coalesce(employer, '')) LIKE ?
-                OR lower(coalesce(market, '')) LIKE ?
-                OR lower(coalesce(noc_label, '')) LIKE ?
-                OR lower(coalesce(naics_label, '')) LIKE ?
-                OR lower(coalesce(description_excerpt, '')) LIKE ?
-            )
+            f"""
+            ({search_sql})
             """
         )
-        params.extend([pattern] * 7)
+        params.extend([pattern] * len(search_columns))
+
+    description_full_select = (
+        "description_full" if has_full_description else "description_excerpt AS description_full"
+    )
 
     query = f"""
 SELECT
@@ -1340,17 +1470,24 @@ SELECT
     remote_class,
     data_source,
     has_description,
-    description_excerpt
+    description_excerpt,
+    {description_full_select}
 FROM read_parquet(?)
 WHERE {' AND '.join(where)}
 ORDER BY date_found DESC, posting_id DESC
 LIMIT ?
 """
-    con = duckdb.connect()
     result = con.execute(query, [path.as_posix(), *params, int(limit)]).df()
     if "date_found" in result.columns:
         result["date_found"] = pd.to_datetime(result["date_found"])
     return result
+
+
+def posting_lookup_date_bounds(date_window: tuple[pd.Timestamp, pd.Timestamp]) -> tuple[str, str]:
+    """Return full-month date bounds for posting-level lookup queries."""
+    start_date = pd.Timestamp(date_window[0]).replace(day=1)
+    end_date = pd.Timestamp(date_window[1]) + pd.offsets.MonthEnd(0)
+    return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
 
 
 def month_label(value: pd.Timestamp | str | None) -> str:
@@ -2122,7 +2259,7 @@ def render_explore(
         "Top industry groups": "Broad NAICS sectors ranked by postings.",
         "Advertised wage coverage": "Latest wage coverage and median advertised hourly wage where available.",
         "Field coverage": "How often key fields are available in the selected data.",
-        "Specific postings": "Search individual postings in the private lookup index.",
+        "Specific postings": "Search individual postings in the bounded lookup index.",
     }
     selected_query = st.selectbox(
         "Question",
@@ -2159,15 +2296,18 @@ def render_explore(
             )
             return
 
-        search_term = st.text_input(
-            "Posting search",
-            placeholder="Search posting ID, title, employer, market, occupation, industry, or description excerpt",
-        )
-        row_limit = st.selectbox("Rows to show", options=[10, 25, 50, 100], index=1)
+        with st.form("posting_lookup_search_form"):
+            search_term = st.text_input(
+                "Posting search",
+                placeholder="Search posting ID, title, employer, market, occupation, industry, or description text",
+            )
+            row_limit = st.selectbox("Rows to show", options=[10, 25, 50, 100], index=1)
+            st.form_submit_button("Search postings")
+        lookup_start_date, lookup_end_date = posting_lookup_date_bounds(date_window)
         result = query_posting_lookup(
             str(data_root),
-            start_date=pd.Timestamp(date_window[0]).strftime("%Y-%m-%d"),
-            end_date=pd.Timestamp(date_window[1]).strftime("%Y-%m-%d"),
+            start_date=lookup_start_date,
+            end_date=lookup_end_date,
             province_scope=province_scope,
             occupation_scope=occupation_scope,
             industry_scope=industry_scope,
@@ -2226,12 +2366,15 @@ def render_explore(
             st.markdown(f"**Occupation:** {escape(str(detail['occupation_scope']))}")
             st.markdown(f"**Industry:** {escape(str(detail['industry_scope']))}")
             st.markdown(f"**Has description:** {'yes' if bool(detail['has_description']) else 'no'}")
+        full_description = str(detail.get("description_full") or "").strip()
         excerpt = str(detail.get("description_excerpt") or "").strip()
-        if excerpt:
-            st.text_area("Description excerpt", value=excerpt, height=180, disabled=True)
+        description_text = full_description or excerpt
+        if description_text:
+            label = "Full description" if full_description else "Description excerpt"
+            st.text_area(label, value=description_text, height=360 if full_description else 180, disabled=True)
         else:
-            st.caption("No description excerpt is available for this indexed posting.")
-        st.caption("This private view shows a bounded excerpt for inspection, not a bulk raw-text export.")
+            st.caption("No description text is available for this indexed posting.")
+        st.caption("This view shows the selected posting text for inspection; the results table remains bounded.")
         return
 
     if selected_query == "Posting trend":
@@ -2915,6 +3058,7 @@ def main() -> None:
         initial_sidebar_state="auto",
     )
     inject_global_styles()
+    require_dashboard_authentication()
 
     data_root = resolve_data_root()
 
@@ -2933,8 +3077,9 @@ def main() -> None:
     monthly = tables["monthly_overall"].copy()
     monthly["month"] = pd.to_datetime(monthly["month"])
     date_values = sorted(monthly["month"].unique())
-    min_month = pd.Timestamp(date_values[0]).to_pydatetime()
-    max_month = pd.Timestamp(date_values[-1]).to_pydatetime()
+    month_options = [pd.Timestamp(value).to_pydatetime() for value in date_values]
+    min_month = month_options[0]
+    max_month = month_options[-1]
 
     cube = tables["monthly_filter_cube"]
     province_options = build_selector_options(
@@ -2984,10 +3129,12 @@ def main() -> None:
         current_end = month_label(pd.Timestamp(current_date_window[1]))
         st.markdown(
             f"""
-            <div class="aclmr-date-header">
-              <strong>Date range</strong>
-              <span class="aclmr-date-value">{escape(current_start)}</span>
-              <span class="aclmr-date-value">{escape(current_end)}</span>
+            <div class="aclmr-date-slider-head">
+              <div class="aclmr-date-slider-title">Date range</div>
+              <div class="aclmr-date-slider-values">
+                <div class="aclmr-date-slider-pill"><small>Start</small><span>{escape(current_start)}</span></div>
+                <div class="aclmr-date-slider-pill"><small>End</small><span>{escape(current_end)}</span></div>
+              </div>
             </div>
             """,
             unsafe_allow_html=True,

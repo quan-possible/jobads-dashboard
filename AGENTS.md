@@ -1,10 +1,12 @@
 # Repository Guidelines
 
 ## Required Pre-Read
-1. Before substantive work, read `AGENTS.md`, `MEMORY.md`, and the latest `memory/YYYY-MM-DD.md` when present.
-2. Treat these files as the high-level contract and context-loading index.
-3. Read the matching `docs/jobs/*-ongoing.md` file when the task matches an active dashboard job.
-4. Before planning or edits related to the dashboard product, read `docs/analyses/labor_market_dashboard_spec/report.md`.
+1. Read `AGENTS.md`.
+2. Read any skill, workflow, profile, or prompt restriction implicated by the prompt.
+3. Read `MEMORY.md` and `memory/YYYY-MM-DD.md` only if allowed.
+4. Read everything else only after that.
+5. Read the matching `docs/jobs/*-ongoing.md` file when the task matches an active dashboard job.
+6. Before planning or edits related to the dashboard product, read `docs/analyses/labor_market_dashboard_spec/report.md`.
 
 ## State Model
 1. `AGENTS.md` defines behavior and policy only.
@@ -33,6 +35,7 @@
 6. After any page/dashboard UI change or page bug fix, deploy the updated page through the project ngrok path before sign-off.
 7. Treat `http://127.0.0.1:8520` plus the current live ngrok URL as the canonical deployment target for this repo. Reuse that exact live URL whenever the existing tunnel is still active instead of creating a fresh tunnel.
 8. If the canonical ngrok tunnel is no longer active and the URL must rotate, bring the page back up on port `8520`, create or reconnect the tunnel, and explicitly report the new live URL in the handoff instead of implying the old URL still works.
+9. The public Mac Mini dashboard password is stored in macOS Keychain, not in repo files. When the password is needed, retrieve it with `security find-generic-password -a jobads-dashboard-public -s jobads-dashboard-public-password -w`. Do not commit the plaintext password or password hash.
 
 ## Scope Guardrails
 1. Do not implement dashboard logic inside `jobads-data/main` or `ai_labor`.

@@ -128,7 +128,7 @@ SELECT
     NULLIF(TRIM(skills), '') AS skills,
     NULLIF(TRIM(certs), '') AS certs,
     NULLIF(TRIM(cips), '') AS cips,
-    NULLIF(TRIM(description), '') AS description,
+    CAST(description AS VARCHAR) AS description,
     noc,
     naics
 FROM raw
@@ -555,8 +555,9 @@ SELECT
     remote_class,
     primary_posting_language,
     data_source,
-    description IS NOT NULL AS has_description,
-    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt
+    NULLIF(TRIM(description), '') IS NOT NULL AS has_description,
+    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt,
+    COALESCE(description, '') AS description_full
 FROM normalized_postings
 {where_sql}
 ORDER BY date_found DESC, posting_id DESC
@@ -662,7 +663,7 @@ WITH base AS (
         END AS remote_class,
         NULLIF(TRIM(CAST(primaryPostingLanguage AS VARCHAR)), '') AS primary_posting_language,
         NULLIF(TRIM(CAST(dataSource AS VARCHAR)), '') AS data_source,
-        NULLIF(TRIM(CAST(description AS VARCHAR)), '') AS description
+        CAST(description AS VARCHAR) AS description
     FROM read_parquet({source_sql}, union_by_name=True)
     WHERE dateFound IS NOT NULL
     {recent_filter}
@@ -693,8 +694,9 @@ SELECT
     remote_class,
     primary_posting_language,
     data_source,
-    description IS NOT NULL AS has_description,
-    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt
+    NULLIF(TRIM(description), '') IS NOT NULL AS has_description,
+    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt,
+    COALESCE(description, '') AS description_full
 FROM base
 ORDER BY date_found DESC, posting_id DESC
 {limit_sql}

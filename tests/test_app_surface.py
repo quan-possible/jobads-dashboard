@@ -2,17 +2,27 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 from streamlit.testing.v1 import AppTest
 
 from jobads_dashboard.dashboard.app import (
     ALL_CANADA,
     ALL_INDUSTRIES,
     ALL_OCCUPATIONS,
+    AUTH_REQUIRED_ENV,
     MAX_LIST_ITEMS,
+    PASSWORD_HASH_ENV,
     compute_market_concentration_summary,
     compute_top_group_shares,
     filter_skills_frame,
+    hash_dashboard_password,
 )
+
+
+@pytest.fixture(autouse=True)
+def clear_dashboard_auth_env(monkeypatch) -> None:
+    monkeypatch.delenv(AUTH_REQUIRED_ENV, raising=False)
+    monkeypatch.delenv(PASSWORD_HASH_ENV, raising=False)
 
 
 def headline_metrics(app: AppTest) -> dict[str, str]:
@@ -28,6 +38,35 @@ def selectbox_by_label(app: AppTest, label: str):
         if box.label == label:
             return box
     raise AssertionError(f"Missing selectbox with label {label!r}")
+
+
+def test_dashboard_password_gate_blocks_dashboard_until_unlocked(monkeypatch) -> None:
+    monkeypatch.setenv(AUTH_REQUIRED_ENV, "true")
+    monkeypatch.setenv(PASSWORD_HASH_ENV, hash_dashboard_password("correct horse battery staple", salt=b"test-salt-123456"))
+
+    app = AppTest.from_file("streamlit_app.py")
+    app.run(timeout=120)
+
+    assert len(app.exception) == 0
+    assert "Password" in [field.label for field in app.text_input]
+    assert "Unlock dashboard" in [button.label for button in app.button]
+    assert len(app.metric) == 0
+
+    app.text_input[0].set_value("wrong")
+    app.button[0].click()
+    app.run(timeout=120)
+
+    assert "Incorrect password." in [error.value for error in app.error]
+    assert len(app.metric) == 0
+
+    app.text_input[0].set_value("correct horse battery staple")
+    app.button[0].click()
+    app.run(timeout=120)
+    app.run(timeout=120)
+
+    assert len(app.exception) == 0
+    assert "Password" not in [field.label for field in app.text_input]
+    assert headline_metrics(app)["Postings in window"] != "0"
 
 
 def test_partial_bundle_shows_operator_guidance(tmp_path: Path, monkeypatch) -> None:

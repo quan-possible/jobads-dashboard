@@ -57,6 +57,15 @@ Detailed runbook:
 
 - `docs/analyses/private_query_dashboard/runbook.md`
 
+## Public Password Gate
+
+When serving the dashboard through a public URL, protect the Streamlit app with a password hash in the service environment:
+
+- `JOBADS_DASHBOARD_AUTH_REQUIRED=true`
+- `JOBADS_DASHBOARD_PASSWORD_HASH=<pbkdf2_sha256 hash>`
+
+Do not commit the password or the hash into the repository. The app fails closed when `JOBADS_DASHBOARD_AUTH_REQUIRED=true` but no password hash is configured.
+
 ## Render Hosting
 
 This repo is set up to deploy as a Docker-based Render web service.
