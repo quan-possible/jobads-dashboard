@@ -16,12 +16,25 @@ const ptSans = PT_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "ACLMR Labour Market Dashboard",
-    template: "%s · ACLMR Labour Market",
+    default: "Canadian Labour Market Pulse · ACLMR",
+    template: "%s · ACLMR",
   },
   description:
-    "Labour-market signals from Canadian online job postings — a descriptive view of posted demand across regions, occupations, industries, wages and skills.",
+    "An interactive view of Canada's online job postings — demand, wages, skills and geography — from the ACLMR aggregates.",
+  applicationName: "ACLMR Labour Market",
+  authors: [{ name: "ACLMR", url: "https://aclmr.ca" }],
+  openGraph: {
+    type: "website",
+    title: "Canadian Labour Market Pulse · ACLMR",
+    description:
+      "An interactive view of Canada's online job postings — demand, wages, skills and geography — from the ACLMR aggregates.",
+    siteName: "ACLMR Labour Market",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default async function RootLayout({

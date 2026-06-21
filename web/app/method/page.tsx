@@ -2,8 +2,15 @@ import { CoverageBar } from "@/components/CoverageBar";
 import { Figure } from "@/components/Figure";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth } from "@/lib/format";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Method",
+  description:
+    "How the ACLMR dashboard works — data sources, field coverage, caveats and key term definitions.",
+};
 
 function ApiDown() {
   return (

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Cream background -->
+  <rect width="32" height="32" fill="#fbf8f5"/>
+  <!-- Pixel-tile mosaic: 4×4 grid of 6px squares with 1px gaps, left-to-right gradient (navy→teal→sand→orange) -->
+  <!-- Row 1 -->
+  <rect x="3"  y="3"  width="6" height="6" fill="#041c2c"/>
+  <rect x="10" y="3"  width="6" height="6" fill="#345961"/>
+  <rect x="17" y="3"  width="6" height="6" fill="#c39e80"/>
+  <rect x="24" y="3"  width="6" height="6" fill="#cf7730"/>
+  <!-- Row 2 -->
+  <rect x="3"  y="10" width="6" height="6" fill="#345961"/>
+  <rect x="10" y="10" width="6" height="6" fill="#345961"/>
+  <rect x="17" y="10" width="6" height="6" fill="#c39e80"/>
+  <rect x="24" y="10" width="6" height="6" fill="#cf7730"/>
+  <!-- Row 3 -->
+  <rect x="3"  y="17" width="6" height="6" fill="#041c2c"/>
+  <rect x="10" y="17" width="6" height="6" fill="#345961"/>
+  <rect x="17" y="17" width="6" height="6" fill="#c39e80"/>
+  <rect x="24" y="17" width="6" height="6" fill="#cf7730"/>
+  <!-- Row 4 -->
+  <rect x="3"  y="24" width="6" height="6" fill="#345961"/>
+  <rect x="10" y="24" width="6" height="6" fill="#c39e80"/>
+  <rect x="17" y="24" width="6" height="6" fill="#cf7730"/>
+  <rect x="24" y="24" width="6" height="6" fill="#041c2c"/>
+</svg>

@@ -69,7 +69,7 @@ export function Choropleth({
       .rotate([98, 0])
       .center([0, 62])
       .parallels([50, 70])
-      .fitSize([width, height], fc);
+      .fitExtent([[12, 12], [width - 12, height - 12]], fc);
     const path = geoPath(projection);
     const values = items.map((i) => i.value).filter((v): v is number => v !== null && v !== undefined);
     const scale = scaleQuantile<string>().domain(values).range(RAMP);

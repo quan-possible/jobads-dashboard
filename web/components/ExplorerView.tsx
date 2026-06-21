@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ClickableRanks } from "@/components/ClickableRanks";
 import { DemandChart } from "@/components/DemandChart";
+import { DownloadCSV } from "@/components/DownloadCSV";
 import { Figure } from "@/components/Figure";
 import { KpiTile } from "@/components/KpiTile";
 import { SkillBars } from "@/components/SkillBars";
@@ -50,6 +51,17 @@ export async function ExplorerView({ filters, dim }: { filters: Filters; dim: "o
   }
   const wageItem = wage?.items?.[0] ?? null;
 
+  // Build CSV download endpoint for the ranked list.
+  const rankQS = (() => {
+    const p = new URLSearchParams({ limit: "20", order: "value" });
+    if (filters.geo) p.set("geo", filters.geo);
+    if (filters.occ) p.set("occ", filters.occ);
+    if (filters.ind) p.set("ind", filters.ind);
+    return p.toString();
+  })();
+  const rankEndpoint = `/api/rank/${dim}?${rankQS}`;
+  const asOfSlug = ov.as_of ?? "latest";
+
   return (
     <div className="pb-4">
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
@@ -64,7 +76,26 @@ export async function ExplorerView({ filters, dim }: { filters: Filters; dim: "o
 
       <section className="container-x py-8">
         <div className="grid gap-5 lg:grid-cols-[1fr_1.1fr]">
-          <Figure eyebrow={`${c.eyebrow} · year over year`} title={c.rankTitle} asOf={ov.as_of} note={c.rankNote}>
+          <Figure
+            eyebrow={`${c.eyebrow} · year over year`}
+            title={c.rankTitle}
+            asOf={ov.as_of}
+            note={c.rankNote}
+            actions={
+              <DownloadCSV
+                endpoint={rankEndpoint}
+                filename={`aclmr-${dim}-${asOfSlug}.csv`}
+                columns={[
+                  { key: "code", header: "Code" },
+                  { key: "label", header: "Label" },
+                  { key: "value", header: "Active Postings" },
+                  { key: "yoy", header: "YoY (%)" },
+                  { key: "share", header: "Share" },
+                ]}
+                pick={(json) => (Array.isArray(json) ? json : [])}
+              />
+            }
+          >
             <ClickableRanks items={ranks} param={c.param} options={c.options} />
           </Figure>
           <Figure

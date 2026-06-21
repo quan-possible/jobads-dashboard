@@ -9,8 +9,9 @@ export function FilterSpine() {
   const pathname = usePathname();
   const { filters, setFilter, reset, activeCount } = useFilters();
 
-  // The trust page and the private lookup are not filter-driven.
-  if (pathname === "/method" || pathname.startsWith("/explore")) return null;
+  // The trust page and the developer docs are not filter-driven. Explore IS —
+  // the same region/occupation/industry controls scope the posting lookup.
+  if (pathname === "/method" || pathname.startsWith("/developers")) return null;
 
   return (
     <div className="sticky top-16 z-30 border-b border-card-border bg-surface-alt/80 backdrop-blur-md">

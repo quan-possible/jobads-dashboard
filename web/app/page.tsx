@@ -8,8 +8,15 @@ import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth, fmtPct, fmtWage } from "@/lib/format";
 import { GEO_OPTIONS, labelFor } from "@/lib/options";
 import type { Filters, RankItem } from "@/lib/types";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Canadian Labour Market Pulse",
+  description:
+    "A monthly read on posted hiring demand across Canada's regions, occupations, industries, wages and skills — from online job ads.",
+};
 
 function ApiDown() {
   return (

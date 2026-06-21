@@ -1,11 +1,19 @@
+import { DownloadCSV } from "@/components/DownloadCSV";
 import { Figure } from "@/components/Figure";
 import { WageRangeBars } from "@/components/WageRangeBars";
 import { api } from "@/lib/api";
 import { fmtMonth, fmtShare } from "@/lib/format";
 import { GEO_OPTIONS, labelFor } from "@/lib/options";
 import type { Filters } from "@/lib/types";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Wages",
+  description:
+    "Posted hourly wage ranges by occupation and province, from Canadian online job ads.",
+};
 
 function ApiDown() {
   return (
@@ -49,6 +57,17 @@ export default async function WagesPage({
 
   const regionLabel = labelFor(GEO_OPTIONS, filters.geo);
   const as_of = occ.as_of;
+
+  // Build query strings for CSV download endpoints (browser-relative paths via Next rewrite).
+  function wagesQS(dim: string): string {
+    const p = new URLSearchParams({ dim });
+    if (filters.geo) p.set("geo", filters.geo);
+    if (filters.occ) p.set("occ", filters.occ);
+    if (filters.ind) p.set("ind", filters.ind);
+    return p.toString();
+  }
+
+  const asOfSlug = as_of ? as_of.replace("-", "-") : "latest";
 
   // Wage coverage share from meta.
   const wageCoverage = meta.coverage.find((c) => c.label === "Wage");
@@ -95,6 +114,20 @@ export default async function WagesPage({
           eyebrow="Posted hourly wage · 25th–75th percentile"
           title="Hourly wage range by occupation"
           asOf={as_of}
+          actions={
+            <DownloadCSV
+              endpoint={`/api/wages?${wagesQS("occupation")}`}
+              filename={`aclmr-wages-occupation-${asOfSlug}.csv`}
+              columns={[
+                { key: "code", header: "Code" },
+                { key: "label", header: "Occupation" },
+                { key: "p25", header: "P25 ($/hr)" },
+                { key: "median", header: "Median ($/hr)" },
+                { key: "p75", header: "P75 ($/hr)" },
+                { key: "n", header: "N" },
+              ]}
+            />
+          }
           note={`Dot = median posted wage. Bar spans the 25th to 75th percentile of wages listed in job ads. Groups with fewer than ${minSample} wage observations are withheld.`}
         >
           <WageRangeBars items={occ.items} />
@@ -107,6 +140,20 @@ export default async function WagesPage({
           eyebrow="Posted hourly wage · 25th–75th percentile"
           title="Hourly wage range by province"
           asOf={as_of}
+          actions={
+            <DownloadCSV
+              endpoint={`/api/wages?${wagesQS("province")}`}
+              filename={`aclmr-wages-province-${asOfSlug}.csv`}
+              columns={[
+                { key: "code", header: "Code" },
+                { key: "label", header: "Province" },
+                { key: "p25", header: "P25 ($/hr)" },
+                { key: "median", header: "Median ($/hr)" },
+                { key: "p75", header: "P75 ($/hr)" },
+                { key: "n", header: "N" },
+              ]}
+            />
+          }
           note={`Dot = median posted wage. Bar spans the 25th to 75th percentile of wages listed in job ads. Groups with fewer than ${minSample} wage observations are withheld.`}
         >
           <WageRangeBars items={province.items} />

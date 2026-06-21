@@ -1,7 +1,14 @@
 import { ExplorerView } from "@/components/ExplorerView";
 import type { Filters } from "@/lib/types";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Occupations",
+  description:
+    "Posted hiring demand across Canada's broad occupational groups (NOC), with trends, wages and in-demand skills.",
+};
 
 export default async function OccupationsPage({
   searchParams,

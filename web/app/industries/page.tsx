@@ -1,7 +1,14 @@
 import { ExplorerView } from "@/components/ExplorerView";
 import type { Filters } from "@/lib/types";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Industries",
+  description:
+    "Posted hiring demand across Canadian industry sectors (NAICS), with trends, wages and in-demand skills.",
+};
 
 export default async function IndustriesPage({
   searchParams,

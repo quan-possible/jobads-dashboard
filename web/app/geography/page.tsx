@@ -1,12 +1,20 @@
 import { Choropleth } from "@/components/Choropleth";
+import { DownloadCSV } from "@/components/DownloadCSV";
 import { Figure } from "@/components/Figure";
 import { SegmentToggle } from "@/components/SegmentToggle";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth } from "@/lib/format";
 import { GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS, labelFor } from "@/lib/options";
 import type { Filters, GeoItem } from "@/lib/types";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Geography",
+  description:
+    "Posted hiring demand by Canadian province — per-capita, concentration, and raw count views.",
+};
 
 function ApiDown() {
   return (
@@ -84,6 +92,16 @@ export default async function GeographyPage({
         ? "Location quotient: a province’s share of postings divided by its share of the labour force. Above 1.0 means hiring is concentrated there relative to its size."
         : "Raw count of active postings — larger provinces lead simply because they are larger.";
 
+  // Build query string for CSV download.
+  const geoQS = (() => {
+    const p = new URLSearchParams({ measure });
+    if (filters.geo) p.set("geo", filters.geo);
+    if (filters.occ) p.set("occ", filters.occ);
+    if (filters.ind) p.set("ind", filters.ind);
+    return p.toString();
+  })();
+  const asOfSlug = data.as_of ?? "latest";
+
   return (
     <div className="pb-4">
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
@@ -102,7 +120,23 @@ export default async function GeographyPage({
           eyebrow="By province"
           title="Posted hiring demand across Canada"
           asOf={data.as_of}
-          actions={<SegmentToggle param="measure" defaultValue="per10k" options={MEASURES} ariaLabel="Choose how to measure demand" />}
+          actions={
+            <>
+              <DownloadCSV
+                endpoint={`/api/geography?${geoQS}`}
+                filename={`aclmr-geography-${measure}-${asOfSlug}.csv`}
+                columns={[
+                  { key: "code", header: "Code" },
+                  { key: "label", header: "Province" },
+                  { key: "value", header: "Value" },
+                  { key: "count", header: "Count" },
+                  { key: "per10k", header: "Per 10k" },
+                  { key: "lq", header: "Location Quotient" },
+                ]}
+              />
+              <SegmentToggle param="measure" defaultValue="per10k" options={MEASURES} ariaLabel="Choose how to measure demand" />
+            </>
+          }
           note={
             <>
               <span className="block">{measureExplainer}</span>

@@ -35,7 +35,22 @@ def _resolve_skills_csv() -> pathlib.Path:
     return pathlib.Path("/Volumes/ACLMR/jobads-data/main/config/skills.csv")
 
 
+def _resolve_posting_lookup() -> pathlib.Path:
+    """Private posting-level lookup. Gitignored, so it is read from the main
+    checkout (or an explicit env override), never bundled into the worktree."""
+    env = os.environ.get("JOBADS_POSTING_LOOKUP")
+    if env:
+        return pathlib.Path(env)
+    local = DATA_DIR / "posting_lookup.parquet"
+    if local.exists():
+        return local
+    return pathlib.Path(
+        "/Volumes/ACLMR/jobads-dashboard/data/derived/labor_market_dashboard_v1/posting_lookup.parquet"
+    )
+
+
 SKILLS_CSV = _resolve_skills_csv()
+POSTING_LOOKUP = _resolve_posting_lookup()
 PROVINCE_LF_CSV = REFERENCE_DIR / "province_labour_force.csv"
 PROVINCE_TOPO = REFERENCE_DIR / "canada_provinces.topo.json"
 METADATA_JSON = DATA_DIR / "metadata.json"

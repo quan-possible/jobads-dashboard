@@ -19,12 +19,15 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
         </div>
 
         <nav aria-label="Sections" className="flex flex-col gap-2">
-          <span className="eyebrow text-orange-soft">Explore</span>
+          <span className="eyebrow text-orange-soft">Dashboard</span>
           {NAV.map((item) => (
             <Link key={item.href} href={item.href} className="w-fit text-[0.9rem] text-ink-invert/80 transition-colors hover:text-orange-soft">
               {item.label}
             </Link>
           ))}
+          <Link href="/developers" className="w-fit text-[0.9rem] text-ink-invert/80 transition-colors hover:text-orange-soft">
+            Developers
+          </Link>
         </nav>
 
         <div className="flex flex-col gap-3 text-[0.82rem] text-ink-invert/65">

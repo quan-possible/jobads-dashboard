@@ -1,3 +1,4 @@
+import { DownloadCSV } from "@/components/DownloadCSV";
 import { Figure } from "@/components/Figure";
 import { ShareBars } from "@/components/ShareBars";
 import { SkillBars } from "@/components/SkillBars";
@@ -5,8 +6,15 @@ import { api } from "@/lib/api";
 import { fmtCompact, fmtMonth } from "@/lib/format";
 import { ALL_GEO, ALL_IND, ALL_OCC, GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS, labelFor } from "@/lib/options";
 import type { Filters } from "@/lib/types";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Skills",
+  description:
+    "Skills and requirements most commonly listed in Canadian job postings, by region, occupation and industry.",
+};
 
 function ApiDown() {
   return (
@@ -64,6 +72,26 @@ export default async function SkillsPage({
 
   const as_of = top.as_of;
 
+  // Build query strings for CSV download endpoints.
+  function skillsQS(mode: string, limit: number): string {
+    const p = new URLSearchParams({ mode, limit: String(limit) });
+    if (filters.geo) p.set("geo", filters.geo);
+    if (filters.occ) p.set("occ", filters.occ);
+    if (filters.ind) p.set("ind", filters.ind);
+    return p.toString();
+  }
+
+  const asOfSlug = as_of ?? "latest";
+
+  const skillColumns = [
+    { key: "code", header: "Code" },
+    { key: "label", header: "Skill" },
+    { key: "group", header: "Group" },
+    { key: "share", header: "Share" },
+    { key: "count", header: "Count" },
+    { key: "lift", header: "Lift" },
+  ];
+
   return (
     <div className="pb-4">
       {/* Hero */}
@@ -90,6 +118,13 @@ export default async function SkillsPage({
           eyebrow={`Share of postings · skills`}
           title="Most-requested skills"
           asOf={as_of}
+          actions={
+            <DownloadCSV
+              endpoint={`/api/skills?${skillsQS("top", 15)}`}
+              filename={`aclmr-skills-top-${asOfSlug}.csv`}
+              columns={skillColumns}
+            />
+          }
           note={`Among the ${fmtCompact(top.n)} postings that list skills.`}
         >
           <SkillBars items={top.items} metric="share" />
@@ -102,6 +137,15 @@ export default async function SkillsPage({
           eyebrow="Vs the national mix"
           title="What’s distinctive here"
           asOf={as_of}
+          actions={
+            scopeActive ? (
+              <DownloadCSV
+                endpoint={`/api/skills?${skillsQS("distinctive", 12)}`}
+                filename={`aclmr-skills-distinctive-${asOfSlug}.csv`}
+                columns={skillColumns}
+              />
+            ) : undefined
+          }
           note="Skills more common here than across Canada (lift = local share ÷ national share)."
         >
           {!scopeActive ? (

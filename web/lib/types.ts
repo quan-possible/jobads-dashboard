@@ -142,3 +142,51 @@ export interface Filters {
   end?: string;
   cmp?: string;
 }
+
+// --- Private Explore (posting-level lookup) ---
+
+export interface AuthStatus {
+  authenticated: boolean;
+  configured: boolean;
+}
+
+export interface PostingRow {
+  posting_id: string;
+  month: string;
+  date_found: string | null;
+  job_title: string | null;
+  employer: string | null;
+  province: string | null;
+  market: string | null;
+  occupation: string | null;
+  industry: string | null;
+  wage_hourly: number | null;
+  wage_min: number | null;
+  wage_max: number | null;
+  employment_type: string | null;
+  remote_class: string | null;
+  has_description: boolean;
+}
+
+export interface PostingsResponse {
+  scope: Scope;
+  total: number;
+  limit: number;
+  offset: number;
+  items: PostingRow[];
+}
+
+export interface PostingDetail extends PostingRow {
+  noc_code: string | null;
+  noc_label: string | null;
+  naics_code: string | null;
+  naics_label: string | null;
+  wage_unit: string | null;
+  duration: string | null;
+  experience: string | null;
+  experience_details: string | null;
+  education: string | null;
+  primary_posting_language: string | null;
+  data_source: string | null;
+  description_full: string | null;
+}

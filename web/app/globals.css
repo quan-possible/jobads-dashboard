@@ -228,6 +228,18 @@ body {
   border-radius: var(--radius-control);
 }
 
+/* Explore detail drawer slide-in */
+@keyframes drawerIn {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

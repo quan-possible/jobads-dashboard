@@ -184,3 +184,58 @@ class RequirementsResponse(BaseModel):
     education: list[CategoryShare]
     experience: list[CategoryShare]
     language: list[CategoryShare]
+
+
+# --------------------------------------------------------------------------- #
+# Auth + private postings (Explore)
+# --------------------------------------------------------------------------- #
+
+
+class AuthStatus(BaseModel):
+    authenticated: bool
+    configured: bool = Field(description="True if a password source is available.")
+
+
+class PostingRow(BaseModel):
+    """One posting in the Explore table (list view — no full description)."""
+
+    posting_id: str
+    month: str
+    date_found: str | None = None
+    job_title: str | None = None
+    employer: str | None = None
+    province: str | None = None
+    market: str | None = None
+    occupation: str | None = None
+    industry: str | None = None
+    wage_hourly: float | None = None
+    wage_min: float | None = None
+    wage_max: float | None = None
+    employment_type: str | None = None
+    remote_class: str | None = None
+    has_description: bool = False
+
+
+class PostingsResponse(BaseModel):
+    scope: Scope
+    total: int = Field(description="Total matching postings (capped for performance).")
+    limit: int
+    offset: int
+    items: list[PostingRow]
+
+
+class PostingDetail(PostingRow):
+    """Full posting record, including the description, for the drawer view."""
+
+    noc_code: str | None = None
+    noc_label: str | None = None
+    naics_code: str | None = None
+    naics_label: str | None = None
+    wage_unit: str | None = None
+    duration: str | None = None
+    experience: str | None = None
+    experience_details: str | None = None
+    education: str | None = None
+    primary_posting_language: str | None = None
+    data_source: str | None = None
+    description_full: str | None = None
