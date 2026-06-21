@@ -1,0 +1,58 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS } from "@/lib/options";
+import { useFilters } from "@/lib/useFilters";
+import { Select } from "./Select";
+
+export function FilterSpine() {
+  const pathname = usePathname();
+  const { filters, setFilter, reset, activeCount } = useFilters();
+
+  // The trust page and the private lookup are not filter-driven.
+  if (pathname === "/method" || pathname.startsWith("/explore")) return null;
+
+  return (
+    <div className="sticky top-16 z-30 border-b border-card-border bg-surface-alt/80 backdrop-blur-md">
+      <div className="container-x flex flex-wrap items-end gap-x-4 gap-y-3 py-3">
+        <div className="mr-1 flex flex-col">
+          <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-orange">Filter</span>
+          <span className="text-[0.7rem] font-bold uppercase tracking-[0.02em] text-ink-soft">
+            Across the dashboard
+          </span>
+        </div>
+        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <Select
+            id="filter-geo"
+            label="Region"
+            value={filters.geo}
+            options={GEO_OPTIONS}
+            onChange={(v) => setFilter("geo", v)}
+          />
+          <Select
+            id="filter-occ"
+            label="Occupation"
+            value={filters.occ}
+            options={OCC_OPTIONS}
+            onChange={(v) => setFilter("occ", v)}
+          />
+          <Select
+            id="filter-ind"
+            label="Industry"
+            value={filters.ind}
+            options={IND_OPTIONS}
+            onChange={(v) => setFilter("ind", v)}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={reset}
+          disabled={activeCount === 0}
+          className="control h-[38px] shrink-0 self-end border border-card-border px-3 text-[0.74rem] font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
+        >
+          Reset{activeCount > 0 ? ` · ${activeCount}` : ""}
+        </button>
+      </div>
+    </div>
+  );
+}
