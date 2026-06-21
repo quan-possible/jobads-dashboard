@@ -19,6 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0.0",
+  "kaleido>=1.0.0",  # static PNG export for visual verification of viz figures
 ]
 api = [
   "fastapi>=0.115.0",
