@@ -1,0 +1,50 @@
+<svg viewBox="0 0 760 470" xmlns="http://www.w3.org/2000/svg" font-family="PT Sans, ui-sans-serif, system-ui, sans-serif">
+  <rect width="760" height="470" fill="#fbf8f5"/>
+  <rect x="10" y="10" width="740" height="450" rx="10" fill="#ffffff" stroke="#e3d6c8"/>
+
+  <!-- view toggle (top-left) -->
+  <g font-size="11" font-weight="700">
+    <rect x="28" y="24" width="56" height="24" rx="6" fill="#f7efe9" stroke="#e3d6c8"/><text x="56" y="40" text-anchor="middle" fill="#5d6b74">Line</text>
+    <rect x="88" y="24" width="56" height="24" rx="6" fill="#041c2c"/><text x="116" y="40" text-anchor="middle" fill="#ffffff">Bar</text>
+    <rect x="148" y="24" width="56" height="24" rx="6" fill="#f7efe9" stroke="#e3d6c8"/><text x="176" y="40" text-anchor="middle" fill="#5d6b74">Map</text>
+    <rect x="208" y="24" width="56" height="24" rx="6" fill="#f7efe9" stroke="#e3d6c8"/><text x="236" y="40" text-anchor="middle" fill="#5d6b74">Table</text>
+  </g>
+  <!-- settings (top-right) -->
+  <g font-size="11" font-weight="700">
+    <rect x="556" y="24" width="98" height="24" rx="6" fill="#f7efe9" stroke="#e3d6c8"/><text x="605" y="40" text-anchor="middle" fill="#5d6b74">Relative ▢</text>
+    <rect x="662" y="24" width="70" height="24" rx="6" fill="#f7efe9" stroke="#e3d6c8"/><text x="697" y="40" text-anchor="middle" fill="#5d6b74">⚙ Log</text>
+  </g>
+
+  <!-- title -->
+  <text x="28" y="76" font-size="9.5" letter-spacing="0.06em" font-weight="700" fill="#a25518">POSTED HIRING DEMAND BY PROVINCE</text>
+  <text x="28" y="96" font-size="15" font-weight="700" fill="#041c2c">March 2026 — Ontario and Québec lead</text>
+  <text x="540" y="96" font-size="10.5" fill="#616a71">▮ scrubbed to Mar 2026</text>
+
+  <!-- bars -->
+  <g font-size="11.5" font-weight="700" fill="#16242f">
+    <text x="170" y="124" text-anchor="end">Ontario</text><rect x="180" y="111" width="480" height="18" rx="3" fill="#cf7730"/><text x="668" y="124" font-size="10.5" font-family="ui-monospace,monospace" fill="#5d6b74">720k</text>
+    <text x="170" y="160" text-anchor="end">Québec</text><rect x="180" y="147" width="273" height="18" rx="3" fill="#345961"/><text x="461" y="160" font-size="10.5" font-family="ui-monospace,monospace" fill="#5d6b74">410k</text>
+    <text x="170" y="196" text-anchor="end">British Columbia</text><rect x="180" y="183" width="200" height="18" rx="3" fill="#345961"/><text x="388" y="196" font-size="10.5" font-family="ui-monospace,monospace" fill="#5d6b74">300k</text>
+    <text x="170" y="232" text-anchor="end">Alberta</text><rect x="180" y="219" width="187" height="18" rx="3" fill="#345961"/><text x="375" y="232" font-size="10.5" font-family="ui-monospace,monospace" fill="#5d6b74">280k</text>
+    <text x="170" y="268" text-anchor="end">Manitoba</text><rect x="180" y="255" width="60" height="18" rx="3" fill="#345961"/><text x="248" y="268" font-size="10.5" font-family="ui-monospace,monospace" fill="#5d6b74">90k</text>
+    <text x="170" y="304" text-anchor="end">Nova Scotia</text><rect x="180" y="291" width="47" height="18" rx="3" fill="#345961"/><text x="235" y="304" font-size="10.5" font-family="ui-monospace,monospace" fill="#5d6b74">70k</text>
+    <text x="170" y="340" text-anchor="end">Saskatchewan</text><rect x="180" y="327" width="40" height="18" rx="3" fill="#345961"/><text x="228" y="340" font-size="10.5" font-family="ui-monospace,monospace" fill="#5d6b74">60k</text>
+  </g>
+
+  <!-- timeline / play -->
+  <line x1="60" y1="406" x2="700" y2="406" stroke="#e3d6c8" stroke-width="4" stroke-linecap="round"/>
+  <line x1="60" y1="406" x2="690" y2="406" stroke="#345961" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="30" cy="406" r="13" fill="#041c2c"/>
+  <path d="M25,400 L25,412 L36,406 Z" fill="#ffffff"/>
+  <circle cx="690" cy="406" r="9" fill="#ffffff" stroke="#041c2c" stroke-width="2.5"/>
+  <g font-size="9.5" fill="#616a71">
+    <text x="60" y="430" text-anchor="middle">2016</text>
+    <text x="188" y="430" text-anchor="middle">2018</text>
+    <text x="316" y="430" text-anchor="middle">2020</text>
+    <text x="444" y="430" text-anchor="middle">2022</text>
+    <text x="572" y="430" text-anchor="middle">2024</text>
+    <text x="700" y="430" text-anchor="middle">2026</text>
+  </g>
+
+  <text x="10" y="454" font-size="11" fill="#5d6b74">The reference pattern: one chart, four views, a play button + a 123-month scrubber. Drag to any month; bars re-sort. Same data, same footprint.</text>
+</svg>

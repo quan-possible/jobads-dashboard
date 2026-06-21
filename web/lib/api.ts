@@ -10,6 +10,12 @@ import type {
   SeriesPoint,
   SkillsResponse,
   WagesResponse,
+  WageTrendResponse,
+  CompositionResponse,
+  ConcentrationResponse,
+  MatrixResponse,
+  CoverageTrendResponse,
+  GeoTrendResponse,
   RankItem,
 } from "./types";
 
@@ -48,6 +54,16 @@ export const api = {
     get<GeographyResponse>(`/api/geography${qs(f, { measure })}`),
   wages: (f?: Filters, dim: string = "occupation") =>
     get<WagesResponse>(`/api/wages${qs(f, { dim })}`),
+  wageTrend: (f?: Filters) => get<WageTrendResponse>(`/api/wages/trend${qs(f)}`),
+  composition: (dim: "occupations" | "industries", f?: Filters) =>
+    get<CompositionResponse>(`/api/composition/${dim}${qs(f)}`),
+  concentration: (dim: "occupations" | "industries", f?: Filters) =>
+    get<ConcentrationResponse>(`/api/concentration/${dim}${qs(f)}`),
+  matrixOccProvince: (f?: Filters, measure: string = "lq") =>
+    get<MatrixResponse>(`/api/matrix/occ-province${qs(f, { measure })}`),
+  coverageTrend: (f?: Filters, field: string = "naics") =>
+    get<CoverageTrendResponse>(`/api/coverage/trend${qs(f, { field })}`),
+  geographyTrend: (f?: Filters) => get<GeoTrendResponse>(`/api/geography/trend${qs(f)}`),
   skills: (f?: Filters, opts: { mode?: string; limit?: number } = {}) =>
     get<SkillsResponse>(`/api/skills${qs(f, { mode: opts.mode, limit: opts.limit })}`),
   requirements: (f?: Filters) => get<RequirementsResponse>(`/api/requirements${qs(f)}`),

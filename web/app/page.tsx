@@ -1,15 +1,18 @@
 import Link from "next/link";
-import { DemandChart } from "@/components/DemandChart";
+import { ExplorerChart } from "@/components/ExplorerChart";
+import { SeasonalityHeatmap } from "@/components/SeasonalityHeatmap";
+import { DivergingMovers } from "@/components/DivergingMovers";
 import { Figure } from "@/components/Figure";
 import { KeyPoints } from "@/components/KeyPoints";
 import { KpiTile } from "@/components/KpiTile";
-import { RankedBars } from "@/components/RankedBars";
+import { SparklineTable, type SparkRow } from "@/components/SparklineTable";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth, fmtPct, fmtWage } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { pulseDict } from "@/lib/i18n/dict/page-pulse";
+import { explorerDict } from "@/lib/i18n/dict/explorer";
 import { GEO_OPTIONS, labelFor } from "@/lib/options";
-import type { Filters, RankItem } from "@/lib/types";
+import type { Filters } from "@/lib/types";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -62,6 +65,11 @@ export default async function PulsePage({
 
   const indexSpark = series.slice(-24).map((p) => p.index ?? 0);
   const postingsSpark = series.slice(-24).map((p) => p.postings);
+  const yoySpark = series
+    .filter((p) => p.yoy !== null)
+    .slice(-24)
+    .map((p) => p.yoy as number);
+  const wageSpark = kpis.median_wage_trend ?? undefined;
 
   const baselineGap = kpis.demand_index !== null ? kpis.demand_index - 100 : null;
   // Headline is API-derived (composed from data) — left in English as specified.
@@ -72,10 +80,16 @@ export default async function PulsePage({
 
   const growing = top_growing.filter((i) => (i.yoy ?? 0) > 0);
   const cooling = top_cooling.filter((i) => (i.yoy ?? 0) < 0);
+  // One honest scale: growth + decline in a single diverging chart.
+  const movers = [...growing, ...cooling];
 
-  const geoItems: RankItem[] = geo.items
-    .slice(0, 6)
-    .map((g) => ({ code: g.code, label: g.label, value: g.count ?? 0, yoy: g.yoy, share: null }));
+  const geoRows: SparkRow[] = geo.items.slice(0, 8).map((g) => ({
+    code: g.code,
+    label: g.label,
+    value: g.count ?? 0,
+    yoy: g.yoy,
+    trend: g.trend,
+  }));
 
   return (
     <div className="pb-4">
@@ -115,12 +129,16 @@ export default async function PulsePage({
             label={t.kpiYoyLabel}
             value={fmtPct(kpis.active_yoy_pct, { sign: true })}
             context={t.kpiYoyContext}
+            spark={yoySpark.length > 1 ? yoySpark : undefined}
+            sparkColor="var(--teal)"
           />
           <KpiTile
             label={t.kpiWageLabel}
             value={fmtWage(kpis.median_wage)}
             unit={kpis.median_wage ? t.kpiWageUnit : undefined}
             context={kpis.wage_n ? `n = ${fmtCompact(kpis.wage_n)}` : t.kpiWageInsufficient}
+            spark={wageSpark && wageSpark.length > 1 ? wageSpark : undefined}
+            sparkColor="var(--teal)"
           />
         </div>
       </section>
@@ -134,48 +152,52 @@ export default async function PulsePage({
             asOf={as_of}
             note={t.demandNote}
           >
-            <DemandChart series={series} />
+            <ExplorerChart
+              series={series}
+              labels={explorerDict[locale]}
+              ariaLabel="Posting demand over time — switch between index, postings and year-over-year"
+            />
           </Figure>
           <KeyPoints points={key_points} title={t.keyPointsTitle} />
         </div>
       </section>
 
-      {/* Ranked movers */}
+      {/* Movers + regional snapshot */}
       <section className="container-x py-4">
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
           <Figure
             eyebrow={t.moversEyebrow}
-            title={t.growingTitle}
+            title={t.moversTitle}
             asOf={as_of}
-            note={t.growingNote}
+            note={t.moversNote}
           >
-            <RankedBars items={growing} metric="yoy" emptyHint={t.growingEmpty} />
+            <DivergingMovers items={movers} emptyHint={t.moversEmpty} />
           </Figure>
           <Figure
-            eyebrow={t.moversEyebrow}
-            title={t.coolingTitle}
+            eyebrow={t.regionalEyebrow}
+            title={t.regionalTitle}
             asOf={as_of}
-            note={t.coolingNote}
+            actions={
+              <Link href="/geography" className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange-deep hover:underline">
+                {t.fullMap}
+              </Link>
+            }
+            note={t.regionalNote}
           >
-            <RankedBars items={cooling} metric="yoy" emptyHint={t.coolingEmpty} />
+            <SparklineTable rows={geoRows} valueLabel={t.regionalValueLabel} trendLabel={t.trendLabel} />
           </Figure>
         </div>
       </section>
 
-      {/* Regional snapshot */}
+      {/* Seasonality — month × year, normalised to each year's average */}
       <section className="container-x py-4">
         <Figure
-          eyebrow={t.regionalEyebrow}
-          title={t.regionalTitle}
+          eyebrow={t.seasonalityEyebrow}
+          title={t.seasonalityTitle}
           asOf={as_of}
-          actions={
-            <Link href="/geography" className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange-deep hover:underline">
-              {t.fullMap}
-            </Link>
-          }
-          note={t.regionalNote}
+          note={t.seasonalityNote}
         >
-          <RankedBars items={geoItems} metric="value" />
+          <SeasonalityHeatmap series={series} monthLabels={t.monthsShort} />
         </Figure>
       </section>
     </div>

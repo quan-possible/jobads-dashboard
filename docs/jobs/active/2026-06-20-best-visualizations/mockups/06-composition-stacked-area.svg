@@ -1,0 +1,43 @@
+<svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" font-family="PT Sans, ui-sans-serif, system-ui, sans-serif">
+  <rect width="720" height="340" fill="#fbf8f5"/>
+  <rect x="10" y="10" width="700" height="320" rx="10" fill="#ffffff" stroke="#e3d6c8"/>
+  <text x="28" y="38" font-size="9.5" letter-spacing="0.06em" font-weight="700" fill="#a25518">OCCUPATION MIX OVER TIME · % OF CODED POSTINGS</text>
+  <text x="28" y="56" font-size="15" font-weight="700" fill="#041c2c">How the occupational share of demand has shifted</text>
+
+  <!-- bands -->
+  <polygon fill="#345961" points="56,300 164.8,300 273.6,300 382.4,300 491.2,300 600,300 600,244.8 491.2,242.4 382.4,240 273.6,228 164.8,235.2 56,232.8"/>
+  <polygon fill="#cf7730" points="56,232.8 164.8,235.2 273.6,228 382.4,240 491.2,242.4 600,244.8 600,196.8 491.2,192 382.4,189.6 273.6,180 164.8,182.4 56,180"/>
+  <polygon fill="#6f93a0" points="56,180 164.8,182.4 273.6,180 382.4,189.6 491.2,192 600,196.8 600,153.6 491.2,151.2 382.4,148.8 273.6,144 164.8,144 56,141.6"/>
+  <polygon fill="#9a6a3c" points="56,141.6 164.8,144 273.6,144 382.4,148.8 491.2,151.2 600,153.6 600,115.2 491.2,115.2 382.4,115.2 273.6,115.2 164.8,112.8 56,112.8"/>
+  <polygon fill="#3f7a5c" points="56,112.8 164.8,112.8 273.6,115.2 382.4,115.2 491.2,115.2 600,115.2 600,79.2 491.2,81.6 382.4,84 273.6,86.4 164.8,86.4 56,88.8"/>
+  <polygon fill="#8a5f86" points="56,88.8 164.8,86.4 273.6,86.4 382.4,84 491.2,81.6 600,79.2 600,60 491.2,60 382.4,60 273.6,60 164.8,60 56,60"/>
+
+  <!-- y labels -->
+  <g font-size="9.5" fill="#616a71">
+    <text x="50" y="304" text-anchor="end">0%</text>
+    <text x="50" y="184" text-anchor="end">50%</text>
+    <text x="50" y="64" text-anchor="end">100%</text>
+  </g>
+
+  <!-- direct band labels -->
+  <g font-size="10" font-weight="700" fill="#16242f">
+    <text x="606" y="276">Sales &amp; service</text>
+    <text x="606" y="225">Trades &amp; transport</text>
+    <text x="606" y="179">Business &amp; finance</text>
+    <text x="606" y="138">Health</text>
+    <text x="606" y="101">Sciences</text>
+    <text x="606" y="74">Other</text>
+  </g>
+
+  <!-- x labels -->
+  <g font-size="9.5" fill="#616a71">
+    <text x="56" y="318" text-anchor="middle">2016</text>
+    <text x="164.8" y="318" text-anchor="middle">2018</text>
+    <text x="273.6" y="318" text-anchor="middle">2020</text>
+    <text x="382.4" y="318" text-anchor="middle">2022</text>
+    <text x="491.2" y="318" text-anchor="middle">2024</text>
+    <text x="600" y="318" text-anchor="middle">2026</text>
+  </g>
+
+  <text x="10" y="335" font-size="10.5" fill="#5d6b74">100% stacked area shows a structural shift a snapshot bar can’t. Tail lumped into “Other”, labelled at the right edge. Same component renders province, occupation and industry mix.</text>
+</svg>

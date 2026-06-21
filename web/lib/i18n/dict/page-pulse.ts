@@ -28,8 +28,11 @@ export const pulseDict = {
     demandNote: "Index of monthly active postings, January 2019 = 100. Hover for monthly values.",
     keyPointsTitle: "What stands out",
 
-    // Movers section — both panels share the same eyebrow
+    // Movers section — one diverging chart, growth + decline on one scale
     moversEyebrow: "Occupations · year over year",
+    moversTitle: "Biggest movers in hiring demand",
+    moversNote: "Broad occupational groups (NOC) with the largest year-over-year change, growth and decline on one scale.",
+    moversEmpty: "No broad group changed year over year this month.",
     growingTitle: "Where hiring demand is climbing fastest",
     growingNote: "Broad occupational groups (NOC) with rising year-over-year demand.",
     growingEmpty: "No broad group grew year over year this month.",
@@ -41,7 +44,15 @@ export const pulseDict = {
     regionalEyebrow: "Regional snapshot",
     regionalTitle: "Active postings by province this month",
     regionalNote: "Counts of active postings. See Geography for per-capita and concentration views.",
+    regionalValueLabel: "Postings",
+    trendLabel: "24-mo trend",
     fullMap: "Full map →",
+
+    // Seasonality heatmap
+    seasonalityEyebrow: "Seasonality · month by year",
+    seasonalityTitle: "When hiring picks up through the year",
+    seasonalityNote: "Each cell is that month's active postings relative to its own year's average (1.00× = average), so the seasonal shape shows through the long-run trend. Hover for exact values.",
+    monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
 
     // ApiDown error card
     apiDownTitle: "Data service unavailable",
@@ -72,8 +83,11 @@ export const pulseDict = {
     demandNote: "Indice des offres actives mensuelles, janvier 2019 = 100. Survolez pour les valeurs mensuelles.",
     keyPointsTitle: "Ce qui ressort",
 
-    // Movers section
+    // Movers section — un seul graphique divergent
     moversEyebrow: "Professions · année sur année",
+    moversTitle: "Plus fortes variations de la demande",
+    moversNote: "Grands groupes professionnels (CNP) avec la plus forte variation sur un an, hausse et baisse sur une même échelle.",
+    moversEmpty: "Aucun grand groupe n’a varié sur un an ce mois-ci.",
     growingTitle: "Où la demande grimpe le plus vite",
     growingNote: "Grands groupes professionnels (CNP) en hausse d’une année à l’autre.",
     growingEmpty: "Aucun grand groupe n’a progressé sur un an ce mois-ci.",
@@ -85,7 +99,15 @@ export const pulseDict = {
     regionalEyebrow: "Aperçu régional",
     regionalTitle: "Offres actives par province ce mois-ci",
     regionalNote: "Nombre d’offres actives. Voir Géographie pour les vues par habitant et de concentration.",
+    regionalValueLabel: "Offres",
+    trendLabel: "Tendance 24 mois",
     fullMap: "Carte complète →",
+
+    // Seasonality heatmap
+    seasonalityEyebrow: "Saisonnalité · mois par année",
+    seasonalityTitle: "Quand l'embauche s'accélère dans l'année",
+    seasonalityNote: "Chaque cellule représente les offres actives du mois par rapport à la moyenne de son année (1,00× = moyenne), pour révéler la forme saisonnière au-delà de la tendance de fond. Survolez pour les valeurs exactes.",
+    monthsShort: ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"],
 
     // ApiDown error card
     apiDownTitle: "Service de données indisponible",

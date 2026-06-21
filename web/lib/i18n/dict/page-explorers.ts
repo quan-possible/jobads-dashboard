@@ -64,6 +64,29 @@ export const explorersDict = {
     skillBarsAriaLabel: "Top requested skills",
     skillBarsEmptyText: "No skill data for this selection.",
 
+    // Concentration KPIs
+    hhiLabel: "Concentration (HHI)",
+    hhiContext: "0–10,000 · higher = more concentrated",
+    top5Label: "Top-5 share",
+    top5Context: "of demand in the 5 largest groups",
+    nGroupsLabel: "Groups",
+    nGroupsContext: "broad groups with demand",
+
+    // Composition over time
+    compEyebrow: "Mix over time",
+    compTitle: "How the composition of demand has shifted",
+    compNote: "Share of coded postings by broad group each month (top groups; the rest pooled as “Other”).",
+
+    // Occupation × province heatmap
+    matrixEyebrow: "Occupation × province",
+    matrixTitle: "Where each occupation concentrates",
+    matrixNote: "Location quotient: a cell’s share of a province’s demand vs the national mix. 1.0 = as expected; above 1 = over-represented.",
+
+    // Coverage-stability (industries)
+    coverageEyebrow: "Coverage over time",
+    coverageTitle: "Share of postings with a usable industry code",
+    coverageNote: "Not every posting carries a classifiable NAICS industry. This is the honesty companion to the industry views above.",
+
     // ApiDown error
     apiDownTitle: "Data service unavailable",
     apiDownBody: "The API isn’t responding. Start it with",
@@ -129,6 +152,29 @@ export const explorersDict = {
     // SkillBars accessibility
     skillBarsAriaLabel: "Compétences les plus demandées",
     skillBarsEmptyText: "Aucune donnée de compétences pour cette sélection.",
+
+    // Concentration KPIs
+    hhiLabel: "Concentration (IHH)",
+    hhiContext: "0–10 000 · plus élevé = plus concentré",
+    top5Label: "Part du top 5",
+    top5Context: "de la demande dans les 5 plus grands groupes",
+    nGroupsLabel: "Groupes",
+    nGroupsContext: "grands groupes avec demande",
+
+    // Composition over time
+    compEyebrow: "Composition au fil du temps",
+    compTitle: "Comment la composition de la demande a évolué",
+    compNote: "Part des offres codées par grand groupe chaque mois (principaux groupes; le reste regroupé sous « Autre »).",
+
+    // Occupation × province heatmap
+    matrixEyebrow: "Profession × province",
+    matrixTitle: "Où chaque profession se concentre",
+    matrixNote: "Quotient de localisation : part d’une profession dans la demande d’une province vs la moyenne nationale. 1,0 = attendu; au-dessus de 1 = surreprésenté.",
+
+    // Coverage-stability (industries)
+    coverageEyebrow: "Couverture au fil du temps",
+    coverageTitle: "Part des offres avec un code d’industrie utilisable",
+    coverageNote: "Toutes les offres ne portent pas un code SCIAN classifiable. C’est le complément d’honnêteté aux vues sectorielles ci-dessus.",
 
     // ApiDown error
     apiDownTitle: "Service de données indisponible",

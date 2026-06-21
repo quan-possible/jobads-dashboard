@@ -1,17 +1,22 @@
 "use client";
 
-import { geoConicConformal, geoPath } from "d3-geo";
-import { scaleQuantile } from "d3-scale";
+import { useEffect, useMemo, useState } from "react";
+import type { Data, Layout } from "plotly.js";
 import type { FeatureCollection, Geometry } from "geojson";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { feature } from "topojson-client";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import { fmtCompact, fmtInt } from "@/lib/format";
+import { PC } from "@/lib/plotly/theme";
 import type { GeoItem } from "@/lib/types";
+import { PlotlyFigure } from "./PlotlyFigure";
+
+// Provincial choropleth, now drawn by Plotly (replacing the hand-rolled d3 +
+// quantile SVG). Two traces over our provinces GeoJSON: a gray base so no-data
+// provinces read as "no data", and the warm sequential ramp on top for the
+// measured provinces. A custom HTML legend keeps the editorial look; Plotly's
+// colorbar stays off.
 
 type ProvProps = { code: string; name: string };
-const RAMP = ["#efe2d2", "#e3bd92", "#d59257", "#cf7730", "#a4531b"];
-const NO_DATA = "#ece4da";
 
 export type ChoroLabels = {
   per10k: string;
@@ -35,13 +40,17 @@ const DEFAULT_LABELS: ChoroLabels = {
   noPostings: "No postings recorded",
 };
 
+const NO_DATA = "#ece4da";
+const SEQ = PC.sequential;
+const COLORSCALE = SEQ.map((c, i) => [i / (SEQ.length - 1), c] as [number, string]);
+
 function measureLabel(measure: string, labels: ChoroLabels): string {
   if (measure === "per10k") return labels.per10k;
   if (measure === "lq") return labels.lq;
   return labels.count;
 }
 
-function formatValue(v: number | null, measure: string): string {
+function valueFmt(v: number | null, measure: string): string {
   if (v === null || v === undefined) return "—";
   if (measure === "count") return fmtCompact(v);
   if (measure === "lq") return v.toFixed(2);
@@ -59,129 +68,119 @@ export function Choropleth({
   height?: number;
   labels?: ChoroLabels;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
   const [topo, setTopo] = useState<Topology | null>(null);
-  const [width, setWidth] = useState(0);
-  const [hover, setHover] = useState<{ x: number; y: number; item: GeoItem | null; name: string } | null>(null);
 
   useEffect(() => {
+    let alive = true;
     fetch("/geo/canada_provinces.topo.json")
       .then((r) => r.json())
-      .then(setTopo)
-      .catch(() => setTopo(null));
+      .then((t) => alive && setTopo(t))
+      .catch(() => alive && setTopo(null));
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    setWidth(el.clientWidth || 600);
-    const ro = new ResizeObserver((e) => {
-      const w = Math.floor(e[0]?.contentRect.width ?? 0);
-      if (w > 0) setWidth(w);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const byCode = useMemo(() => new Map(items.map((i) => [i.code, i])), [items]);
-
-  const built = useMemo(() => {
-    if (!topo || width === 0) return null;
+  const fc = useMemo<FeatureCollection<Geometry, ProvProps> | null>(() => {
+    if (!topo) return null;
     const obj = topo.objects.data as GeometryCollection<ProvProps>;
-    const fc = feature(topo, obj) as FeatureCollection<Geometry, ProvProps>;
-    const projection = geoConicConformal()
-      .rotate([98, 0])
-      .center([0, 62])
-      .parallels([50, 70])
-      .fitExtent([[12, 12], [width - 12, height - 12]], fc);
-    const path = geoPath(projection);
-    const values = items.map((i) => i.value).filter((v): v is number => v !== null && v !== undefined);
-    const scale = scaleQuantile<string>().domain(values).range(RAMP);
-    return { fc, path, scale };
-  }, [topo, width, height, items]);
+    return feature(topo, obj) as FeatureCollection<Geometry, ProvProps>;
+  }, [topo]);
 
-  const colorFor = (code: string): string => {
-    const item = byCode.get(code);
-    if (!item || item.value === null || item.value === undefined || !built) return NO_DATA;
-    return built.scale(item.value);
-  };
+  const allCodes = useMemo(
+    () => (fc ? fc.features.map((f) => f.properties.code) : []),
+    [fc],
+  );
+  const nameByCode = useMemo(
+    () => new Map((fc?.features ?? []).map((f) => [f.properties.code, f.properties.name])),
+    [fc],
+  );
+
+  const { data, layout } = useMemo(() => {
+    if (!fc) return { data: [] as Data[], layout: {} as Partial<Layout> };
+
+    const measured = items.filter((i) => i.value !== null && i.value !== undefined);
+    const values = measured.map((i) => i.value as number);
+    const ml = measureLabel(measure, labels);
+
+    const base = {
+      type: "choropleth",
+      geojson: fc,
+      featureidkey: "properties.code",
+      locations: allCodes,
+      z: allCodes.map(() => 0),
+      colorscale: [
+        [0, NO_DATA],
+        [1, NO_DATA],
+      ],
+      showscale: false,
+      marker: { line: { color: PC.ground, width: 0.8 } },
+      text: allCodes.map((c) => nameByCode.get(c) ?? c),
+      hovertemplate: `<b>%{text}</b><br>${labels.noPostings}<extra></extra>`,
+    };
+
+    const dataTrace = {
+      type: "choropleth",
+      geojson: fc,
+      featureidkey: "properties.code",
+      locations: measured.map((i) => i.code),
+      z: values,
+      zmin: values.length ? Math.min(...values) : 0,
+      zmax: values.length ? Math.max(...values) : 1,
+      colorscale: COLORSCALE,
+      showscale: false,
+      marker: { line: { color: PC.ground, width: 0.8 } },
+      customdata: measured.map((i) => [
+        nameByCode.get(i.code) ?? i.label,
+        `${valueFmt(i.value, measure)} · ${ml}`,
+        i.count !== null && i.count !== undefined ? `${fmtInt(i.count)} ${labels.postings}` : "—",
+      ]),
+      hovertemplate:
+        "<b>%{customdata[0]}</b><br>%{customdata[1]}<br>%{customdata[2]}<extra></extra>",
+    };
+
+    const layout: Partial<Layout> = {
+      margin: { l: 0, r: 0, t: 0, b: 0 },
+      geo: {
+        fitbounds: "locations",
+        visible: false,
+        bgcolor: "rgba(0,0,0,0)",
+        projection: { type: "conic conformal", rotation: { lon: -96, lat: 0 }, parallels: [49, 77] },
+      },
+    } as Partial<Layout>;
+
+    return { data: [base, dataTrace] as unknown as Data[], layout };
+  }, [fc, items, measure, labels, allCodes, nameByCode]);
+
+  if (!fc) {
+    return <div style={{ height }} className="animate-pulse rounded-sm bg-surface-alt/60" aria-hidden />;
+  }
+
+  const ml = measureLabel(measure, labels);
 
   return (
-    <div className="relative">
-      <div ref={ref} style={{ width: "100%", minHeight: height }}>
-        {built && (
-          <svg
-            width={width}
-            height={height}
-            viewBox={`0 0 ${width} ${height}`}
-            role="img"
-            aria-label={`Choropleth of Canadian provinces by ${measureLabel(measure, labels)}`}
-            onMouseLeave={() => setHover(null)}
-          >
-            {built.fc.features.map((f) => {
-              const code = f.properties.code;
-              const item = byCode.get(code) ?? null;
-              const d = built.path(f) ?? undefined;
-              return (
-                <path
-                  key={code}
-                  d={d}
-                  fill={colorFor(code)}
-                  stroke="#fbf8f5"
-                  strokeWidth={0.8}
-                  className="cursor-pointer transition-[fill-opacity] hover:fill-opacity-80"
-                  onMouseMove={(e) => {
-                    const rect = ref.current?.getBoundingClientRect();
-                    setHover({
-                      x: e.clientX - (rect?.left ?? 0),
-                      y: e.clientY - (rect?.top ?? 0),
-                      item,
-                      name: f.properties.name,
-                    });
-                  }}
-                />
-              );
-            })}
-          </svg>
-        )}
+    <div>
+      <PlotlyFigure
+        data={data}
+        layout={layout}
+        height={height}
+        ariaLabel={`Choropleth of Canadian provinces by ${ml}`}
+      />
+      {/* Editorial legend (Plotly colorbar stays off) */}
+      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="text-[0.68rem] font-bold uppercase tracking-[0.04em] text-ink-faint">{ml}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[0.7rem] text-ink-faint">{labels.low}</span>
+          {SEQ.map((c) => (
+            <span key={c} className="h-3 w-6" style={{ background: c }} />
+          ))}
+          <span className="text-[0.7rem] text-ink-faint">{labels.high}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-3 w-6" style={{ background: NO_DATA }} />
+          <span className="text-[0.7rem] text-ink-faint">{labels.noData}</span>
+        </div>
       </div>
-
-      {hover && (
-        <div
-          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[calc(100%+10px)] whitespace-nowrap border border-card-border bg-surface px-3 py-2 text-[0.8rem] shadow-pop"
-          style={{ left: hover.x, top: hover.y, boxShadow: "var(--shadow-pop)" }}
-        >
-          <div className="font-bold text-navy-deep">{hover.name}</div>
-          {hover.item && hover.item.value !== null ? (
-            <div className="num text-ink-soft">
-              {formatValue(hover.item.value, measure)} · {measureLabel(measure, labels)}
-              {hover.item.count !== null && <span className="block text-ink-faint">{fmtInt(hover.item.count)} {labels.postings}</span>}
-            </div>
-          ) : (
-            <div className="text-ink-faint">{labels.noPostings}</div>
-          )}
-        </div>
-      )}
-
-      {/* Legend */}
-      {built && (
-        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <span className="text-[0.68rem] font-bold uppercase tracking-[0.04em] text-ink-faint">
-            {measureLabel(measure, labels)}
-          </span>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[0.7rem] text-ink-faint">{labels.low}</span>
-            {RAMP.map((c) => (
-              <span key={c} className="h-3 w-6" style={{ background: c }} />
-            ))}
-            <span className="text-[0.7rem] text-ink-faint">{labels.high}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-3 w-6" style={{ background: NO_DATA }} />
-            <span className="text-[0.7rem] text-ink-faint">{labels.noData}</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

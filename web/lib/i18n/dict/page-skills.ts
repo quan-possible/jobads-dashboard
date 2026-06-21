@@ -49,6 +49,7 @@ export const skillsDict = {
     skillBarsShareLabel: "Most-requested skills by share of postings",
     skillBarsLiftLabel: "Distinctive skills by lift over national average",
     skillBarsEmpty: "No data for this selection.",
+    liftRefLabel: "1× = national average",
 
     // ShareBars aria-label / empty
     shareBarsLabel: "Category share breakdown",
@@ -99,6 +100,7 @@ export const skillsDict = {
     // SkillBars aria-labels
     skillBarsShareLabel: "Compétences les plus demandées par part des offres",
     skillBarsLiftLabel: "Compétences distinctives par indice de spécificité",
+    liftRefLabel: "1× = moyenne nationale",
     skillBarsEmpty: "Aucune donnée pour cette sélection.",
 
     // ShareBars aria-label / empty

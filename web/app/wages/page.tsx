@@ -1,6 +1,8 @@
 import { DownloadCSV } from "@/components/DownloadCSV";
 import { Figure } from "@/components/Figure";
+import { WageBand } from "@/components/WageBand";
 import { WageRangeBars } from "@/components/WageRangeBars";
+import { WageDemandScatter } from "@/components/WageDemandScatter";
 import { api } from "@/lib/api";
 import { fmtMonth, fmtShare } from "@/lib/format";
 import { wagesDict, type WagesDictEntry } from "@/lib/i18n/dict/page-wages";
@@ -48,16 +50,24 @@ export default async function WagesPage({
     ind: typeof sp.ind === "string" ? sp.ind : undefined,
   };
 
-  let occ, province, meta;
+  let occ, province, meta, trend, occRank;
   try {
-    [occ, province, meta] = await Promise.all([
+    [occ, province, meta, trend, occRank] = await Promise.all([
       api.wages(filters, "occupation"),
       api.wages(filters, "province"),
       api.meta(),
+      api.wageTrend(filters),
+      api.rank("occupations", filters, { limit: 20, order: "value" }),
     ]);
   } catch {
     return <ApiDown t={t} />;
   }
+
+  // Join occupation demand (ranking) with occupation median wage for the scatter.
+  const demandByCode = new Map(occRank.map((r) => [r.code, r.value]));
+  const scatterPoints = occ.items
+    .filter((i) => !i.gated && i.median !== null && demandByCode.has(i.code))
+    .map((i) => ({ label: i.label, demand: demandByCode.get(i.code) ?? 0, wage: i.median as number, n: i.n }));
 
   const regionLabel = labelFor(GEO_OPTIONS, filters.geo);
   const as_of = occ.as_of;
@@ -70,6 +80,14 @@ export default async function WagesPage({
     if (filters.ind) p.set("ind", filters.ind);
     return p.toString();
   }
+
+  const trendQS = (() => {
+    const p = new URLSearchParams();
+    if (filters.geo) p.set("geo", filters.geo);
+    if (filters.occ) p.set("occ", filters.occ);
+    if (filters.ind) p.set("ind", filters.ind);
+    return p.toString();
+  })();
 
   const asOfSlug = as_of ? as_of.replace("-", "-") : "latest";
 
@@ -108,6 +126,34 @@ export default async function WagesPage({
             {t.coverageWithheldSuffix}
           </p>
         </div>
+      </section>
+
+      {/* Wage band over time — the marquee distribution view */}
+      <section className="container-x py-4">
+        <Figure
+          eyebrow={t.bandEyebrow}
+          title={t.bandTitle}
+          asOf={as_of}
+          actions={
+            <DownloadCSV
+              endpoint={`/api/wages/trend?${trendQS}`}
+              filename={`aclmr-wage-band-${asOfSlug}.csv`}
+              columns={[
+                { key: "month", header: "Month" },
+                { key: "p25", header: "P25 ($/hr)" },
+                { key: "median", header: "Median ($/hr)" },
+                { key: "p75", header: "P75 ($/hr)" },
+                { key: "n", header: "N" },
+              ]}
+            />
+          }
+          note={t.bandNote}
+        >
+          <WageBand
+            points={trend.points}
+            labels={{ p25: "P25", median: t.bandMedian, p75: "P75", notEnough: t.bandNotEnough }}
+          />
+        </Figure>
       </section>
 
       {/* Occupation wage ranges */}
@@ -159,6 +205,13 @@ export default async function WagesPage({
           note={sharedNote}
         >
           <WageRangeBars items={province.items} />
+        </Figure>
+      </section>
+
+      {/* Wage vs demand quadrant scatter */}
+      <section className="container-x py-4">
+        <Figure eyebrow={t.scatterEyebrow} title={t.scatterTitle} asOf={as_of} note={t.scatterNote}>
+          <WageDemandScatter points={scatterPoints} notEnough={t.scatterNotEnough} />
         </Figure>
       </section>
     </div>

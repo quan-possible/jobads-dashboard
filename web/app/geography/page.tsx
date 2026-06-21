@@ -1,4 +1,6 @@
 import { Choropleth } from "@/components/Choropleth";
+import { ChoroplethTime } from "@/components/ChoroplethTime";
+import { CumulativeCurve } from "@/components/CumulativeCurve";
 import { DownloadCSV } from "@/components/DownloadCSV";
 import { Figure } from "@/components/Figure";
 import { SegmentToggle } from "@/components/SegmentToggle";
@@ -70,9 +72,9 @@ export default async function GeographyPage({
   };
   const measure = typeof sp.measure === "string" ? sp.measure : "per10k";
 
-  let data;
+  let data, trend;
   try {
-    data = await api.geography(filters, measure);
+    [data, trend] = await Promise.all([api.geography(filters, measure), api.geographyTrend(filters)]);
   } catch {
     return <ApiDown t={t} />;
   }
@@ -154,6 +156,21 @@ export default async function GeographyPage({
             </div>
           </div>
         </Figure>
+      </section>
+
+      {/* Time-scrubbed choropleth + cumulative concentration */}
+      <section className="container-x py-4">
+        <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+          <Figure eyebrow={t.timeEyebrow} title={t.timeTitle} asOf={data.as_of} note={t.timeNote}>
+            <ChoroplethTime data={trend} playLabel={t.playLabel} monthPrefix={t.monthPrefix} />
+          </Figure>
+          <Figure eyebrow={t.cumEyebrow} title={t.cumTitle} asOf={data.as_of} note={t.cumNote}>
+            <CumulativeCurve
+              items={data.items.map((i) => ({ label: i.label, value: i.count ?? 0 }))}
+              unitLabel={t.cumUnit}
+            />
+          </Figure>
+        </div>
       </section>
     </div>
   );

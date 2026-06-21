@@ -1,0 +1,51 @@
+<svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" font-family="PT Sans, ui-sans-serif, system-ui, sans-serif">
+  <rect width="720" height="340" fill="#fbf8f5"/>
+  <rect x="10" y="10" width="700" height="300" rx="10" fill="#ffffff" stroke="#e3d6c8"/>
+  <text x="28" y="38" font-size="9.5" letter-spacing="0.06em" font-weight="700" fill="#a25518">OCCUPATIONS · RANKED</text>
+  <text x="28" y="56" font-size="15" font-weight="700" fill="#041c2c">Rank, level, 10-year trajectory and momentum — one row each</text>
+
+  <!-- column headers -->
+  <g font-size="9.5" letter-spacing="0.04em" font-weight="700" fill="#616a71">
+    <text x="46" y="80">OCCUPATION GROUP</text>
+    <text x="420" y="80" text-anchor="end">POSTINGS</text>
+    <text x="440" y="80">10-YEAR TREND</text>
+    <text x="692" y="80" text-anchor="end">YoY</text>
+  </g>
+  <line x1="28" y1="88" x2="692" y2="88" stroke="#ece3da"/>
+
+  <!-- rows -->
+  <g font-size="13" font-weight="700" fill="#16242f">
+    <text x="28" y="114" fill="#616a71" font-size="11">1</text><text x="46" y="114">Sales &amp; service</text><text x="420" y="114" text-anchor="end" font-family="ui-monospace,monospace">1.93M</text>
+    <text x="28" y="150" fill="#616a71" font-size="11">2</text><text x="46" y="150">Trades &amp; transport</text><text x="420" y="150" text-anchor="end" font-family="ui-monospace,monospace">1.44M</text>
+    <text x="28" y="186" fill="#616a71" font-size="11">3</text><text x="46" y="186">Business &amp; finance</text><text x="420" y="186" text-anchor="end" font-family="ui-monospace,monospace">1.21M</text>
+    <text x="28" y="222" fill="#616a71" font-size="11">4</text><text x="46" y="222">Health</text><text x="420" y="222" text-anchor="end" font-family="ui-monospace,monospace">0.98M</text>
+    <text x="28" y="258" fill="#616a71" font-size="11">5</text><text x="46" y="258">Education, law &amp; social</text><text x="420" y="258" text-anchor="end" font-family="ui-monospace,monospace">0.61M</text>
+    <text x="28" y="294" fill="#616a71" font-size="11">6</text><text x="46" y="294">Natural &amp; applied sci.</text><text x="420" y="294" text-anchor="end" font-family="ui-monospace,monospace">0.54M</text>
+  </g>
+
+  <!-- sparklines -->
+  <g fill="none" stroke="#345961" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+    <polyline points="440,108.4 460,107.5 480,106.6 500,105.7 520,103 540,102.1 560,99.4 580,97.6 600,95.8"/>
+    <polyline points="440,140.8 460,140.4 480,140.8 500,139.9 520,139 540,138.1 560,137.2 580,135.4 600,132.7"/>
+    <polyline points="440,175 460,173.2 480,170.5 500,168.7 520,169.6 540,172.3 560,175 580,176.8 600,177.7"/>
+    <polyline points="440,217.3 460,216.4 480,214.6 500,211.9 520,210.1 540,208.3 560,205.6 580,203.8 600,202"/>
+    <polyline points="440,247.9 460,247.7 480,247.4 500,247 520,246.6 540,246.1 560,245.9 580,245.2 600,244.8"/>
+    <polyline points="440,282.1 460,279.4 480,276.7 500,275.8 520,277.6 540,281.2 560,283.9 580,286.6 600,288.4"/>
+  </g>
+  <g fill="#cf7730">
+    <circle cx="600" cy="95.8" r="2.6"/><circle cx="600" cy="132.7" r="2.6"/><circle cx="600" cy="177.7" r="2.6"/>
+    <circle cx="600" cy="202" r="2.6"/><circle cx="600" cy="244.8" r="2.6"/><circle cx="600" cy="288.4" r="2.6"/>
+  </g>
+
+  <!-- YoY chips -->
+  <g font-size="12" font-weight="700">
+    <text x="692" y="114" text-anchor="end" fill="#2c765c">▲ +6%</text>
+    <text x="692" y="150" text-anchor="end" fill="#2c765c">▲ +9%</text>
+    <text x="692" y="186" text-anchor="end" fill="#b54e33">▼ −3%</text>
+    <text x="692" y="222" text-anchor="end" fill="#2c765c">▲ +14%</text>
+    <text x="692" y="258" text-anchor="end" fill="#2c765c">▲ +2%</text>
+    <text x="692" y="294" text-anchor="end" fill="#b54e33">▼ −9%</text>
+  </g>
+
+  <text x="10" y="330" font-size="11.5" fill="#5d6b74">Tufte data-density: four readings per text line. Replaces the bar-below-label list wherever a ranked list appears.</text>
+</svg>

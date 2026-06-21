@@ -42,11 +42,11 @@ export function KpiTile({
         <span className="num text-[2.05rem] font-bold leading-none text-navy-deep">{value}</span>
         {unit && <span className="mb-0.5 text-[0.85rem] font-bold text-ink-soft">{unit}</span>}
       </div>
-      <div className="mt-auto flex items-end justify-between gap-2">
+      <div className="mt-auto flex items-end gap-2">
         {hasDelta ? (
           <span
             className={[
-              "num inline-flex items-center gap-1 text-[0.82rem] font-bold",
+              "num inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[0.82rem] font-bold",
               up ? "text-pos" : "text-neg",
             ].join(" ")}
           >
@@ -58,7 +58,9 @@ export function KpiTile({
           <span />
         )}
         {spark && spark.length > 1 && (
-          <Sparkline data={spark} stroke={sparkColor ?? (accent ? "var(--orange)" : "var(--teal)")} />
+          <div className="flex min-w-0 flex-1 justify-end">
+            <Sparkline data={spark} stroke={sparkColor ?? (accent ? "var(--orange)" : "var(--teal)")} />
+          </div>
         )}
       </div>
     </div>

@@ -18,6 +18,13 @@ export const wagesDict = {
     coverageWithheldSuffix:
       "wage observations is withheld from the charts below to avoid unreliable estimates.",
 
+    // Wage band over time
+    bandEyebrow: "Advertised hourly pay over time",
+    bandTitle: "Pay has risen — and spread out",
+    bandNote: "Teal band spans the 25th–75th percentile; navy line is the median, by month. Months below the minimum sample are dropped.",
+    bandNotEnough: "Not enough wage data for this selection.",
+    bandMedian: "Median",
+
     // Figure — shared eyebrow
     figureEyebrow: "Posted hourly wage · 25th–75th percentile",
 
@@ -26,6 +33,12 @@ export const wagesDict = {
 
     // Figure — province
     provTitle: "Hourly wage range by province",
+
+    // Wage vs demand scatter
+    scatterEyebrow: "Pay vs demand · by occupation",
+    scatterTitle: "Where pay and hiring demand meet",
+    scatterNote: "Each bubble is a broad occupational group: horizontal = posting demand, vertical = median advertised wage, size = volume. Dashed lines mark the medians.",
+    scatterNotEnough: "Not enough paired wage-and-demand data for this selection.",
 
     // Figure — shared note (minSample interpolated by the page)
     notePrefix:
@@ -51,6 +64,13 @@ export const wagesDict = {
     coverageWithheldSuffix:
       "observations salariales est retenue des graphiques ci-dessous afin d'éviter des estimations peu fiables.",
 
+    // Wage band over time
+    bandEyebrow: "Salaire horaire affiché au fil du temps",
+    bandTitle: "La rémunération a augmenté — et s'est dispersée",
+    bandNote: "La bande turquoise couvre du 25e au 75e centile; la ligne marine est la médiane, par mois. Les mois sous l'échantillon minimal sont retirés.",
+    bandNotEnough: "Données salariales insuffisantes pour cette sélection.",
+    bandMedian: "Médiane",
+
     // Figure — shared eyebrow
     figureEyebrow: "Salaire horaire affiché · 25e–75e centile",
 
@@ -59,6 +79,12 @@ export const wagesDict = {
 
     // Figure — province
     provTitle: "Fourchette salariale horaire par province",
+
+    // Wage vs demand scatter
+    scatterEyebrow: "Salaire vs demande · par profession",
+    scatterTitle: "Où le salaire et la demande se rencontrent",
+    scatterNote: "Chaque bulle est un grand groupe professionnel : horizontal = demande d'offres, vertical = salaire médian affiché, taille = volume. Les lignes pointillées marquent les médianes.",
+    scatterNotEnough: "Données appariées salaire-demande insuffisantes pour cette sélection.",
 
     // Figure — shared note (minSample interpolated by the page)
     notePrefix:

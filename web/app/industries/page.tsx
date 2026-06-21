@@ -24,5 +24,5 @@ export default async function IndustriesPage({
     ind: typeof sp.ind === "string" ? sp.ind : undefined,
   };
   const dict = explorersDict[locale];
-  return <ExplorerView filters={filters} dim="industries" dict={dict} />;
+  return <ExplorerView filters={filters} dim="industries" dict={dict} locale={locale} />;
 }

@@ -73,6 +73,8 @@ class Kpis(BaseModel):
     active_yoy_pct: float | None = None
     median_wage: float | None = None
     wage_n: int | None = None
+    # Trailing monthly median-wage trend (gated months dropped) for the KPI spark.
+    median_wage_trend: list[float] | None = None
     # Deferred until the Phase-5 data-layer columns exist; omitted when absent.
     posting_intensity: float | None = None
     postings_new: int | None = None
@@ -84,6 +86,8 @@ class RankItem(BaseModel):
     value: int
     yoy: float | None = None
     share: float | None = None
+    # Trailing monthly postings for this entity — drives the in-table sparkline.
+    trend: list[float] | None = None
 
 
 class OverviewResponse(BaseModel):
@@ -109,6 +113,8 @@ class GeoItem(BaseModel):
     yoy: float | None = None
     per10k: float | None = None
     lq: float | None = None
+    # Trailing monthly postings for this province — drives the in-table sparkline.
+    trend: list[float] | None = None
 
 
 class GeographyResponse(BaseModel):
@@ -139,6 +145,75 @@ class WagesResponse(BaseModel):
     dim: str
     min_sample: int
     items: list[WageItem]
+
+
+class WageTrendPoint(BaseModel):
+    month: str
+    p25: float
+    median: float
+    p75: float
+    n: int
+
+
+class WageTrendResponse(BaseModel):
+    scope: Scope
+    as_of: str
+    min_sample: int
+    points: list[WageTrendPoint]
+
+
+# --------------------------------------------------------------------------- #
+# Composition / concentration / matrix / coverage / language (researcher views)
+# --------------------------------------------------------------------------- #
+
+
+class CompositionGroup(BaseModel):
+    code: str
+    label: str
+    values: list[float]  # share (0-1) per month, aligned to months[]
+
+
+class CompositionResponse(BaseModel):
+    scope: Scope
+    as_of: str
+    dim: str
+    months: list[str]
+    groups: list[CompositionGroup]
+
+
+class ConcentrationResponse(BaseModel):
+    scope: Scope
+    as_of: str
+    dim: str
+    hhi: float                # Herfindahl-Hirschman index, 0-10000
+    top5_share: float         # share held by the top 5 groups, 0-1
+    n_groups: int
+
+
+class MatrixResponse(BaseModel):
+    scope: Scope
+    as_of: str
+    measure: str
+    rows: list[str]                  # row labels (occupations)
+    cols: list[str]                  # column labels (provinces)
+    z: list[list[float | None]]      # value per (row, col)
+    counts: list[list[int | None]]   # raw posting counts per (row, col)
+
+
+class CoverageTrendResponse(BaseModel):
+    scope: Scope
+    field: str
+    months: list[str]
+    share: list[float]
+
+
+class GeoTrendResponse(BaseModel):
+    scope: Scope
+    measure: str
+    months: list[str]
+    codes: list[str]                 # province codes, aligned to values columns
+    labels: list[str]
+    values: list[list[float | None]]  # values[monthIdx][codeIdx]
 
 
 # --------------------------------------------------------------------------- #

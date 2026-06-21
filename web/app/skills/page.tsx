@@ -162,6 +162,7 @@ export default async function SkillsPage({
               metric="lift"
               ariaLabel={t.skillBarsLiftLabel}
               emptyText={t.skillBarsEmpty}
+              refLabel={t.liftRefLabel}
             />
           )}
         </Figure>

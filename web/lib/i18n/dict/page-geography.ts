@@ -42,6 +42,19 @@ export const geographyDict = {
     // Ranked header prefix
     rankedPrefix: "Ranked · ",
 
+    // Time-scrubbed choropleth
+    timeEyebrow: "Demand over time · by province",
+    timeTitle: "How posted demand shifted across the country",
+    timeNote: "Active postings per province, animated by month. Colour scale is fixed across all months, so growth reads as the map brightening. Drag the slider or press play.",
+    playLabel: "▶ Play",
+    monthPrefix: "Month: ",
+
+    // Cumulative concentration
+    cumEyebrow: "Market concentration",
+    cumTitle: "How concentrated demand is across provinces",
+    cumNote: "Cumulative share of all postings as provinces are added largest-first.",
+    cumUnit: "provinces",
+
     // Choropleth legend / tooltip labels
     legend: {
       per10k: "postings per 10k labour force",
@@ -97,6 +110,19 @@ export const geographyDict = {
 
     // Ranked header prefix
     rankedPrefix: "Classement · ",
+
+    // Time-scrubbed choropleth
+    timeEyebrow: "Demande au fil du temps · par province",
+    timeTitle: "Comment la demande affichée a évolué au pays",
+    timeNote: "Offres actives par province, animées par mois. L'échelle de couleur est fixe sur tous les mois : la croissance se lit comme un éclaircissement de la carte. Glissez le curseur ou appuyez sur lecture.",
+    playLabel: "▶ Lecture",
+    monthPrefix: "Mois : ",
+
+    // Cumulative concentration
+    cumEyebrow: "Concentration du marché",
+    cumTitle: "À quel point la demande est concentrée entre provinces",
+    cumNote: "Part cumulée de toutes les offres à mesure que les provinces s'ajoutent, des plus grandes aux plus petites.",
+    cumUnit: "provinces",
 
     // Choropleth legend / tooltip labels
     legend: {

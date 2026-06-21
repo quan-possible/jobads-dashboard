@@ -26,10 +26,27 @@ export function Sparkline({
   });
   const line = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
   const area = `${line} L${pts[pts.length - 1][0].toFixed(1)} ${height} L${pts[0][0].toFixed(1)} ${height} Z`;
+  // Responsive: fills its container width (capped at `width`) so it never
+  // overflows a narrow card. preserveAspectRatio="none" + non-scaling stroke
+  // keeps the line crisp while the x-axis flexes.
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden className="overflow-visible">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      aria-hidden
+      className="block overflow-visible"
+      style={{ width: "100%", maxWidth: width, height }}
+    >
       {fill && <path d={area} fill={stroke} opacity={0.1} />}
-      <path d={line} fill="none" stroke={stroke} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
+      <path
+        d={line}
+        fill="none"
+        stroke={stroke}
+        strokeWidth={1.75}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+      />
       <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={2.4} fill={stroke} />
     </svg>
   );

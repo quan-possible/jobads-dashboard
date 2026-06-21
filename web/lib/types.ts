@@ -42,6 +42,7 @@ export interface Kpis {
   active_yoy_pct: number | null;
   median_wage: number | null;
   wage_n: number | null;
+  median_wage_trend: number[] | null;
   posting_intensity: number | null;
   postings_new: number | null;
 }
@@ -52,6 +53,7 @@ export interface RankItem {
   value: number;
   yoy: number | null;
   share: number | null;
+  trend: number[] | null;
 }
 
 export interface OverviewResponse {
@@ -72,6 +74,7 @@ export interface GeoItem {
   yoy: number | null;
   per10k: number | null;
   lq: number | null;
+  trend: number[] | null;
 }
 
 export interface GeographyResponse {
@@ -97,6 +100,70 @@ export interface WagesResponse {
   dim: string;
   min_sample: number;
   items: WageItem[];
+}
+
+export interface WageTrendPoint {
+  month: string;
+  p25: number;
+  median: number;
+  p75: number;
+  n: number;
+}
+
+export interface WageTrendResponse {
+  scope: Scope;
+  as_of: string;
+  min_sample: number;
+  points: WageTrendPoint[];
+}
+
+export interface CompositionGroup {
+  code: string;
+  label: string;
+  values: number[];
+}
+
+export interface CompositionResponse {
+  scope: Scope;
+  as_of: string;
+  dim: string;
+  months: string[];
+  groups: CompositionGroup[];
+}
+
+export interface ConcentrationResponse {
+  scope: Scope;
+  as_of: string;
+  dim: string;
+  hhi: number;
+  top5_share: number;
+  n_groups: number;
+}
+
+export interface MatrixResponse {
+  scope: Scope;
+  as_of: string;
+  measure: string;
+  rows: string[];
+  cols: string[];
+  z: (number | null)[][];
+  counts: (number | null)[][];
+}
+
+export interface CoverageTrendResponse {
+  scope: Scope;
+  field: string;
+  months: string[];
+  share: number[];
+}
+
+export interface GeoTrendResponse {
+  scope: Scope;
+  measure: string;
+  months: string[];
+  codes: string[];
+  labels: string[];
+  values: (number | null)[][];
 }
 
 export interface SkillItem {

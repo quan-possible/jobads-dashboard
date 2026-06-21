@@ -35,6 +35,14 @@ from .models import (
     SourceWindow,
     WageItem,
     WagesResponse,
+    WageTrendPoint,
+    WageTrendResponse,
+    CompositionGroup,
+    CompositionResponse,
+    ConcentrationResponse,
+    MatrixResponse,
+    CoverageTrendResponse,
+    GeoTrendResponse,
 )
 
 # --------------------------------------------------------------------------- #
@@ -111,6 +119,101 @@ def _scope_where(scope: Scope, prefix: str = "") -> tuple[str, list]:
         f"{p}province_scope = ? AND {p}occupation_scope = ? AND {p}industry_scope = ?",
         [scope.geo, scope.occ, scope.ind],
     )
+
+
+# --------------------------------------------------------------------------- #
+# Trailing trends (drive the in-table / KPI sparklines)
+# --------------------------------------------------------------------------- #
+
+TREND_MONTHS = 24
+
+
+def _months_back(d: date, n: int) -> date:
+    y, m = d.year, d.month - n
+    while m <= 0:
+        m += 12
+        y -= 1
+    return date(y, m, 1)
+
+
+def _entity_trends(scope: Scope, dim: str, groups: list[str], n_months: int = TREND_MONTHS) -> dict[str, list[float]]:
+    """Trailing monthly postings per ranked entity (the `vary` scope-label values)."""
+    if not groups:
+        return {}
+    as_of = core.month_floor(scope.end)
+    start = _months_back(as_of, n_months - 1)
+    if dim == "occupations":
+        vary, fixed_a, fixed_b = "occupation_scope", "province_scope", "industry_scope"
+        fixed_vals = [scope.geo, scope.ind]
+    else:
+        vary, fixed_a, fixed_b = "industry_scope", "province_scope", "occupation_scope"
+        fixed_vals = [scope.geo, scope.occ]
+    placeholders = ",".join(["?"] * len(groups))
+    sql = f"""
+        SELECT {vary} AS g, month, postings_total
+        FROM {core.parquet('filter_cube')}
+        WHERE {fixed_a} = ? AND {fixed_b} = ?
+          AND {vary} IN ({placeholders})
+          AND month >= ? AND month <= ?
+        ORDER BY {vary}, month
+    """
+    params = [*fixed_vals, *groups, start, as_of]
+    df = core.query_df(sql, params)
+    if df.empty:
+        return {}
+    out: dict[str, list[float]] = {}
+    for g, grp in df.groupby("g"):
+        out[str(g)] = [float(v) for v in grp.sort_values("month")["postings_total"].tolist()]
+    return out
+
+
+def _province_trends(scope: Scope, codes: list[str], n_months: int = TREND_MONTHS) -> dict[str, list[float]]:
+    """Trailing monthly postings per province for the scope's occupation/industry slice."""
+    if not codes:
+        return {}
+    as_of = core.month_floor(scope.end)
+    start = _months_back(as_of, n_months - 1)
+    placeholders = ",".join(["?"] * len(codes))
+    sql = f"""
+        SELECT province_scope AS code, month, postings_total
+        FROM {core.parquet('filter_cube')}
+        WHERE occupation_scope = ? AND industry_scope = ?
+          AND province_scope IN ({placeholders})
+          AND month >= ? AND month <= ?
+        ORDER BY province_scope, month
+    """
+    params = [scope.occ, scope.ind, *codes, start, as_of]
+    df = core.query_df(sql, params)
+    if df.empty:
+        return {}
+    out: dict[str, list[float]] = {}
+    for code, grp in df.groupby("code"):
+        out[str(code)] = [float(v) for v in grp.sort_values("month")["postings_total"].tolist()]
+    return out
+
+
+def _wage_trend(scope: Scope, as_of: date, n_months: int = TREND_MONTHS) -> list[float] | None:
+    """Trailing monthly median wage at the scope (gated months dropped)."""
+    where, params = _scope_where(scope)
+    start = _months_back(as_of, n_months - 1)
+    df = core.query_df(
+        f"""SELECT month, wage_postings AS n, wage_median AS median
+            FROM {core.parquet('wage_cube')}
+            WHERE {where} AND month >= ? AND month <= ?
+            ORDER BY month""",
+        params + [start, as_of],
+    )
+    if df.empty:
+        return None
+    vals = [
+        float(r["median"])
+        for _, r in df.iterrows()
+        if r["n"] is not None
+        and int(r["n"]) >= core.WAGE_MIN_SAMPLE
+        and r["median"] is not None
+        and not pd.isna(r["median"])
+    ]
+    return vals if len(vals) >= 2 else None
 
 
 # --------------------------------------------------------------------------- #
@@ -237,6 +340,7 @@ def _rank_dim(scope: Scope, dim: str, limit: int) -> list[RankItem]:
     if df.empty:
         return []
     total = df["value"].sum()
+    trends = _entity_trends(scope, dim, [str(g) for g in df["g"].tolist()])
     items = []
     for _, r in df.iterrows():
         code, label = _split_label(r["g"])
@@ -249,6 +353,7 @@ def _rank_dim(scope: Scope, dim: str, limit: int) -> list[RankItem]:
                 value=int(r["value"]),
                 yoy=yoy,
                 share=round(r["value"] / total, 4) if total else None,
+                trend=trends.get(str(r["g"])),
             )
         )
     return items
@@ -299,6 +404,7 @@ def _kpis(scope: Scope, series: list[SeriesPoint]) -> tuple[Kpis, date]:
         active_yoy_pct=_pct(last.postings, yoy_ref.postings) if yoy_ref else None,
         median_wage=median_wage,
         wage_n=wage_n,
+        median_wage_trend=_wage_trend(scope, as_of),
         # posting_intensity / postings_new omitted — data-layer columns absent.
     )
     return kpis, as_of
@@ -401,6 +507,7 @@ def geography(scope: Scope, measure: str = "per10k") -> GeographyResponse:
     total_post = df["value"].sum()
     total_lf = lf["labour_force"].sum() if not lf.empty else None
     lf_map = dict(zip(lf["code"], lf["labour_force"])) if not lf.empty else {}
+    trends = _province_trends(scope, [str(c) for c in df["code"].tolist()])
     for _, r in df.iterrows():
         code = r["code"]
         count = int(r["value"])
@@ -426,6 +533,7 @@ def geography(scope: Scope, measure: str = "per10k") -> GeographyResponse:
                 yoy=_pct(count, r["prev"]) if r["prev"] and r["prev"] >= 100 else None,
                 per10k=per10k,
                 lq=lq,
+                trend=trends.get(str(code)),
             )
         )
     items.sort(key=lambda i: (i.value if i.value is not None else -1), reverse=True)
@@ -488,6 +596,198 @@ def wages(scope: Scope, dim: str = "occupation") -> WagesResponse:
             )
         )
     return WagesResponse(scope=scope, as_of=_iso(as_of), dim=dim, min_sample=core.WAGE_MIN_SAMPLE, items=items)
+
+
+def wage_trend(scope: Scope) -> WageTrendResponse:
+    """Monthly advertised-wage band (p25 / median / p75) for the scope, full
+    history. Months below the minimum sample are dropped (honesty over
+    continuity) — the band only shows where the estimate is supportable."""
+    as_of = core.month_floor(scope.end)
+    where, params = _scope_where(scope)
+    df = core.query_df(
+        f"""SELECT month, wage_postings AS n, wage_p25 AS p25, wage_median AS median, wage_p75 AS p75
+            FROM {core.parquet('wage_cube')}
+            WHERE {where} AND month <= ?
+            ORDER BY month""",
+        params + [as_of],
+    )
+    points: list[WageTrendPoint] = []
+    for _, r in df.iterrows():
+        if r["n"] is None or pd.isna(r["n"]) or int(r["n"]) < core.WAGE_MIN_SAMPLE:
+            continue
+        p25, median, p75 = _clean(r["p25"]), _clean(r["median"]), _clean(r["p75"])
+        if p25 is None or median is None or p75 is None:
+            continue
+        points.append(
+            WageTrendPoint(month=_iso(r["month"]), p25=p25, median=median, p75=p75, n=int(r["n"]))
+        )
+    return WageTrendResponse(scope=scope, as_of=_iso(as_of), min_sample=core.WAGE_MIN_SAMPLE, points=points)
+
+
+# --------------------------------------------------------------------------- #
+# Composition / concentration / matrix / coverage / language (researcher views)
+# --------------------------------------------------------------------------- #
+
+
+def _dim_cfg(scope: Scope, dim: str):
+    """(vary, fixed_a, fixed_b, fixed_vals, all_sentinel, unknown) for a rank-style dim."""
+    if dim == "occupations":
+        return ("occupation_scope", "province_scope", "industry_scope", [scope.geo, scope.ind], core.ALL_OCC, core.UNKNOWN_OCC)
+    return ("industry_scope", "province_scope", "occupation_scope", [scope.geo, scope.occ], core.ALL_IND, core.UNKNOWN_IND)
+
+
+def composition(scope: Scope, dim: str, top_n: int = 6) -> CompositionResponse:
+    """Monthly mix (share of coded postings) by broad group — top N + 'Other'."""
+    as_of = core.month_floor(scope.end)
+    vary, fixed_a, fixed_b, fixed_vals, all_sentinel, unknown = _dim_cfg(scope, dim)
+    df = core.query_df(
+        f"""SELECT {vary} AS g, month, postings_total AS n
+            FROM {core.parquet('filter_cube')}
+            WHERE {fixed_a} = ? AND {fixed_b} = ?
+              AND {vary} NOT IN (?, ?) AND month <= ?
+            ORDER BY month""",
+        [*fixed_vals, all_sentinel, unknown, as_of],
+    )
+    if df.empty:
+        return CompositionResponse(scope=scope, as_of=_iso(as_of), dim=dim, months=[], groups=[])
+    df["month"] = pd.to_datetime(df["month"])
+    months = sorted(df["month"].unique())
+    month_iso = [_iso(pd.Timestamp(m).date()) for m in months]
+    totals = df.groupby("g")["n"].sum().sort_values(ascending=False)
+    top_codes = list(totals.index[:top_n])
+    month_total = df.groupby("month")["n"].sum()
+
+    groups: list[CompositionGroup] = []
+    for g in top_codes:
+        code, label = _split_label(str(g))
+        sub = df[df["g"] == g].set_index("month")["n"]
+        values = [float(sub.get(m, 0) / month_total[m]) if month_total[m] else 0.0 for m in months]
+        groups.append(CompositionGroup(code=code, label=label, values=values))
+    other_codes = list(totals.index[top_n:])
+    if other_codes:
+        sub = df[df["g"].isin(other_codes)].groupby("month")["n"].sum()
+        values = [float(sub.get(m, 0) / month_total[m]) if month_total[m] else 0.0 for m in months]
+        groups.append(CompositionGroup(code="__other__", label="Other", values=values))
+    return CompositionResponse(scope=scope, as_of=_iso(as_of), dim=dim, months=month_iso, groups=groups)
+
+
+def concentration(scope: Scope, dim: str) -> ConcentrationResponse:
+    """Concentration of demand across broad groups at the as-of month: HHI + top-5 share."""
+    as_of = core.month_floor(scope.end)
+    vary, fixed_a, fixed_b, fixed_vals, all_sentinel, unknown = _dim_cfg(scope, dim)
+    df = core.query_df(
+        f"""SELECT {vary} AS g, postings_total AS n
+            FROM {core.parquet('filter_cube')}
+            WHERE month = ? AND {fixed_a} = ? AND {fixed_b} = ?
+              AND {vary} NOT IN (?, ?)""",
+        [as_of, *fixed_vals, all_sentinel, unknown],
+    )
+    if df.empty or df["n"].sum() == 0:
+        return ConcentrationResponse(scope=scope, as_of=_iso(as_of), dim=dim, hhi=0.0, top5_share=0.0, n_groups=0)
+    shares = (df["n"] / df["n"].sum()).sort_values(ascending=False)
+    hhi = float((shares**2).sum() * 10000)
+    top5 = float(shares.iloc[:5].sum())
+    return ConcentrationResponse(
+        scope=scope, as_of=_iso(as_of), dim=dim, hhi=round(hhi, 1), top5_share=round(top5, 4), n_groups=int(len(shares))
+    )
+
+
+def occ_province_matrix(scope: Scope, measure: str = "lq") -> MatrixResponse:
+    """Occupation × province demand at the as-of month. measure='lq' (location quotient,
+    >1 = over-represented vs the national mix) or 'count' (raw postings)."""
+    as_of = core.month_floor(scope.end)
+    df = core.query_df(
+        f"""SELECT occupation_scope AS occ, province_scope AS prov, postings_total AS n
+            FROM {core.parquet('filter_cube')}
+            WHERE month = ? AND industry_scope = ?
+              AND occupation_scope NOT IN (?, ?) AND province_scope <> ?""",
+        [as_of, scope.ind, core.ALL_OCC, core.UNKNOWN_OCC, core.ALL_GEO],
+    )
+    if df.empty:
+        return MatrixResponse(scope=scope, as_of=_iso(as_of), measure=measure, rows=[], cols=[], z=[], counts=[])
+    occ_tot = df.groupby("occ")["n"].sum().sort_values(ascending=False)
+    prov_tot = df.groupby("prov")["n"].sum().sort_values(ascending=False)
+    grand = float(df["n"].sum())
+    occ_codes = list(occ_tot.index)
+    prov_codes = list(prov_tot.index)
+    pivot = df.pivot_table(index="occ", columns="prov", values="n", aggfunc="sum", fill_value=0)
+
+    z: list[list[float | None]] = []
+    counts: list[list[int | None]] = []
+    for o in occ_codes:
+        zr: list[float | None] = []
+        cr: list[int | None] = []
+        for p in prov_codes:
+            c = float(pivot.loc[o, p]) if (o in pivot.index and p in pivot.columns) else 0.0
+            cr.append(int(c))
+            if measure == "count":
+                zr.append(int(c))
+            else:  # location quotient = (c / prov_total) / (occ_total / grand)
+                denom = (prov_tot[p] / grand) * occ_tot[o]
+                zr.append(round(float(c / denom), 3) if denom else None)
+        z.append(zr)
+        counts.append(cr)
+    rows = [_split_label(str(o))[1] for o in occ_codes]
+    cols = [core.PROVINCE_NAMES.get(str(p), str(p)) for p in prov_codes]
+    return MatrixResponse(scope=scope, as_of=_iso(as_of), measure=measure, rows=rows, cols=cols, z=z, counts=counts)
+
+
+_COVERAGE_FIELDS = {
+    "naics": "naics_postings",
+    "noc": "noc_postings",
+    "wage": "wage_postings",
+    "skills": "skills_postings",
+    "remote": "remote_field_postings",
+}
+
+
+def coverage_trend(scope: Scope, field: str = "naics") -> CoverageTrendResponse:
+    """Share of postings with a usable value for `field`, by month (a data-honesty companion)."""
+    as_of = core.month_floor(scope.end)
+    col = _COVERAGE_FIELDS.get(field, "naics_postings")
+    where, params = _scope_where(scope)
+    df = core.query_df(
+        f"""SELECT month, {col} AS k, postings_total AS n
+            FROM {core.parquet('filter_cube')}
+            WHERE {where} AND month <= ? ORDER BY month""",
+        params + [as_of],
+    )
+    months: list[str] = []
+    share: list[float] = []
+    for _, r in df.iterrows():
+        if r["n"] and int(r["n"]) > 0:
+            months.append(_iso(r["month"]))
+            share.append(round(float(r["k"]) / float(r["n"]), 4))
+    return CoverageTrendResponse(scope=scope, field=field, months=months, share=share)
+
+
+def geography_trend(scope: Scope, measure: str = "count") -> GeoTrendResponse:
+    """Per-province posting counts by month, for the scope's occupation/industry slice
+    (drives the time-scrubbed choropleth)."""
+    as_of = core.month_floor(scope.end)
+    df = core.query_df(
+        f"""SELECT province_scope AS code, month, postings_total AS n
+            FROM {core.parquet('filter_cube')}
+            WHERE occupation_scope = ? AND industry_scope = ?
+              AND province_scope <> ? AND month <= ?
+            ORDER BY month""",
+        [scope.occ, scope.ind, core.ALL_GEO, as_of],
+    )
+    if df.empty:
+        return GeoTrendResponse(scope=scope, measure=measure, months=[], codes=[], labels=[], values=[])
+    df["month"] = pd.to_datetime(df["month"])
+    months = sorted(df["month"].unique())
+    month_iso = [_iso(pd.Timestamp(m).date()) for m in months]
+    codes = list(df.groupby("code")["n"].sum().sort_values(ascending=False).index)
+    pivot = df.pivot_table(index="month", columns="code", values="n", aggfunc="sum", fill_value=0)
+    values: list[list[float | None]] = []
+    for m in months:
+        row = pivot.loc[m] if m in pivot.index else None
+        values.append([int(row[c]) if (row is not None and c in row) else None for c in codes])
+    labels = [core.PROVINCE_NAMES.get(str(c), str(c)) for c in codes]
+    return GeoTrendResponse(
+        scope=scope, measure=measure, months=month_iso, codes=[str(c) for c in codes], labels=labels, values=values
+    )
 
 
 # --------------------------------------------------------------------------- #

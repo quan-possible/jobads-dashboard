@@ -1,0 +1,88 @@
+<svg viewBox="0 0 1000 360" xmlns="http://www.w3.org/2000/svg" font-family="PT Sans, ui-sans-serif, system-ui, sans-serif">
+  <rect width="1000" height="360" fill="#fbf8f5"/>
+  <text x="20" y="26" font-size="17" font-weight="700" fill="#16242f">Pulse “biggest movers”: two +/− bar charts → one honest movers chart</text>
+
+  <!-- BEFORE -->
+  <text x="20" y="56" font-size="12" font-weight="700" fill="#b54e33">BEFORE · two cards · two independent scales · bar sits below the label</text>
+
+  <!-- Card A: Growing -->
+  <rect x="20" y="68" width="215" height="210" rx="8" fill="#ffffff" stroke="#e3d6c8"/>
+  <text x="34" y="90" font-size="9.5" letter-spacing="0.06em" font-weight="700" fill="#a25518">MOVERS</text>
+  <text x="34" y="107" font-size="14" font-weight="700" fill="#041c2c">Growing</text>
+  <g font-size="12.5" fill="#16242f" font-weight="700">
+    <text x="34" y="134">Registered nurses</text><text x="221" y="134" text-anchor="end" fill="#2c765c">+31%</text>
+    <rect x="34" y="140" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="34" y="140" width="187" height="7" rx="3" fill="#2c765c"/>
+    <text x="34" y="172">Transport drivers</text><text x="221" y="172" text-anchor="end" fill="#2c765c">+18%</text>
+    <rect x="34" y="178" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="34" y="178" width="108" height="7" rx="3" fill="#2c765c"/>
+    <text x="34" y="210">Cooks</text><text x="221" y="210" text-anchor="end" fill="#2c765c">+12%</text>
+    <rect x="34" y="216" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="34" y="216" width="73" height="7" rx="3" fill="#2c765c"/>
+    <text x="34" y="248">Welders</text><text x="221" y="248" text-anchor="end" fill="#2c765c">+7%</text>
+    <rect x="34" y="254" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="34" y="254" width="43" height="7" rx="3" fill="#2c765c"/>
+  </g>
+
+  <!-- Card B: Cooling -->
+  <rect x="250" y="68" width="215" height="210" rx="8" fill="#ffffff" stroke="#e3d6c8"/>
+  <text x="264" y="90" font-size="9.5" letter-spacing="0.06em" font-weight="700" fill="#a25518">MOVERS</text>
+  <text x="264" y="107" font-size="14" font-weight="700" fill="#041c2c">Cooling</text>
+  <g font-size="12.5" fill="#16242f" font-weight="700">
+    <text x="264" y="134">Software developers</text><text x="451" y="134" text-anchor="end" fill="#b54e33">−9%</text>
+    <rect x="264" y="140" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="264" y="140" width="187" height="7" rx="3" fill="#b54e33"/>
+    <text x="264" y="172">Administrative</text><text x="451" y="172" text-anchor="end" fill="#b54e33">−6%</text>
+    <rect x="264" y="178" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="264" y="178" width="125" height="7" rx="3" fill="#b54e33"/>
+    <text x="264" y="210">Retail sales</text><text x="451" y="210" text-anchor="end" fill="#b54e33">−4%</text>
+    <rect x="264" y="216" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="264" y="216" width="82" height="7" rx="3" fill="#b54e33"/>
+    <text x="264" y="248">Telemarketers</text><text x="451" y="248" text-anchor="end" fill="#b54e33">−2%</text>
+    <rect x="264" y="254" width="187" height="7" rx="3" fill="#f7efe9"/><rect x="264" y="254" width="41" height="7" rx="3" fill="#b54e33"/>
+  </g>
+
+  <!-- problem annotation -->
+  <line x1="221" y1="151" x2="264" y2="151" stroke="#b54e33" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="20" y="300" font-size="11.5" fill="#b54e33">✗ Both top bars are full-width — but one is +31%, the other −9%.</text>
+  <text x="20" y="316" font-size="11.5" fill="#b54e33">Each card rescales to its own max, so lengths can’t be compared. Double chrome; bar-below-label doubles row height.</text>
+
+  <!-- AFTER -->
+  <text x="520" y="56" font-size="12" font-weight="700" fill="#2c765c">AFTER · one card · one shared scale · diverging through zero + per-row trend</text>
+  <rect x="520" y="68" width="460" height="232" rx="8" fill="#ffffff" stroke="#e3d6c8"/>
+  <text x="536" y="90" font-size="9.5" letter-spacing="0.06em" font-weight="700" fill="#a25518">BIGGEST MOVERS · YEAR OVER YEAR</text>
+  <text x="536" y="108" font-size="14" font-weight="700" fill="#041c2c">Nursing leads; software keeps cooling</text>
+
+  <!-- zero axis -->
+  <line x1="740" y1="120" x2="740" y2="274" stroke="#b9ab9d" stroke-width="1"/>
+  <text x="740" y="288" font-size="9" text-anchor="middle" fill="#616a71">0%</text>
+
+  <!-- category labels (right-aligned, far enough left that no bar reaches them) -->
+  <g font-size="11" fill="#16242f" font-weight="700">
+    <text x="660" y="138" text-anchor="end">Registered nurses</text>
+    <text x="660" y="157" text-anchor="end">Transport drivers</text>
+    <text x="660" y="176" text-anchor="end">Cooks</text>
+    <text x="660" y="195" text-anchor="end">Welders</text>
+    <text x="660" y="214" text-anchor="end">Telemarketers</text>
+    <text x="660" y="233" text-anchor="end">Retail sales</text>
+    <text x="660" y="252" text-anchor="end">Administrative</text>
+    <text x="660" y="271" text-anchor="end">Software developers</text>
+  </g>
+
+  <!-- growing bars (green, right of zero) -->
+  <g fill="#2c765c">
+    <rect x="740" y="129" width="150" height="9" rx="2"/>
+    <rect x="740" y="148" width="87" height="9" rx="2"/>
+    <rect x="740" y="167" width="58" height="9" rx="2"/>
+    <rect x="740" y="186" width="34" height="9" rx="2"/>
+  </g>
+  <g font-size="10.5" fill="#2c765c" font-weight="700">
+    <text x="896" y="138">+31%</text><text x="833" y="157">+18%</text><text x="804" y="176">+12%</text><text x="780" y="195">+7%</text>
+  </g>
+  <!-- cooling bars (red, left of zero) -->
+  <g fill="#b54e33">
+    <rect x="730.3" y="205" width="9.7" height="9" rx="2"/>
+    <rect x="720.6" y="224" width="19.4" height="9" rx="2"/>
+    <rect x="711" y="243" width="29" height="9" rx="2"/>
+    <rect x="696.5" y="262" width="43.5" height="9" rx="2"/>
+  </g>
+  <g font-size="10.5" fill="#b54e33" font-weight="700">
+    <text x="724" y="214" text-anchor="end">−2%</text><text x="714" y="233" text-anchor="end">−4%</text><text x="705" y="252" text-anchor="end">−6%</text><text x="690" y="271" text-anchor="end">−9%</text>
+  </g>
+
+  <text x="520" y="324" font-size="11.5" fill="#5d6b74">✓ One Figure, one shared scale — +31% visibly dwarfs −9%, sorted through zero.</text>
+  <text x="520" y="340" font-size="11.5" fill="#5d6b74">~40% less height, honest comparison, and room for a per-row sparkline.</text>
+</svg>

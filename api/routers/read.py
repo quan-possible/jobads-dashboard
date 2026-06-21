@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 
 from .. import queries
 from ..deps import scope_dependency
@@ -16,6 +16,12 @@ from ..models import (
     SeriesPoint,
     SkillsResponse,
     WagesResponse,
+    WageTrendResponse,
+    CompositionResponse,
+    ConcentrationResponse,
+    MatrixResponse,
+    CoverageTrendResponse,
+    GeoTrendResponse,
 )
 
 router = APIRouter(prefix="/api", tags=["read"])
@@ -64,6 +70,52 @@ def wages(
     dim: str = Query("occupation", pattern="^(occupation|province|overall)$"),
 ) -> WagesResponse:
     return queries.wages(scope, dim)
+
+
+@router.get("/wages/trend", response_model=WageTrendResponse)
+def wages_trend(scope: Scope = Depends(scope_dependency)) -> WageTrendResponse:
+    return queries.wage_trend(scope)
+
+
+@router.get("/composition/{dim}", response_model=CompositionResponse)
+def composition(
+    dim: str = Path(..., pattern="^(occupations|industries)$"),
+    scope: Scope = Depends(scope_dependency),
+    top_n: int = Query(6, ge=2, le=10),
+) -> CompositionResponse:
+    return queries.composition(scope, dim, top_n)
+
+
+@router.get("/concentration/{dim}", response_model=ConcentrationResponse)
+def concentration(
+    dim: str = Path(..., pattern="^(occupations|industries)$"),
+    scope: Scope = Depends(scope_dependency),
+) -> ConcentrationResponse:
+    return queries.concentration(scope, dim)
+
+
+@router.get("/matrix/occ-province", response_model=MatrixResponse)
+def matrix_occ_province(
+    scope: Scope = Depends(scope_dependency),
+    measure: str = Query("lq", pattern="^(lq|count)$"),
+) -> MatrixResponse:
+    return queries.occ_province_matrix(scope, measure)
+
+
+@router.get("/coverage/trend", response_model=CoverageTrendResponse)
+def coverage_trend(
+    scope: Scope = Depends(scope_dependency),
+    field: str = Query("naics", pattern="^(naics|noc|wage|skills|remote)$"),
+) -> CoverageTrendResponse:
+    return queries.coverage_trend(scope, field)
+
+
+@router.get("/geography/trend", response_model=GeoTrendResponse)
+def geography_trend(
+    scope: Scope = Depends(scope_dependency),
+    measure: str = Query("count", pattern="^(count)$"),
+) -> GeoTrendResponse:
+    return queries.geography_trend(scope, measure)
 
 
 @router.get("/skills", response_model=SkillsResponse)
