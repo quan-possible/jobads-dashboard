@@ -13,10 +13,32 @@ type ProvProps = { code: string; name: string };
 const RAMP = ["#efe2d2", "#e3bd92", "#d59257", "#cf7730", "#a4531b"];
 const NO_DATA = "#ece4da";
 
-function measureLabel(measure: string): string {
-  if (measure === "per10k") return "postings per 10k labour force";
-  if (measure === "lq") return "location quotient (1.0 = national average)";
-  return "active postings";
+export type ChoroLabels = {
+  per10k: string;
+  lq: string;
+  count: string;
+  low: string;
+  high: string;
+  noData: string;
+  postings: string;
+  noPostings: string;
+};
+
+const DEFAULT_LABELS: ChoroLabels = {
+  per10k: "postings per 10k labour force",
+  lq: "location quotient (1.0 = national average)",
+  count: "active postings",
+  low: "low",
+  high: "high",
+  noData: "no data",
+  postings: "postings",
+  noPostings: "No postings recorded",
+};
+
+function measureLabel(measure: string, labels: ChoroLabels): string {
+  if (measure === "per10k") return labels.per10k;
+  if (measure === "lq") return labels.lq;
+  return labels.count;
 }
 
 function formatValue(v: number | null, measure: string): string {
@@ -30,10 +52,12 @@ export function Choropleth({
   items,
   measure,
   height = 460,
+  labels = DEFAULT_LABELS,
 }: {
   items: GeoItem[];
   measure: string;
   height?: number;
+  labels?: ChoroLabels;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [topo, setTopo] = useState<Topology | null>(null);
@@ -91,7 +115,7 @@ export function Choropleth({
             height={height}
             viewBox={`0 0 ${width} ${height}`}
             role="img"
-            aria-label={`Choropleth of Canadian provinces by ${measureLabel(measure)}`}
+            aria-label={`Choropleth of Canadian provinces by ${measureLabel(measure, labels)}`}
             onMouseLeave={() => setHover(null)}
           >
             {built.fc.features.map((f) => {
@@ -130,11 +154,11 @@ export function Choropleth({
           <div className="font-bold text-navy-deep">{hover.name}</div>
           {hover.item && hover.item.value !== null ? (
             <div className="num text-ink-soft">
-              {formatValue(hover.item.value, measure)} · {measureLabel(measure)}
-              {hover.item.count !== null && <span className="block text-ink-faint">{fmtInt(hover.item.count)} postings</span>}
+              {formatValue(hover.item.value, measure)} · {measureLabel(measure, labels)}
+              {hover.item.count !== null && <span className="block text-ink-faint">{fmtInt(hover.item.count)} {labels.postings}</span>}
             </div>
           ) : (
-            <div className="text-ink-faint">No postings recorded</div>
+            <div className="text-ink-faint">{labels.noPostings}</div>
           )}
         </div>
       )}
@@ -143,18 +167,18 @@ export function Choropleth({
       {built && (
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <span className="text-[0.68rem] font-bold uppercase tracking-[0.04em] text-ink-faint">
-            {measureLabel(measure)}
+            {measureLabel(measure, labels)}
           </span>
           <div className="flex items-center gap-1.5">
-            <span className="text-[0.7rem] text-ink-faint">low</span>
+            <span className="text-[0.7rem] text-ink-faint">{labels.low}</span>
             {RAMP.map((c) => (
               <span key={c} className="h-3 w-6" style={{ background: c }} />
             ))}
-            <span className="text-[0.7rem] text-ink-faint">high</span>
+            <span className="text-[0.7rem] text-ink-faint">{labels.high}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-3 w-6" style={{ background: NO_DATA }} />
-            <span className="text-[0.7rem] text-ink-faint">no data</span>
+            <span className="text-[0.7rem] text-ink-faint">{labels.noData}</span>
           </div>
         </div>
       )}

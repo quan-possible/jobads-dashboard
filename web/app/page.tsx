@@ -136,7 +136,7 @@ export default async function PulsePage({
           >
             <DemandChart series={series} />
           </Figure>
-          <KeyPoints points={key_points} />
+          <KeyPoints points={key_points} title={t.keyPointsTitle} />
         </div>
       </section>
 

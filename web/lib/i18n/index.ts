@@ -14,12 +14,6 @@ export function getDictionary(locale: Locale) {
     nav: nav[locale],
     filter: filter[locale],
     footer: footer[locale],
-    pulse: pages[locale].pulse,
-    explorers: pages[locale].explorers,
-    geography: pages[locale].geography,
-    wages: pages[locale].wages,
-    skills: pages[locale].skills,
-    method: pages[locale].method,
     explore: pages[locale].explore,
   };
 }

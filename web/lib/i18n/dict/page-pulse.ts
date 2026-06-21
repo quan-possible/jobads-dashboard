@@ -26,6 +26,7 @@ export const pulseDict = {
     demandEyebrow: "Posting demand over time",
     demandTitle: "Demand relative to the pre-pandemic norm",
     demandNote: "Index of monthly active postings, January 2019 = 100. Hover for monthly values.",
+    keyPointsTitle: "What stands out",
 
     // Movers section — both panels share the same eyebrow
     moversEyebrow: "Occupations · year over year",
@@ -69,6 +70,7 @@ export const pulseDict = {
     demandEyebrow: "Demande affichée au fil du temps",
     demandTitle: "Demande par rapport à la norme pré-pandémique",
     demandNote: "Indice des offres actives mensuelles, janvier 2019 = 100. Survolez pour les valeurs mensuelles.",
+    keyPointsTitle: "Ce qui ressort",
 
     // Movers section
     moversEyebrow: "Professions · année sur année",

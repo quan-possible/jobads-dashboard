@@ -42,6 +42,18 @@ export const geographyDict = {
     // Ranked header prefix
     rankedPrefix: "Ranked · ",
 
+    // Choropleth legend / tooltip labels
+    legend: {
+      per10k: "postings per 10k labour force",
+      lq: "location quotient (1.0 = national avg)",
+      count: "active postings",
+      low: "low",
+      high: "high",
+      noData: "no data",
+      postings: "postings",
+      noPostings: "No postings recorded",
+    },
+
     // ApiDown card
     apiDownTitle: "Data service unavailable",
     apiDownBody: "The API isn't responding. Start it with",
@@ -85,6 +97,18 @@ export const geographyDict = {
 
     // Ranked header prefix
     rankedPrefix: "Classement · ",
+
+    // Choropleth legend / tooltip labels
+    legend: {
+      per10k: "offres pour 10k actifs",
+      lq: "quotient de localisation (1,0 = moy. nat.)",
+      count: "offres actives",
+      low: "faible",
+      high: "élevé",
+      noData: "sans données",
+      postings: "offres",
+      noPostings: "Aucune offre recensée",
+    },
 
     // ApiDown card
     apiDownTitle: "Service de données indisponible",
