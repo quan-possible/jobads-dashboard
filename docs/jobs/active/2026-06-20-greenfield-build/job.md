@@ -20,13 +20,25 @@
 - Private `posting_lookup.parquet` is gitignored (absent in worktree) → G5 reads it from the main checkout / configured path.
 
 ## Phase tracker
-- [ ] **G0 Scaffold** — monorepo (`api/`,`web/`), Tailwind+tokens, PT Sans, `/api/meta`, both boot.
-- [ ] **G1 API** — all read endpoints + DuckDB queries + Pydantic + pytest; values parity vs parquet.
-- [ ] **G2 Design system + shell** — tokens(warm), GradientBar, PixelTiles, TopNav, sticky FilterSpine (URL-synced), footer, Figure.
-- [ ] **G3 Pulse** — KpiStrip+sparklines, demand index, KeyPoints (causation-guarded), DemandChart, RankedBars.
-- [ ] **G4 Explorers** — Occupations/Industries/Geography(choropleth)/Wages(range bars)/Skills; cross-filter + compare.
-- [ ] **G5 Trust + private** — Method page, Explore behind AuthGate, n everywhere, sample gates.
-- [ ] **G6 Citability + polish** — shareable URLs, CSV/PNG export, embeddable widget, OG, EN/FR i18n, API docs, Lighthouse/axe.
+- [x] **G0 Scaffold** — Next 16 + Tailwind v4 + FastAPI; `/api/meta`; both boot. (commit c3381a2)
+- [x] **G1 API** — all read endpoints + DuckDB + Pydantic; **63 parity tests pass**. (c3381a2)
+- [x] **G2 Design system + shell** — warm tokens, GradientBar/PixelTiles, TopNav, URL-synced FilterSpine, Footer, Figure. (c3381a2)
+- [x] **G3 Pulse** — KPI strip+sparklines, demand index chart, causation-guarded KeyPoints, ranked movers, regional snapshot. (c3381a2)
+- [x] **G4 Explorers** — Occupations/Industries (ExplorerView + ClickableRanks cross-filter), Geography (D3 choropleth + measure toggle), Wages (range bars), Skills (top+distinctive+requirements). Real cross-filter via URL works across pages. (de34a95)
+- [~] **G5 Trust + private** — Method/trust page DONE (de34a95). REMAINING: private Explore posting lookup behind PBKDF2 auth cookie (needs new `/api/auth` + `/api/postings` endpoints + AuthGate page; posting_lookup.parquet is absent in worktree — read from main checkout / configured path).
+- [ ] **G6 Citability + polish** — shareable URLs already work (filters-in-URL). REMAINING: CSV/PNG export, embeddable widget, OG images, EN/FR i18n, API docs page, Lighthouse/axe pass, mobile nav polish.
+
+## Servers (dev)
+- API: detached uvicorn on 127.0.0.1:8530 (PID may change; `pgrep -fl "uvicorn api.main"`). Start: `PYTHONPATH=src .venv/bin/python -m uvicorn api.main:app --port 8530`.
+- Web: preview "web" config in MAIN repo `.claude/launch.json` → next dev on :3000 (abs --prefix to worktree). `NEXT_PUBLIC_API_BASE` defaults to 127.0.0.1:8530.
+
+## Verified (visual, 1280px)
+Pulse, Occupations(+cross-filter Health profile), Geography(choropleth), Wages(range bars), Skills(scoped distinctive), Method — all render beautifully, on-brand, no console errors. tsc clean; all 12 routes 200.
+
+## Known follow-ups / polish backlog
+- Choropleth: Canada projection a touch small; NWT per-10k outlier dominates colour scale (honest, quantile-binned). Consider a "median wage" sparkline on the Pulse wage tile. Colour the YoY KPI value by sign. Mobile nav is horizontal-scroll (fine, could become a menu).
 
 ## Log
-- 2026-06-20: worktree created, data ground-truth verified, ledger started. Beginning G0.
+- 2026-06-20: worktree created, data ground-truth verified, ledger started.
+- 2026-06-20: G0–G3 built + committed (c3381a2). API 63 tests pass. Pulse verified beautiful.
+- 2026-06-20: G4 + Method built (3 Sonnet agents in parallel for Wages/Skills/Method; I built choropleth + explorer/cross-filter). Fixed Choropleth width-seed bug. All pages verified. Committed de34a95.
