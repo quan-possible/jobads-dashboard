@@ -14,7 +14,7 @@ export function CoverageBar({
 }) {
   const pct = (share * 100).toFixed(0);
   const isSparse = share < 0.4;
-  const accentClass = isSparse ? "text-orange" : "text-teal";
+  const accentClass = isSparse ? "text-orange-deep" : "text-teal";
   const barClass = isSparse ? "bg-orange" : "bg-teal";
 
   return (

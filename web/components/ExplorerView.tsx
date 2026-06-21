@@ -115,7 +115,7 @@ export async function ExplorerView({ filters, dim }: { filters: Filters; dim: "o
             <h2 className="h-section">{selectedLabel}</h2>
             <Link
               href={dim === "occupations" ? "/occupations" : "/industries"}
-              className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange hover:underline"
+              className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange-deep hover:underline"
             >
               Clear selection ✕
             </Link>

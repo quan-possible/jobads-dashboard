@@ -17,7 +17,7 @@ export function FilterSpine() {
     <div className="sticky top-16 z-30 border-b border-card-border bg-surface-alt/80 backdrop-blur-md">
       <div className="container-x flex flex-wrap items-end gap-x-4 gap-y-3 py-3">
         <div className="mr-1 flex flex-col">
-          <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-orange">Filter</span>
+          <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-orange-deep">Filter</span>
           <span className="text-[0.7rem] font-bold uppercase tracking-[0.02em] text-ink-soft">
             Across the dashboard
           </span>

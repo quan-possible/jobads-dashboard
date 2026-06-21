@@ -83,7 +83,7 @@ export function AuthGate() {
         <div className="mb-5 flex items-center gap-3">
           <PixelTiles size={11} className="shrink-0" />
           <div>
-            <div className="eyebrow text-orange">Protected</div>
+            <div className="eyebrow">Protected</div>
             <h2 className="text-[1.1rem] font-bold leading-snug text-navy-deep">Posting-level lookup</h2>
           </div>
         </div>

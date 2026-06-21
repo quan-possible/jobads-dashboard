@@ -118,7 +118,7 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
                   </span>
                 )}
                 {detail.remote_class && detail.remote_class !== "Not reported" && (
-                  <span className="border border-orange/40 bg-orange/5 px-2 py-1 text-[0.72rem] font-bold text-orange">
+                  <span className="border border-orange/40 bg-orange/5 px-2 py-1 text-[0.72rem] font-bold text-orange-deep">
                     {detail.remote_class}
                   </span>
                 )}

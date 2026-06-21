@@ -147,7 +147,7 @@ export default async function GeographyPage({
           <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
             <Choropleth items={data.items} measure={measure} />
             <div>
-              <h3 className="eyebrow mb-3 text-ink-faint">Ranked · {MEASURES.find((m) => m.value === measure)?.label}</h3>
+              <p className="eyebrow mb-3 text-ink-faint">Ranked · {MEASURES.find((m) => m.value === measure)?.label}</p>
               <RankedProvinces items={data.items} measure={measure} />
             </div>
           </div>

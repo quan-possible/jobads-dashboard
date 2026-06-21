@@ -17,7 +17,7 @@
   /* Ink */
   --ink: #16242f;           /* body text */
   --ink-soft: #5d6b74;      /* secondary text */
-  --ink-faint: #8a949b;     /* captions, axis labels */
+  --ink-faint: #616a71;     /* captions, axis labels — AA on cream + panels */
   --ink-invert: #f4eee7;    /* text on navy */
 
   /* Brand */
@@ -28,7 +28,7 @@
   --sand: #c39e80;
   --sand-soft: #e3d2c1;
   --orange: #cf7730;        /* the single accent */
-  --orange-deep: #a85a1d;
+  --orange-deep: #a25518;   /* AA text orange (eyebrows, small accents) */
   --orange-soft: #f0c79f;
 
   /* Lines */
@@ -38,8 +38,8 @@
   --chart-axis: #b9ab9d;
 
   /* Status (kept brand-tinted, CVD-distinct) */
-  --pos: #2f7d62;           /* growth — green-teal */
-  --neg: #c0563a;           /* cooling — warm red, distinct from orange accent */
+  --pos: #2c765c;           /* growth — green-teal (AA) */
+  --neg: #b54e33;           /* cooling — warm red, distinct from orange accent (AA) */
 
   /* CVD-safe categorical sequence (brand-anchored, luminance-separated) */
   --cat-1: #345961;
@@ -149,7 +149,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--orange);
+  color: var(--orange-deep); /* deeper burnt orange clears AA at eyebrow size */
   line-height: 1.2;
 }
 

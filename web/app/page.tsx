@@ -166,7 +166,7 @@ export default async function PulsePage({
           title="Active postings by province this month"
           asOf={as_of}
           actions={
-            <Link href="/geography" className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange hover:underline">
+            <Link href="/geography" className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange-deep hover:underline">
               Full map →
             </Link>
           }
