@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from ..datasource import DataSource
+from ..labels import noc_short
 from ..theme import BRAND, CONTEXT, MUTED, add_reference_line
 from ._common import titled
 
@@ -26,8 +27,7 @@ def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None) -> go.F
     fig.update_xaxes(title_text="lift (occupation share ÷ national share)", ticksuffix="×")
     fig.update_yaxes(type="category", title_text="skill code")
     fig.update_layout(height=440)
-    short = occupation_scope.split("|")[-1].strip()
-    return titled(fig, f"Distinctive skills for {short[:42]}",
+    return titled(fig, f"Distinctive skills for {noc_short(occupation_scope)}",
                   "Skills most over-represented vs the whole market (codes are taxonomy IDs; no public label table in v1)")
 
 

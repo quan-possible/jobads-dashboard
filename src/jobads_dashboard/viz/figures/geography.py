@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 
 from .. import compute as C
 from ..datasource import BASE_YEAR, PROVINCE_CENTROID, PROVINCE_NAMES, DataSource
+from ..labels import NOC_SHORT, noc_short
 from ..theme import BRAND, CONTEXT, DIVERGING, MUTED, SEQUENTIAL
 from ._common import titled
 
@@ -78,14 +79,14 @@ def share_choropleth(ds: DataSource) -> go.Figure:
 # --------------------------------------------------------------------------- DEEP
 
 
-def lq_choropleth(ds: DataSource, noc_label: str | None = None) -> go.Figure:
-    po = ds.province_occupation
-    window = _last12(po)
-    lq = C.location_quotient(window, "province_scope", "noc_label", "postings_total")
-    if noc_label is None:
-        # default: the group with the widest specialisation spread
-        noc_label = lq.std().sort_values(ascending=False).index[0]
-    col = lq[noc_label]
+def lq_choropleth(ds: DataSource, noc_code: str | None = None) -> go.Figure:
+    window = _last12(ds.province_occupation)
+    lq = C.location_quotient(window, "province_scope", "noc_code", "postings_total")
+    lq = lq[[c for c in lq.columns if c in NOC_SHORT]]
+    if noc_code is None:
+        # default: the group with the widest specialisation spread across provinces
+        noc_code = lq.std().sort_values(ascending=False).index[0]
+    col = lq[noc_code]
     df = pd.DataFrame({"code": col.index, "lq": col.values})
     df["name"] = df["code"].map(PROVINCE_NAMES)
     fig = go.Figure(go.Choropleth(
@@ -96,24 +97,27 @@ def lq_choropleth(ds: DataSource, noc_label: str | None = None) -> go.Figure:
         hovertemplate="%{text}: LQ %{z:.2f}<extra></extra>"))
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(height=470, margin=dict(l=10, r=10, t=70, b=10))
-    short = noc_label.split("|")[-1].strip() if "|" in noc_label else noc_label
-    return titled(fig, f"Specialisation: location quotient — {short[:46]}",
+    return titled(fig, f"Specialisation: location quotient — {noc_short(noc_code)}",
                   "LQ = local share ÷ national share. >1 (orange) = relatively specialised; 1 = on par with Canada")
 
 
 def lq_heatmap(ds: DataSource) -> go.Figure:
     window = _last12(ds.province_occupation)
-    lq = C.location_quotient(window, "province_name", "noc_label", "postings_total")
-    lq = lq.loc[:, [c for c in lq.columns if "Unknown" not in c]]
-    short_cols = [c.split("|")[0].strip() for c in lq.columns]
+    lq = C.location_quotient(window, "province_scope", "noc_code", "postings_total")
+    lq = lq[[c for c in lq.columns if c in NOC_SHORT]]            # drop Unknown
+    # provinces ordered by demand volume (busiest first) for a sensible reading order
+    order = window.groupby("province_scope")["postings_total"].sum().sort_values(ascending=False)
+    lq = lq.reindex(index=[p for p in order.index if p in lq.index])
+    lqT = lq.T                                                    # rows = occupations, cols = provinces
+    y = [noc_short(c) for c in lqT.index]
     fig = go.Figure(go.Heatmap(
-        z=lq.values, x=short_cols, y=lq.index, colorscale=DIVERGING, zmid=1.0, zmin=0, zmax=2,
+        z=lqT.values, x=list(lqT.columns), y=y, colorscale=DIVERGING, zmid=1.0, zmin=0, zmax=2,
         colorbar=dict(title="LQ"), xgap=1, ygap=1,
-        hovertemplate="%{y} · NOC %{x}: LQ %{z:.2f}<extra></extra>"))
-    fig.update_xaxes(title_text="broad occupation group (NOC code)", side="top")
-    fig.update_layout(height=430)
-    return titled(fig, "What each province is known for: LQ wall (province × occupation)",
-                  "Dense specialisation map — orange = over-represented vs Canada, teal = under-represented")
+        hovertemplate="%{y} in %{x}: LQ %{z:.2f}<extra></extra>"))
+    fig.update_xaxes(title_text="province (ordered by demand volume)", type="category")
+    fig.update_layout(height=440, margin=dict(l=170))
+    return titled(fig, "What each province is known for: LQ wall (occupation × province)",
+                  "Specialisation vs Canada — orange = over-represented, teal = under-represented (>1 = specialised)")
 
 
 def shift_share_bars(ds: DataSource) -> go.Figure:

@@ -23,11 +23,7 @@ def _stable_window() -> tuple[pd.Timestamp, pd.Timestamp]:
     return pd.Timestamp(f"{BASE_YEAR}-06-01"), _PROVISIONAL_FROM - pd.DateOffset(months=1)
 
 
-def _short(label: str) -> str:
-    return label.split("|")[0].strip() if "|" in label else label[:18]
-
-
-def _real_groups(df: pd.DataFrame, col: str = "noc_label") -> pd.DataFrame:
+def _real_groups(df: pd.DataFrame, col: str = "noc_name") -> pd.DataFrame:
     return df[~df[col].str.contains("Unknown", na=False)]
 
 
@@ -37,8 +33,8 @@ def _real_groups(df: pd.DataFrame, col: str = "noc_label") -> pd.DataFrame:
 def treemap(ds: DataSource) -> go.Figure:
     nb = ds.noc_broad
     cut = nb["month"].max() - pd.DateOffset(months=12)
-    g = nb[nb["month"] > cut].groupby("noc_label", as_index=False)["postings_total"].sum()
-    g["short"] = g["noc_label"].map(lambda s: s.split("|")[-1].strip())
+    g = nb[nb["month"] > cut].groupby("noc_name", as_index=False)["postings_total"].sum()
+    g["short"] = g["noc_name"].map(lambda s: s.split("|")[-1].strip())
     total = g["postings_total"].sum()
     labels = ["All occupations"] + g["short"].tolist()
     parents = [""] + ["All occupations"] * len(g)
@@ -56,18 +52,18 @@ def treemap(ds: DataSource) -> go.Figure:
 
 def indexed_lines(ds: DataSource) -> go.Figure:
     nb = _real_groups(ds.noc_broad)
-    idx = C.index_to_base(nb, "postings_total", BASE_YEAR, by="noc_label")
-    latest = idx[idx["month"] == idx["month"].max()].set_index("noc_label")["index"]
+    idx = C.index_to_base(nb, "postings_total", BASE_YEAR, by="noc_name")
+    latest = idx[idx["month"] == idx["month"].max()].set_index("noc_name")["index"]
     movers = latest.sort_values(ascending=False)
     highlight = set(list(movers.index[:2]) + list(movers.index[-1:]))
     fig = go.Figure()
-    for lbl, sub in idx.groupby("noc_label"):
+    for lbl, sub in idx.groupby("noc_name"):
         on = lbl in highlight
         fig.add_trace(go.Scatter(
-            x=sub["month"], y=sub["index"], name=_short(lbl),
+            x=sub["month"], y=sub["index"], name=lbl,
             mode="lines", line=dict(color=BRAND if on else CONTEXT, width=2.6 if on else 1),
             opacity=1 if on else 0.5, showlegend=on,
-            hovertemplate="%{x|%b %Y} · " + _short(lbl) + ": %{y:.0f}<extra></extra>"))
+            hovertemplate="%{x|%b %Y} · " + lbl + ": %{y:.0f}<extra></extra>"))
     add_reference_line(fig, 100, text=f"{BASE_YEAR}=100")
     add_covid_band(fig)
     fig.update_yaxes(title_text=f"index ({BASE_YEAR} = 100)")
@@ -81,8 +77,8 @@ def indexed_lines(ds: DataSource) -> go.Figure:
 def contribution_bars(ds: DataSource) -> go.Figure:
     base, end = _stable_window()
     nb = _real_groups(ds.noc_broad)
-    c = C.contribution_to_growth(nb, "noc_label", "postings_total", base, end)
-    c["short"] = c["noc_label"].map(lambda s: s.split("|")[-1].strip())
+    c = C.contribution_to_growth(nb, "noc_name", "postings_total", base, end)
+    c["short"] = c["noc_name"].map(lambda s: s.split("|")[-1].strip())
     c = c.sort_values("contribution_pp")
     colors = np.where(c["contribution_pp"] >= 0, UP, DOWN)
     net = c["contribution_pp"].sum()
@@ -90,7 +86,7 @@ def contribution_bars(ds: DataSource) -> go.Figure:
         x=c["contribution_pp"], y=c["short"], orientation="h", marker_color=colors,
         hovertemplate="%{y}: %{x:+.1f} pp<extra></extra>"))
     add_reference_line(fig, 0)
-    fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.04, showarrow=False,
+    fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.96, showarrow=False,
                        text=f"net {net:+.1f} pp", font=dict(size=12, color=MUTED))
     fig.update_xaxes(title_text="contribution to total growth (pp)", ticksuffix=" pp")
     fig.update_layout(height=420)
@@ -101,8 +97,8 @@ def contribution_bars(ds: DataSource) -> go.Figure:
 def waterfall(ds: DataSource) -> go.Figure:
     base, end = _stable_window()
     nb = _real_groups(ds.noc_broad)
-    c = C.contribution_to_growth(nb, "noc_label", "postings_total", base, end)
-    c["short"] = c["noc_label"].map(lambda s: s.split("|")[-1].strip())
+    c = C.contribution_to_growth(nb, "noc_name", "postings_total", base, end)
+    c["short"] = c["noc_name"].map(lambda s: s.split("|")[-1].strip())
     c = c.sort_values("delta", ascending=False)
     base_total = c["base"].sum()
     end_total = c["end"].sum()
@@ -124,8 +120,8 @@ def waterfall(ds: DataSource) -> go.Figure:
 def dumbbell(ds: DataSource) -> go.Figure:
     base, end = _stable_window()
     nb = _real_groups(ds.noc_broad)
-    b = nb[nb["month"] == base].set_index("noc_label")["postings_total"]
-    e = nb[nb["month"] == end].set_index("noc_label")["postings_total"]
+    b = nb[nb["month"] == base].set_index("noc_name")["postings_total"]
+    e = nb[nb["month"] == end].set_index("noc_name")["postings_total"]
     df = pd.DataFrame({"base": b, "end": e}).dropna()
     df["short"] = [s.split("|")[-1].strip() for s in df.index]
     df = df.sort_values("end")
@@ -148,20 +144,20 @@ def dumbbell(ds: DataSource) -> go.Figure:
 def bump_chart(ds: DataSource) -> go.Figure:
     nb = _real_groups(ds.noc_broad).copy()
     nb["year"] = nb["month"].dt.year
-    ann = nb.groupby(["year", "noc_label"], as_index=False)["postings_total"].sum()
+    ann = nb.groupby(["year", "noc_name"], as_index=False)["postings_total"].sum()
     ann = ann[ann["year"].between(2017, 2025)]
     ann["rank"] = ann.groupby("year")["postings_total"].rank(ascending=False, method="first")
     fig = go.Figure()
-    last = ann[ann["year"] == ann["year"].max()].set_index("noc_label")["rank"]
+    last = ann[ann["year"] == ann["year"].max()].set_index("noc_name")["rank"]
     top = set(last.sort_values().index[:5])
-    for lbl, sub in ann.groupby("noc_label"):
+    for lbl, sub in ann.groupby("noc_name"):
         on = lbl in top
         sub = sub.sort_values("year")
         fig.add_trace(go.Scatter(
-            x=sub["year"], y=sub["rank"], mode="lines+markers", name=_short(lbl),
+            x=sub["year"], y=sub["rank"], mode="lines+markers", name=lbl,
             line=dict(color=BRAND if on else CONTEXT, width=2.5 if on else 1.2),
             marker=dict(size=7 if on else 4), opacity=1 if on else 0.5, showlegend=on,
-            hovertemplate="%{x} · " + _short(lbl) + ": rank %{y:.0f}<extra></extra>"))
+            hovertemplate="%{x} · " + lbl + ": rank %{y:.0f}<extra></extra>"))
     fig.update_yaxes(title_text="rank (1 = most postings)", autorange="reversed",
                      dtick=1)
     fig.update_layout(height=420)
@@ -173,16 +169,19 @@ def noc_naics_heatmap(ds: DataSource) -> go.Figure:
     df = ds.noc_by_naics
     cut = df["month"].max() - pd.DateOffset(months=12)
     g = df[df["month"] > cut]
-    g = g[~g["noc_label"].str.contains("Unknown") & ~g["naics_label"].str.contains("Unknown")]
-    piv = g.pivot_table(index="noc_label", columns="naics_code", values="postings_total",
+    g = g[~g["noc_name"].str.contains("Unknown") & ~g["naics_name"].str.contains("Unknown")]
+    piv = g.pivot_table(index="noc_name", columns="naics_code", values="postings_total",
                         aggfunc="sum", fill_value=0.0)
     norm = piv.div(piv.sum(axis=0).replace(0, np.nan), axis=1) * 100  # column share
-    ycols = [s[:30] for s in norm.index]
+    # full sector name on hover (the x tick stays a compact NAICS code)
+    code2name = dict(zip(g["naics_code"], g["naics_name"]))
+    sector_names = [code2name.get(c, c) for c in norm.columns]
+    customdata = np.tile(sector_names, (len(norm.index), 1))
     fig = go.Figure(go.Heatmap(
-        z=norm.values, x=list(norm.columns), y=ycols, colorscale=SEQUENTIAL,
-        colorbar=dict(title="% of sector", ticksuffix="%"), xgap=1, ygap=1,
-        hovertemplate="%{y} in NAICS %{x}: %{z:.0f}% of sector demand<extra></extra>"))
-    fig.update_xaxes(title_text="industry sector (NAICS code)", type="category")
+        z=norm.values, x=list(norm.columns), y=list(norm.index), customdata=customdata,
+        colorscale=SEQUENTIAL, colorbar=dict(title="% of sector", ticksuffix="%"), xgap=1, ygap=1,
+        hovertemplate="%{y} in %{customdata} (NAICS %{x}): %{z:.0f}% of sector demand<extra></extra>"))
+    fig.update_xaxes(title_text="industry sector (NAICS code · hover for name)", type="category")
     fig.update_layout(height=460, margin=dict(l=190))
     return titled(fig, "Which sectors demand which occupations",
                   "Column-normalised: each industry's postings split across occupation groups (last 12 months)")
@@ -229,8 +228,8 @@ def concentration_trio(ds: DataSource) -> go.Figure:
 
 def horizon_wall(ds: DataSource) -> go.Figure:
     nb = _real_groups(ds.noc_broad)
-    idx = C.index_to_base(nb, "postings_total", BASE_YEAR, by="noc_label")
-    groups = list(idx.groupby("noc_label"))
+    idx = C.index_to_base(nb, "postings_total", BASE_YEAR, by="noc_name")
+    groups = list(idx.groupby("noc_name"))
     n = len(groups)
     fig = make_subplots(rows=n, cols=1, shared_xaxes=True, vertical_spacing=0.012)
     band = 20.0  # index points per colour band; deviation from 100
@@ -250,8 +249,8 @@ def horizon_wall(ds: DataSource) -> go.Figure:
                                      fill="tozeroy", fillcolor=neg_shades[bi], showlegend=False,
                                      hoverinfo="skip"), row=r, col=1)
         fig.add_annotation(xref="paper", x=0, xanchor="right", y=band / 2, yref=f"y{r}" if r > 1 else "y",
-                           text=_short(lbl), showarrow=False, font=dict(size=9, color=MUTED), xshift=-6)
+                           text=lbl, showarrow=False, font=dict(size=9, color=MUTED), xshift=-6)
         fig.update_yaxes(range=[0, band], showticklabels=False, showgrid=False, row=r, col=1)
-    fig.update_layout(height=max(360, 42 * n), margin=dict(l=120, r=20, t=64, b=30))
+    fig.update_layout(height=max(360, 42 * n), margin=dict(l=170, r=20, t=92, b=30))
     return titled(fig, "Horizon wall: every occupation group's trajectory in one screen",
                   "Each strip = deviation from its 2019 level, folded into colour bands (teal above, orange below)")

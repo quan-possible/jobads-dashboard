@@ -126,9 +126,9 @@ def seasonality_heatmap(ds: DataSource) -> go.Figure:
 def composition_area(ds: DataSource, top: int = 6) -> go.Figure:
     nb = ds.noc_broad.copy()
     recent = nb[nb["month"] >= nb["month"].max() - pd.DateOffset(years=1)]
-    order = recent.groupby("noc_label")["postings_total"].sum().sort_values(ascending=False)
+    order = recent.groupby("noc_name")["postings_total"].sum().sort_values(ascending=False)
     keep = list(order.index[:top])
-    nb["band"] = np.where(nb["noc_label"].isin(keep), nb["noc_label"], "Other groups")
+    nb["band"] = np.where(nb["noc_name"].isin(keep), nb["noc_name"], "Other groups")
     g = nb.groupby(["month", "band"], as_index=False)["postings_total"].sum()
     tot = g.groupby("month")["postings_total"].transform("sum")
     g["share"] = g["postings_total"] / tot * 100
@@ -138,9 +138,9 @@ def composition_area(ds: DataSource, top: int = 6) -> go.Figure:
     for i, b in enumerate(bands):
         sub = g[g["band"] == b]
         fig.add_trace(go.Scatter(
-            x=sub["month"], y=sub["share"], name=b[:38], stackgroup="one",
+            x=sub["month"], y=sub["share"], name=b, stackgroup="one",
             mode="lines", line=dict(width=0.5, color=COLORWAY[i % len(COLORWAY)]),
-            hovertemplate="%{x|%b %Y} · " + b[:30] + ": %{y:.1f}%<extra></extra>"))
+            hovertemplate="%{x|%b %Y} · " + b + ": %{y:.1f}%<extra></extra>"))
     fig.update_yaxes(title_text="share of postings", ticksuffix="%", range=[0, 100])
     add_covid_band(fig, label=False)
     return titled(fig, "How the occupational mix shifts over time",

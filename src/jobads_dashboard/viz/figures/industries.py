@@ -22,12 +22,8 @@ UP = "#2f6f77"
 DOWN = "#b5523a"
 
 
-def _short(label: str) -> str:
-    return label.split("|")[0].strip() if "|" in label else label
-
-
 def _real(df: pd.DataFrame) -> pd.DataFrame:
-    return df[~df["naics_label"].str.contains("Unknown", na=False)]
+    return df[~df["naics_name"].str.contains("Unknown", na=False)]
 
 
 def coverage_line(ds: DataSource) -> go.Figure:
@@ -47,8 +43,8 @@ def coverage_line(ds: DataSource) -> go.Figure:
 def treemap(ds: DataSource) -> go.Figure:
     nb = _real(ds.naics_broad)
     cut = nb["month"].max() - pd.DateOffset(months=12)
-    g = nb[nb["month"] > cut].groupby("naics_label", as_index=False)["postings_total"].sum()
-    g["short"] = g["naics_label"].map(lambda s: s.split("|")[-1].strip())
+    g = nb[nb["month"] > cut].groupby("naics_name", as_index=False)["postings_total"].sum()
+    g["short"] = g["naics_name"].map(lambda s: s.split("|")[-1].strip())
     total = g["postings_total"].sum()
     labels = ["All industries"] + g["short"].tolist()
     parents = [""] + ["All industries"] * len(g)
@@ -67,9 +63,9 @@ def treemap(ds: DataSource) -> go.Figure:
 def share_over_time(ds: DataSource, top: int = 7) -> go.Figure:
     nb = _real(ds.naics_broad)
     recent = nb[nb["month"] >= nb["month"].max() - pd.DateOffset(years=1)]
-    keep = list(recent.groupby("naics_label")["postings_total"].sum().sort_values(ascending=False).index[:top])
+    keep = list(recent.groupby("naics_name")["postings_total"].sum().sort_values(ascending=False).index[:top])
     nb = nb.copy()
-    nb["band"] = np.where(nb["naics_label"].isin(keep), nb["naics_label"], "Other sectors")
+    nb["band"] = np.where(nb["naics_name"].isin(keep), nb["naics_name"], "Other sectors")
     g = nb.groupby(["month", "band"], as_index=False)["postings_total"].sum()
     tot = g.groupby("month")["postings_total"].transform("sum")
     g["share"] = g["postings_total"] / tot * 100
@@ -89,8 +85,8 @@ def share_over_time(ds: DataSource, top: int = 7) -> go.Figure:
 def contribution_bars(ds: DataSource) -> go.Figure:
     base, end = pd.Timestamp(f"{BASE_YEAR}-06-01"), _PROVISIONAL_FROM - pd.DateOffset(months=1)
     nb = _real(ds.naics_broad)
-    c = C.contribution_to_growth(nb, "naics_label", "postings_total", base, end)
-    c["short"] = c["naics_label"].map(lambda s: s.split("|")[-1].strip()[:30])
+    c = C.contribution_to_growth(nb, "naics_name", "postings_total", base, end)
+    c["short"] = c["naics_name"].map(lambda s: s.split("|")[-1].strip()[:30])
     c = c.sort_values("contribution_pp")
     colors = np.where(c["contribution_pp"] >= 0, UP, DOWN)
     fig = go.Figure(go.Bar(x=c["contribution_pp"], y=c["short"], orientation="h",

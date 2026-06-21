@@ -16,6 +16,7 @@ import pandas as pd
 
 from ..dashboard.constants import ALL_CANADA, ALL_INDUSTRIES, ALL_OCCUPATIONS
 from ..dashboard.data import load_tables
+from .labels import NAICS_SHORT, NOC_SHORT
 
 # Repo-relative default: <repo>/data/derived/labor_market_dashboard_v1
 _DEFAULT_ROOT = Path(__file__).resolve().parents[3] / "data" / "derived" / "labor_market_dashboard_v1"
@@ -77,6 +78,7 @@ class DataSource:
         df = self._tables["monthly_by_noc_broad"].copy()
         cl = _parse_code_label(df["occupation_scope"])
         df["noc_code"], df["noc_label"] = cl["code"], cl["label"]
+        df["noc_name"] = df["noc_code"].map(NOC_SHORT).fillna("Unknown")
         return df.sort_values("month").reset_index(drop=True)
 
     @functools.cached_property
@@ -84,6 +86,7 @@ class DataSource:
         df = self._tables["monthly_by_naics_broad"].copy()
         cl = _parse_code_label(df["industry_scope"])
         df["naics_code"], df["naics_label"] = cl["code"], cl["label"]
+        df["naics_name"] = df["naics_code"].map(NAICS_SHORT).fillna("Unknown")
         return df.sort_values("month").reset_index(drop=True)
 
     @functools.cached_property
@@ -118,6 +121,7 @@ class DataSource:
         df = self._tables["monthly_wage_by_noc_broad"].copy()
         cl = _parse_code_label(df["occupation_scope"])
         df["noc_code"], df["noc_label"] = cl["code"], cl["label"]
+        df["noc_name"] = df["noc_code"].map(NOC_SHORT).fillna("Unknown")
         return df.sort_values("month").reset_index(drop=True)
 
     # -- categorical dimensions ---------------------------------------------- #
@@ -196,6 +200,7 @@ class DataSource:
         out = df[m].copy()
         cl = _parse_code_label(out["occupation_scope"])
         out["noc_code"], out["noc_label"] = cl["code"], cl["label"]
+        out["noc_name"] = out["noc_code"].map(NOC_SHORT).fillna("Unknown")
         out["province_name"] = out["province_scope"].map(PROVINCE_NAMES).fillna(out["province_scope"])
         return out.sort_values("month").reset_index(drop=True)
 
@@ -213,6 +218,8 @@ class DataSource:
         ind = _parse_code_label(out["industry_scope"])
         out["noc_code"], out["noc_label"] = occ["code"].values, occ["label"].values
         out["naics_code"], out["naics_label"] = ind["code"].values, ind["label"].values
+        out["noc_name"] = pd.Series(out["noc_code"].values).map(NOC_SHORT).fillna("Unknown").values
+        out["naics_name"] = pd.Series(out["naics_code"].values).map(NAICS_SHORT).fillna("Unknown").values
         return out.sort_values("month").reset_index(drop=True)
 
     # -- coverage / quality -------------------------------------------------- #

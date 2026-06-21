@@ -81,23 +81,25 @@ def wage_dumbbell(ds: DataSource) -> go.Figure:
 
 def wage_demand_quadrant(ds: DataSource) -> go.Figure:
     w = ds.wage_by_noc
-    wm = w[w["month"] == _STABLE_END].dropna(subset=["wage_median"]).set_index("noc_label")
+    wm = w[w["month"] == _STABLE_END].dropna(subset=["wage_median"]).set_index("noc_name")
     nb = ds.noc_broad
-    cur = nb[nb["month"] == _STABLE_END].set_index("noc_label")["postings_total"]
-    ago = nb[nb["month"] == _STABLE_END - pd.DateOffset(months=12)].set_index("noc_label")["postings_total"]
+    cur = nb[nb["month"] == _STABLE_END].set_index("noc_name")["postings_total"]
+    ago = nb[nb["month"] == _STABLE_END - pd.DateOffset(months=12)].set_index("noc_name")["postings_total"]
     yoy = (cur / ago - 1) * 100
     df = pd.DataFrame({"wage": wm["wage_median"], "vol": cur, "yoy": yoy}).dropna()
     df = df[~df.index.str.contains("Unknown")]
-    df["short"] = [s.split("|")[-1].strip()[:24] for s in df.index]
+    df["short"] = list(df.index)
     xmid = df["wage"].median()
     # Label only the notable points (corners / big movers); the mid-pack reveals on hover.
     wlo, whi = df["wage"].quantile(0.25), df["wage"].quantile(0.75)
     vbig = df["vol"].quantile(0.7)
     notable = (df["yoy"].abs() > 4) | (df["wage"] > whi) | (df["wage"] < wlo) | (df["vol"] > vbig)
     labels = [s if n else "" for s, n in zip(df["short"], notable)]
+    # split labels above/below the marker by sign to reduce collisions in the mid-pack
+    textpos = ["bottom center" if y < 0 else "top center" for y in df["yoy"]]
     fig = go.Figure(go.Scatter(
         x=df["wage"], y=df["yoy"], mode="markers+text", text=labels,
-        textposition="top center", textfont=dict(size=9, color=MUTED),
+        textposition=textpos, textfont=dict(size=9, color=MUTED),
         marker=dict(size=np.sqrt(df["vol"]) / np.sqrt(df["vol"]).max() * 46 + 8,
                     color=df["yoy"], colorscale="RdYlGn", cmid=0, line=dict(width=1, color="white"),
                     showscale=False),
