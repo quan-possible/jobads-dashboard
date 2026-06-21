@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV } from "@/lib/nav";
+import { useI18n } from "@/lib/i18n/provider";
 import { Brand } from "./Brand";
+import { LocaleToggle } from "./LocaleToggle";
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
@@ -13,6 +15,7 @@ function isActive(pathname: string, href: string): boolean {
 
 export function TopNav() {
   const pathname = usePathname();
+  const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Close on route change
@@ -37,65 +40,69 @@ export function TopNav() {
         <div className="container-x flex h-16 items-center justify-between gap-6">
           <Brand />
 
-          {/* Desktop nav — hidden below md */}
-          <nav aria-label="Primary" className="-mx-2 hidden items-center overflow-x-auto md:flex">
-            {NAV.map((item) => {
-              const active = isActive(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={[
-                    "relative whitespace-nowrap px-3 py-2 text-[0.78rem] font-bold uppercase tracking-[0.01em] transition-colors",
-                    active ? "text-navy-deep" : "text-ink-soft hover:text-navy",
-                  ].join(" ")}
-                >
-                  {item.label}
-                  <span
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Desktop nav — hidden below md */}
+            <nav aria-label={t.nav.primary} className="-mx-2 hidden items-center overflow-x-auto md:flex">
+              {NAV.map((item) => {
+                const active = isActive(pathname, item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
                     className={[
-                      "absolute inset-x-3 -bottom-px h-[3px] origin-left transition-transform duration-300",
-                      active ? "scale-x-100 bg-orange" : "scale-x-0 bg-orange/0",
+                      "relative whitespace-nowrap px-3 py-2 text-[0.78rem] font-bold uppercase tracking-[0.01em] transition-colors",
+                      active ? "text-navy-deep" : "text-ink-soft hover:text-navy",
                     ].join(" ")}
-                  />
-                </Link>
-              );
-            })}
-          </nav>
+                  >
+                    {t.nav[item.key]}
+                    <span
+                      className={[
+                        "absolute inset-x-3 -bottom-px h-[3px] origin-left transition-transform duration-300",
+                        active ? "scale-x-100 bg-orange" : "scale-x-0 bg-orange/0",
+                      ].join(" ")}
+                    />
+                  </Link>
+                );
+              })}
+            </nav>
 
-          {/* Hamburger — visible below md only */}
-          <button
-            type="button"
-            aria-label="Menu"
-            aria-expanded={menuOpen}
-            aria-controls="mobile-nav-panel"
-            onClick={() => setMenuOpen((o) => !o)}
-            className={[
-              "control flex h-9 w-9 flex-col items-center justify-center gap-[5px] border border-card-border transition-colors duration-200 md:hidden",
-              menuOpen
-                ? "border-orange text-orange"
-                : "text-ink-soft hover:border-orange hover:text-orange",
-            ].join(" ")}
-          >
-            <span
+            <LocaleToggle />
+
+            {/* Hamburger — visible below md only */}
+            <button
+              type="button"
+              aria-label={t.nav.menu}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav-panel"
+              onClick={() => setMenuOpen((o) => !o)}
               className={[
-                "block h-[2px] w-[18px] bg-current transition-all duration-200",
-                menuOpen ? "translate-y-[7px] rotate-45" : "",
+                "control flex h-9 w-9 flex-col items-center justify-center gap-[5px] border border-card-border transition-colors duration-200 md:hidden",
+                menuOpen
+                  ? "border-orange text-orange"
+                  : "text-ink-soft hover:border-orange hover:text-orange",
               ].join(" ")}
-            />
-            <span
-              className={[
-                "block h-[2px] w-[18px] bg-current transition-all duration-200",
-                menuOpen ? "opacity-0" : "",
-              ].join(" ")}
-            />
-            <span
-              className={[
-                "block h-[2px] w-[18px] bg-current transition-all duration-200",
-                menuOpen ? "-translate-y-[7px] -rotate-45" : "",
-              ].join(" ")}
-            />
-          </button>
+            >
+              <span
+                className={[
+                  "block h-[2px] w-[18px] bg-current transition-all duration-200",
+                  menuOpen ? "translate-y-[7px] rotate-45" : "",
+                ].join(" ")}
+              />
+              <span
+                className={[
+                  "block h-[2px] w-[18px] bg-current transition-all duration-200",
+                  menuOpen ? "opacity-0" : "",
+                ].join(" ")}
+              />
+              <span
+                className={[
+                  "block h-[2px] w-[18px] bg-current transition-all duration-200",
+                  menuOpen ? "-translate-y-[7px] -rotate-45" : "",
+                ].join(" ")}
+              />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -103,7 +110,7 @@ export function TopNav() {
       <div
         id="mobile-nav-panel"
         role="navigation"
-        aria-label="Primary mobile"
+        aria-label={t.nav.primary}
         className={[
           "border-b border-card-border bg-canvas md:hidden",
           "overflow-hidden transition-[max-height,opacity] duration-250",
@@ -133,7 +140,7 @@ export function TopNav() {
                     active ? "opacity-100" : "opacity-0",
                   ].join(" ")}
                 />
-                {item.label}
+                {t.nav[item.key]}
               </Link>
             );
           })}

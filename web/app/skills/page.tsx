@@ -4,6 +4,8 @@ import { ShareBars } from "@/components/ShareBars";
 import { SkillBars } from "@/components/SkillBars";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtMonth } from "@/lib/format";
+import { skillsDict } from "@/lib/i18n/dict/page-skills";
+import { getLocale } from "@/lib/i18n/server";
 import { ALL_GEO, ALL_IND, ALL_OCC, GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS, labelFor } from "@/lib/options";
 import type { Filters } from "@/lib/types";
 import type { Metadata } from "next";
@@ -16,17 +18,14 @@ export const metadata: Metadata = {
     "Skills and requirements most commonly listed in Canadian job postings, by region, occupation and industry.",
 };
 
-function ApiDown() {
+function ApiDown({ t }: { t: typeof skillsDict.en }) {
   return (
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
-        <h1 className="h-section mb-2">Data service unavailable</h1>
+        <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
         <p className="text-ink-soft">
-          The API isn&apos;t responding. Start it with{" "}
-          <code className="bg-surface-alt px-1">
-            uvicorn api.main:app --port 8530
-          </code>
-          .
+          {t.apiDownBody}
+          <code className="bg-surface-alt px-1">{t.apiDownCode}</code>.
         </p>
       </div>
     </div>
@@ -38,6 +37,9 @@ export default async function SkillsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const locale = await getLocale();
+  const t = skillsDict[locale];
+
   const sp = await searchParams;
   const filters: Filters = {
     geo: typeof sp.geo === "string" ? sp.geo : undefined,
@@ -58,7 +60,7 @@ export default async function SkillsPage({
       api.requirements(filters),
     ]);
   } catch {
-    return <ApiDown />;
+    return <ApiDown t={t} />;
   }
 
   const regionLabel = labelFor(GEO_OPTIONS, filters.geo);
@@ -98,16 +100,13 @@ export default async function SkillsPage({
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            Skills &amp; requirements &middot; {scopeParts.join(" · ")} &middot; {fmtMonth(as_of)}
+            {t.heroEyebrowPrefix} &middot; {scopeParts.join(" · ")} &middot; {fmtMonth(as_of)}
           </div>
           <h1 className="h-display max-w-4xl text-balance">
-            What employers are asking for
+            {t.heroTitle}
           </h1>
           <p className="lede mt-4 max-w-2xl">
-            Skills and requirements drawn from job postings that explicitly list
-            them. Coverage varies — education and remote-work fields are sparsely
-            reported, so those figures reflect only the postings that include
-            them.
+            {t.heroLede}
           </p>
         </div>
       </section>
@@ -115,8 +114,8 @@ export default async function SkillsPage({
       {/* Most-requested skills */}
       <section className="container-x py-4">
         <Figure
-          eyebrow={`Share of postings · skills`}
-          title="Most-requested skills"
+          eyebrow={t.mostRequestedEyebrow}
+          title={t.mostRequestedTitle}
           asOf={as_of}
           actions={
             <DownloadCSV
@@ -125,17 +124,22 @@ export default async function SkillsPage({
               columns={skillColumns}
             />
           }
-          note={`Among the ${fmtCompact(top.n)} postings that list skills.`}
+          note={t.mostRequestedNote(fmtCompact(top.n))}
         >
-          <SkillBars items={top.items} metric="share" />
+          <SkillBars
+            items={top.items}
+            metric="share"
+            ariaLabel={t.skillBarsShareLabel}
+            emptyText={t.skillBarsEmpty}
+          />
         </Figure>
       </section>
 
       {/* Distinctive skills */}
       <section className="container-x py-4">
         <Figure
-          eyebrow="Vs the national mix"
-          title="What’s distinctive here"
+          eyebrow={t.distinctiveEyebrow}
+          title={t.distinctiveTitle}
           asOf={as_of}
           actions={
             scopeActive ? (
@@ -146,15 +150,19 @@ export default async function SkillsPage({
               />
             ) : undefined
           }
-          note="Skills more common here than across Canada (lift = local share ÷ national share)."
+          note={t.distinctiveNote}
         >
           {!scopeActive ? (
             <p className="py-8 text-center text-[0.88rem] text-ink-faint">
-              Select a region, occupation or industry in the filter bar to see
-              the skills that set it apart.
+              {t.distinctiveHint}
             </p>
           ) : (
-            <SkillBars items={distinctive.items} metric="lift" />
+            <SkillBars
+              items={distinctive.items}
+              metric="lift"
+              ariaLabel={t.skillBarsLiftLabel}
+              emptyText={t.skillBarsEmpty}
+            />
           )}
         </Figure>
       </section>
@@ -164,40 +172,56 @@ export default async function SkillsPage({
         <div className="grid gap-5 md:grid-cols-2">
           {requirements.education.length > 0 && (
             <Figure
-              eyebrow="Requirements · education"
-              title="Education"
+              eyebrow={t.reqEyebrowEducation}
+              title={t.reqTitleEducation}
               asOf={as_of}
-              note="Sparsely reported — reflects only postings that specify an education requirement."
+              note={t.reqNoteEducation}
             >
-              <ShareBars items={requirements.education} />
+              <ShareBars
+                items={requirements.education}
+                ariaLabel={t.shareBarsLabel}
+                emptyText={t.shareBarsEmpty}
+              />
             </Figure>
           )}
           {requirements.experience.length > 0 && (
             <Figure
-              eyebrow="Requirements · experience"
-              title="Experience"
+              eyebrow={t.reqEyebrowExperience}
+              title={t.reqTitleExperience}
               asOf={as_of}
             >
-              <ShareBars items={requirements.experience} />
+              <ShareBars
+                items={requirements.experience}
+                ariaLabel={t.shareBarsLabel}
+                emptyText={t.shareBarsEmpty}
+              />
             </Figure>
           )}
           {requirements.language.length > 0 && (
             <Figure
-              eyebrow="Requirements · work language"
-              title="Work language"
+              eyebrow={t.reqEyebrowLanguage}
+              title={t.reqTitleLanguage}
               asOf={as_of}
             >
-              <ShareBars items={requirements.language} />
+              <ShareBars
+                items={requirements.language}
+                ariaLabel={t.shareBarsLabel}
+                emptyText={t.shareBarsEmpty}
+              />
             </Figure>
           )}
           {requirements.remote.length > 0 && (
             <Figure
-              eyebrow="Requirements · remote work"
-              title="Remote work"
+              eyebrow={t.reqEyebrowRemote}
+              title={t.reqTitleRemote}
               asOf={as_of}
-              note="Sparsely reported — most postings do not specify a remote-work arrangement."
+              note={t.reqNoteRemote}
             >
-              <ShareBars items={requirements.remote} />
+              <ShareBars
+                items={requirements.remote}
+                ariaLabel={t.shareBarsLabel}
+                emptyText={t.shareBarsEmpty}
+              />
             </Figure>
           )}
         </div>

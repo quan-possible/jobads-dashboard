@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchPosting } from "@/lib/explore";
 import { fmtMonth, fmtWage } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/provider";
 import type { PostingDetail } from "@/lib/types";
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
@@ -27,6 +28,7 @@ function wageLine(d: PostingDetail): string | null {
 }
 
 export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () => void }) {
+  const { t } = useI18n();
   const [detail, setDetail] = useState<PostingDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,10 +66,10 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
   const wage = detail ? wageLine(detail) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Posting detail">
+    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label={t.explore.drawerPosting}>
       <button
         type="button"
-        aria-label="Close detail"
+        aria-label={t.common.close}
         onClick={onClose}
         className="absolute inset-0 bg-navy-deep/40 backdrop-blur-[1px]"
       />
@@ -77,16 +79,16 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
 
         <div className="flex items-start justify-between gap-4 border-b border-card-border px-6 py-4">
           <div className="min-w-0">
-            <div className="eyebrow mb-1">Posting</div>
+            <div className="eyebrow mb-1">{t.explore.drawerPosting}</div>
             <h2 className="text-[1.08rem] font-bold leading-snug text-navy-deep">
-              {detail?.job_title ?? (loading ? "Loading…" : "Posting")}
+              {detail?.job_title ?? (loading ? t.common.loading : t.explore.drawerPosting)}
             </h2>
             {detail?.employer && <p className="mt-0.5 text-[0.85rem] text-ink-soft">{detail.employer}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
             className="control shrink-0 border border-card-border px-2.5 py-1.5 text-[0.9rem] font-bold leading-none text-ink-soft transition-colors hover:border-orange hover:text-orange"
           >
             ✕
@@ -94,7 +96,7 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-          {loading && <div className="py-10 text-center text-[0.85rem] text-ink-faint">Loading posting…</div>}
+          {loading && <div className="py-10 text-center text-[0.85rem] text-ink-faint">{t.explore.loadingPosting}</div>}
           {error && <div className="py-10 text-center text-[0.85rem] text-neg">{error}</div>}
 
           {detail && (
@@ -125,37 +127,33 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
               </div>
 
               <dl className="grid grid-cols-2 gap-x-5 gap-y-4">
-                <Field label="Posted" value={detail.date_found ? fmtMonth(detail.date_found) : null} />
-                <Field label="Reference month" value={fmtMonth(detail.month)} />
-                <Field label="Wage" value={wage} />
-                <Field label="Employment" value={detail.employment_type} />
-                <Field label="Duration" value={detail.duration} />
-                <Field label="Experience" value={detail.experience} />
-                <Field label="Education" value={detail.education} />
-                <Field label="Language" value={detail.primary_posting_language} />
-                <Field label="Occupation (NOC)" value={detail.noc_label} />
-                <Field label="Industry (NAICS)" value={detail.naics_label} />
+                <Field label={t.explore.fPosted} value={detail.date_found ? fmtMonth(detail.date_found) : null} />
+                <Field label={t.explore.fRefMonth} value={fmtMonth(detail.month)} />
+                <Field label={t.explore.fWage} value={wage} />
+                <Field label={t.explore.fEmployment} value={detail.employment_type} />
+                <Field label={t.explore.fDuration} value={detail.duration} />
+                <Field label={t.explore.fExperience} value={detail.experience} />
+                <Field label={t.explore.fEducation} value={detail.education} />
+                <Field label={t.explore.fLanguage} value={detail.primary_posting_language} />
+                <Field label={t.explore.fOccupation} value={detail.noc_label} />
+                <Field label={t.explore.fIndustry} value={detail.naics_label} />
               </dl>
 
               {detail.description_full ? (
                 <div>
-                  <div className="eyebrow mb-2 border-t border-hairline pt-4">Posting description</div>
+                  <div className="eyebrow mb-2 border-t border-hairline pt-4">{t.explore.descHeading}</div>
                   <p className="whitespace-pre-wrap text-[0.86rem] leading-relaxed text-ink-soft">
                     {detail.description_full}
                   </p>
-                  <p className="mt-4 text-[0.72rem] italic leading-relaxed text-ink-faint">
-                    Raw text as collected from the source site, lightly trimmed. Shown for verification only.
-                  </p>
+                  <p className="mt-4 text-[0.72rem] italic leading-relaxed text-ink-faint">{t.explore.descNote}</p>
                 </div>
               ) : (
-                <p className="border-t border-hairline pt-4 text-[0.8rem] italic text-ink-faint">
-                  No description was captured for this posting.
-                </p>
+                <p className="border-t border-hairline pt-4 text-[0.8rem] italic text-ink-faint">{t.explore.noDesc}</p>
               )}
 
               {detail.data_source && (
                 <p className="text-[0.72rem] text-ink-faint">
-                  Source · <span className="text-ink-soft">{detail.data_source}</span>
+                  {t.explore.source} · <span className="text-ink-soft">{detail.data_source}</span>
                 </p>
               )}
             </div>

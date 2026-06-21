@@ -1,4 +1,6 @@
 import { ExplorerView } from "@/components/ExplorerView";
+import { getLocale } from "@/lib/i18n/server";
+import { explorersDict } from "@/lib/i18n/dict/page-explorers";
 import type { Filters } from "@/lib/types";
 import type { Metadata } from "next";
 
@@ -15,11 +17,12 @@ export default async function IndustriesPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const sp = await searchParams;
+  const [sp, locale] = await Promise.all([searchParams, getLocale()]);
   const filters: Filters = {
     geo: typeof sp.geo === "string" ? sp.geo : undefined,
     occ: typeof sp.occ === "string" ? sp.occ : undefined,
     ind: typeof sp.ind === "string" ? sp.ind : undefined,
   };
-  return <ExplorerView filters={filters} dim="industries" />;
+  const dict = explorersDict[locale];
+  return <ExplorerView filters={filters} dim="industries" dict={dict} />;
 }

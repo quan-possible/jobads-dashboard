@@ -3,10 +3,12 @@
 import { usePathname } from "next/navigation";
 import { GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS } from "@/lib/options";
 import { useFilters } from "@/lib/useFilters";
+import { useI18n } from "@/lib/i18n/provider";
 import { Select } from "./Select";
 
 export function FilterSpine() {
   const pathname = usePathname();
+  const { t } = useI18n();
   const { filters, setFilter, reset, activeCount } = useFilters();
 
   // The trust page and the developer docs are not filter-driven. Explore IS —
@@ -17,29 +19,29 @@ export function FilterSpine() {
     <div className="sticky top-16 z-30 border-b border-card-border bg-surface-alt/80 backdrop-blur-md">
       <div className="container-x flex flex-wrap items-end gap-x-4 gap-y-3 py-3">
         <div className="mr-1 flex flex-col">
-          <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-orange-deep">Filter</span>
+          <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-orange-deep">{t.filter.eyebrow}</span>
           <span className="text-[0.7rem] font-bold uppercase tracking-[0.02em] text-ink-soft">
-            Across the dashboard
+            {t.filter.scope}
           </span>
         </div>
         <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           <Select
             id="filter-geo"
-            label="Region"
+            label={t.filter.region}
             value={filters.geo}
             options={GEO_OPTIONS}
             onChange={(v) => setFilter("geo", v)}
           />
           <Select
             id="filter-occ"
-            label="Occupation"
+            label={t.filter.occupation}
             value={filters.occ}
             options={OCC_OPTIONS}
             onChange={(v) => setFilter("occ", v)}
           />
           <Select
             id="filter-ind"
-            label="Industry"
+            label={t.filter.industry}
             value={filters.ind}
             options={IND_OPTIONS}
             onChange={(v) => setFilter("ind", v)}
@@ -51,7 +53,7 @@ export function FilterSpine() {
           disabled={activeCount === 0}
           className="control h-[38px] shrink-0 self-end border border-card-border px-3 text-[0.74rem] font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
         >
-          Reset{activeCount > 0 ? ` · ${activeCount}` : ""}
+          {t.filter.reset}{activeCount > 0 ? ` · ${activeCount}` : ""}
         </button>
       </div>
     </div>

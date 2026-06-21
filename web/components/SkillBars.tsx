@@ -4,18 +4,25 @@ import type { SkillItem } from "@/lib/types";
 // Ranked skill list with a thin bar under each row.
 // metric="share"  → teal bar sized by share/maxShare, value shown as percent
 // metric="lift"   → orange bar sized by lift/maxLift, value shown as ×
+//
+// ariaLabel and emptyText come from the parent page so this component stays
+// locale-agnostic.
 
 export function SkillBars({
   items,
   metric,
+  ariaLabel,
+  emptyText,
 }: {
   items: SkillItem[];
   metric: "share" | "lift";
+  ariaLabel: string;
+  emptyText: string;
 }) {
   if (!items || items.length === 0) {
     return (
       <p className="py-6 text-center text-[0.85rem] text-ink-faint">
-        No data for this selection.
+        {emptyText}
       </p>
     );
   }
@@ -29,15 +36,7 @@ export function SkillBars({
   const maxLift = Math.max(1e-9, ...sorted.map((i) => i.lift ?? 0));
 
   return (
-    <ul
-      className="flex flex-col gap-2.5"
-      role="img"
-      aria-label={
-        metric === "share"
-          ? "Most-requested skills by share of postings"
-          : "Distinctive skills by lift over national average"
-      }
-    >
+    <ul className="flex flex-col gap-2.5" role="img" aria-label={ariaLabel}>
       {sorted.map((it) => {
         const isShare = metric === "share";
         const barPct = isShare
@@ -76,7 +75,10 @@ export function SkillBars({
             <div className="col-span-2 h-2 w-full overflow-hidden rounded-sm bg-surface-alt">
               <div
                 className="h-full rounded-sm transition-[width] duration-500"
-                style={{ width: `${Math.max(3, barPct)}%`, background: barColor }}
+                style={{
+                  width: `${Math.max(3, barPct)}%`,
+                  background: barColor,
+                }}
               />
             </div>
           </li>

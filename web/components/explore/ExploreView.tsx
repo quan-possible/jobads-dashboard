@@ -5,6 +5,7 @@ import { fetchPostings } from "@/lib/explore";
 import { fmtInt, fmtMonth, fmtWage } from "@/lib/format";
 import { labelFor } from "@/lib/options";
 import { GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS } from "@/lib/options";
+import { useI18n } from "@/lib/i18n/provider";
 import type { PostingRow, PostingsResponse } from "@/lib/types";
 import { useFilters } from "@/lib/useFilters";
 import { PostingDrawer } from "./PostingDrawer";
@@ -24,6 +25,7 @@ function rowWage(r: PostingRow): string {
 
 export function ExploreView() {
   const { filters } = useFilters();
+  const { t } = useI18n();
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [offset, setOffset] = useState(0);
@@ -88,7 +90,7 @@ export function ExploreView() {
       {/* Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3" ref={tableTop}>
         <label className="relative flex-1 sm:max-w-md">
-          <span className="sr-only">Search job title or employer</span>
+          <span className="sr-only">{t.explore.searchPlaceholder}</span>
           <svg
             aria-hidden
             viewBox="0 0 16 16"
@@ -104,16 +106,16 @@ export function ExploreView() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search job title or employer…"
+            placeholder={t.explore.searchPlaceholder}
             className="control w-full border border-card-border bg-surface py-2 pl-9 pr-3 text-[0.9rem] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
           />
         </label>
         <div className="num text-[0.78rem] text-ink-soft">
           {loading && !data ? (
-            "Loading…"
+            t.common.loading
           ) : (
             <>
-              <span className="font-bold text-navy-deep">{fmtInt(total)}</span> postings · {scopeSummary}
+              <span className="font-bold text-navy-deep">{fmtInt(total)}</span> {t.explore.postings} · {scopeSummary}
             </>
           )}
         </div>
@@ -125,13 +127,13 @@ export function ExploreView() {
           <table className="w-full border-collapse text-left text-[0.85rem]">
             <thead>
               <tr className="border-b border-card-border bg-surface-alt text-[0.62rem] uppercase tracking-[0.05em] text-ink-faint">
-                <th className="px-4 py-2.5 font-bold">Posted</th>
-                <th className="px-4 py-2.5 font-bold">Title</th>
-                <th className="hidden px-4 py-2.5 font-bold md:table-cell">Employer</th>
-                <th className="px-4 py-2.5 font-bold">Region</th>
-                <th className="hidden px-4 py-2.5 font-bold lg:table-cell">Occupation</th>
-                <th className="px-4 py-2.5 text-right font-bold">Wage</th>
-                <th className="hidden px-4 py-2.5 font-bold sm:table-cell">Type</th>
+                <th className="px-4 py-2.5 font-bold">{t.explore.colPosted}</th>
+                <th className="px-4 py-2.5 font-bold">{t.explore.colTitle}</th>
+                <th className="hidden px-4 py-2.5 font-bold md:table-cell">{t.explore.colEmployer}</th>
+                <th className="px-4 py-2.5 font-bold">{t.explore.colRegion}</th>
+                <th className="hidden px-4 py-2.5 font-bold lg:table-cell">{t.explore.colOccupation}</th>
+                <th className="px-4 py-2.5 text-right font-bold">{t.explore.colWage}</th>
+                <th className="hidden px-4 py-2.5 font-bold sm:table-cell">{t.explore.colType}</th>
               </tr>
             </thead>
             <tbody>
@@ -145,7 +147,7 @@ export function ExploreView() {
               {!error && rows.length === 0 && !loading && (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center text-[0.85rem] text-ink-faint">
-                    No postings match this scope. Try widening the filters or clearing the search.
+                    {t.explore.emptyRows}
                   </td>
                 </tr>
               )}
@@ -185,7 +187,7 @@ export function ExploreView() {
         <div className="num text-[0.76rem] text-ink-soft">
           {total > 0 ? (
             <>
-              {fmtInt(from)}–{fmtInt(to)} of {fmtInt(total)}
+              {fmtInt(from)}–{fmtInt(to)} {t.common.of} {fmtInt(total)}
             </>
           ) : (
             "—"
@@ -198,7 +200,7 @@ export function ExploreView() {
             disabled={offset === 0 || loading}
             className="control border border-card-border px-3 py-1.5 text-[0.74rem] font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
           >
-            ← Prev
+            ← {t.common.prev}
           </button>
           <button
             type="button"
@@ -206,7 +208,7 @@ export function ExploreView() {
             disabled={to >= total || loading}
             className="control border border-card-border px-3 py-1.5 text-[0.74rem] font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
           >
-            Next →
+            {t.common.next} →
           </button>
         </div>
       </div>

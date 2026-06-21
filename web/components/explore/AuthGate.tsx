@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { authStatus, AuthError, login, logout } from "@/lib/explore";
+import { useI18n } from "@/lib/i18n/provider";
 import { PixelTiles } from "@/components/PixelTiles";
 import { ExploreView } from "./ExploreView";
 
 type Phase = "checking" | "locked" | "unconfigured" | "open" | "error";
 
 export function AuthGate() {
+  const { t } = useI18n();
   const [phase, setPhase] = useState<Phase>("checking");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -55,7 +57,7 @@ export function AuthGate() {
 
   if (phase === "checking") {
     return (
-      <div className="flex items-center justify-center py-24 text-[0.85rem] text-ink-faint">Checking access…</div>
+      <div className="flex items-center justify-center py-24 text-[0.85rem] text-ink-faint">{t.explore.checking}</div>
     );
   }
 
@@ -68,7 +70,7 @@ export function AuthGate() {
             onClick={onSignOut}
             className="control border border-card-border px-3 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.02em] text-ink-faint transition-colors hover:border-orange hover:text-orange"
           >
-            Sign out
+            {t.common.signOut}
           </button>
         </div>
         <ExploreView />
@@ -83,33 +85,25 @@ export function AuthGate() {
         <div className="mb-5 flex items-center gap-3">
           <PixelTiles size={11} className="shrink-0" />
           <div>
-            <div className="eyebrow">Protected</div>
-            <h2 className="text-[1.1rem] font-bold leading-snug text-navy-deep">Posting-level lookup</h2>
+            <div className="eyebrow">{t.explore.protected}</div>
+            <h2 className="text-[1.1rem] font-bold leading-snug text-navy-deep">{t.explore.lookupTitle}</h2>
           </div>
         </div>
 
         {phase === "unconfigured" && (
-          <p className="text-[0.86rem] leading-relaxed text-ink-soft">
-            Access control isn&rsquo;t configured on this server, so the private lookup is unavailable here. On the
-            deployed dashboard this view is unlocked with the team password.
-          </p>
+          <p className="text-[0.86rem] leading-relaxed text-ink-soft">{t.explore.unconfigured}</p>
         )}
 
-        {phase === "error" && (
-          <p className="text-[0.86rem] leading-relaxed text-neg">
-            Couldn&rsquo;t reach the access service. Confirm the API is running, then reload.
-          </p>
-        )}
+        {phase === "error" && <p className="text-[0.86rem] leading-relaxed text-neg">{t.explore.authError}</p>}
 
         {phase === "locked" && (
           <>
-            <p className="mb-5 text-[0.86rem] leading-relaxed text-ink-soft">
-              The individual job postings behind the aggregates are available to the team for verification. Enter the
-              dashboard password to continue.
-            </p>
+            <p className="mb-5 text-[0.86rem] leading-relaxed text-ink-soft">{t.explore.lockedBody}</p>
             <form onSubmit={onSubmit} className="flex flex-col gap-3">
               <label className="flex flex-col gap-1">
-                <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">Password</span>
+                <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">
+                  {t.explore.password}
+                </span>
                 <input
                   type="password"
                   autoFocus
@@ -124,15 +118,13 @@ export function AuthGate() {
                 disabled={submitting || !password}
                 className="control bg-navy px-4 py-2.5 text-[0.8rem] font-bold uppercase tracking-[0.03em] text-canvas transition-colors enabled:hover:bg-orange disabled:opacity-50"
               >
-                {submitting ? "Unlocking…" : "Unlock"}
+                {submitting ? t.explore.unlocking : t.explore.unlock}
               </button>
             </form>
           </>
         )}
       </div>
-      <p className="mt-4 text-center text-[0.72rem] leading-relaxed text-ink-faint">
-        Aggregated views need no sign-in. Only the raw posting lookup is gated.
-      </p>
+      <p className="mt-4 text-center text-[0.72rem] leading-relaxed text-ink-faint">{t.explore.gateHint}</p>
     </div>
   );
 }

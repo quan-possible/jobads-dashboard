@@ -2,6 +2,8 @@ import { CoverageBar } from "@/components/CoverageBar";
 import { Figure } from "@/components/Figure";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth } from "@/lib/format";
+import { methodDict } from "@/lib/i18n/dict/page-method";
+import { getLocale } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -12,14 +14,14 @@ export const metadata: Metadata = {
     "How the ACLMR dashboard works — data sources, field coverage, caveats and key term definitions.",
 };
 
-function ApiDown() {
+function ApiDown({ t }: { t: typeof methodDict.en }) {
   return (
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
-        <h1 className="h-section mb-2">Data service unavailable</h1>
+        <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
         <p className="text-ink-soft">
-          The API isn't responding. Start it with{" "}
-          <code className="bg-surface-alt px-1">uvicorn api.main:app --port 8530</code>.
+          {t.apiDownBody}{" "}
+          <code className="bg-surface-alt px-1">{t.apiDownCmd}</code>.
         </p>
       </div>
     </div>
@@ -27,11 +29,14 @@ function ApiDown() {
 }
 
 export default async function MethodPage() {
+  const locale = await getLocale();
+  const t = methodDict[locale];
+
   let meta;
   try {
     meta = await api.meta();
   } catch {
-    return <ApiDown />;
+    return <ApiDown t={t} />;
   }
 
   return (
@@ -39,12 +44,9 @@ export default async function MethodPage() {
       {/* Hero */}
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">Method &amp; data</div>
-          <h1 className="h-display max-w-4xl text-balance">How to read this dashboard.</h1>
-          <p className="lede mt-4 max-w-2xl">
-            These figures come from online job postings and describe posted hiring demand — not
-            employment, unemployment, vacancies, or hires.
-          </p>
+          <div className="eyebrow mb-3">{t.heroEyebrow}</div>
+          <h1 className="h-display max-w-4xl text-balance">{t.heroTitle}</h1>
+          <p className="lede mt-4 max-w-2xl">{t.heroIntro}</p>
         </div>
       </section>
 
@@ -52,50 +54,26 @@ export default async function MethodPage() {
       <section className="container-x py-4">
         <div className="grid gap-5 md:grid-cols-2">
           <div className="card card-pad">
-            <h2 className="h-card mb-3">What this measures</h2>
+            <h2 className="h-card mb-3">{t.measuresTitle}</h2>
             <ul className="flex flex-col gap-2 text-[0.95rem] leading-snug text-ink">
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-teal" />
-                <span>Posted hiring demand from Canadian online job ads</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-teal" />
-                <span>Demand by month, region, occupation (NOC), and industry (NAICS)</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-teal" />
-                <span>Wage ranges posted in ads (25th / median / 75th percentile)</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-teal" />
-                <span>Skills mentioned in postings and their relative frequency</span>
-              </li>
+              {t.measuresItems.map((item, i) => (
+                <li key={i} className="flex gap-3">
+                  <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-teal" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="card card-pad">
-            <h2 className="h-card mb-3">What it does NOT measure</h2>
+            <h2 className="h-card mb-3">{t.notMeasuresTitle}</h2>
             <ul className="flex flex-col gap-2 text-[0.95rem] leading-snug text-ink">
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
-                <span>Not employment — how many people hold jobs</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
-                <span>Not the unemployment rate</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
-                <span>Not job vacancies as defined by Statistics Canada (JVWS)</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
-                <span>Not actual hires — a posting may never lead to a hire</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
-                <span>A single ad may not equal one open job</span>
-              </li>
+              {t.notMeasuresItems.map((item, i) => (
+                <li key={i} className="flex gap-3">
+                  <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -104,14 +82,14 @@ export default async function MethodPage() {
       {/* Field coverage */}
       <section className="container-x py-4">
         <Figure
-          eyebrow="How complete each field is"
-          title="Field coverage"
-          note="Share of all postings that report each field. Wage, remote-work and similar fields are sparse — read them with care."
+          eyebrow={t.coverageEyebrow}
+          title={t.coverageTitle}
+          note={t.coverageNote}
         >
           <p className="mb-4 text-[0.95rem] text-ink-soft">
-            Built from{" "}
+            {t.coverageBuiltFrom}{" "}
             <span className="num font-bold text-navy">{fmtInt(meta.postings_total)}</span>{" "}
-            postings spanning{" "}
+            {t.coveragePostingsSpanning}{" "}
             <span className="num font-bold text-navy">
               {fmtMonth(meta.source_window.min_date)} – {fmtMonth(meta.source_window.max_date)}
             </span>
@@ -124,15 +102,16 @@ export default async function MethodPage() {
                 label={item.label}
                 share={item.share}
                 count={item.postings}
+                postingsLabel={t.coveragePostingsLabel}
               />
             ))}
           </div>
         </Figure>
       </section>
 
-      {/* Caveats */}
+      {/* Caveats — text comes from the API, no translation */}
       <section className="container-x py-4">
-        <Figure eyebrow="Caveats" title="Things to keep in mind">
+        <Figure eyebrow={t.caveatsEyebrow} title={t.caveatsTitle}>
           <ul className="flex flex-col gap-3.5">
             {meta.caveats.map((caveat, i) => (
               <li key={i} className="flex gap-3 text-[0.95rem] leading-snug text-ink">
@@ -146,60 +125,26 @@ export default async function MethodPage() {
 
       {/* Glossary */}
       <section className="container-x py-4">
-        <Figure eyebrow="Glossary" title="Key terms defined">
+        <Figure eyebrow={t.glossaryEyebrow} title={t.glossaryTitle}>
           <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
-            <div>
-              <dt className="h-card mb-1">Demand index</dt>
-              <dd className="text-[0.92rem] text-ink-soft">
-                Monthly active postings indexed to January 2019 = 100. A value of 110 means 10%
-                more postings than in the 2019 baseline.
-              </dd>
-            </div>
-            <div>
-              <dt className="h-card mb-1">Year over year</dt>
-              <dd className="text-[0.92rem] text-ink-soft">
-                Change versus the same month a year earlier, expressed as a percentage.
-              </dd>
-            </div>
-            <div>
-              <dt className="h-card mb-1">Wage range</dt>
-              <dd className="text-[0.92rem] text-ink-soft">
-                25th percentile / median / 75th percentile of posted hourly wages. Shown only when
-                at least 100 postings list a wage.
-              </dd>
-            </div>
-            <div>
-              <dt className="h-card mb-1">Location quotient</dt>
-              <dd className="text-[0.92rem] text-ink-soft">
-                A region's share of postings divided by its share of the labour force. Values above
-                1 mean the region is over-represented in that type of posting.
-              </dd>
-            </div>
-            <div>
-              <dt className="h-card mb-1">Distinctive skills / lift</dt>
-              <dd className="text-[0.92rem] text-ink-soft">
-                A scope's skill share divided by the national share. High lift means a skill appears
-                disproportionately often in this filter.
-              </dd>
-            </div>
-            <div>
-              <dt className="h-card mb-1">Sample gate, n</dt>
-              <dd className="text-[0.92rem] text-ink-soft">
-                Statistics are withheld when fewer than 100 postings support them. Shown as "—"
-                with a note indicating insufficient sample.
-              </dd>
-            </div>
+            {t.glossaryTerms.map(({ term, def }) => (
+              <div key={term}>
+                <dt className="h-card mb-1">{term}</dt>
+                <dd className="text-[0.92rem] text-ink-soft">{def}</dd>
+              </div>
+            ))}
           </dl>
         </Figure>
       </section>
 
       {/* Version */}
       <section className="container-x py-4">
-        <Figure eyebrow="Version" title="Changelog">
+        <Figure eyebrow={t.versionEyebrow} title={t.versionTitle}>
           <p className="text-[0.95rem] text-ink-soft">
             <span className="num font-bold text-navy">v1</span> ·{" "}
-            {fmtMonth(meta.latest_month)} — initial public release. Data current through{" "}
-            {fmtMonth(meta.latest_month)}; generated {fmtMonth(meta.generated_at_utc.slice(0, 7))}.
+            {fmtMonth(meta.latest_month)} — {t.versionRelease}{" "}
+            {fmtMonth(meta.latest_month)}; {t.versionGenerated}{" "}
+            {fmtMonth(meta.generated_at_utc.slice(0, 7))}.
           </p>
         </Figure>
       </section>

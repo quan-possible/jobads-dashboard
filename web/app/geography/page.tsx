@@ -4,6 +4,8 @@ import { Figure } from "@/components/Figure";
 import { SegmentToggle } from "@/components/SegmentToggle";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth } from "@/lib/format";
+import { geographyDict } from "@/lib/i18n/dict/page-geography";
+import { getLocale } from "@/lib/i18n/server";
 import { GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS, labelFor } from "@/lib/options";
 import type { Filters, GeoItem } from "@/lib/types";
 import type { Metadata } from "next";
@@ -16,22 +18,16 @@ export const metadata: Metadata = {
     "Posted hiring demand by Canadian province — per-capita, concentration, and raw count views.",
 };
 
-function ApiDown() {
+function ApiDown({ t }: { t: (typeof geographyDict)[keyof typeof geographyDict] }) {
   return (
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
-        <h1 className="h-section mb-2">Data service unavailable</h1>
-        <p className="text-ink-soft">The API isn’t responding. Start it with <code className="bg-surface-alt px-1">uvicorn api.main:app --port 8530</code>.</p>
+        <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
+        <p className="text-ink-soft">{t.apiDownBody} <code className="bg-surface-alt px-1">uvicorn api.main:app --port 8530</code>.</p>
       </div>
     </div>
   );
 }
-
-const MEASURES = [
-  { value: "per10k", label: "Per 10k" },
-  { value: "lq", label: "Concentration" },
-  { value: "count", label: "Count" },
-];
 
 function valueText(item: GeoItem, measure: string): string {
   const v = item.value;
@@ -63,6 +59,9 @@ export default async function GeographyPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const locale = await getLocale();
+  const t = geographyDict[locale];
+
   const sp = await searchParams;
   const filters: Filters = {
     geo: typeof sp.geo === "string" ? sp.geo : undefined,
@@ -75,22 +74,28 @@ export default async function GeographyPage({
   try {
     data = await api.geography(filters, measure);
   } catch {
-    return <ApiDown />;
+    return <ApiDown t={t} />;
   }
 
   const occLabel = labelFor(OCC_OPTIONS, filters.occ);
   const indLabel = labelFor(IND_OPTIONS, filters.ind);
   const sliceNote =
     filters.occ || filters.ind
-      ? `Showing ${occLabel.toLowerCase() === "all occupations" ? "all occupations" : occLabel}${filters.ind ? ` in ${indLabel}` : ""}.`
-      : "Showing all postings.";
+      ? `${t.sliceShowing}${occLabel.toLowerCase() === "all occupations" ? occLabel : occLabel}${filters.ind ? `${t.sliceIn}${indLabel}` : ""}${t.sliceTrailing}`
+      : t.sliceAll;
 
   const measureExplainer =
     measure === "per10k"
-      ? "Postings per 10,000 people in each province’s labour force — adjusts for the size of the workforce."
+      ? t.explainerPer10k
       : measure === "lq"
-        ? "Location quotient: a province’s share of postings divided by its share of the labour force. Above 1.0 means hiring is concentrated there relative to its size."
-        : "Raw count of active postings — larger provinces lead simply because they are larger.";
+        ? t.explainerLq
+        : t.explainerCount;
+
+  const MEASURES = [
+    { value: "per10k", label: t.measurePer10k },
+    { value: "lq", label: t.measureLq },
+    { value: "count", label: t.measureCount },
+  ];
 
   // Build query string for CSV download.
   const geoQS = (() => {
@@ -106,19 +111,16 @@ export default async function GeographyPage({
     <div className="pb-4">
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">Geography · {labelFor(GEO_OPTIONS, filters.geo)} · {fmtMonth(data.as_of)}</div>
-          <h1 className="h-display max-w-3xl text-balance">Where the hiring is</h1>
-          <p className="lede mt-4 max-w-2xl">
-            Posted demand by province. Per-capita and concentration views correct for the simple fact that
-            bigger provinces post more — so you can see where hiring runs hot relative to the local workforce.
-          </p>
+          <div className="eyebrow mb-3">{t.eyebrow} · {labelFor(GEO_OPTIONS, filters.geo)} · {fmtMonth(data.as_of)}</div>
+          <h1 className="h-display max-w-3xl text-balance">{t.hero}</h1>
+          <p className="lede mt-4 max-w-2xl">{t.lede}</p>
         </div>
       </section>
 
       <section className="container-x py-8">
         <Figure
-          eyebrow="By province"
-          title="Posted hiring demand across Canada"
+          eyebrow={t.figureEyebrow}
+          title={t.figureTitle}
           asOf={data.as_of}
           actions={
             <>
@@ -134,20 +136,20 @@ export default async function GeographyPage({
                   { key: "lq", header: "Location Quotient" },
                 ]}
               />
-              <SegmentToggle param="measure" defaultValue="per10k" options={MEASURES} ariaLabel="Choose how to measure demand" />
+              <SegmentToggle param="measure" defaultValue="per10k" options={MEASURES} ariaLabel={t.toggleAriaLabel} />
             </>
           }
           note={
             <>
               <span className="block">{measureExplainer}</span>
-              <span className="mt-1 block text-ink-faint">{sliceNote} Nunavut and Yukon are not covered in the source data and show as “no data.”</span>
+              <span className="mt-1 block text-ink-faint">{sliceNote} {t.territoryNote}</span>
             </>
           }
         >
           <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
             <Choropleth items={data.items} measure={measure} />
             <div>
-              <p className="eyebrow mb-3 text-ink-faint">Ranked · {MEASURES.find((m) => m.value === measure)?.label}</p>
+              <p className="eyebrow mb-3 text-ink-faint">{t.rankedPrefix}{MEASURES.find((m) => m.value === measure)?.label}</p>
               <RankedProvinces items={data.items} measure={measure} />
             </div>
           </div>

@@ -8,31 +8,42 @@ import { SkillBars } from "@/components/SkillBars";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth, fmtPct, fmtWage } from "@/lib/format";
 import { GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS, labelFor } from "@/lib/options";
+import type { ExplorersDictEntry } from "@/lib/i18n/dict/page-explorers";
 import type { Filters } from "@/lib/types";
 
-const COPY = {
+const DIM_OPTS = {
   occupations: {
     param: "occ" as const,
     options: OCC_OPTIONS,
-    eyebrow: "Occupations",
-    title: "Which occupations employers are hiring for",
-    lede: "Posted hiring demand across the ten broad occupational groups (NOC). Select a group to see its trend, pay and most-requested skills — your choice carries across every page.",
-    rankTitle: "Hiring demand by occupational group",
-    rankNote: "Active postings this month, with year-over-year change. Click a group to filter the whole dashboard.",
+    eyebrow: (d: ExplorersDictEntry) => d.occEyebrow,
+    title: (d: ExplorersDictEntry) => d.occTitle,
+    lede: (d: ExplorersDictEntry) => d.occLede,
+    rankTitle: (d: ExplorersDictEntry) => d.occRankTitle,
+    rankNote: (d: ExplorersDictEntry) => d.occRankNote,
+    selectHint: (d: ExplorersDictEntry) => d.occSelectHint,
   },
   industries: {
     param: "ind" as const,
     options: IND_OPTIONS,
-    eyebrow: "Industries",
-    title: "Which industries are posting jobs",
-    lede: "Posted hiring demand across industry sectors (NAICS). Select a sector to see its trend, pay and most-requested skills — your choice carries across every page.",
-    rankTitle: "Hiring demand by industry sector",
-    rankNote: "Active postings this month, with year-over-year change. Click a sector to filter the whole dashboard.",
+    eyebrow: (d: ExplorersDictEntry) => d.indEyebrow,
+    title: (d: ExplorersDictEntry) => d.indTitle,
+    lede: (d: ExplorersDictEntry) => d.indLede,
+    rankTitle: (d: ExplorersDictEntry) => d.indRankTitle,
+    rankNote: (d: ExplorersDictEntry) => d.indRankNote,
+    selectHint: (d: ExplorersDictEntry) => d.indSelectHint,
   },
 };
 
-export async function ExplorerView({ filters, dim }: { filters: Filters; dim: "occupations" | "industries" }) {
-  const c = COPY[dim];
+export async function ExplorerView({
+  filters,
+  dim,
+  dict,
+}: {
+  filters: Filters;
+  dim: "occupations" | "industries";
+  dict: ExplorersDictEntry;
+}) {
+  const c = DIM_OPTS[dim];
   const selectedValue = dim === "occupations" ? filters.occ : filters.ind;
   const selectedLabel = selectedValue ? labelFor(c.options, selectedValue) : null;
 
@@ -67,42 +78,45 @@ export async function ExplorerView({ filters, dim }: { filters: Filters; dim: "o
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            {c.eyebrow} · {labelFor(GEO_OPTIONS, filters.geo)} · {fmtMonth(ov.as_of)}
+            {c.eyebrow(dict)} · {labelFor(GEO_OPTIONS, filters.geo)} · {fmtMonth(ov.as_of)}
           </div>
-          <h1 className="h-display max-w-3xl text-balance">{c.title}</h1>
-          <p className="lede mt-4 max-w-2xl">{c.lede}</p>
+          <h1 className="h-display max-w-3xl text-balance">{c.title(dict)}</h1>
+          <p className="lede mt-4 max-w-2xl">{c.lede(dict)}</p>
         </div>
       </section>
 
       <section className="container-x py-8">
         <div className="grid gap-5 lg:grid-cols-[1fr_1.1fr]">
           <Figure
-            eyebrow={`${c.eyebrow} · year over year`}
-            title={c.rankTitle}
+            eyebrow={`${c.eyebrow(dict)} · ${dict.rankEyebrowSuffix}`}
+            title={c.rankTitle(dict)}
             asOf={ov.as_of}
-            note={c.rankNote}
+            note={c.rankNote(dict)}
             actions={
               <DownloadCSV
                 endpoint={rankEndpoint}
                 filename={`aclmr-${dim}-${asOfSlug}.csv`}
                 columns={[
-                  { key: "code", header: "Code" },
-                  { key: "label", header: "Label" },
-                  { key: "value", header: "Active Postings" },
-                  { key: "yoy", header: "YoY (%)" },
-                  { key: "share", header: "Share" },
+                  { key: "code", header: dict.csvCode },
+                  { key: "label", header: dict.csvLabel },
+                  { key: "value", header: dict.csvActive },
+                  { key: "yoy", header: dict.csvYoy },
+                  { key: "share", header: dict.csvShare },
                 ]}
-                pick={(json) => (Array.isArray(json) ? json : [])}
               />
             }
           >
             <ClickableRanks items={ranks} param={c.param} options={c.options} />
           </Figure>
           <Figure
-            eyebrow="Demand over time"
-            title={selectedLabel ? `${selectedLabel}: demand vs the 2019 norm` : "Demand vs the 2019 norm"}
+            eyebrow={dict.demandEyebrow}
+            title={
+              selectedLabel
+                ? `${selectedLabel}: ${dict.demandTitleSelected}`
+                : dict.demandTitleBase
+            }
             asOf={ov.as_of}
-            note="Indexed monthly active postings for the current selection, January 2019 = 100."
+            note={dict.demandNote}
           >
             <DemandChart series={ov.series} height={260} />
           </Figure>
@@ -117,40 +131,65 @@ export async function ExplorerView({ filters, dim }: { filters: Filters; dim: "o
               href={dim === "occupations" ? "/occupations" : "/industries"}
               className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange-deep hover:underline"
             >
-              Clear selection ✕
+              {dict.clearSelection}
             </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            <KpiTile label="Active postings" value={fmtCompact(ov.kpis.active_postings)} context="this month" delta={ov.kpis.active_mom_pct} deltaLabel="MoM" />
-            <KpiTile label="Vs last year" value={fmtPct(ov.kpis.active_yoy_pct, { sign: true })} context="year over year" />
             <KpiTile
-              label="Median wage"
+              label={dict.kpiActive}
+              value={fmtCompact(ov.kpis.active_postings)}
+              context={dict.kpiActiveContext}
+              delta={ov.kpis.active_mom_pct}
+              deltaLabel={dict.kpiActiveMonthLabel}
+            />
+            <KpiTile
+              label={dict.kpiVsYear}
+              value={fmtPct(ov.kpis.active_yoy_pct, { sign: true })}
+              context={dict.kpiVsYearContext}
+            />
+            <KpiTile
+              label={dict.kpiWage}
               value={fmtWage(wageItem && !wageItem.gated ? wageItem.median : null)}
-              unit={wageItem && !wageItem.gated ? "/hr" : undefined}
-              context={wageItem ? (wageItem.gated ? "insufficient sample" : `n = ${fmtCompact(wageItem.n)}`) : "—"}
+              unit={wageItem && !wageItem.gated ? dict.kpiWageUnit : undefined}
+              context={
+                wageItem
+                  ? wageItem.gated
+                    ? dict.kpiInsufficient
+                    : `n = ${fmtCompact(wageItem.n)}`
+                  : "—"
+              }
             />
           </div>
 
           <div className="mt-5">
             <Figure
-              eyebrow="Skills"
-              title={`Most-requested skills in ${selectedLabel.toLowerCase()}`}
+              eyebrow={dict.skillsEyebrow}
+              title={`${dict.skillsTitlePrefix} ${selectedLabel.toLowerCase()}`}
               asOf={ov.as_of}
-              note={skills ? `Among the ${fmtInt(skills.n)} postings in this selection that list skills.` : undefined}
+              note={
+                skills
+                  ? `${dict.skillsNotePrefix} ${fmtInt(skills.n)} ${dict.skillsNotePostfix}`
+                  : undefined
+              }
             >
               {skills && skills.items.length > 0 ? (
-                <SkillBars items={skills.items} metric="share" />
+                <SkillBars
+                  items={skills.items}
+                  metric="share"
+                  ariaLabel={dict.skillBarsAriaLabel}
+                  emptyText={dict.skillBarsEmptyText}
+                />
               ) : (
-                <p className="py-6 text-center text-[0.85rem] text-ink-faint">No skill data for this selection.</p>
+                <p className="py-6 text-center text-[0.85rem] text-ink-faint">
+                  {dict.skillsEmpty}
+                </p>
               )}
             </Figure>
           </div>
         </section>
       ) : (
         <section className="container-x py-2">
-          <p className="text-[0.9rem] text-ink-soft">
-            Select a {dim === "occupations" ? "group" : "sector"} above to see its trend, pay and most-requested skills.
-          </p>
+          <p className="text-[0.9rem] text-ink-soft">{c.selectHint(dict)}</p>
         </section>
       )}
     </div>

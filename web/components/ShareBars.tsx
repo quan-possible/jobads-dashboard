@@ -3,18 +3,25 @@ import type { CategoryShare } from "@/lib/types";
 
 // Compact share list for requirements sub-figures (education, experience, etc.).
 // Drops zero-share categories, limits to top 6, and sizes teal bars by share.
+//
+// ariaLabel and emptyText come from the parent page so this component stays
+// locale-agnostic.
 
 export function ShareBars({
   items,
   max,
+  ariaLabel,
+  emptyText,
 }: {
   items: CategoryShare[];
   max?: number;
+  ariaLabel: string;
+  emptyText: string;
 }) {
   if (!items || items.length === 0) {
     return (
       <p className="py-4 text-center text-[0.85rem] text-ink-faint">
-        No data for this selection.
+        {emptyText}
       </p>
     );
   }
@@ -28,7 +35,7 @@ export function ShareBars({
   if (visible.length === 0) {
     return (
       <p className="py-4 text-center text-[0.85rem] text-ink-faint">
-        No data for this selection.
+        {emptyText}
       </p>
     );
   }
@@ -36,11 +43,7 @@ export function ShareBars({
   const maxShare = Math.max(1e-9, ...visible.map((i) => i.share));
 
   return (
-    <ul
-      className="flex flex-col gap-2"
-      role="img"
-      aria-label="Category share breakdown"
-    >
+    <ul className="flex flex-col gap-2" role="img" aria-label={ariaLabel}>
       {visible.map((it) => {
         const barPct = (it.share / maxShare) * 100;
         return (
@@ -60,7 +63,10 @@ export function ShareBars({
             <div className="col-span-2 h-1.5 w-full overflow-hidden rounded-sm bg-surface-alt">
               <div
                 className="h-full rounded-sm transition-[width] duration-500"
-                style={{ width: `${Math.max(3, barPct)}%`, background: "var(--teal)" }}
+                style={{
+                  width: `${Math.max(3, barPct)}%`,
+                  background: "var(--teal)",
+                }}
               />
             </div>
           </li>

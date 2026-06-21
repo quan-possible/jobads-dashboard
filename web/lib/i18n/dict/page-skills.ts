@@ -1,0 +1,110 @@
+// Self-contained i18n dict for the Skills page and its private components:
+// SkillBars and ShareBars (used only by this page).
+//
+// DO NOT translate: skill names, group labels, occupation/industry labels,
+// numbers, percentages, lift/share values, or any API-derived copy.
+
+export const skillsDict = {
+  en: {
+    // Hero section
+    heroEyebrowPrefix: "Skills & requirements",
+    heroTitle: "What employers are asking for",
+    heroLede:
+      "Skills and requirements drawn from job postings that explicitly list them. Coverage varies — education and remote-work fields are sparsely reported, so those figures reflect only the postings that include them.",
+
+    // Most-requested skills section
+    mostRequestedEyebrow: "Share of postings · skills",
+    mostRequestedTitle: "Most-requested skills",
+    mostRequestedNote: (n: string) => `Among the ${n} postings that list skills.`,
+
+    // Distinctive skills section
+    distinctiveEyebrow: "Vs the national mix",
+    distinctiveTitle: "What’s distinctive here",
+    distinctiveNote:
+      "Skills more common here than across Canada (lift = local share ÷ national share).",
+    distinctiveHint:
+      "Select a region, occupation or industry in the filter bar to see the skills that set it apart.",
+
+    // Requirements section
+    reqEyebrowEducation: "Requirements · education",
+    reqTitleEducation: "Education",
+    reqNoteEducation:
+      "Sparsely reported — reflects only postings that specify an education requirement.",
+    reqEyebrowExperience: "Requirements · experience",
+    reqTitleExperience: "Experience",
+    reqEyebrowLanguage: "Requirements · work language",
+    reqTitleLanguage: "Work language",
+    reqEyebrowRemote: "Requirements · remote work",
+    reqTitleRemote: "Remote work",
+    reqNoteRemote:
+      "Sparsely reported — most postings do not specify a remote-work arrangement.",
+
+    // API-down fallback
+    apiDownTitle: "Data service unavailable",
+    apiDownBody:
+      "The API isn’t responding. Start it with ",
+    apiDownCode: "uvicorn api.main:app --port 8530",
+
+    // SkillBars aria-labels
+    skillBarsShareLabel: "Most-requested skills by share of postings",
+    skillBarsLiftLabel: "Distinctive skills by lift over national average",
+    skillBarsEmpty: "No data for this selection.",
+
+    // ShareBars aria-label / empty
+    shareBarsLabel: "Category share breakdown",
+    shareBarsEmpty: "No data for this selection.",
+  },
+
+  fr: {
+    // Hero section
+    heroEyebrowPrefix: "Compétences et exigences",
+    heroTitle: "Ce que les employeurs demandent",
+    heroLede:
+      "Compétences et exigences tirées des offres d’emploi qui les mentionnent explicitement. La couverture varie — les champs liés à la scolarité et au télétravail sont peu renseignés; ces chiffres ne reflètent donc que les offres qui les incluent.",
+
+    // Most-requested skills section
+    mostRequestedEyebrow: "Part des offres · compétences",
+    mostRequestedTitle: "Compétences les plus demandées",
+    mostRequestedNote: (n: string) =>
+      `Parmi les ${n} offres qui mentionnent des compétences.`,
+
+    // Distinctive skills section
+    distinctiveEyebrow: "Par rapport à la moyenne nationale",
+    distinctiveTitle: "Ce qui distingue cette sélection",
+    distinctiveNote:
+      "Compétences plus fréquentes ici qu’à l’échelle canadienne (indice = part locale ÷ part nationale).",
+    distinctiveHint:
+      "Sélectionnez une région, une profession ou une industrie dans la barre de filtres pour voir les compétences qui la distinguent.",
+
+    // Requirements section
+    reqEyebrowEducation: "Exigences · scolarité",
+    reqTitleEducation: "Scolarité",
+    reqNoteEducation:
+      "Peu renseigné — reflète uniquement les offres précisant une exigence de scolarité.",
+    reqEyebrowExperience: "Exigences · expérience",
+    reqTitleExperience: "Expérience",
+    reqEyebrowLanguage: "Exigences · langue de travail",
+    reqTitleLanguage: "Langue de travail",
+    reqEyebrowRemote: "Exigences · télétravail",
+    reqTitleRemote: "Télétravail",
+    reqNoteRemote:
+      "Peu renseigné — la plupart des offres ne précisent pas le mode de travail.",
+
+    // API-down fallback
+    apiDownTitle: "Service de données indisponible",
+    apiDownBody:
+      "L’API ne répond pas. Démarrez-la avec ",
+    apiDownCode: "uvicorn api.main:app --port 8530",
+
+    // SkillBars aria-labels
+    skillBarsShareLabel: "Compétences les plus demandées par part des offres",
+    skillBarsLiftLabel: "Compétences distinctives par indice de spécificité",
+    skillBarsEmpty: "Aucune donnée pour cette sélection.",
+
+    // ShareBars aria-label / empty
+    shareBarsLabel: "Répartition par catégorie",
+    shareBarsEmpty: "Aucune donnée pour cette sélection.",
+  },
+};
+
+export type SkillsDict = (typeof skillsDict)[keyof typeof skillsDict];
