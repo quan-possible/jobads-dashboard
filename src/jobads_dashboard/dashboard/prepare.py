@@ -326,20 +326,36 @@ ORDER BY month, province_scope, occupation_scope, industry_scope, market_provinc
     write_query_to_parquet(con, query, output_root / "monthly_by_market.parquet")
 
 
-def build_monthly_conditions(con: duckdb.DuckDBPyConnection, output_root: Path) -> None:
+# Long-format "stacked dimension" tables (conditions / language / requirements)
+# all share the same scope rollup: stack several posting attributes into
+# (dimension, category) rows, then count over the standard province/occ/ind
+# GROUPING SETS. Only the list of stacked attributes differs.
+_STACKED_GROUPING_SETS = """GROUP BY GROUPING SETS (
+    (month, province, noc_broad_label, naics_sector_label, dimension, category),
+    (month, province, noc_broad_label, dimension, category),
+    (month, province, naics_sector_label, dimension, category),
+    (month, province, dimension, category),
+    (month, noc_broad_label, naics_sector_label, dimension, category),
+    (month, noc_broad_label, dimension, category),
+    (month, naics_sector_label, dimension, category),
+    (month, dimension, category)
+)"""
+
+
+def _build_stacked_dimension(
+    con: duckdb.DuckDBPyConnection, output_root: Path, filename: str,
+    dimensions: list[tuple[str, str]],
+) -> None:
+    """Build a long-format dimension table. ``dimensions`` is a list of
+    ``(dimension_label, category_sql_expr)`` pairs stacked via UNION ALL."""
+    stacked = "\n    UNION ALL\n".join(
+        f"    SELECT month, province, noc_broad_label, naics_sector_label, "
+        f"{sql_literal(label)} AS dimension, {expr} AS category\n    FROM normalized_postings"
+        for label, expr in dimensions
+    )
     query = f"""
 WITH stacked AS (
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Employment type' AS dimension, employment_type AS category
-    FROM normalized_postings
-    UNION ALL
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Duration' AS dimension, duration AS category
-    FROM normalized_postings
-    UNION ALL
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Student job flag' AS dimension, student_job_flag AS category
-    FROM normalized_postings
-    UNION ALL
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Advertised by' AS dimension, advertised_by AS category
-    FROM normalized_postings
+{stacked}
 )
 SELECT
     month,
@@ -350,91 +366,35 @@ SELECT
     category,
     count(*) AS postings_total
 FROM stacked
-GROUP BY GROUPING SETS (
-    (month, province, noc_broad_label, naics_sector_label, dimension, category),
-    (month, province, noc_broad_label, dimension, category),
-    (month, province, naics_sector_label, dimension, category),
-    (month, province, dimension, category),
-    (month, noc_broad_label, naics_sector_label, dimension, category),
-    (month, noc_broad_label, dimension, category),
-    (month, naics_sector_label, dimension, category),
-    (month, dimension, category)
-)
+{_STACKED_GROUPING_SETS}
 ORDER BY month, dimension, province_scope, occupation_scope, industry_scope, postings_total DESC
 """
-    write_query_to_parquet(con, query, output_root / "monthly_conditions.parquet")
+    write_query_to_parquet(con, query, output_root / filename)
+
+
+def build_monthly_conditions(con: duckdb.DuckDBPyConnection, output_root: Path) -> None:
+    _build_stacked_dimension(con, output_root, "monthly_conditions.parquet", [
+        ("Employment type", "employment_type"),
+        ("Duration", "duration"),
+        ("Student job flag", "student_job_flag"),
+        ("Advertised by", "advertised_by"),
+    ])
 
 
 def build_monthly_language(con: duckdb.DuckDBPyConnection, output_root: Path) -> None:
-    query = f"""
-WITH stacked AS (
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Primary posting language' AS dimension, COALESCE(primary_posting_language, 'Not reported') AS category
-    FROM normalized_postings
-    UNION ALL
-    SELECT month, province, noc_broad_label, naics_sector_label, 'English requirement' AS dimension, COALESCE(english_language_requirement, 'Not reported') AS category
-    FROM normalized_postings
-    UNION ALL
-    SELECT month, province, noc_broad_label, naics_sector_label, 'French requirement' AS dimension, COALESCE(french_language_requirement, 'Not reported') AS category
-    FROM normalized_postings
-)
-SELECT
-    month,
-    COALESCE(province, {sql_literal(ALL_CANADA)}) AS province_scope,
-    COALESCE(noc_broad_label, {sql_literal(ALL_OCCUPATIONS)}) AS occupation_scope,
-    COALESCE(naics_sector_label, {sql_literal(ALL_INDUSTRIES)}) AS industry_scope,
-    dimension,
-    category,
-    count(*) AS postings_total
-FROM stacked
-GROUP BY GROUPING SETS (
-    (month, province, noc_broad_label, naics_sector_label, dimension, category),
-    (month, province, noc_broad_label, dimension, category),
-    (month, province, naics_sector_label, dimension, category),
-    (month, province, dimension, category),
-    (month, noc_broad_label, naics_sector_label, dimension, category),
-    (month, noc_broad_label, dimension, category),
-    (month, naics_sector_label, dimension, category),
-    (month, dimension, category)
-)
-ORDER BY month, dimension, province_scope, occupation_scope, industry_scope, postings_total DESC
-"""
-    write_query_to_parquet(con, query, output_root / "monthly_language.parquet")
+    _build_stacked_dimension(con, output_root, "monthly_language.parquet", [
+        ("Primary posting language", "COALESCE(primary_posting_language, 'Not reported')"),
+        ("English requirement", "COALESCE(english_language_requirement, 'Not reported')"),
+        ("French requirement", "COALESCE(french_language_requirement, 'Not reported')"),
+    ])
 
 
 def build_monthly_requirements(con: duckdb.DuckDBPyConnection, output_root: Path) -> None:
-    query = f"""
-WITH stacked AS (
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Education' AS dimension, education AS category
-    FROM normalized_postings
-    UNION ALL
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Experience category' AS dimension, experience AS category
-    FROM normalized_postings
-    UNION ALL
-    SELECT month, province, noc_broad_label, naics_sector_label, 'Experience details band' AS dimension, experience_band AS category
-    FROM normalized_postings
-)
-SELECT
-    month,
-    COALESCE(province, {sql_literal(ALL_CANADA)}) AS province_scope,
-    COALESCE(noc_broad_label, {sql_literal(ALL_OCCUPATIONS)}) AS occupation_scope,
-    COALESCE(naics_sector_label, {sql_literal(ALL_INDUSTRIES)}) AS industry_scope,
-    dimension,
-    category,
-    count(*) AS postings_total
-FROM stacked
-GROUP BY GROUPING SETS (
-    (month, province, noc_broad_label, naics_sector_label, dimension, category),
-    (month, province, noc_broad_label, dimension, category),
-    (month, province, naics_sector_label, dimension, category),
-    (month, province, dimension, category),
-    (month, noc_broad_label, naics_sector_label, dimension, category),
-    (month, noc_broad_label, dimension, category),
-    (month, naics_sector_label, dimension, category),
-    (month, dimension, category)
-)
-ORDER BY month, dimension, province_scope, occupation_scope, industry_scope, postings_total DESC
-"""
-    write_query_to_parquet(con, query, output_root / "monthly_requirements.parquet")
+    _build_stacked_dimension(con, output_root, "monthly_requirements.parquet", [
+        ("Education", "education"),
+        ("Experience category", "experience"),
+        ("Experience details band", "experience_band"),
+    ])
 
 
 def build_coverage_table(con: duckdb.DuckDBPyConnection, output_root: Path) -> None:
