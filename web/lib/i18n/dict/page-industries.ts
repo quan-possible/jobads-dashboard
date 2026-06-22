@@ -28,10 +28,10 @@ export const industriesDict = {
         aria: "Share of postings carrying a NAICS industry code over time",
       },
       treemap: {
-        eyebrow: "Sector mix · last 12 months",
+        eyebrow: "Sector mix · through time",
         title: "Demand by industry sector (where coded)",
-        note: "Area is proportional to postings with a NAICS code, last 12 months.",
-        aria: "Treemap of postings by industry sector among coded postings",
+        note: "Area ∝ postings with a NAICS code in the selected year. Drag the slider or press play to move through time.",
+        aria: "Treemap of postings by industry sector among coded postings, with a year slider to scrub through time",
       },
       shareOverTime: {
         eyebrow: "Industry mix over time",
@@ -71,10 +71,10 @@ export const industriesDict = {
         aria: "Part des offres portant un code sectoriel SCIAN au fil du temps",
       },
       treemap: {
-        eyebrow: "Composition sectorielle · 12 derniers mois",
+        eyebrow: "Composition sectorielle · au fil du temps",
         title: "Demande par secteur d’activité (lorsque codé)",
-        note: "L’aire est proportionnelle aux offres portant un code SCIAN, 12 derniers mois.",
-        aria: "Carte proportionnelle des offres par secteur d’activité parmi les offres codées",
+        note: "Surface ∝ offres portant un code SCIAN pour l’année sélectionnée. Utilisez le curseur ou lancez la lecture pour parcourir le temps.",
+        aria: "Carte proportionnelle des offres par secteur d’activité parmi les offres codées, avec un curseur annuel pour parcourir le temps",
       },
       shareOverTime: {
         eyebrow: "Composition sectorielle au fil du temps",

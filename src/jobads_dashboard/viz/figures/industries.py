@@ -15,7 +15,7 @@ from ..datasource import BASE_YEAR, DataSource
 from ..theme import (
     BRAND, CONTEXT, MUTED, SEQUENTIAL, add_covid_band, add_provisional_band, add_reference_line,
 )
-from ._common import titled
+from ._common import add_time_slider, titled
 
 _PROVISIONAL_FROM = pd.Timestamp("2025-01-01")
 UP = "#2f6f77"
@@ -40,21 +40,37 @@ def coverage_line(ds: DataSource) -> go.Figure:
                   "Only this share of postings carries an industry code — every sector total below is conditional on it")
 
 
-def treemap(ds: DataSource) -> go.Figure:
-    nb = _real(ds.naics_broad)
-    cut = nb["month"].max() - pd.DateOffset(months=12)
-    g = nb[nb["month"] > cut].groupby("naics_name", as_index=False)["postings_total"].sum()
+def _treemap_trace(g: pd.DataFrame, root: str = "All industries") -> go.Treemap:
+    g = g.copy()
     g["short"] = g["naics_name"].map(lambda s: s.split("|")[-1].strip())
     total = g["postings_total"].sum()
-    labels = ["All industries"] + g["short"].tolist()
-    parents = [""] + ["All industries"] * len(g)
-    values = [total] + g["postings_total"].tolist()
-    fig = go.Figure(go.Treemap(
-        labels=labels, parents=parents, values=values, branchvalues="total",
+    return go.Treemap(
+        labels=[root] + g["short"].tolist(),
+        parents=[""] + [root] * len(g),
+        values=[total] + g["postings_total"].tolist(), branchvalues="total",
         marker=dict(colors=[total] + g["postings_total"].tolist(), colorscale=SEQUENTIAL,
                     line=dict(width=1, color="white")),
         textinfo="label+value+percent root", maxdepth=2,
-        hovertemplate="%{label}: %{value:,.0f} (%{percentRoot})<extra></extra>"))
+        hovertemplate="%{label}: %{value:,.0f} (%{percentRoot})<extra></extra>")
+
+
+def treemap(ds: DataSource, animate: str | None = None) -> go.Figure:
+    nb = _real(ds.naics_broad)
+    if animate == "by-year":
+        nb = nb.copy()
+        nb["year"] = nb["month"].dt.year
+        years = sorted(nb["year"].unique())
+        agg = {y: nb[nb["year"] == y].groupby("naics_name", as_index=False)["postings_total"].sum()
+               for y in years}
+        frames = [go.Frame(name=str(y), data=[_treemap_trace(agg[y])]) for y in years]
+        fig = go.Figure(data=frames[-1].data, frames=frames)
+        add_time_slider(fig, years)
+        fig.update_layout(height=480, margin=dict(l=8, r=8, t=64, b=44))
+        return titled(fig, "Demand by industry sector (where coded)",
+                      "Area ∝ postings with a NAICS code in the selected year — drag or press play")
+    cut = nb["month"].max() - pd.DateOffset(months=12)
+    g = nb[nb["month"] > cut].groupby("naics_name", as_index=False)["postings_total"].sum()
+    fig = go.Figure(_treemap_trace(g))
     fig.update_layout(height=460, margin=dict(l=8, r=8, t=64, b=8))
     return titled(fig, "Demand by industry sector (where coded)",
                   "Area ∝ postings with a NAICS code, last 12 months")

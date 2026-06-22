@@ -21,6 +21,35 @@ def titled(fig: go.Figure, headline: str, subtitle: str | None = None,
     return fig
 
 
+def add_time_slider(fig: go.Figure, periods, *, prefix: str = "Year: ",
+                    play: str = "▶ Play") -> go.Figure:
+    """Attach a native Plotly slider + play button that scrubs through ``periods``.
+
+    ``fig`` must already carry one ``go.Frame`` per period (named ``str(period)``)
+    with the latest period as the visible data. The slider drives the frames
+    entirely client-side — no React state — so any snapshot figure becomes
+    drag-through-time for free. Mirrors the mechanism proven by ChoroplethTime.
+    """
+    labels = [str(p) for p in periods]
+    fig.update_layout(
+        sliders=[dict(
+            active=len(labels) - 1, x=0, y=0, len=0.86, pad=dict(t=8, b=4),
+            currentvalue=dict(prefix=prefix, font=dict(size=11, color=MUTED)),
+            font=dict(size=10, color=MUTED),
+            steps=[dict(label=l, method="animate", args=[[l], dict(
+                mode="immediate", frame=dict(duration=0, redraw=True),
+                transition=dict(duration=0))]) for l in labels],
+        )],
+        updatemenus=[dict(
+            type="buttons", showactive=False, x=0.98, y=0, xanchor="right",
+            pad=dict(t=8), buttons=[dict(label=play, method="animate", args=[None, dict(
+                fromcurrent=True, frame=dict(duration=650, redraw=True),
+                transition=dict(duration=0))])],
+        )],
+    )
+    return fig
+
+
 def emphasise(n: int, focus: int | None = None) -> list[str]:
     """Return a colorway that greys everything except ``focus`` (brand accent)."""
     if focus is None:

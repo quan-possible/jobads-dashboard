@@ -23,10 +23,10 @@ export const occupationsDict = {
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       treemap: {
-        eyebrow: "Demand by volume",
+        eyebrow: "Demand by volume · through time",
         title: "What work is in demand: occupation groups by volume",
-        note: "Area ∝ postings (last 12 months); click a tile to zoom.",
-        aria: "Treemap of occupation groups sized by share of postings over the last 12 months",
+        note: "Area ∝ postings in the selected year. Drag the slider or press play to move through time.",
+        aria: "Treemap of occupation groups by postings, with a year slider to scrub through time",
       },
       indexedLines: {
         eyebrow: "Growth since 2019",
@@ -90,10 +90,10 @@ export const occupationsDict = {
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       treemap: {
-        eyebrow: "Demande par volume",
+        eyebrow: "Demande par volume · au fil du temps",
         title: "Quels métiers sont en demande : groupes professionnels par volume",
-        note: "Surface ∝ offres (12 derniers mois) ; cliquez sur une tuile pour zoomer.",
-        aria: "Carte proportionnelle des groupes professionnels dimensionnés selon leur part des offres sur les 12 derniers mois",
+        note: "Surface ∝ offres de l’année sélectionnée. Utilisez le curseur ou lancez la lecture pour parcourir le temps.",
+        aria: "Carte proportionnelle des groupes professionnels par offres, avec un curseur annuel pour parcourir le temps",
       },
       indexedLines: {
         eyebrow: "Croissance depuis 2019",

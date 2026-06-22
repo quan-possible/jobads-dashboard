@@ -76,7 +76,7 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "geography.yoy_choropleth": lambda ds, **k: geography.yoy_choropleth(ds),
     "geography.province_tiles": lambda ds, **k: geography.province_tile_grid(ds),
     # --- Occupations --------------------------------------------------------
-    "occupations.treemap": lambda ds, **k: occupations.treemap(ds),
+    "occupations.treemap": lambda ds, **k: occupations.treemap(ds, animate="by-year"),
     "occupations.indexed_lines": lambda ds, **k: occupations.indexed_lines(ds),
     "occupations.contribution_bars": lambda ds, **k: occupations.contribution_bars(ds),
     "occupations.waterfall": lambda ds, **k: occupations.waterfall(ds),
@@ -86,7 +86,7 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "occupations.noc_naics_heatmap": lambda ds, **k: occupations.noc_naics_heatmap(ds),
     # --- Industries ---------------------------------------------------------
     "industries.coverage_line": lambda ds, **k: industries.coverage_line(ds),
-    "industries.treemap": lambda ds, **k: industries.treemap(ds),
+    "industries.treemap": lambda ds, **k: industries.treemap(ds, animate="by-year"),
     "industries.share_over_time": lambda ds, **k: industries.share_over_time(ds),
     "industries.contribution_bars": lambda ds, **k: industries.contribution_bars(ds),
     # --- Pay & conditions ---------------------------------------------------

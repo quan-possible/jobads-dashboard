@@ -56,6 +56,17 @@ def test_figure_ids_listing():
     assert "occupations.treemap" in ids
 
 
+@pytest.mark.parametrize("chart_id", ["occupations.treemap", "industries.treemap"])
+def test_treemaps_are_time_animated(chart_id: str):
+    """The treemaps ship one frame per year + a slider so they scrub through time."""
+    payload = json.loads(figures.build(chart_id))
+    frames = payload.get("frames") or []
+    assert len(frames) >= 5, f"{chart_id}: expected yearly frames, got {len(frames)}"
+    sliders = payload["layout"].get("sliders") or []
+    assert sliders and sliders[0].get("steps"), f"{chart_id}: missing slider steps"
+    assert len(sliders[0]["steps"]) == len(frames), f"{chart_id}: step/frame mismatch"
+
+
 def test_no_causal_language_in_emitted_text():
     """The demand-signal framing forbids causal claims in chart chrome."""
     for chart_id in sorted(figures.REGISTRY):
