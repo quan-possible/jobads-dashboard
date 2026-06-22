@@ -1,6 +1,6 @@
 # Merge the code-simplification and redesign2-deep-audit branches
 
-- **Status:** PLAN READY — investigation complete, **nothing merged yet**. Two decisions (D1, D2) need a yes/no before execution.
+- **Status:** PLAN READY — investigation complete, **nothing merged yet**. D2 decided (KEEP compute primitives + golden tests); D1 (keep `review.py`) still to confirm.
 - **Date:** 2026-06-22
 - **This plan lives on:** worktree `sleepy-euler-04a7d0` (the simplification branch).
 - **Goal:** one integration branch that has **both** the audit's behavioral fixes (the *correct* rendered output) **and** the simplification's leaner structure, verified green, ready to become the new `redesign2` (and later promote to `main`).
@@ -37,15 +37,15 @@ Auto-merge clean — the **12 two-sided overlaps** that merge without conflict: 
 - It is a **standalone static review tool** (served on `:8533`, wired in `main/.claude/launch.json`; documented in `viz/__init__.py`). It is **not imported by the live dashboard** (`api/figures.py` / `web/`), so keeping it **does not touch dashboard output** or violate any simplification invariant. Both jobs independently note its blast radius is "the internal review tool only."
 - **Recommendation: KEEP audit's `review.py`** (resolve the modify/delete by keeping the audit side) and keep `tests/test_review.py`. The simplification's deletion overreached — it removed a wanted tool, not dead code.
 
-## D2 — the 6 unused `compute.py` primitives: REMOVE (recommended), or keep as a tested library
+## D2 — the 6 unused `compute.py` primitives: KEEP (decided — user wants the golden coverage)
 
 - Simplification removed: `lorenz_curve`, `topk_cumulative_share`, `location_quotient`, `classical_decompose`, `robust_z`, `hhi`.
 - **Confirmed dead**: no figure on *either* branch calls any of them (the `hhi` hits on the audit branch are a *local* `(shares**2).sum()` inside the removed typed-JSON concentration query, not `compute.hhi`).
 - But the audit's golden suite **`tests/golden/test_compute_golden.py` (Layer A) pins all six** as a maintained transform library, and `tests/test_compute.py` unit-tests `classical_decompose`.
-- **Recommendation: REMOVE** (lean), consistent with the user-ratified decision to drop the unused typed-JSON API — and **trim** `test_compute_golden.py` + `test_compute.py` to the surviving transforms (`MONTH`, `moving_average`, `yoy_pct`, `index_to_base`, `contribution_to_growth`, `shift_share`, `diffusion_index`).
-- **Alternative if you want a future-proof primitive library:** KEEP all six (~150 LOC) and their golden/unit tests untouched. Then compute.py takes the *audit* side and the simplification's compute deletion is dropped. Decide once; the rest of the plan is unaffected.
+- **DECIDED (2026-06-22): KEEP all six + their golden/unit tests.** The user wants the golden coverage — and the suite is rigorous-not-excessive (known-by-construction analytic literals, not snapshots; three orthogonal layers; Layer C asserts on numbers + contracts, not cosmetics, so it won't churn on the audit's font/colour changes). So `compute.py` takes the **audit side**: the simplification's compute deletion is **dropped**, and `test_compute_golden.py` / `test_compute.py` are kept untouched. No test trimming.
+- Follow-up (separate, not this merge): add a few **property-based (Hypothesis)** invariants on the Layer-A transforms (shift-share reconciliation, index base=100, contribution sums to total, diffusion ∈ [0,100]) — generalises beyond the fixture, the one place worth *adding* rigour.
 
-> D1 and D2 are the same shape ("audit treats it as maintained; simplification calls it dead") but decided oppositely on purpose: `review.py` is a **served tool** → keep; the compute fns are **unwired utilities** → lean-remove.
+> D1 and D2 are the same shape ("audit treats it as maintained; simplification calls it dead"), decided the same way: keep the audit's view in both. `review.py` is a served tool; the compute fns are a golden-tested primitive library the user wants kept.
 
 ---
 
@@ -58,7 +58,7 @@ Auto-merge clean — the **12 two-sided overlaps** that merge without conflict: 
 
 **Content conflicts (10) — keep audit behavior, re-apply simplification structure:**
 - `api/models.py` / `api/queries.py` / `api/tests/test_read.py` — **the read-API path.** Take the simplification's pruned set (meta/overview + Auth/Posting only; the user ratified removing the typed-JSON API). **Fold in only the audit fixes that touch surviving code** — S01 date-keyed YoY in `_kpis()` (kept) survives; the audit's S02 `_long_shares` national-flag and `requirements()` fix sit on **removed** functions and are **dropped with them** (you don't fix what you delete). Keep `test_read.py` cases for surviving endpoints (meta/overview/causal/cross-filter) with audit's assertions where they apply.
-- `viz/compute.py` — per **D2**.
+- `viz/compute.py` — per **D2 (decided KEEP)**: take the **audit side** — keep all 12 transforms incl. the 6 the simplification removed; drop the simplification's deletion. `test_compute_golden.py` / `test_compute.py` stay untouched.
 - `viz/figures/occupations.py` — take audit behavior; re-apply simplification's shared `treemap_trace`.
 - `viz/theme.py` — disjoint edits: keep audit's font change (U04 PT Sans) + FR chrome **and** the simplification's removed dead members (`DARK`/`palette()`/`coverage_opacity()`/`INK`/…) + `UP`/`DOWN` consts.
 - `web/app/developers/page.tsx` — audit's page-developers i18n + dead `/docs` link removal (S24) **and** simplification's `ENDPOINTS` trimmed to `meta`+`overview`.
@@ -90,15 +90,15 @@ Run the `verification` skill (code + multi-file route). Concretely, in order:
 
 ## Risks & notes
 
-- **Removed-symbol leakage** — any test/page still importing a simplification-removed symbol fails fast in (b)/(d). Already cleared the known ones: `classical_decompose` (in `test_compute.py` + golden), `metrics`, and the 6 compute fns + golden Layer A.
+- **Removed-symbol leakage** — any test/page still importing a simplification-removed symbol fails fast in (b)/(d). With D2 = KEEP, the compute fns are no longer removed, so `test_compute.py` + golden Layer A pass as-is. Remaining removed-symbol risk is only the read-API names (queries/models/types) — covered by (b)/(d).
 - **Auto-merged figures silently wrong** — textual clean ≠ correct; the golden suite (c) is the catch.
 - **Mooted audit fixes (intended, listed so nothing is lost silently):** S02 (`requirements` national-flag) is discarded with the removed `requirements` endpoint. **S04** (malformed-date guard) lives in `api/core.py`, which auto-merges → it survives. Re-confirm during merge that **S03** (503 on missing posting lookup) also lands on a surviving path (it's not in the read-API queries; expected in `private.py`/`core.py`) — if it sits only on a removed read endpoint, it's dropped with it.
 - **Golden encodes a known bug** — the golden note flagged `geography.cma_demand` inflating volumes ~8×. The suite pins *current* output; fixing that is **out of scope** for this merge (decide separately).
 - **Scope** — this merges two branches onto a `redesign2`-line integration branch. Promoting `redesign2` → `main` is a **separate** step (`redesign2` is far ahead of `main`); not part of this job.
 
-## Decisions to confirm before executing
-- **D1:** keep `review.py` (audit) — *recommended yes*.
-- **D2:** remove the 6 unused `compute.py` primitives + trim their tests — *recommended yes*; alternative is keep-as-library.
+## Decisions
+- **D1:** keep `review.py` (audit) — *recommended yes; still to confirm*.
+- **D2:** ~~remove the 6 compute primitives~~ → **DECIDED KEEP** (2026-06-22) — keep them + their golden/unit tests; `compute.py` takes the audit side. Optional follow-up: add property-based invariants on Layer A.
 
 ## Related
 [[simplification-plan]] · [[redesign2-deep-audit]] · [[golden-testing-plan]] · [[parallel-subagents-git-worktree]]
