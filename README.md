@@ -22,6 +22,19 @@ Optional dev extras:
 python -m pip install -e '.[dev]'
 ```
 
+## Architecture
+
+The dashboard is a two-process web app:
+
+- `web/` — the public UI, a **Next.js** app (server-rendered pages + Plotly figures).
+- `api/` — a **FastAPI** service that serves typed JSON over the derived
+  aggregates, plus a figure bridge that renders the Python Plotly factories in
+  `src/jobads_dashboard/viz/` to figure JSON for the web app.
+
+The browser calls `/api/*` on the web server, which proxies to FastAPI (Next
+`rewrites()`); server-side rendering fetches FastAPI directly. The Python CLI
+(`jobads-dashboard`) only builds and validates the derived data the API reads.
+
 ## Main Commands
 
 Refresh the local dashboard aggregates from the upstream processed parquet layer:
@@ -36,10 +49,16 @@ Validate that the derived package exists and reconciles with metadata totals:
 jobads-dashboard validate
 ```
 
-Launch the Streamlit app:
+Run the app locally (two processes):
 
 ```bash
-jobads-dashboard app
+# Terminal 1 — the API (reads only derived parquet)
+python -m pip install -e '.[api]'
+uvicorn api.main:app --port 8530
+
+# Terminal 2 — the web UI (proxies /api/* to the API above)
+npm --prefix web install
+npm --prefix web run dev
 ```
 
 ## Private Mac Mini Deployment
@@ -48,7 +67,7 @@ For ACLMR-private supervisor access, use the existing dashboard app rather than 
 
 1. Mirror this repo to `/Volumes/ACLMR/jobads-dashboard`.
 2. Keep `/Volumes/ACLMR/jobads-dashboard` beside `/Volumes/ACLMR/jobads-data/main`.
-3. Run the Streamlit app on the Mac mini on local port `8520`.
+3. Run the app on the Mac mini (the FastAPI service plus the Next.js web server, or the single Docker image below).
 4. Share access through Tailscale or an SSH tunnel, not a public URL.
 
 The supervisor-facing `Explore` tab exposes curated aggregate queries plus a private posting lookup built from a local `posting_lookup.parquet` index. It does not provide arbitrary SQL, raw posting downloads, or bulk raw text browsing.
@@ -59,28 +78,31 @@ Detailed runbook:
 
 ## Public Password Gate
 
-When serving the dashboard through a public URL, protect the Streamlit app with a password hash in the service environment:
+The private `Explore` posting lookup is gated by the API. Configure the password in the service environment (see `api/auth.py`):
 
-- `JOBADS_DASHBOARD_AUTH_REQUIRED=true`
-- `JOBADS_DASHBOARD_PASSWORD_HASH=<pbkdf2_sha256 hash>`
+- `JOBADS_DASHBOARD_PASSWORD_HASH=<pbkdf2_sha256 hash>` (production), or
+- `JOBADS_DASHBOARD_PASSWORD=<plain>` (local dev only).
 
-Do not commit the password or the hash into the repository. The app fails closed when `JOBADS_DASHBOARD_AUTH_REQUIRED=true` but no password hash is configured.
+Do not commit the password or the hash into the repository. On the Mac mini the public password is read from the macOS Keychain rather than an env var.
 
 ## Render Hosting
 
-This repo is set up to deploy as a Docker-based Render web service.
+This repo deploys as a single Docker-based Render web service. The image runs
+both processes: FastAPI on an internal port and the Next.js standalone server on
+Render's `$PORT` (see `Dockerfile` and `docker-entrypoint.sh`).
 
 Render-specific files:
 
 - `Dockerfile`
+- `docker-entrypoint.sh`
 - `render.yaml`
 
 Local preflight:
 
 ```bash
-python -m pip install -e '.[dev]'
-PYTHONPATH=src pytest -q
-jobads-dashboard app -- --server.headless true --server.port 8520
+python -m pip install -e '.[api,dev]'
+PYTHONPATH=src pytest -q          # Python + API tests
+npm --prefix web run build        # web build (also type-checks/lints)
 ```
 
 Render deployment options:
@@ -105,7 +127,7 @@ render services create \
   --plan free \
   --repo https://github.com/quan-possible/jobads-dashboard \
   --branch main \
-  --health-check-path /_stcore/health \
+  --health-check-path /healthz \
   --output json
 ```
 
@@ -136,14 +158,13 @@ This keeps runtime fast and avoids repeated scans over the full upstream process
 
 The minimum verification loop for implementation work is:
 
-1. `PYTHONPATH=src pytest -q`
-2. `jobads-dashboard refresh`
+1. `PYTHONPATH=src pytest -q` (Python + API tests)
+2. `npm --prefix web run build` (web build, type-check, lint)
 3. `jobads-dashboard validate`
-4. `jobads-dashboard app`
 
 `jobads-dashboard validate` is expected to reconcile the derived bundle against the live upstream processed source window, not just against local metadata.
 
-Direct UI verification should inspect the actual Streamlit surface, not just the Python modules.
+Direct UI verification should inspect the actual Next.js UI in the browser, not just the Python modules.
 
 ## Upstream Inputs
 - Primary upstream data repo:
@@ -172,7 +193,8 @@ Direct UI verification should inspect the actual Streamlit surface, not just the
 
 ## Current Runtime Surface
 
-- CLI entrypoint: `jobads-dashboard`
+- Data CLI entrypoint: `jobads-dashboard` (refresh / validate / posting-lookup)
 - Aggregate builder: `src/jobads_dashboard/dashboard/prepare.py`
-- App entrypoint: `src/jobads_dashboard/dashboard/app.py`
-- Shared metric helpers: `src/jobads_dashboard/dashboard/metrics.py`
+- Web UI: `web/` (Next.js)
+- API + figure bridge: `api/` (FastAPI), figures from `src/jobads_dashboard/viz/`
+- Shared loaders/constants/metrics: `src/jobads_dashboard/dashboard/{data,constants,metrics}.py`

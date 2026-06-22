@@ -12,3 +12,15 @@ logs
 output
 tmp
 data/derived/labor_market_dashboard_v1/posting_lookup.parquet
+
+# Node: never ship the host's node_modules / prior build — npm ci rebuilds them
+# for Linux inside the image, and a stray COPY would clobber that.
+node_modules
+web/node_modules
+web/.next
+*.log
+
+# Other git worktrees and agent scratch live here; huge and irrelevant to build.
+.claude
+.codex
+docs/jobs/archive

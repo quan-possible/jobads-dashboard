@@ -1,4 +1,0 @@
-# Pin the Streamlit theme to light so a dark-mode browser cannot flip text tokens
-# to near-white on the app's light cards (deep-audit FIX-B / L02 / U07).
-[theme]
-base = "light"

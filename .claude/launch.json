@@ -7,6 +7,13 @@
       "runtimeArgs": ["--prefix", "web", "run", "dev"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "redesign2-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", ".claude/worktrees/redesign2/web", "run", "dev"],
+      "port": 3210,
+      "autoPort": true
     }
   ]
 }
