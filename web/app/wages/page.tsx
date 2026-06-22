@@ -1,5 +1,6 @@
 import { Figure } from "@/components/Figure";
 import { RemoteFigure } from "@/components/RemoteFigure";
+import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
 import { fmtMonth } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
@@ -84,13 +85,7 @@ export default async function WagesPage() {
         </div>
       </section>
 
-      {/* Deep divider */}
-      <section className="container-x pt-8 pb-1">
-        <div className="border-t border-card-border pt-6">
-          <div className="eyebrow mb-1.5">{t.deepEyebrow}</div>
-          <p className="lede max-w-2xl">{t.deepLede}</p>
-        </div>
-      </section>
+      <DeepDivider eyebrow={t.deepEyebrow} lede={t.deepLede} />
 
       {/* Deep: the conditioned wage premium — credential ladder + pay vs demand */}
       <section className="container-x py-4">
