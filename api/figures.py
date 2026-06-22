@@ -96,10 +96,12 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "pay.wage_dumbbell": lambda ds, **k: pay.wage_dumbbell(ds),
     "pay.wage_demand_quadrant": lambda ds, **k: pay.wage_demand_quadrant(ds),
     "pay.education_wage_proxy": lambda ds, **k: pay.education_wage_proxy(ds),
+    "pay.wage_by_education": lambda ds, **k: pay.wage_by_education(ds),
     "pay.conditions_mix": lambda ds, **k: pay.conditions_mix(ds),
     "pay.language_gap": lambda ds, **k: pay.language_gap(ds),
     # --- Skills & requirements ----------------------------------------------
     "skills.top_skills_trend": lambda ds, **k: skills.top_skills_trend(ds),
+    "skills.ai_skill_diffusion": lambda ds, **k: skills.ai_skill_diffusion(ds),
     "skills.skill_lift": lambda ds, **k: skills.skill_lift_bars(ds),
     "skills.skill_occupation_heatmap": lambda ds, **k: skills.skill_occupation_heatmap(ds),
     "skills.education": lambda ds, **k: skills.education_composition(ds),
@@ -151,6 +153,7 @@ _FR_CHROME: dict[str, str] = {
     "share of postings asking for a university degree": "part des offres exigeant un diplôme universitaire",
     "median advertised wage": "salaire médian affiché",
     "AI exposure (β)": "exposition à l’IA (β)",
+    "% of all skill mentions": "% des mentions de compétences",
     # colorbar titles
     "% of national": "% national",
     "% of sector": "% du secteur",

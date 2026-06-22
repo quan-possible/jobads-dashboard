@@ -23,6 +23,7 @@ _DEFAULT_ROOT = Path(__file__).resolve().parents[3] / "data" / "derived" / "labo
 _GEO_PATH = Path(__file__).resolve().parents[3] / "data" / "geo" / "canada_provinces.geojson"
 _REFERENCE = Path(__file__).resolve().parents[3] / "data" / "reference"
 _AI_PATH = Path(__file__).resolve().parents[3] / "data" / "ai" / "occupation_ai_exposure.parquet"
+_WAGE_EDU_PATH = Path(__file__).resolve().parents[3] / "data" / "derived" / "wage_by_education.parquet"
 
 #: Last clean pre-COVID year - the cross-series indexing baseline (plan default).
 BASE_YEAR = 2019
@@ -272,6 +273,21 @@ class DataSource:
         agg["skill_name"] = agg["skill_code"].map(names).fillna(agg["skill_code"])
         return agg[~agg["noc_name"].eq("Unknown")].reset_index(drop=True)
 
+    def ai_skill_diffusion(self) -> pd.DataFrame:
+        """Monthly share of all skill mentions that are AI skills. AI skills are the
+        reference taxonomy's dedicated 'Artificial Intelligence' sub-group (Machine
+        Learning, Generative AI, LLMs, Prompt Engineering, …). Mention-share avoids
+        the posting double-count of summing a top-k-per-cell table."""
+        lab = self.skill_labels
+        ai = set(lab.loc[lab["skill_subgroup"] == "Artificial Intelligence", "skill_code"].astype(str))
+        sk = self._tables["monthly_skills_topk"].copy()
+        sk["skill_code"] = sk["skill_code"].astype(str)
+        tot = sk.groupby("month")["postings_total"].sum()
+        aim = sk[sk["skill_code"].isin(ai)].groupby("month")["postings_total"].sum()
+        out = pd.DataFrame({"all_mentions": tot, "ai_mentions": aim}).fillna(0.0)
+        out["ai_share"] = out["ai_mentions"] / out["all_mentions"] * 100.0
+        return out.reset_index().sort_values("month").reset_index(drop=True)
+
     # -- cubes for decomposition / cross-tabs -------------------------------- #
     @functools.cached_property
     def province_occupation(self) -> pd.DataFrame:
@@ -339,6 +355,13 @@ class DataSource:
         df = pd.read_parquet(_AI_PATH)
         df["noc_code"] = df["noc_code"].astype(str)
         return df
+
+    @functools.cached_property
+    def wage_by_education(self) -> pd.DataFrame:
+        """Latest-month wage percentiles by education level (the conditioned wage
+        premium), built by ``tools/build_wage_by_education.py`` from the posting-level
+        lookup. Ordered low→high; a cross-section, not a time series."""
+        return pd.read_parquet(_WAGE_EDU_PATH).sort_values("education_order").reset_index(drop=True)
 
     @functools.cached_property
     def metadata(self) -> dict:

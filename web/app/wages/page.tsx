@@ -42,18 +42,19 @@ export default async function WagesPage() {
   let asOf: string;
   let figs;
   try {
-    const [meta, wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, conditionsMix, languageGap] =
+    const [meta, wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, wageByEducation, conditionsMix, languageGap] =
       await Promise.all([
         api.meta(),
         api.figure("pay.wage_band", locale),
         api.figure("pay.wage_dumbbell", locale),
         api.figure("pay.wage_demand_quadrant", locale),
         api.figure("pay.education_wage_proxy", locale),
+        api.figure("pay.wage_by_education", locale),
         api.figure("pay.conditions_mix", locale),
         api.figure("pay.language_gap", locale),
       ]);
     asOf = meta.latest_month;
-    figs = { wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, conditionsMix, languageGap };
+    figs = { wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, wageByEducation, conditionsMix, languageGap };
   } catch {
     return <ApiDown t={t} />;
   }
@@ -91,16 +92,16 @@ export default async function WagesPage() {
         </div>
       </section>
 
-      {/* Deep: pay vs demand quadrant + credentials vs pay */}
+      {/* Deep: the conditioned wage premium — credential ladder + pay vs demand */}
       <section className="container-x py-4">
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure
-            eyebrow={c.wageDemandQuadrant.eyebrow}
-            title={c.wageDemandQuadrant.title}
+            eyebrow={c.wageByEducation.eyebrow}
+            title={c.wageByEducation.title}
             asOf={asOf}
-            note={c.wageDemandQuadrant.note}
+            note={c.wageByEducation.note}
           >
-            <RemoteFigure fig={figs.wageDemandQuadrant} height={440} ariaLabel={c.wageDemandQuadrant.aria} />
+            <RemoteFigure fig={figs.wageByEducation} height={420} ariaLabel={c.wageByEducation.aria} />
           </Figure>
           <Figure
             eyebrow={c.educationWageProxy.eyebrow}
@@ -108,9 +109,21 @@ export default async function WagesPage() {
             asOf={asOf}
             note={c.educationWageProxy.note}
           >
-            <RemoteFigure fig={figs.educationWageProxy} height={440} ariaLabel={c.educationWageProxy.aria} />
+            <RemoteFigure fig={figs.educationWageProxy} height={420} ariaLabel={c.educationWageProxy.aria} />
           </Figure>
         </div>
+      </section>
+
+      {/* Deep: pay vs demand quadrant */}
+      <section className="container-x py-4">
+        <Figure
+          eyebrow={c.wageDemandQuadrant.eyebrow}
+          title={c.wageDemandQuadrant.title}
+          asOf={asOf}
+          note={c.wageDemandQuadrant.note}
+        >
+          <RemoteFigure fig={figs.wageDemandQuadrant} height={440} ariaLabel={c.wageDemandQuadrant.aria} />
+        </Figure>
       </section>
 
       {/* Deep: posting conditions */}

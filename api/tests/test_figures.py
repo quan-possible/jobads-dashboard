@@ -107,6 +107,14 @@ def test_ai_exposure_charts_build(chart_id: str):
     assert payload["data"], chart_id
 
 
+def test_wave2b_charts_build():
+    """The conditioned wage premium (wage×education) and AI-skill diffusion build
+    from their derived assets."""
+    for cid in ("pay.wage_by_education", "skills.ai_skill_diffusion"):
+        payload = json.loads(figures.build(cid))
+        assert payload["data"], cid
+
+
 def test_ai_exposure_scatter_covers_broad_groups():
     # Numeric arrays are base64-encoded by Plotly; the string `text` array is plain.
     payload = json.loads(figures.build("occupations.ai_exposure"))

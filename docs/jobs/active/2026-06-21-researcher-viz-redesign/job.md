@@ -1,8 +1,9 @@
 # Job: researcher viz redesign — same richness, better economics
 
-Status: BUILT (Wave 1 + Wave 2A shipped & verified, 2026-06-21). Two items remain
-upstream-blocked (Wave 2B); see "Status / next steps". Commits on `redesign2`:
-`03d9091` (Python layer), `487fbde` (web layer), `e7540d5` (plan docs).
+Status: BUILT — Wave 1 + 2A + 2B all shipped & verified (2026-06-21/22). The only
+remaining gap is a *monthly time series* of wage-by-education (the cross-section
+ships now; the series needs an upstream wage-cube education dimension). 142 tests
+pass; 43 charts registered. See "Status / next steps".
 Date opened: 2026-06-21. Worktree: `redesign2`.
 Supersedes the count-cutting framing in
 [`2026-06-21-labor-econ-dashboard-design/job.md`](../2026-06-21-labor-econ-dashboard-design/job.md)
@@ -213,12 +214,23 @@ data (no ApiDown), correct plot counts, measure toggle swaps the map, no console
 errors; FR chrome translates on every new chart. Builder β ranking is economically
 sensible (office/knowledge high, trades/resources low).
 
-**BLOCKED — Wave 2B (true upstream dependency on the corpus team), NOT built:**
-1. Conditioned wage premium — needs a corpus-derived `monthly_wage_by_education`
-   table (wage percentiles cut by education). Shipped the `education_wage_proxy`
-   meanwhile.
-2. AI-skill diffusion over time — needs an AI-skill label list / taxonomy flag.
-   Deliberately not faked.
+**DONE — Wave 2B (both turned out buildable from data we already have; my earlier
+"blocked" call was wrong):**
+1. Conditioned wage premium — the posting-level `posting_lookup.parquet` carries each
+   posting's wage AND education together. `tools/build_wage_by_education.py` →
+   `data/derived/wage_by_education.parquet` → `pay.wage_by_education` (the credential
+   ladder: P25–P75 + median by education level). Clean monotone gradient
+   $21→$59. Caveat: posting_lookup is a single-month sample, so this is a
+   cross-section, not a time series — a monthly series still needs an education cut on
+   the upstream wage cube. `education_wage_proxy` kept as the occupation-level companion.
+2. AI-skill diffusion — the reference taxonomy has a dedicated "Artificial
+   Intelligence" sub-group (31 skills). `skills.ai_skill_diffusion` = AI skills as a
+   share of all skill mentions over time; shows the generative-AI surge (steady ~0.2%
+   through 2024 → 0.36% 2025 → 0.68% 2026).
+
+**Only remaining true upstream dependency:** a *monthly time series* of wage by
+education (the cross-section ships now; the series needs the upstream wage cube to
+gain an education dimension).
 
 **Known data caveat (W1b finding):** postings ~double from 2017→2018 (a vendor/scrape
 coverage ramp, not real demand). The researcher indexed charts use a 2019 base, which

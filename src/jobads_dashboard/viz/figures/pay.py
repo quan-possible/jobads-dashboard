@@ -151,6 +151,36 @@ def education_wage_proxy(ds: DataSource) -> go.Figure:
                   "Each broad occupation group: degree-requirement share vs median advertised wage · bubble ∝ volume (correlation, not causation)")
 
 
+def wage_by_education(ds: DataSource) -> go.Figure:
+    """The conditioned wage premium: advertised hourly wage by education level. Each
+    row is the P25–P75 band with the median marked, ordered from least to most
+    schooling — the credential ladder, derived from the posting-level sample."""
+    w = ds.wage_by_education
+    # short y labels keep the ladder legible
+    short = {
+        "No Education Required": "No requirement",
+        "High School Completion": "High school",
+        "College Diploma or Certification": "College",
+        "Undergraduate Degree (Bachelors)": "Bachelor's",
+        "Graduate Degree - Masters": "Master's",
+        "Post-Graduate Degree - Doctorate": "Doctorate",
+    }
+    w = w.assign(label=w["education"].map(short).fillna(w["education"]))
+    fig = go.Figure()
+    for _, r in w.iterrows():
+        fig.add_trace(go.Scatter(x=[r["wage_p25"], r["wage_p75"]], y=[r["label"]] * 2,
+                                 mode="lines", line=dict(color=CONTEXT, width=5),
+                                 showlegend=False, hoverinfo="skip"))
+    fig.add_trace(go.Scatter(
+        x=w["wage_median"], y=w["label"], mode="markers", name="Median",
+        marker=dict(color=BRAND, size=12), customdata=w["n"],
+        hovertemplate="%{y}: median %{x:$,.2f}/hr (P25–P75 band · n=%{customdata:,})<extra></extra>"))
+    fig.update_xaxes(title_text="advertised hourly wage", tickprefix="$")
+    fig.update_layout(height=420, showlegend=False)
+    return titled(fig, "The credential ladder: advertised wage by education level",
+                  "P25–P75 band, dot = median · latest-month posting sample with both a wage and a stated education requirement (correlation, not causation)")
+
+
 def conditions_mix(ds: DataSource) -> go.Figure:
     c = ds.conditions("Employment type")
     tot = c.groupby("month")["postings_total"].transform("sum")

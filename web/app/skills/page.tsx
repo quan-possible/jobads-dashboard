@@ -39,16 +39,17 @@ export default async function SkillsPage() {
   let figs;
   let asOf: string;
   try {
-    const [meta, topSkillsTrend, skillLift, skillOccupationHeatmap, education, experience] = await Promise.all([
+    const [meta, topSkillsTrend, aiSkillDiffusion, skillLift, skillOccupationHeatmap, education, experience] = await Promise.all([
       api.meta(),
       api.figure("skills.top_skills_trend", locale),
+      api.figure("skills.ai_skill_diffusion", locale),
       api.figure("skills.skill_lift", locale),
       api.figure("skills.skill_occupation_heatmap", locale),
       api.figure("skills.education", locale),
       api.figure("skills.experience", locale),
     ]);
     asOf = meta.latest_month;
-    figs = { topSkillsTrend, skillLift, skillOccupationHeatmap, education, experience };
+    figs = { topSkillsTrend, aiSkillDiffusion, skillLift, skillOccupationHeatmap, education, experience };
   } catch {
     return <ApiDown t={t} />;
   }
@@ -70,6 +71,13 @@ export default async function SkillsPage() {
       <section className="container-x py-4">
         <Figure eyebrow={c.topSkillsTrend.eyebrow} title={c.topSkillsTrend.title} asOf={asOf} note={c.topSkillsTrend.note}>
           <RemoteFigure fig={figs.topSkillsTrend} height={420} ariaLabel={c.topSkillsTrend.aria} />
+        </Figure>
+      </section>
+
+      {/* Core: the AI-skill surge */}
+      <section className="container-x py-4">
+        <Figure eyebrow={c.aiSkillDiffusion.eyebrow} title={c.aiSkillDiffusion.title} asOf={asOf} note={c.aiSkillDiffusion.note}>
+          <RemoteFigure fig={figs.aiSkillDiffusion} height={380} ariaLabel={c.aiSkillDiffusion.aria} />
         </Figure>
       </section>
 

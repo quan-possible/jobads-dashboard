@@ -46,6 +46,29 @@ def top_skills_trend(ds: DataSource, top: int = 8) -> go.Figure:
                   "Top skills by posting volume, each indexed to its 2019 average · fastest/slowest movers highlighted")
 
 
+def ai_skill_diffusion(ds: DataSource) -> go.Figure:
+    """The rise of AI skills in hiring demand: AI skills as a share of all skill
+    mentions over time. AI skills = the reference taxonomy's 'Artificial Intelligence'
+    sub-group. Mention-share, smoothed; the generative-AI surge shows from 2024."""
+    d = ds.ai_skill_diffusion()
+    d = d[d["all_mentions"] > 0].copy()
+    d["smooth"] = C.moving_average(d["ai_share"], 3)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=d["month"], y=d["ai_share"], mode="lines", name="monthly",
+        line=dict(color=CONTEXT, width=1), opacity=0.5,
+        hovertemplate="%{x|%b %Y}: %{y:.2f}%<extra></extra>"))
+    fig.add_trace(go.Scatter(
+        x=d["month"], y=d["smooth"], mode="lines", name="3-month average",
+        line=dict(color=BRAND, width=2.8),
+        hovertemplate="%{x|%b %Y}: %{y:.2f}%<extra>3-mo avg</extra>"))
+    add_covid_band(fig)
+    fig.update_yaxes(title_text="% of all skill mentions", ticksuffix="%", rangemode="tozero")
+    fig.update_layout(showlegend=False)
+    return titled(fig, "The rise of AI skills in hiring demand",
+                  "AI-related skills (machine learning, generative AI, LLMs, …) as a share of all skill mentions · faint = monthly, bold = 3-month average")
+
+
 # --------------------------------------------------------------------------- DEEP
 
 

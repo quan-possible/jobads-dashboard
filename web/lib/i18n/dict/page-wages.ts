@@ -81,6 +81,12 @@ export const wagesDict = {
         note: "Each broad occupation group: share of postings asking for a university degree vs median advertised wage · bubble ∝ volume (correlation, not causation).",
         aria: "Scatter of broad occupation groups by degree-requirement share and median advertised wage, bubble size by volume",
       },
+      wageByEducation: {
+        eyebrow: "Credential ladder · by education",
+        title: "The credential ladder: advertised wage by education level",
+        note: "P25–P75 band, dot = median · latest-month posting sample with both a wage and a stated education requirement (correlation, not causation).",
+        aria: "Dumbbell ladder of advertised hourly wage P25–P75 band and median by education level",
+      },
       conditionsMix: {
         eyebrow: "Posting conditions over time",
         title: "Employment-type mix over time",
@@ -171,6 +177,12 @@ export const wagesDict = {
         title: "Les professions exigeantes en diplômes paient-elles plus ?",
         note: "Chaque grand groupe professionnel : part des offres exigeant un diplôme universitaire vs salaire médian affiché · bulle ∝ volume (corrélation, non causalité).",
         aria: "Nuage de points des grands groupes professionnels selon la part d'exigence de diplôme et le salaire médian affiché, taille des bulles selon le volume",
+      },
+      wageByEducation: {
+        eyebrow: "Échelle des diplômes · par scolarité",
+        title: "L'échelle des diplômes : salaire affiché par niveau de scolarité",
+        note: "Bande P25–P75, point = médiane · échantillon du dernier mois avec à la fois un salaire et une exigence de scolarité (corrélation, non causalité).",
+        aria: "Graphique en haltères du salaire horaire affiché (bande P25–P75 et médiane) par niveau de scolarité",
       },
       conditionsMix: {
         eyebrow: "Conditions des offres au fil du temps",

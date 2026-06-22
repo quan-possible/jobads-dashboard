@@ -68,6 +68,12 @@ export const skillsDict = {
         note: "Top skills by posting volume, each indexed to its 2019 average so fast and slow movers are comparable.",
         aria: "Indexed line chart of the most-demanded skills since 2019",
       },
+      aiSkillDiffusion: {
+        eyebrow: "AI skills · diffusion",
+        title: "The rise of AI skills in hiring demand",
+        note: "AI-related skills (machine learning, generative AI, LLMs, …) as a share of all skill mentions · faint = monthly, bold = 3-month average. The generative-AI surge shows from 2024.",
+        aria: "Line chart of AI skills as a share of all skill mentions over time",
+      },
       skillLift: {
         eyebrow: "Distinctive skills · lift",
         title: "Distinctive skills for a specialised group",
@@ -158,6 +164,12 @@ export const skillsDict = {
         title: "Les compétences les plus demandées, et leur évolution",
         note: "Principales compétences par volume d’offres, chacune indexée à sa moyenne de 2019 pour comparer les fortes et faibles variations.",
         aria: "Graphique linéaire indexé des compétences les plus demandées depuis 2019",
+      },
+      aiSkillDiffusion: {
+        eyebrow: "Compétences en IA · diffusion",
+        title: "L’essor des compétences en IA dans la demande",
+        note: "Compétences liées à l’IA (apprentissage automatique, IA générative, LLM, …) en part de toutes les mentions de compétences · pâle = mensuel, gras = moyenne sur 3 mois. La poussée de l’IA générative apparaît à partir de 2024.",
+        aria: "Graphique linéaire des compétences en IA en part de toutes les mentions de compétences au fil du temps",
       },
       skillLift: {
         eyebrow: "Compétences distinctives · indice",
