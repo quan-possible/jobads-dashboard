@@ -21,9 +21,6 @@ export function useFilters() {
       geo: sp.get("geo") ?? undefined,
       occ: sp.get("occ") ?? undefined,
       ind: sp.get("ind") ?? undefined,
-      start: sp.get("start") ?? undefined,
-      end: sp.get("end") ?? undefined,
-      cmp: sp.get("cmp") ?? undefined,
     }),
     [sp],
   );

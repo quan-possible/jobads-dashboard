@@ -205,9 +205,6 @@ export interface Filters {
   geo?: string;
   occ?: string;
   ind?: string;
-  start?: string;
-  end?: string;
-  cmp?: string;
 }
 
 // --- Figure bridge (Plotly factories served as figure JSON) ---

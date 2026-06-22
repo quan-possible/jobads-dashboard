@@ -2,10 +2,10 @@
 // (no next/headers here; that lives in ./server).
 
 import { common } from "./dict/common";
+import { explore } from "./dict/explore";
 import { filter } from "./dict/filter";
 import { footer } from "./dict/footer";
 import { nav } from "./dict/nav";
-import { pages } from "./dict/pages";
 import type { Locale } from "./locale";
 
 export function getDictionary(locale: Locale) {
@@ -14,7 +14,7 @@ export function getDictionary(locale: Locale) {
     nav: nav[locale],
     filter: filter[locale],
     footer: footer[locale],
-    explore: pages[locale].explore,
+    explore: explore[locale],
   };
 }
 
