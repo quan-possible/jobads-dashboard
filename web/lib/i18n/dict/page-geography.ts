@@ -96,10 +96,10 @@ export const geographyDict = {
         aria: "Choropleth map of the location quotient by province for one occupation group",
       },
       lqHeatmap: {
-        eyebrow: "Occupation × province",
+        eyebrow: "Occupation × province · through time",
         title: "What each province is known for: LQ wall",
-        note: "Specialisation versus Canada — orange = over-represented, teal = under-represented (above 1 = specialised).",
-        aria: "Heatmap of the location quotient for each occupation group across provinces",
+        note: "Specialisation versus Canada — orange = over-represented, teal = under-represented (above 1 = specialised). Drag the slider or press play to move through time.",
+        aria: "Heatmap of the location quotient for each occupation group across provinces, with a year slider to scrub through time",
       },
       shiftShare: {
         eyebrow: "Structure vs local",
@@ -108,10 +108,10 @@ export const geographyDict = {
         aria: "Stacked bar chart decomposing each province’s change into national, mix and local components",
       },
       yoyChoropleth: {
-        eyebrow: "Momentum",
-        title: "Year-over-year change by province (provisional)",
-        note: "Diverging fill pinned at 0 — orange rising, teal cooling. The latest month is provisional.",
-        aria: "Choropleth map of year-over-year percentage change in postings by province",
+        eyebrow: "Momentum · through time",
+        title: "Year-over-year change by province",
+        note: "Diverging fill pinned at 0 — orange rising, teal cooling. Drag the slider or press play to watch momentum shift year by year.",
+        aria: "Choropleth map of year-over-year percentage change in postings by province, with a year slider to scrub through time",
       },
       provinceTiles: {
         eyebrow: "Tile grid",
@@ -216,10 +216,10 @@ export const geographyDict = {
         aria: "Carte choroplèthe du quotient de localisation par province pour un groupe professionnel",
       },
       lqHeatmap: {
-        eyebrow: "Profession × province",
+        eyebrow: "Profession × province · au fil du temps",
         title: "Ce qui caractérise chaque province : mur de QL",
-        note: "Spécialisation par rapport au Canada — orange = surreprésenté, sarcelle = sous-représenté (au-dessus de 1 = spécialisé).",
-        aria: "Carte de chaleur du quotient de localisation par groupe professionnel entre les provinces",
+        note: "Spécialisation par rapport au Canada — orange = surreprésenté, sarcelle = sous-représenté (au-dessus de 1 = spécialisé). Utilisez le curseur ou lancez la lecture pour parcourir le temps.",
+        aria: "Carte de chaleur du quotient de localisation par groupe professionnel entre les provinces, avec un curseur annuel pour parcourir le temps",
       },
       shiftShare: {
         eyebrow: "Structure vs local",
@@ -228,10 +228,10 @@ export const geographyDict = {
         aria: "Diagramme à barres empilées décomposant la variation de chaque province en composantes nationale, de composition et locale",
       },
       yoyChoropleth: {
-        eyebrow: "Dynamique",
-        title: "Variation sur un an par province (provisoire)",
-        note: "Remplissage divergent fixé à 0 — orange en hausse, sarcelle en repli. Le dernier mois est provisoire.",
-        aria: "Carte choroplèthe de la variation en pourcentage des offres sur un an par province",
+        eyebrow: "Dynamique · au fil du temps",
+        title: "Variation sur un an par province",
+        note: "Remplissage divergent fixé à 0 — orange en hausse, sarcelle en repli. Utilisez le curseur ou lancez la lecture pour suivre l’évolution année par année.",
+        aria: "Carte choroplèthe de la variation en pourcentage des offres sur un an par province, avec un curseur annuel pour parcourir le temps",
       },
       provinceTiles: {
         eyebrow: "Grille de tuiles",
