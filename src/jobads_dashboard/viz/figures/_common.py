@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import plotly.graph_objects as go
 
-from ..theme import BRAND, CONTEXT, MUTED, SEQUENTIAL, register_templates
+from ..theme import MUTED, SEQUENTIAL, register_templates
 
 register_templates()  # ensure templates exist when figures are built standalone
 
@@ -64,15 +64,3 @@ def add_time_slider(fig: go.Figure, periods, *, prefix: str = "Year: ",
         )],
     )
     return fig
-
-
-def emphasise(n: int, focus: int | None = None) -> list[str]:
-    """Return a colorway that greys everything except ``focus`` (brand accent)."""
-    if focus is None:
-        from ..theme import COLORWAY
-        return [COLORWAY[i % len(COLORWAY)] for i in range(n)]
-    return [BRAND if i == focus else CONTEXT for i in range(n)]
-
-
-def money(v) -> str:
-    return f"${v:,.0f}" if v is not None else "n/a"

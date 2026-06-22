@@ -198,5 +198,3 @@ export const skillsDict = {
     },
   },
 };
-
-export type SkillsDict = (typeof skillsDict)[keyof typeof skillsDict];
