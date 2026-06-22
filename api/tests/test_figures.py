@@ -67,6 +67,28 @@ def test_treemaps_are_time_animated(chart_id: str):
     assert len(sliders[0]["steps"]) == len(frames), f"{chart_id}: step/frame mismatch"
 
 
+def test_fr_localizes_in_figure_chrome():
+    """French requests translate baked-in axis/legend chrome; EN is untouched."""
+    en = json.loads(figures.build("pulse.demand_ribbon", locale="en"))
+    fr = json.loads(figures.build("pulse.demand_ribbon", locale="fr"))
+    assert en["layout"]["yaxis"]["title"]["text"] == "postings / month"
+    assert fr["layout"]["yaxis"]["title"]["text"] == "offres / mois"
+    assert "moyenne sur 3 mois" in [t.get("name") for t in fr["data"]]
+
+
+@pytest.mark.parametrize("chart_id", ["geography.yoy_choropleth", "geography.lq_heatmap"])
+def test_added_charts_are_time_animated(chart_id: str):
+    payload = json.loads(figures.build(chart_id))
+    assert len(payload.get("frames") or []) >= 5, f"{chart_id}: missing yearly frames"
+    assert (payload["layout"].get("sliders") or [{}])[0].get("steps"), chart_id
+
+
+def test_animated_choropleth_payload_is_cheap():
+    """Frames must not re-embed the province geojson (it lives in the base trace)."""
+    payload = figures.build("geography.yoy_choropleth")
+    assert len(payload) < 600_000, "choropleth frames look like they re-embed geojson"
+
+
 def test_no_causal_language_in_emitted_text():
     """The demand-signal framing forbids causal claims in chart chrome."""
     for chart_id in sorted(figures.REGISTRY):

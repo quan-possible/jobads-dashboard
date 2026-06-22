@@ -10,7 +10,12 @@ from .. import compute as C
 from ..datasource import BASE_YEAR, PROVINCE_CENTROID, PROVINCE_NAMES, DataSource
 from ..labels import NOC_SHORT, noc_short
 from ..theme import BRAND, CONTEXT, DIVERGING, MUTED, SEQUENTIAL
-from ._common import titled
+from ._common import add_time_slider, titled
+
+
+def _slider_chrome(locale: str) -> dict:
+    fr = locale == "fr"
+    return dict(prefix="Année : " if fr else "Year: ", play="▶ Lecture" if fr else "▶ Play")
 
 _PROVISIONAL_FROM = pd.Timestamp("2025-01-01")
 
@@ -101,19 +106,40 @@ def lq_choropleth(ds: DataSource, noc_code: str | None = None) -> go.Figure:
                   "LQ = local share ÷ national share. >1 (orange) = relatively specialised; 1 = on par with Canada")
 
 
-def lq_heatmap(ds: DataSource) -> go.Figure:
-    window = _last12(ds.province_occupation)
-    lq = C.location_quotient(window, "province_scope", "noc_code", "postings_total")
-    lq = lq[[c for c in lq.columns if c in NOC_SHORT]]            # drop Unknown
-    # provinces ordered by demand volume (busiest first) for a sensible reading order
+def lq_heatmap(ds: DataSource, animate: str | None = None, locale: str = "en") -> go.Figure:
+    full = ds.province_occupation
+    # Fix the province (x) and occupation (y) order once, from the recent window,
+    # so every frame shares the same grid and the cells stay comparable over time.
+    window = _last12(full)
+    base = C.location_quotient(window, "province_scope", "noc_code", "postings_total")
+    base = base[[c for c in base.columns if c in NOC_SHORT]]
     order = window.groupby("province_scope")["postings_total"].sum().sort_values(ascending=False)
-    lq = lq.reindex(index=[p for p in order.index if p in lq.index])
-    lqT = lq.T                                                    # rows = occupations, cols = provinces
-    y = [noc_short(c) for c in lqT.index]
-    fig = go.Figure(go.Heatmap(
-        z=lqT.values, x=list(lqT.columns), y=y, colorscale=DIVERGING, zmid=1.0, zmin=0, zmax=2,
-        colorbar=dict(title="LQ"), xgap=1, ygap=1,
-        hovertemplate="%{y} in %{x}: LQ %{z:.2f}<extra></extra>"))
+    prov_order = [p for p in order.index if p in base.index]
+    noc_order = list(base.columns)
+    y = [noc_short(c) for c in noc_order]
+
+    def _z(df: pd.DataFrame):
+        lq = C.location_quotient(df, "province_scope", "noc_code", "postings_total")
+        return lq.reindex(index=prov_order, columns=noc_order).T.values  # rows=occ, cols=prov
+
+    def _heat(z):
+        return go.Heatmap(z=z, x=prov_order, y=y, colorscale=DIVERGING, zmid=1.0, zmin=0, zmax=2,
+                          colorbar=dict(title="LQ"), xgap=1, ygap=1,
+                          hovertemplate="%{y} in %{x}: LQ %{z:.2f}<extra></extra>")
+
+    if animate == "by-year":
+        f = full.copy()
+        f["year"] = f["month"].dt.year
+        years = sorted(f["year"].unique())
+        frames = [go.Frame(name=str(yr), data=[_heat(_z(f[f["year"] == yr]))]) for yr in years]
+        fig = go.Figure(data=[_heat(_z(f[f["year"] == years[-1]]))], frames=frames)
+        fig.update_xaxes(title_text="province (ordered by demand volume)", type="category")
+        add_time_slider(fig, years, **_slider_chrome(locale))
+        fig.update_layout(height=460, margin=dict(l=170, b=44))
+        return titled(fig, "What each province is known for: LQ wall (occupation × province)",
+                      "Specialisation vs Canada by year — orange over-represented, teal under (>1 = specialised). Drag or press play.")
+
+    fig = go.Figure(_heat(_z(window)))
     fig.update_xaxes(title_text="province (ordered by demand volume)", type="category")
     fig.update_layout(height=440, margin=dict(l=170))
     return titled(fig, "What each province is known for: LQ wall (occupation × province)",
@@ -143,20 +169,47 @@ def shift_share_bars(ds: DataSource) -> go.Figure:
                   "Accounting identity (not causation): national trend + occupation mix + local shift = actual change")
 
 
-def yoy_choropleth(ds: DataSource) -> go.Figure:
-    prov = ds.province
-    latest = prov["month"].max()
-    ago = latest - pd.DateOffset(months=12)
-    cur = prov[prov["month"] == latest].set_index("province_scope")["postings_total"]
-    prev = prov[prov["month"] == ago].set_index("province_scope")["postings_total"]
+def _yoy_by_month(prov: pd.DataFrame, month: pd.Timestamp) -> pd.DataFrame:
+    cur = prov[prov["month"] == month].set_index("province_scope")["postings_total"]
+    prev = prov[prov["month"] == month - pd.DateOffset(months=12)].set_index("province_scope")["postings_total"]
     yoy = ((cur / prev - 1) * 100).dropna()
     df = pd.DataFrame({"code": yoy.index, "yoy": yoy.values})
     df["name"] = df["code"].map(PROVINCE_NAMES)
-    fig = go.Figure(go.Choropleth(
-        geojson=ds.geojson, locations=df["code"], z=df["yoy"], featureidkey="properties.code",
-        colorscale=DIVERGING, zmid=0.0, marker_line_color="white", marker_line_width=0.6,
-        colorbar=dict(title="YoY %", ticksuffix="%"), text=df["name"],
-        hovertemplate="%{text}: %{z:+.1f}% YoY<extra></extra>"))
+    return df
+
+
+def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en") -> go.Figure:
+    prov = ds.province
+
+    def _trace(df: pd.DataFrame, *, with_geo: bool) -> go.Choropleth:
+        # Fixed symmetric range so the colour reads consistently across frames.
+        kw = dict(locations=df["code"], z=df["yoy"], featureidkey="properties.code",
+                  colorscale=DIVERGING, zmid=0.0, zmin=-40, zmax=40,
+                  marker_line_color="white", marker_line_width=0.6,
+                  colorbar=dict(title="YoY %", ticksuffix="%"), text=df["name"],
+                  hovertemplate="%{text}: %{z:+.1f}% YoY<extra></extra>")
+        if with_geo:
+            kw["geojson"] = ds.geojson
+        return go.Choropleth(**kw)
+
+    if animate == "by-year":
+        # One frame per December (a stable annual YoY read), most recent last.
+        prov2 = prov.copy()
+        prov2["year"] = prov2["month"].dt.year
+        decembers = [prov2[prov2["year"] == y]["month"].max() for y in sorted(prov2["year"].unique())]
+        decembers = [m for m in decembers if not prov[prov["month"] == m - pd.DateOffset(months=12)].empty]
+        labels = [str(m.year) for m in decembers]
+        frames = [go.Frame(name=lbl, data=[_trace(_yoy_by_month(prov, m), with_geo=False)])
+                  for lbl, m in zip(labels, decembers)]
+        fig = go.Figure(data=[_trace(_yoy_by_month(prov, decembers[-1]), with_geo=True)], frames=frames)
+        fig.update_geos(fitbounds="locations", visible=False)
+        add_time_slider(fig, labels, **_slider_chrome(locale))
+        fig.update_layout(height=480, margin=dict(l=10, r=10, t=10, b=44))
+        return titled(fig, "Momentum: year-over-year change by province",
+                      "Diverging fill pinned at 0 — orange growing, teal cooling. Drag the slider or press play to move through time.")
+
+    df = _yoy_by_month(prov, prov["month"].max())
+    fig = go.Figure(_trace(df, with_geo=True))
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(height=460, margin=dict(l=10, r=10, t=64, b=10))
     return titled(fig, "Momentum: year-over-year change by province (provisional)",

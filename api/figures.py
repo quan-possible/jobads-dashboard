@@ -23,6 +23,8 @@ Design notes:
 
 from __future__ import annotations
 
+import json
+import re
 from functools import lru_cache
 from typing import Callable
 
@@ -71,9 +73,9 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "geography.share_choropleth": lambda ds, **k: geography.share_choropleth(ds),
     "geography.ranked_provinces": lambda ds, **k: geography.ranked_provinces(ds),
     "geography.lq_choropleth": lambda ds, **k: geography.lq_choropleth(ds),
-    "geography.lq_heatmap": lambda ds, **k: geography.lq_heatmap(ds),
+    "geography.lq_heatmap": lambda ds, **k: geography.lq_heatmap(ds, animate="by-year", locale=k.get("locale", "en")),
     "geography.shift_share": lambda ds, **k: geography.shift_share_bars(ds),
-    "geography.yoy_choropleth": lambda ds, **k: geography.yoy_choropleth(ds),
+    "geography.yoy_choropleth": lambda ds, **k: geography.yoy_choropleth(ds, animate="by-year", locale=k.get("locale", "en")),
     "geography.province_tiles": lambda ds, **k: geography.province_tile_grid(ds),
     # --- Occupations --------------------------------------------------------
     "occupations.treemap": lambda ds, **k: occupations.treemap(ds, animate="by-year", locale=k.get("locale", "en")),
@@ -105,6 +107,102 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
 }
 
 
+# In-figure chrome the factories bake in English (axis titles, colorbar labels,
+# band/reference annotations, legend names, subplot titles, month ticks). The
+# editorial frame already supplies the localized headline/notes; this fills the
+# remaining standing text. Exact-match only, so data values and hovertemplates
+# are never touched. Taxonomy labels (NOC/NAICS/skill names) stay untranslated.
+_FR_CHROME: dict[str, str] = {
+    # axis titles
+    "% of groups growing (YoY)": "% de groupes en croissance (a/a)",
+    "% of postings with NAICS": "% des offres avec code SCIAN",
+    "% of postings with a wage": "% des offres avec salaire",
+    "% of postings with the field (latest month)": "% des offres avec le champ (dernier mois)",
+    "% of postings with the field": "% des offres avec le champ",
+    "% of postings": "% des offres",
+    "HHI": "IHH",
+    "YoY demand growth": "croissance de la demande (a/a)",
+    "advertised hourly wage": "salaire horaire affiché",
+    "advertised median wage": "salaire médian affiché",
+    "change in postings, decomposed": "variation des offres, décomposée",
+    "contribution to growth (pp)": "contribution à la croissance (pp)",
+    "contribution to total growth (pp)": "contribution à la croissance totale (pp)",
+    "cumulative %": "% cumulé",
+    "industry sector (NAICS code · hover for name)": "secteur d’activité (code SCIAN · survolez pour le nom)",
+    "lift (occupation share ÷ national share)": "indice (part profession ÷ part nationale)",
+    "market rank": "rang du marché",
+    "postings (last 12 months)": "offres (12 derniers mois)",
+    "postings / month": "offres / mois",
+    "province (ordered by demand volume)": "province (classée par volume de demande)",
+    "rank (1 = most postings)": "rang (1 = plus d’offres)",
+    "robust z of remainder": "cote z robuste du résidu",
+    "share of coded postings": "part des offres codées",
+    "share of demand": "part de la demande",
+    "share of markets": "part des marchés",
+    "share of postings": "part des offres",
+    "skill code": "code de compétence",
+    "year-over-year %": "% d’une année à l’autre",
+    "index (2019 = 100)": "indice (2019 = 100)",
+    # colorbar titles
+    "% of national": "% national",
+    "% of sector": "% du secteur",
+    "LQ": "QL",
+    "YoY %": "% a/a",
+    "postings": "offres",
+    "vs year avg": "vs moy. annuelle",
+    # band / reference annotations
+    "provisional": "provisoire",
+    "pre-2021 unstable": "instable avant 2021",
+    "balanced": "équilibré",
+    "national rate": "taux national",
+    # legend names
+    "3-month average": "moyenne sur 3 mois",
+    "Actual change": "variation réelle",
+    "Median": "médiane",
+    "Monthly postings": "offres mensuelles",
+    "Not seasonally adjusted": "non désaisonnalisé",
+    "Seasonally adjusted (approx.)": "désaisonnalisé (approx.)",
+    "Wage coverage": "couverture salariale",
+    # subplot titles
+    "Observed": "Observé",
+    "Trend": "Tendance",
+    "Seasonal": "Saisonnier",
+    "Remainder": "Résidu",
+    "HHI over time (markets)": "IHH au fil du temps (marchés)",
+    "Top-20 cumulative share": "Part cumulée du top 20",
+    # month ticks (cycle plot + seasonality)
+    "Jan": "Janv", "Feb": "Févr", "Mar": "Mars", "Apr": "Avr", "May": "Mai",
+    "Jun": "Juin", "Jul": "Juil", "Aug": "Août", "Sep": "Sept", "Dec": "Déc",
+}
+
+_FR_LORENZ = re.compile(r"^Lorenz curve \(Gini (.+)\)$")
+
+
+def _fr(s: str) -> str:
+    if s in _FR_CHROME:
+        return _FR_CHROME[s]
+    m = _FR_LORENZ.match(s)
+    if m:
+        return f"Courbe de Lorenz (Gini {m.group(1)})"
+    return s
+
+
+def _localize_chrome(node) -> None:
+    """Recursively translate known English chrome strings in a figure JSON dict."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if isinstance(v, str):
+                node[k] = _fr(v)
+            else:
+                _localize_chrome(v)
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            if isinstance(v, str):
+                node[i] = _fr(v)
+            else:
+                _localize_chrome(v)
+
+
 def build(chart_id: str, *, locale: str = "en", **params) -> str:
     """Render a registered factory to a Plotly figure JSON string.
 
@@ -122,11 +220,17 @@ def build(chart_id: str, *, locale: str = "en", **params) -> str:
         plot_bgcolor="rgba(0,0,0,0)",
     )
     # The template reserves ~92px on top for a main title we've now stripped.
-    # Reclaim it for single-panel figures that didn't set their own margin —
-    # but leave multi-panel figures alone (their subplot titles live up there).
+    # Reclaim it when the factory didn't set its own margin: tighter for a single
+    # panel, a little more for multi-panel figures whose subplot titles live up top.
     layout = fig.to_plotly_json().get("layout", {})
     is_multipanel = any(k.startswith("xaxis") and k != "xaxis" for k in layout)
-    if fig.layout.margin.t is None and not is_multipanel:
-        fig.update_layout(margin_t=56)
+    if fig.layout.margin.t is None:
+        fig.update_layout(margin_t=64 if is_multipanel else 56)
+
     # Plotly's own encoder handles numpy arrays / pandas Timestamps.
-    return fig.to_json()
+    payload = fig.to_json()
+    if locale == "fr":
+        data = json.loads(payload)
+        _localize_chrome(data)
+        return json.dumps(data, ensure_ascii=False)
+    return payload

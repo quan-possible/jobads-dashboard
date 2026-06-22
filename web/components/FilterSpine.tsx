@@ -11,9 +11,9 @@ export function FilterSpine() {
   const { t } = useI18n();
   const { filters, setFilter, reset, activeCount } = useFilters();
 
-  // The trust page and the developer docs are not filter-driven. Explore IS —
-  // the same region/occupation/industry controls scope the posting lookup.
-  if (pathname === "/method" || pathname.startsWith("/developers")) return null;
+  // Only the Explore posting lookup is filter-driven. The curated national
+  // visuals ignore scope, so the filter bar would be dead chrome there.
+  if (!pathname.startsWith("/explore")) return null;
 
   return (
     <div className="sticky top-16 z-30 border-b border-card-border bg-surface-alt/80 backdrop-blur-md">
