@@ -1,0 +1,93 @@
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/app/developers/error.tsx
+  8:56  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/app/method/page.tsx
+  4:10  warning  'fmtCompact' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/LocaleToggle.tsx
+  13:5  error  Error: This value cannot be modified
+
+Modifying a variable defined outside a component or hook is not allowed. Consider using an effect.
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/LocaleToggle.tsx:13:5
+  11 |   const choose = (next: Locale) => {
+  12 |     if (next === locale) return;
+> 13 |     document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
+     |     ^^^^^^^^ value cannot be modified
+  14 |     // Re-render the whole server tree under the new locale. A full reload is the
+  15 |     // most reliable way to re-read the locale cookie across server + client.
+  16 |     window.location.reload();  react-hooks/immutability
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/TopNav.tsx
+  23:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/TopNav.tsx:23:5
+  21 |   // Close on route change
+  22 |   useEffect(() => {
+> 23 |     setMenuOpen(false);
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  24 |   }, [pathname]);
+  25 |
+  26 |   // Close on Escape  react-hooks/set-state-in-effect
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/explore/ExploreView.tsx
+  47:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/explore/ExploreView.tsx:47:5
+  45 |   const scopeKey = `${filters.geo ?? ""}|${filters.occ ?? ""}|${filters.ind ?? ""}|${debouncedQ}`;
+  46 |   useEffect(() => {
+> 47 |     setOffset(0);
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  48 |   }, [scopeKey]);
+  49 |
+  50 |   useEffect(() => {  react-hooks/set-state-in-effect
+  52:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/explore/ExploreView.tsx:52:5
+  50 |   useEffect(() => {
+  51 |     let cancelled = false;
+> 52 |     setLoading(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  53 |     setError(null);
+  54 |     fetchPostings({
+  55 |       geo: filters.geo,                                           react-hooks/set-state-in-effect
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/explore/PostingDrawer.tsx
+  39:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Volumes/ACLMR/jobads-dashboard/.claude/worktrees/redesign2/web/components/explore/PostingDrawer.tsx:39:5
+  37 |     if (!id) return;
+  38 |     let cancelled = false;
+> 39 |     setLoading(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  40 |     setError(null);
+  41 |     setDetail(null);
+  42 |     fetchPosting(id)  react-hooks/set-state-in-effect
+
+✖ 7 problems (6 errors, 1 warning)
+

@@ -1,9 +1,16 @@
 # Merge the code-simplification and redesign2-deep-audit branches
 
-- **Status:** PLAN READY — investigation complete, **nothing merged yet**. D2 decided (KEEP compute primitives + golden tests); D1 (keep `review.py`) still to confirm.
+- **Status:** DONE & VERIFIED — executed on branch `redesign2-integration` (merge `ce3c7c63`, fixes `9459f88`), both decisions taken (D1 keep `review.py`, D2 keep compute primitives + golden tests), pushed to `redesign2`.
 - **Date:** 2026-06-22
-- **This plan lives on:** worktree `sleepy-euler-04a7d0` (the simplification branch).
-- **Goal:** one integration branch that has **both** the audit's behavioral fixes (the *correct* rendered output) **and** the simplification's leaner structure, verified green, ready to become the new `redesign2` (and later promote to `main`).
+- **Goal:** one integration branch that has **both** the audit's behavioral fixes (the *correct* rendered output) **and** the simplification's leaner structure, verified green, becoming the new `redesign2`.
+
+## Executed (outcome)
+
+Merged `sleepy-euler-04a7d0` (simplification) + `redesign2-audit-fixes` (audit) onto `redesign2-integration`. All 13 conflicts resolved per the tables below (behavior from audit, structure from simplification). **Both decisions: KEEP** (D1 review.py is a real standalone tool; D2 the golden-tested compute primitives stay).
+
+Running the full suite surfaced four removed-symbol leaks (audit code referencing things the simplification deleted), each fixed: restored `theme.DEMAND_SIGNAL_NOTE` + `DataSource.metadata` (review.py needs them), dropped review.py's `pulse.kpi_row` entry and the golden conftest's `top_markets_per_province` kwarg. Added `tests/golden/test_compute_properties.py` (Hypothesis property tests on the Layer-A invariants).
+
+**Verification (all green):** `pytest` 292 passed (golden + property + audit regressions + review); `npm run build` clean (9 routes); `jobads-dashboard validate` reconciles 25,356,735 postings. The audit's golden suite passing is the proof that the simplification's structure preserved the audit's corrected output.
 
 ## The two branches (clean fork off `redesign2` = `5b9f0994`)
 
