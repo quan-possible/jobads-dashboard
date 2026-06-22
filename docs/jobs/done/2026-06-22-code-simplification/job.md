@@ -1,12 +1,41 @@
 # Code simplification — make the dashboard codebase lean without changing what it renders
 
-- **Status:** PLAN READY — investigation complete, plan written, **no code changed yet** (user chose plan-only).
+- **Status:** BUILT & VERIFIED — all planned tiers implemented (Tier 3 deliberately deferred); the rendered dashboard is unchanged.
 - **Date:** 2026-06-22
-- **Branch / worktree:** `sleepy-euler-04a7d0` (off `main`, HEAD `5b9f099`, clean tree at start).
-- **Skill:** `simplify` (this is its planning deliverable).
-- **Decisions taken** (from the user, 2026-06-22):
-  1. **Remove the unused typed-JSON "Public data API"**; reduce the `/developers` page to the 2 endpoints the UI actually uses. Keep the page and its footer link.
-  2. **Plan only this session, then stop.** Execution is a follow-up.
+- **Branch / worktree:** `sleepy-euler-04a7d0` (off `main`, started at `5b9f099`).
+- **Skill:** `simplify`.
+- **Decisions taken** (from the user, 2026-06-22): (1) remove the unused typed-JSON public API, trim `/developers` to the 2 live endpoints (keep page + footer link); (2) initially plan-only, then a follow-up instruction to **implement to the end while the webapp stays unchanged**.
+
+## RESULT — what was built
+
+**Net −4,335 source lines** (47 files: 245 insertions, 4,580 deletions), the dashboard rendering identically. Commits on this worktree:
+
+| Commit | Scope |
+|---|---|
+| `472f0e2` | checkpoint: baseline + plan |
+| `0973337` | Tier 1 (Python): dead viz/dashboard code + `geography_top_markets` aggregate removed end-to-end |
+| `0421b1c` | Tier 1 (web): dead artifacts (`openapi.json`, `plotTheme.ts`, `DownloadCSV`/`csv.ts`), dead exports, dead i18n blocks |
+| `12bb03d` | Phase 2: removed the unused typed-JSON public API (`queries.py` 964→370, `models.py`, `read.py`, `api.ts`/`types.ts`, tests), trimmed `/developers` |
+| `03df440` | Tier 2 (viz): hoisted duplicated chrome (`UP`/`DOWN`, `treemap_trace`, `PROVISIONAL_FROM`) |
+| `55f990d` | Tier 2 (web): shared `DeepDivider` component |
+| `58a170b` | Tier 2 (prepare): one `_build_stacked_dimension` helper for conditions/language/requirements |
+
+**Verification evidence (the "unchanged" proof):**
+- **Figures**: all 86 renders (43 charts × en/fr) byte-identical to the pre-change baseline, checked after every Python change (`evidence/baseline/figures.sha256.json`).
+- **Web HTML**: `DeepDivider` proven byte-identical via a production-build A/B (`next start`, asset hashes normalized) across 6 pages × 2 locales; all other web changes are dead-code removal gated by `npm run build` (typecheck/lint).
+- **Derived parquet**: the current `prepare.py` was first shown to reproduce all 14 committed tables byte/row-identically (full corpus rebuild); the stacked-dimension refactor was then re-verified byte/row-identical (conditions 1,932,714 / language 1,138,235 / requirements 1,925,857 rows).
+- **Tests**: 111 pass (down from 155 baseline — the 44 removed covered deleted endpoints + 2 dead metrics tests). `jobads-dashboard validate` reconciles (25,356,735 postings, no missing files, no schema issues).
+- **Live smoke**: home renders real charts; `/developers` now lists only `/api/meta` + `/api/overview`.
+
+**Deferred (Tier 3 — deliberately NOT done):** collapsing the two posting-lookup builders and folding `tools/build_wage_by_education.py` into `refresh`. Rationale: these change a private gitignored index and a committed asset's build path; they don't reduce the rendered dashboard, carry latent-bug risk to future refreshes, and have low ROI relative to the verification cost. Left as a clean future option.
+
+**Environment note:** the venv was rebuilt from `uv.lock` (`uv sync --extra api --extra dev`); free numpy resolution breaks pandas, so always sync to the lock.
+
+---
+
+## Original plan (for reference)
+
+- **Status when written:** PLAN READY — investigation complete, no code changed.
 
 ---
 
