@@ -1,6 +1,8 @@
 # Job: researcher viz redesign — same richness, better economics
 
-Status: ACTIVE / PLAN. No code changed yet.
+Status: BUILT (Wave 1 + Wave 2A shipped & verified, 2026-06-21). Two items remain
+upstream-blocked (Wave 2B); see "Status / next steps". Commits on `redesign2`:
+`03d9091` (Python layer), `487fbde` (web layer), `e7540d5` (plan docs).
 Date opened: 2026-06-21. Worktree: `redesign2`.
 Supersedes the count-cutting framing in
 [`2026-06-21-labor-econ-dashboard-design/job.md`](../2026-06-21-labor-econ-dashboard-design/job.md)
@@ -178,17 +180,51 @@ an existing plot.
 
 ## Status / next steps
 
-File-level build map written: [`implementation.md`](implementation.md) — the four
-seams (compute → datasource → factory → registry+web/i18n), a 6-step per-plot
-checklist, per-plot specs with code skeletons, Wave 1 (existing data) vs Wave 2
-(needs a new derived table), and pre-build checks.
+File-level build map: [`implementation.md`](implementation.md). All buildable work
+is now shipped and verified; what's left is genuinely upstream-blocked.
 
-1. Owner review of this target set (which of #6, #7, #14, #24, #31, #33, #36, #37
-   to greenlight; AI-exposure crosswalk ownership).
-2. Wave 1 (all E, no dependencies): reframe LQ→toggle, swap the 4 Pulse
-   decompositions, consolidate the geography maps, add small-multiples + momentum +
-   skill churn + skill×occupation. Pure front-of-house quality lift.
-3. Wave 2 (D): AI-exposure layer once the crosswalk exists; wage premium.
+**DONE — Wave 1 (existing data):**
+- Pulse: dropped anomaly/STL/SA-vs-NSA/cycle; added `occupation_trends_grid` +
+  `momentum`; smoothed `diffusion`.
+- Occupations: dropped bump/concentration/horizon_wall; added `skill_churn`.
+- Geography: one `demand_map(measure=…)` (count/share/per-capita/demand-LQ, animated)
+  + a `MapToggle` client control; added `cma_demand`; kept YoY + shift-share
+  (relabelled secondary); dropped the 3 redundant LQ/tile maps.
+- Skills: headline `top_skills_trend`; relabelled `skill_lift`; added
+  `skill_occupation_heatmap`. All now use the real skill-label taxonomy.
+- Pay: added `education_wage_proxy` (the descriptive credential-premium proxy for 2B).
+
+**DONE — Wave 2A (AI-exposure, we built it):** `tools/build_ai_exposure.py` →
+`data/ai/occupation_ai_exposure.parquet` (Eloundou β, NOC-2021 broad);
+`occupations.ai_exposure_scatter` + `geography.ai_exposure_map`.
+
+**Spec corrections found during build (folded into reality):**
+- Skill labels DO exist (`data/reference/skills.csv` `leaf_label`) — the "no public
+  label table in v1" caveat was wrong; all skill charts now read in plain names.
+- Province labour force DO exist (`province_labour_force.csv`) — so the demand map's
+  per-capita measure is real, not a stub.
+- Crosswalk: used bcgov's `onet_to_noc2021_mapping.csv` (built from the StatCan
+  concordances) at the **NOC 2021** vintage, NOT the raw NOC2016 concordance's first
+  digit — our postings are NOC 2021 broad, and the 2021 TEER restructuring means the
+  2016 first digit does not line up. Same source family, correct vintage.
+
+**Verified:** 139 pytest pass; web tsc/eslint clean; all 6 routes render against live
+data (no ApiDown), correct plot counts, measure toggle swaps the map, no console
+errors; FR chrome translates on every new chart. Builder β ranking is economically
+sensible (office/knowledge high, trades/resources low).
+
+**BLOCKED — Wave 2B (true upstream dependency on the corpus team), NOT built:**
+1. Conditioned wage premium — needs a corpus-derived `monthly_wage_by_education`
+   table (wage percentiles cut by education). Shipped the `education_wage_proxy`
+   meanwhile.
+2. AI-skill diffusion over time — needs an AI-skill label list / taxonomy flag.
+   Deliberately not faked.
+
+**Known data caveat (W1b finding):** postings ~double from 2017→2018 (a vendor/scrape
+coverage ramp, not real demand). The researcher indexed charts use a 2019 base, which
+sits after the ramp, so they're robust. A dashboard-wide coverage-break-marker pass
+(which would also touch the out-of-scope public Core plots) is the cleaner home for a
+visible marker — left as a focused follow-up rather than piecemeal here.
 
 ## Provenance
 
