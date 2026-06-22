@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 ALL_CANADA = "All Canada"
 ALL_OCCUPATIONS = "All occupations"
 ALL_INDUSTRIES = "All industries"
@@ -59,43 +57,3 @@ COVERAGE_FIELDS: tuple[str, ...] = (
     "duration",
     "advertisedBy",
 )
-
-PLOTLY_SEQUENCE: list[str] = [
-    "#041c2c",
-    "#345961",
-    "#cf7730",
-    "#c39e80",
-    "#6e8790",
-    "#203746",
-    "#8b5e3c",
-    "#59828c",
-    "#d28f4b",
-    "#55754e",
-    "#7b6b8d",
-    "#a64d3f",
-]
-
-
-@dataclass(frozen=True)
-class VisualTheme:
-    canvas: str = "#fbf8f5"
-    surface: str = "#ffffff"
-    surface_alt: str = "#f7efe9"
-    text: str = "#132330"
-    secondary_text: str = "#5d6b74"
-    grid: str = "#eadfd7"
-    axis: str = "#c8b3a2"
-    neutral_fill: str = "#f2ebe5"
-    navy: str = "#061f2f"
-    navy_deep: str = "#041c2c"
-    teal: str = "#345961"
-    sand: str = "#c39e80"
-    orange: str = "#cf7730"
-    black: str = "#000000"
-    white: str = "#ffffff"
-    card_border: str = "#d9c2b1"
-    shadow: str = "0 18px 40px rgba(6, 31, 47, 0.12)"
-    gradient: str = "linear-gradient(270deg, #041c2c 0%, #345961 37.49%, #c39e80 76.96%, #cf7730 100%)"
-
-
-THEME = VisualTheme()

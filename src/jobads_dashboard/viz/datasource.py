@@ -59,10 +59,6 @@ class DataSource:
         self.data_root = Path(data_root) if data_root else _DEFAULT_ROOT
         self._tables = load_tables(self.data_root)
 
-    # -- raw table access ---------------------------------------------------- #
-    def table(self, name: str) -> pd.DataFrame:
-        return self._tables[name].copy()
-
     # -- scope-level series -------------------------------------------------- #
     @functools.cached_property
     def overall(self) -> pd.DataFrame:
@@ -71,10 +67,6 @@ class DataSource:
     @property
     def latest_month(self) -> pd.Timestamp:
         return pd.Timestamp(self.overall["month"].max())
-
-    @property
-    def first_month(self) -> pd.Timestamp:
-        return pd.Timestamp(self.overall["month"].min())
 
     @functools.cached_property
     def noc_broad(self) -> pd.DataFrame:
@@ -362,11 +354,3 @@ class DataSource:
         premium), built by ``tools/build_wage_by_education.py`` from the posting-level
         lookup. Ordered low→high; a cross-section, not a time series."""
         return pd.read_parquet(_WAGE_EDU_PATH).sort_values("education_order").reset_index(drop=True)
-
-    @functools.cached_property
-    def metadata(self) -> dict:
-        path = self.data_root / "metadata.json"
-        if path.exists():
-            with path.open() as fh:
-                return json.load(fh)
-        return {}

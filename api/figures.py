@@ -24,7 +24,6 @@ Design notes:
 from __future__ import annotations
 
 import json
-import re
 from functools import lru_cache
 from typing import Callable
 
@@ -45,7 +44,7 @@ from jobads_dashboard.viz.theme import register_templates
 
 from . import core
 
-# Ensure the aclmr_light / aclmr_dark templates exist (idempotent).
+# Ensure the aclmr_light template exists (idempotent).
 register_templates()
 
 
@@ -190,16 +189,8 @@ _FR_CHROME: dict[str, str] = {
     "Jun": "Juin", "Jul": "Juil", "Aug": "Août", "Sep": "Sept", "Dec": "Déc",
 }
 
-_FR_LORENZ = re.compile(r"^Lorenz curve \(Gini (.+)\)$")
-
-
 def _fr(s: str) -> str:
-    if s in _FR_CHROME:
-        return _FR_CHROME[s]
-    m = _FR_LORENZ.match(s)
-    if m:
-        return f"Courbe de Lorenz (Gini {m.group(1)})"
-    return s
+    return _FR_CHROME.get(s, s)
 
 
 def _localize_chrome(node) -> None:

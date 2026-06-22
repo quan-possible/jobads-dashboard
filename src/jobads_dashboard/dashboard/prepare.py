@@ -278,7 +278,7 @@ ORDER BY month, occupation_scope
     write_query_to_parquet(con, noc_query, output_root / "monthly_wage_by_noc_broad.parquet")
 
 
-def build_monthly_by_market(con: duckdb.DuckDBPyConnection, output_root: Path, top_markets_per_province: int) -> None:
+def build_monthly_by_market(con: duckdb.DuckDBPyConnection, output_root: Path) -> None:
     query = f"""
 WITH province_scope_rows AS (
     SELECT
@@ -324,21 +324,6 @@ FROM national_scope_rows
 ORDER BY month, province_scope, occupation_scope, industry_scope, market_province, market
 """
     write_query_to_parquet(con, query, output_root / "monthly_by_market.parquet")
-
-    top_market_query = f"""
-SELECT
-    province,
-    market,
-    province || ' | ' || market AS market_label,
-    count(*) AS postings_total,
-    min(date_found) AS first_month,
-    max(date_found) AS last_month
-FROM normalized_postings
-GROUP BY province, market
-QUALIFY row_number() OVER (PARTITION BY province ORDER BY count(*) DESC, market) <= {int(top_markets_per_province)}
-ORDER BY province, postings_total DESC, market
-"""
-    write_query_to_parquet(con, top_market_query, output_root / "geography_top_markets.parquet")
 
 
 def build_monthly_conditions(con: duckdb.DuckDBPyConnection, output_root: Path) -> None:
@@ -775,7 +760,6 @@ def validate_derived_package(output_root: Path, *, source_root: Path | None = No
         "monthly_requirements.parquet",
         "monthly_skills_topk.parquet",
         "coverage_by_field_monthly.parquet",
-        "geography_top_markets.parquet",
     ]
     missing = [name for name in required if not (output_root / name).exists()]
     metadata_path = output_root / "metadata.json"
@@ -820,14 +804,6 @@ def validate_derived_package(output_root: Path, *, source_root: Path | None = No
             "market",
             "market_label",
             "postings_total",
-        },
-        "geography_top_markets.parquet": {
-            "province",
-            "market",
-            "market_label",
-            "postings_total",
-            "first_month",
-            "last_month",
         },
     }
     schema_issues: dict[str, list[str]] = {}
@@ -900,7 +876,6 @@ WHERE dateFound IS NOT NULL
 def refresh_dashboard_data(
     source_root: Path,
     output_root: Path,
-    top_markets_per_province: int,
     skills_top_k: int,
     posting_lookup_limit: int = 100_000,
     posting_lookup_recent_months: int = 24,
@@ -927,7 +902,7 @@ def refresh_dashboard_data(
     log("Building wage tables ...")
     build_monthly_wage_cubes(con, output_root)
     log("Building market tables ...")
-    build_monthly_by_market(con, output_root, top_markets_per_province=top_markets_per_province)
+    build_monthly_by_market(con, output_root)
     log("Building monthly_conditions.parquet ...")
     build_monthly_conditions(con, output_root)
     log("Building monthly_language.parquet ...")
@@ -958,7 +933,6 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=DEFAULT_SOURCE_ROOT)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
-    parser.add_argument("--top-markets-per-province", type=int, default=10)
     parser.add_argument("--skills-top-k", type=int, default=10)
     parser.add_argument("--posting-lookup-limit", type=int, default=100_000)
     parser.add_argument("--posting-lookup-recent-months", type=int, default=24)
@@ -970,7 +944,6 @@ def main() -> None:
     output_root = refresh_dashboard_data(
         source_root=args.source_root,
         output_root=args.output_root,
-        top_markets_per_province=args.top_markets_per_province,
         skills_top_k=args.skills_top_k,
         posting_lookup_limit=args.posting_lookup_limit,
         posting_lookup_recent_months=args.posting_lookup_recent_months,

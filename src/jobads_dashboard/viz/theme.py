@@ -1,14 +1,14 @@
 """House Plotly theme + shared chart chrome.
 
-One registered template pair (light/dark) and a small set of helpers encode the
-plan's design language so every figure inherits beauty and honesty for free:
+One registered template and a small set of helpers encode the plan's design
+language so every figure inherits beauty and honesty for free:
 
 - one warm ACLMR brand accent, reserved for the focal series / brand;
 - a restrained, distinguishable categorical colorway for everything else;
 - a brand diverging scale pinned at a neutral midpoint (LQ=1, YoY=0);
 - consistent gridlines, fonts, margins, ``hovermode='x unified'``;
 - reusable regime shading (COVID, provisional/under-audit) and reference lines;
-- coverage-aware rendering (split provisional tail, opacity by sample size).
+- a split-provisional helper for rendering the under-audit tail as a dotted line.
 
 Import side effects are avoided: call :func:`register_templates` once at app or
 script start-up. Figure factories call it defensively, so it is idempotent.
@@ -32,7 +32,6 @@ BRAND_DEEP = "#a85c1f"
 
 #: Neutral "context" ink used for de-emphasised series and gridlines.
 CONTEXT = "#9aa7b0"
-INK = "#132330"
 MUTED = "#5d6b74"
 
 #: Categorical colorway for multi-series charts (brand-harmonised, distinguishable).
@@ -87,7 +86,7 @@ _UNSTABLE_FILL = "rgba(123,107,141,0.08)"
 
 @dataclass(frozen=True)
 class ThemePalette:
-    """Light/dark surface colours consumed by the static review chrome."""
+    """Light surface colours consumed by the registered template."""
 
     name: str
     canvas: str
@@ -106,16 +105,6 @@ LIGHT = ThemePalette(
     muted="#5d6b74",
     grid="#ece3da",
     axis="#c8b3a2",
-)
-
-DARK = ThemePalette(
-    name="aclmr_dark",
-    canvas="#10171d",
-    surface="#161f27",
-    text="#eef2f4",
-    muted="#9fb0ba",
-    grid="#27333c",
-    axis="#3c4a54",
 )
 
 _FONT = "Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif"
@@ -175,17 +164,12 @@ _REGISTERED = False
 
 
 def register_templates(default: str = "aclmr_light") -> None:
-    """Register ``aclmr_light`` / ``aclmr_dark`` and set the default. Idempotent."""
+    """Register the ``aclmr_light`` template and set the default. Idempotent."""
     global _REGISTERED
     if not _REGISTERED:
         pio.templates["aclmr_light"] = _template(LIGHT)
-        pio.templates["aclmr_dark"] = _template(DARK)
         _REGISTERED = True
     pio.templates.default = default
-
-
-def palette(theme: str = "light") -> ThemePalette:
-    return DARK if str(theme).startswith("dark") else LIGHT
 
 
 # --------------------------------------------------------------------------- #
@@ -261,15 +245,3 @@ def split_provisional(
         bridge = solid.iloc[[-1]]
         prov = pd.concat([bridge, prov]).drop_duplicates(subset=[x])
     return solid, prov
-
-
-def coverage_opacity(n, target: float, floor: float = 0.25):
-    """Map a sample size to an opacity in [floor, 1] for coverage-aware rendering."""
-    import numpy as np
-
-    arr = np.asarray(n, dtype="float64")
-    return np.clip(arr / float(target), floor, 1.0)
-
-
-# Convenience: the demand-signal disclaimer used in footers everywhere.
-DEMAND_SIGNAL_NOTE = "Vicinity Jobs online job ads · a labour-demand signal, not employment"

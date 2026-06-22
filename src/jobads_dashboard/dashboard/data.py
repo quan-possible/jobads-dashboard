@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import json
-from json import JSONDecodeError
 from pathlib import Path
 
 import pandas as pd
@@ -25,7 +23,6 @@ REQUIRED_TABLES = (
     "monthly_requirements.parquet",
     "monthly_skills_topk.parquet",
     "coverage_by_field_monthly.parquet",
-    "geography_top_markets.parquet",
 )
 
 
@@ -40,25 +37,6 @@ class DashboardDataError(RuntimeError):
 
     def __str__(self) -> str:
         return self.summary
-
-
-def load_metadata(data_root: Path) -> dict:
-    metadata_path = data_root / "metadata.json"
-    if not metadata_path.exists():
-        raise DashboardDataError(
-            "Derived dashboard metadata is missing.",
-            data_root=data_root,
-            missing_files=("metadata.json",),
-        )
-    try:
-        with metadata_path.open("r", encoding="utf-8") as handle:
-            return json.load(handle)
-    except (JSONDecodeError, OSError, UnicodeDecodeError) as exc:
-        raise DashboardDataError(
-            "Derived dashboard metadata could not be read.",
-            data_root=data_root,
-            read_errors=(f"metadata.json: {exc}",),
-        ) from exc
 
 
 def load_tables(data_root: Path) -> dict[str, pd.DataFrame]:

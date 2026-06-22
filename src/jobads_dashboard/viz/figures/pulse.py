@@ -24,54 +24,6 @@ DOWN = "#b5523a"
 # --------------------------------------------------------------------------- CORE
 
 
-def kpi_row(ds: DataSource) -> go.Figure:
-    ov = ds.overall.copy()
-    ov["ma3"] = C.moving_average(ov["postings_total"], 3)
-    latest = ov.iloc[-1]
-    yoy = ov["postings_total"].pct_change(12).iloc[-1] * 100
-    last12 = ov["postings_total"].iloc[-12:].sum()
-    prev12 = ov["postings_total"].iloc[-24:-12].sum()
-    last12_yoy = (last12 / prev12 - 1) * 100 if prev12 else np.nan
-    wage_cov = latest["wage_postings"] / latest["postings_total"] * 100
-    spark = ov.iloc[-24:]
-
-    fig = make_subplots(
-        rows=2, cols=4, row_heights=[0.62, 0.38], vertical_spacing=0.04,
-        specs=[[{"type": "indicator"}] * 4, [{"type": "xy"}] * 4],
-    )
-    cards = [
-        ("Postings, latest month", latest["postings_total"], yoy, "%", spark["postings_total"]),
-        ("Trailing 12-month total", last12, last12_yoy, "%", ov["postings_total"].rolling(12).sum().iloc[-24:]),
-        ("Year-over-year growth", yoy, None, "%", ov["postings_total"].pct_change(12).iloc[-24:] * 100),
-        ("Wage-coverage, latest", wage_cov, None, "%", ov["wage_postings"].iloc[-24:] / ov["postings_total"].iloc[-24:] * 100),
-    ]
-    for i, (label, value, delta, _suf, series) in enumerate(cards, start=1):
-        num = dict(font=dict(size=30, color="#132330"))
-        if i == 3:
-            num["suffix"] = "%"
-            num["valueformat"] = ".1f"
-        elif i == 4:
-            num["suffix"] = "%"
-            num["valueformat"] = ".0f"
-        else:
-            num["valueformat"] = ",.0f"
-        ind = dict(mode="number", value=float(value), number=num,
-                   title=dict(text=label, font=dict(size=12, color=MUTED)))
-        if delta is not None and not np.isnan(delta):
-            ind["mode"] = "number+delta"
-            ind["delta"] = dict(reference=float(value) / (1 + delta / 100),
-                                relative=True, valueformat=".1%",
-                                increasing=dict(color=UP), decreasing=dict(color=DOWN))
-        fig.add_trace(go.Indicator(**ind), row=1, col=i)
-        fig.add_trace(go.Scatter(x=spark["month"], y=series.values, mode="lines",
-                                 line=dict(color=BRAND, width=2), hoverinfo="skip"),
-                      row=2, col=i)
-    fig.update_xaxes(visible=False, row=2)
-    fig.update_yaxes(visible=False, row=2)
-    fig.update_layout(showlegend=False, height=230, margin=dict(l=20, r=20, t=24, b=10))
-    return fig
-
-
 def demand_ribbon(ds: DataSource) -> go.Figure:
     ov = ds.overall.copy()
     ov["ma3"] = C.moving_average(ov["postings_total"], 3)

@@ -66,9 +66,6 @@ def write_minimal_bundle(tmp_path: Path, source_glob: str | None = None, source_
     pd.DataFrame({**shared_scope, "field_name": ["skills"], "populated_postings": [1]}).to_parquet(
         tmp_path / "coverage_by_field_monthly.parquet"
     )
-    pd.DataFrame({"province": ["ON"], "market": ["Toronto"], "market_label": ["ON | Toronto"], "postings_total": [3], "first_month": ["2025-07-01"], "last_month": ["2025-07-31"]}).to_parquet(
-        tmp_path / "geography_top_markets.parquet"
-    )
     metadata = {
         "headline_counts": {"postings_total": 3},
         "source_window": {"min_date": "2025-07-01", "max_date": "2025-07-01"},

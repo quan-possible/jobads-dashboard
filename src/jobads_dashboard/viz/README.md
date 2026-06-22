@@ -3,28 +3,17 @@
 A framework-agnostic implementation of the from-scratch visualization plan
 (`docs/jobs/.../dashboard-viz-from-scratch/plan.md`). Every chart is a pure
 `plotly.graph_objects.Figure` factory, so the same functions render in a static
-page, Streamlit, or Dash without modification. The static review page is one
-consumer; the live site is another.
+page, Streamlit, or Dash without modification. The live site renders them through
+the FastAPI figure bridge (`api/figures.py`).
 
 ## Layout
 
 | Module | Responsibility |
 |---|---|
-| `theme.py` | Registered `aclmr_light` / `aclmr_dark` Plotly templates; palette; chrome helpers (COVID / provisional / pre-2021 bands, reference lines, provisional-tail split, coverage-aware opacity). |
-| `compute.py` | Analytical transforms — YoY, index-to-100, contribution-to-growth, shift-share, location quotient, HHI / Lorenz / top-k, classical seasonal decomposition, robust-z anomalies, diffusion index. Pure functions, no Plotly. |
+| `theme.py` | Registered `aclmr_light` Plotly template; palette; chrome helpers (COVID / provisional / pre-2021 bands, reference lines, provisional-tail split). |
+| `compute.py` | Analytical transforms — YoY, index-to-100, contribution-to-growth, shift-share, diffusion index. Pure functions, no Plotly. |
 | `datasource.py` | `DataSource` — typed, cached accessors over the derived parquet bundle (reuses `dashboard.data.load_tables`). Never scans the raw corpus. |
 | `figures/` | One module per topic surface (`pulse`, `geography`, `occupations`, `industries`, `pay`, `skills`, `quality`). Each function takes a `DataSource` and returns a `Figure`. |
-| `review.py` | Demo consumer: assembles every figure into one Core→Deep static HTML page. |
-
-## Render the review page
-
-```bash
-python -m jobads_dashboard.viz.review --out tmp/review/index.html
-# open tmp/review/index.html in any browser (loads Plotly from CDN)
-```
-
-Optional `--data-root <path>` points at a different derived bundle (defaults to
-`data/derived/labor_market_dashboard_v1`).
 
 ## Use a figure in the live app
 
@@ -41,7 +30,7 @@ fig = pulse.demand_ribbon(ds)      # plain go.Figure
 ```
 
 `theme.register_templates()` is called automatically by the figure modules; call
-it once at app start to set the default template (`aclmr_light` or `aclmr_dark`).
+it once at app start to set the default `aclmr_light` template.
 
 ## Honesty rules baked in
 

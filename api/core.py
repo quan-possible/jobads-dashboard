@@ -108,7 +108,6 @@ TABLES = {
     "conditions": "monthly_conditions",
     "language": "monthly_language",
     "requirements": "monthly_requirements",
-    "geography_markets": "geography_top_markets",
     "by_market": "monthly_by_market",
 }
 

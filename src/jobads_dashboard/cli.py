@@ -51,7 +51,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     refresh = subparsers.add_parser("refresh", help="Build local aggregate tables from upstream processed parquet.")
     refresh.add_argument("--source-root", type=Path, default=DEFAULT_SOURCE_ROOT)
     refresh.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
-    refresh.add_argument("--top-markets-per-province", type=int, default=10)
     refresh.add_argument("--skills-top-k", type=int, default=10)
     refresh.add_argument("--posting-lookup-limit", type=int, default=100_000)
     refresh.add_argument("--posting-lookup-recent-months", type=int, default=24)
@@ -78,7 +77,6 @@ def main() -> None:
         refresh_dashboard_data(
             source_root=args.source_root,
             output_root=args.output_root,
-            top_markets_per_province=args.top_markets_per_province,
             skills_top_k=args.skills_top_k,
             posting_lookup_limit=args.posting_lookup_limit,
             posting_lookup_recent_months=args.posting_lookup_recent_months,
