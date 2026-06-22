@@ -70,6 +70,56 @@ export const geographyDict = {
     // ApiDown card
     apiDownTitle: "Data service unavailable",
     apiDownBody: "The API isn't responding. Start it with",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Going deeper",
+    deepLede: "Specialisation, structure and momentum for readers who want the regional detail beneath the headline map.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      shareChoropleth: {
+        eyebrow: "By province",
+        title: "Share of national demand by province",
+        note: "Normalised fill (share of postings) — never raw counts on a choropleth.",
+        aria: "Choropleth map of each province’s share of national postings",
+      },
+      rankedProvinces: {
+        eyebrow: "Ranked · volume",
+        title: "Ranked: provinces by posting volume",
+        note: "The list carries the precise ranking the map cannot.",
+        aria: "Horizontal bar chart ranking provinces by posting volume over the last 12 months",
+      },
+      lqChoropleth: {
+        eyebrow: "Specialisation",
+        title: "Specialisation: location quotient by province",
+        note: "LQ = local share ÷ national share. Above 1 (orange) = relatively specialised; 1 = on par with Canada.",
+        aria: "Choropleth map of the location quotient by province for one occupation group",
+      },
+      lqHeatmap: {
+        eyebrow: "Occupation × province",
+        title: "What each province is known for: LQ wall",
+        note: "Specialisation versus Canada — orange = over-represented, teal = under-represented (above 1 = specialised).",
+        aria: "Heatmap of the location quotient for each occupation group across provinces",
+      },
+      shiftShare: {
+        eyebrow: "Structure vs local",
+        title: "Why provinces grew or shrank: shift-share",
+        note: "Accounting identity (not causation): national trend + occupation mix + local shift = actual change.",
+        aria: "Stacked bar chart decomposing each province’s change into national, mix and local components",
+      },
+      yoyChoropleth: {
+        eyebrow: "Momentum",
+        title: "Year-over-year change by province (provisional)",
+        note: "Diverging fill pinned at 0 — orange rising, teal cooling. The latest month is provisional.",
+        aria: "Choropleth map of year-over-year percentage change in postings by province",
+      },
+      provinceTiles: {
+        eyebrow: "Tile grid",
+        title: "Every province equally legible: tile grid",
+        note: "Equal-area cells (last 12 months) — the North reads as clearly as Ontario.",
+        aria: "Tile grid of provinces with each cell shaded by posting volume",
+      },
+    },
   },
   fr: {
     // Hero section
@@ -140,5 +190,55 @@ export const geographyDict = {
     apiDownTitle: "Service de données indisponible",
     apiDownBody:
       "L'API ne répond pas. Démarrez-la avec",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Pour aller plus loin",
+    deepLede: "Spécialisation, structure et dynamique pour qui veut le détail régional sous la carte principale.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      shareChoropleth: {
+        eyebrow: "Par province",
+        title: "Part de la demande nationale par province",
+        note: "Remplissage normalisé (part des offres) — jamais de nombres bruts sur une carte choroplèthe.",
+        aria: "Carte choroplèthe de la part de chaque province dans les offres nationales",
+      },
+      rankedProvinces: {
+        eyebrow: "Classement · volume",
+        title: "Classement : provinces par volume d'offres",
+        note: "La liste porte le classement précis que la carte ne peut rendre.",
+        aria: "Diagramme à barres horizontales classant les provinces par volume d'offres sur les 12 derniers mois",
+      },
+      lqChoropleth: {
+        eyebrow: "Spécialisation",
+        title: "Spécialisation : quotient de localisation par province",
+        note: "QL = part locale ÷ part nationale. Au-dessus de 1 (orange) = relativement spécialisée ; 1 = au niveau du Canada.",
+        aria: "Carte choroplèthe du quotient de localisation par province pour un groupe professionnel",
+      },
+      lqHeatmap: {
+        eyebrow: "Profession × province",
+        title: "Ce qui caractérise chaque province : mur de QL",
+        note: "Spécialisation par rapport au Canada — orange = surreprésenté, sarcelle = sous-représenté (au-dessus de 1 = spécialisé).",
+        aria: "Carte de chaleur du quotient de localisation par groupe professionnel entre les provinces",
+      },
+      shiftShare: {
+        eyebrow: "Structure vs local",
+        title: "Pourquoi les provinces ont crû ou reculé : analyse structurelle-résiduelle",
+        note: "Identité comptable (non causale) : tendance nationale + composition professionnelle + écart local = variation réelle.",
+        aria: "Diagramme à barres empilées décomposant la variation de chaque province en composantes nationale, de composition et locale",
+      },
+      yoyChoropleth: {
+        eyebrow: "Dynamique",
+        title: "Variation sur un an par province (provisoire)",
+        note: "Remplissage divergent fixé à 0 — orange en hausse, sarcelle en repli. Le dernier mois est provisoire.",
+        aria: "Carte choroplèthe de la variation en pourcentage des offres sur un an par province",
+      },
+      provinceTiles: {
+        eyebrow: "Grille de tuiles",
+        title: "Chaque province aussi lisible : grille de tuiles",
+        note: "Cellules de surface égale (12 derniers mois) — le Nord se lit aussi clairement que l'Ontario.",
+        aria: "Grille de tuiles des provinces, chaque cellule teintée selon le volume d'offres",
+      },
+    },
   },
 } as const;

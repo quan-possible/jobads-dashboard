@@ -54,6 +54,33 @@ export const skillsDict = {
     // ShareBars aria-label / empty
     shareBarsLabel: "Category share breakdown",
     shareBarsEmpty: "No data for this selection.",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Going deeper",
+    deepLede:
+      "How requirements break down for readers who want the detail behind the headline skills.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      skillLift: {
+        eyebrow: "Distinctive skills · lift",
+        title: "Distinctive skills for a specialised group",
+        note: "Skills most over-represented vs the whole market (codes are taxonomy IDs; no public label table in v1).",
+        aria: "Horizontal bars of skills ranked by lift over the national share",
+      },
+      education: {
+        eyebrow: "Requirements · education",
+        title: "Education requirements over time",
+        note: "Share of postings by stated education requirement.",
+        aria: "Stacked area of posting share by stated education requirement over time",
+      },
+      experience: {
+        eyebrow: "Requirements · experience",
+        title: "Experience bands over time",
+        note: "Share of postings by advertised years-of-experience band.",
+        aria: "Stacked area of posting share by advertised years-of-experience band over time",
+      },
+    },
   },
 
   fr: {
@@ -106,6 +133,33 @@ export const skillsDict = {
     // ShareBars aria-label / empty
     shareBarsLabel: "Répartition par catégorie",
     shareBarsEmpty: "Aucune donnée pour cette sélection.",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Pour aller plus loin",
+    deepLede:
+      "Le détail des exigences pour qui veut le sous-jacent derrière les compétences principales.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      skillLift: {
+        eyebrow: "Compétences distinctives · indice",
+        title: "Compétences distinctives d’un groupe spécialisé",
+        note: "Compétences les plus surreprésentées par rapport à l’ensemble du marché (les codes sont des identifiants de taxonomie; pas de table d’étiquettes publique en v1).",
+        aria: "Barres horizontales des compétences classées par indice de spécificité vs la part nationale",
+      },
+      education: {
+        eyebrow: "Exigences · scolarité",
+        title: "Exigences de scolarité au fil du temps",
+        note: "Part des offres par exigence de scolarité indiquée.",
+        aria: "Aires empilées de la part des offres par exigence de scolarité indiquée dans le temps",
+      },
+      experience: {
+        eyebrow: "Exigences · expérience",
+        title: "Bandes d’expérience au fil du temps",
+        note: "Part des offres par bande d’années d’expérience annoncée.",
+        aria: "Aires empilées de la part des offres par bande d’années d’expérience annoncée dans le temps",
+      },
+    },
   },
 };
 

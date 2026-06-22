@@ -49,6 +49,45 @@ export const wagesDict = {
     apiDownTitle: "Data service unavailable",
     apiDownBody:
       "The API isn't responding. Start it with",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Going deeper",
+    deepLede:
+      "Provincial spread, the pay-versus-demand quadrant, and posting conditions for readers who want the texture behind the headline pay.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      wageBand: {
+        eyebrow: "Advertised hourly pay over time",
+        title: "Advertised hourly wage: median and P25–P75 band",
+        note: "Wages are advertised, not paid · dotted line = share of postings carrying a wage (right axis).",
+        aria: "Median advertised hourly wage with a 25th-to-75th percentile band and a wage-coverage line",
+      },
+      wageDumbbell: {
+        eyebrow: "Advertised pay spread · by province",
+        title: "Advertised wage spread by province",
+        note: "Bar = P25→P75 range, dot = median · provinces with at least 200 wage-bearing postings.",
+        aria: "Dumbbell chart of advertised hourly wage spread by province, P25 to P75 with the median marked",
+      },
+      wageDemandQuadrant: {
+        eyebrow: "Pay vs demand · by occupation",
+        title: "Pay vs momentum: the wage × demand quadrant",
+        note: "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation).",
+        aria: "Quadrant scatter of occupations by advertised median wage and year-over-year demand growth, bubble size by volume",
+      },
+      conditionsMix: {
+        eyebrow: "Posting conditions over time",
+        title: "Employment-type mix over time",
+        note: "Share of postings by advertised employment type.",
+        aria: "Stacked area of the advertised employment-type mix over time",
+      },
+      languageGap: {
+        eyebrow: "Language requirements over time",
+        title: "Language requirements: English vs French (mandatory)",
+        note: "Share of postings flagging a mandatory language · unstable before 2021 (shaded).",
+        aria: "Lines of the share of postings flagging a mandatory English or French requirement over time",
+      },
+    },
   },
   fr: {
     // Hero
@@ -95,9 +134,48 @@ export const wagesDict = {
     apiDownTitle: "Service de données indisponible",
     apiDownBody:
       "L'API ne répond pas. Démarrez-la avec",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Pour aller plus loin",
+    deepLede:
+      "L'écart entre provinces, le quadrant salaire-demande et les conditions des offres, pour qui veut la texture derrière la rémunération principale.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      wageBand: {
+        eyebrow: "Salaire horaire affiché au fil du temps",
+        title: "Salaire horaire affiché : médiane et bande P25–P75",
+        note: "Les salaires sont affichés, non versés · ligne pointillée = part des offres indiquant un salaire (axe de droite).",
+        aria: "Salaire horaire médian affiché avec une bande du 25e au 75e centile et une ligne de couverture salariale",
+      },
+      wageDumbbell: {
+        eyebrow: "Écart de salaire affiché · par province",
+        title: "Écart de salaire affiché par province",
+        note: "Barre = fourchette P25→P75, point = médiane · provinces avec au moins 200 offres porteuses d'un salaire.",
+        aria: "Graphique en haltère de l'écart de salaire horaire affiché par province, du P25 au P75 avec la médiane indiquée",
+      },
+      wageDemandQuadrant: {
+        eyebrow: "Salaire vs demande · par profession",
+        title: "Salaire vs élan : le quadrant salaire × demande",
+        note: "Aire des bulles ∝ volume · en haut à droite = bien payé et en hausse (corrélation, non causalité).",
+        aria: "Nuage en quadrant des professions selon le salaire médian affiché et la croissance de la demande sur un an, taille des bulles selon le volume",
+      },
+      conditionsMix: {
+        eyebrow: "Conditions des offres au fil du temps",
+        title: "Composition des types d'emploi au fil du temps",
+        note: "Part des offres par type d'emploi affiché.",
+        aria: "Aires empilées de la composition des types d'emploi affichés au fil du temps",
+      },
+      languageGap: {
+        eyebrow: "Exigences linguistiques au fil du temps",
+        title: "Exigences linguistiques : anglais vs français (obligatoire)",
+        note: "Part des offres signalant une langue obligatoire · instable avant 2021 (zone ombrée).",
+        aria: "Courbes de la part des offres signalant une exigence obligatoire d'anglais ou de français au fil du temps",
+      },
+    },
   },
 } as const;
 
-// Widened type so both "en" and "fr" variants satisfy the same interface
-// (avoids TS2719 when an indexed `as const` locale value is passed as a prop or used inline).
-export type WagesDictEntry = { [K in keyof (typeof wagesDict)["en"]]: string };
+// Locale entry type — indexed off the dict itself so nested objects (charts)
+// stay typed. Mirrors how the Pulse page consumes its dict.
+export type WagesDictEntry = (typeof wagesDict)[keyof typeof wagesDict];
