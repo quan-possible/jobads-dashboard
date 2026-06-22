@@ -43,60 +43,6 @@ const ENDPOINTS: Endpoint[] = [
     purpose: "High-level snapshot of posting demand for the active scope: current level, YoY change, and context.",
     params: SCOPE_PARAMS,
   },
-  {
-    method: "GET",
-    path: "/api/series/postings",
-    purpose: "Monthly time series of posting demand.",
-    params: [
-      { name: "metric", type: '"index" | "level" | "yoy"', desc: 'Demand index (Jan 2019 = 100), raw posting count, or year-over-year % change. Required.' },
-      ...SCOPE_PARAMS,
-    ],
-  },
-  {
-    method: "GET",
-    path: "/api/rank/{dim}",
-    purpose: "Ranked list of occupations or industries by posting volume or YoY growth.",
-    params: [
-      { name: "dim",   type: '"occupations" | "industries"', desc: "Dimension to rank (path param). Required." },
-      { name: "limit", type: "integer",                      desc: "Number of rows to return. Default: 10." },
-      { name: "order", type: '"value" | "yoy"',              desc: 'Sort by posting volume or year-over-year change. Default: "value".' },
-      ...SCOPE_PARAMS,
-    ],
-  },
-  {
-    method: "GET",
-    path: "/api/geography",
-    purpose: "Posting intensity by province using the chosen geographic measure.",
-    params: [
-      { name: "measure", type: '"per10k" | "lq" | "count"', desc: "Postings per 10k labour-force, location quotient, or raw count. Required." },
-      ...SCOPE_PARAMS,
-    ],
-  },
-  {
-    method: "GET",
-    path: "/api/wages",
-    purpose: "Posted wage percentiles (p25 / median / p75) broken down by the chosen dimension.",
-    params: [
-      { name: "dim", type: '"occupation" | "province" | "overall"', desc: "Breakdown dimension. Required." },
-      ...SCOPE_PARAMS,
-    ],
-  },
-  {
-    method: "GET",
-    path: "/api/skills",
-    purpose: "Top or distinctive skills mentioned in postings within the active scope.",
-    params: [
-      { name: "mode",  type: '"top" | "distinctive"', desc: 'Most frequent skills ("top") or skills with high lift vs. Canada ("distinctive"). Required.' },
-      { name: "limit", type: "integer",               desc: "Number of skills to return. Default: 20." },
-      ...SCOPE_PARAMS,
-    ],
-  },
-  {
-    method: "GET",
-    path: "/api/requirements",
-    purpose: "Share of postings specifying remote/hybrid work, education, or experience requirements.",
-    params: SCOPE_PARAMS,
-  },
 ];
 
 // ── Sub-components ────────────────────────────────────────────────────────────

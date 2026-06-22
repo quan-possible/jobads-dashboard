@@ -1,24 +1,9 @@
 // Typed client for the ACLMR API. Used from server components (default) and,
-// where interactivity needs it, from client components.
+// where interactivity needs it, from client components. The dashboard renders
+// its charts through the figure bridge (`api.figure`); `meta` and `overview`
+// are the only typed-JSON aggregates the UI still reads directly.
 
-import type {
-  Filters,
-  GeographyResponse,
-  Meta,
-  OverviewResponse,
-  RequirementsResponse,
-  SeriesPoint,
-  SkillsResponse,
-  WagesResponse,
-  WageTrendResponse,
-  CompositionResponse,
-  ConcentrationResponse,
-  MatrixResponse,
-  CoverageTrendResponse,
-  GeoTrendResponse,
-  RankItem,
-  FigJSON,
-} from "./types";
+import type { Filters, Meta, OverviewResponse, FigJSON } from "./types";
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8530";
@@ -47,27 +32,6 @@ async function get<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   meta: () => get<Meta>(`/api/meta`),
   overview: (f?: Filters) => get<OverviewResponse>(`/api/overview${qs(f)}`),
-  series: (f?: Filters, metric: string = "index") =>
-    get<SeriesPoint[]>(`/api/series/postings${qs(f, { metric })}`),
-  rank: (dim: "occupations" | "industries", f?: Filters, opts: { limit?: number; order?: string } = {}) =>
-    get<RankItem[]>(`/api/rank/${dim}${qs(f, { limit: opts.limit, order: opts.order })}`),
-  geography: (f?: Filters, measure: string = "per10k") =>
-    get<GeographyResponse>(`/api/geography${qs(f, { measure })}`),
-  wages: (f?: Filters, dim: string = "occupation") =>
-    get<WagesResponse>(`/api/wages${qs(f, { dim })}`),
-  wageTrend: (f?: Filters) => get<WageTrendResponse>(`/api/wages/trend${qs(f)}`),
-  composition: (dim: "occupations" | "industries", f?: Filters) =>
-    get<CompositionResponse>(`/api/composition/${dim}${qs(f)}`),
-  concentration: (dim: "occupations" | "industries", f?: Filters) =>
-    get<ConcentrationResponse>(`/api/concentration/${dim}${qs(f)}`),
-  matrixOccProvince: (f?: Filters, measure: string = "lq") =>
-    get<MatrixResponse>(`/api/matrix/occ-province${qs(f, { measure })}`),
-  coverageTrend: (f?: Filters, field: string = "naics") =>
-    get<CoverageTrendResponse>(`/api/coverage/trend${qs(f, { field })}`),
-  geographyTrend: (f?: Filters) => get<GeoTrendResponse>(`/api/geography/trend${qs(f)}`),
-  skills: (f?: Filters, opts: { mode?: string; limit?: number } = {}) =>
-    get<SkillsResponse>(`/api/skills${qs(f, { mode: opts.mode, limit: opts.limit })}`),
-  requirements: (f?: Filters) => get<RequirementsResponse>(`/api/requirements${qs(f)}`),
   // Figure bridge: a redesign2 Plotly factory rendered to figure JSON.
   figure: (id: string, locale: string) =>
     get<FigJSON>(`/api/figure/${id}${qs({}, { locale })}`),
