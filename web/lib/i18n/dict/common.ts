@@ -18,6 +18,7 @@ export const common = {
     apiDownTitle: "This view couldn’t load",
     apiDownBody: "The data service may be unavailable. Confirm the API is running on port 8530, then try again.",
     somethingWrong: "Something went wrong",
+    chartUnavailable: "This chart is temporarily unavailable.",
   },
   fr: {
     csv: "CSV",
@@ -38,5 +39,6 @@ export const common = {
     apiDownTitle: "Impossible de charger cette vue",
     apiDownBody: "Le service de données est peut-être indisponible. Vérifiez que l’API tourne sur le port 8530, puis réessayez.",
     somethingWrong: "Une erreur est survenue",
+    chartUnavailable: "Ce graphique est momentanément indisponible.",
   },
 } as const;

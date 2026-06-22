@@ -91,7 +91,7 @@ export default async function MethodPage() {
             <span className="num font-bold text-navy">{fmtInt(meta.postings_total)}</span>{" "}
             {t.coveragePostingsSpanning}{" "}
             <span className="num font-bold text-navy">
-              {fmtMonth(meta.source_window.min_date)} – {fmtMonth(meta.source_window.max_date)}
+              {fmtMonth(meta.source_window.min_date, locale)} – {fmtMonth(meta.source_window.max_date, locale)}
             </span>
             .
           </p>
@@ -142,9 +142,9 @@ export default async function MethodPage() {
         <Figure eyebrow={t.versionEyebrow} title={t.versionTitle}>
           <p className="text-[0.95rem] text-ink-soft">
             <span className="num font-bold text-navy">v1</span> ·{" "}
-            {fmtMonth(meta.latest_month)} — {t.versionRelease}{" "}
-            {fmtMonth(meta.latest_month)}; {t.versionGenerated}{" "}
-            {fmtMonth(meta.generated_at_utc.slice(0, 7))}.
+            {fmtMonth(meta.latest_month, locale)} — {t.versionRelease}{" "}
+            {fmtMonth(meta.latest_month, locale)}; {t.versionGenerated}{" "}
+            {fmtMonth(meta.generated_at_utc.slice(0, 7), locale)}.
           </p>
         </Figure>
       </section>

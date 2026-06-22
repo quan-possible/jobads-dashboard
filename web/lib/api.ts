@@ -71,4 +71,8 @@ export const api = {
   // Figure bridge: a redesign2 Plotly factory rendered to figure JSON.
   figure: (id: string, locale: string) =>
     get<FigJSON>(`/api/figure/${id}${qs({}, { locale })}`),
+  // Resilient variant: a single failed figure resolves to null so one bad chart
+  // degrades to a per-figure fallback instead of throwing the whole route (S23).
+  figureSafe: (id: string, locale: string): Promise<FigJSON | null> =>
+    get<FigJSON>(`/api/figure/${id}${qs({}, { locale })}`).catch(() => null),
 };

@@ -254,6 +254,11 @@ class RequirementsResponse(BaseModel):
     scope: Scope
     as_of: str
     n: int
+    national_fallback: bool = Field(
+        default=False,
+        description="True if any dimension had no rows at the requested scope and "
+        "national figures were substituted. The echoed `scope` is the requested one.",
+    )
     remote: list[CategoryShare]
     employment_type: list[CategoryShare]
     education: list[CategoryShare]

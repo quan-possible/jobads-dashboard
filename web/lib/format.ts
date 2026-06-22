@@ -1,7 +1,11 @@
 // Display formatting helpers. Keep numbers honest and scannable.
 
+import type { Locale } from "./i18n/locale";
+
 const NF = new Intl.NumberFormat("en-CA");
 const NF1 = new Intl.NumberFormat("en-CA", { maximumFractionDigits: 1 });
+
+const intlLocale = (locale: Locale): string => (locale === "fr" ? "fr-CA" : "en-CA");
 
 export function fmtInt(n: number | null | undefined): string {
   if (n === null || n === undefined) return "—";
@@ -27,9 +31,16 @@ export function fmtShare(n: number | null | undefined): string {
   return `${NF1.format(n * 100)}%`;
 }
 
-export function fmtWage(n: number | null | undefined): string {
+export function fmtWage(n: number | null | undefined, locale: Locale = "en"): string {
   if (n === null || n === undefined) return "—";
-  return `$${NF1.format(n)}`;
+  // Locale-correct currency: "$25.50" (en) vs "25,50 $" (fr). The symbol comes
+  // from the formatter, so callers must not add their own "$" (S17).
+  return new Intl.NumberFormat(intlLocale(locale), {
+    style: "currency",
+    currency: "CAD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(n);
 }
 
 export function fmtIndex(n: number | null | undefined): string {
@@ -37,17 +48,23 @@ export function fmtIndex(n: number | null | undefined): string {
   return NF.format(Math.round(n));
 }
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-export function fmtMonth(iso: string | null | undefined): string {
+export function fmtMonth(iso: string | null | undefined, locale: Locale = "en"): string {
   if (!iso) return "—";
   const [y, m] = iso.split("-").map(Number);
-  return `${MONTHS[(m ?? 1) - 1]} ${y}`;
+  if (!y || !m) return "—";
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(y, m - 1, 1)));
 }
 
-export function fmtMonthShort(iso: string): string {
+export function fmtMonthShort(iso: string, locale: Locale = "en"): string {
   const [y, m] = iso.split("-").map(Number);
-  return `${MONTHS[(m ?? 1) - 1]} ’${String(y).slice(2)}`;
+  const mon = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", timeZone: "UTC" }).format(
+    new Date(Date.UTC(y, (m ?? 1) - 1, 1)),
+  );
+  return `${mon} ’${String(y).slice(2)}`;
 }
 
 /** Direction sign: positive = growth (teal), negative = cooling (warm red). */

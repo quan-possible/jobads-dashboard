@@ -41,10 +41,10 @@ export default async function IndustriesPage() {
   try {
     const [meta, coverageLine, treemap, shareOverTime, contributionBars] = await Promise.all([
       api.meta(),
-      api.figure("industries.coverage_line", locale),
-      api.figure("industries.treemap", locale),
-      api.figure("industries.share_over_time", locale),
-      api.figure("industries.contribution_bars", locale),
+      api.figureSafe("industries.coverage_line", locale),
+      api.figureSafe("industries.treemap", locale),
+      api.figureSafe("industries.share_over_time", locale),
+      api.figureSafe("industries.contribution_bars", locale),
     ]);
     asOf = meta.latest_month;
     figs = { coverageLine, treemap, shareOverTime, contributionBars };
@@ -58,7 +58,7 @@ export default async function IndustriesPage() {
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            {t.eyebrow} · {fmtMonth(asOf)}
+            {t.eyebrow} · {fmtMonth(asOf, locale)}
           </div>
           <h1 className="h-display max-w-4xl text-balance">{t.hero}.</h1>
           <p className="lede mt-4 max-w-2xl">{t.lede}</p>

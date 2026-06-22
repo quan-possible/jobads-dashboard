@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toCSV, downloadCSV } from "@/lib/csv";
 
 interface ColSpec {
@@ -41,6 +41,13 @@ type State = "idle" | "loading" | "error";
 
 export function DownloadCSV({ endpoint, filename, columns, pick, label = "↓ CSV" }: Props) {
   const [state, setState] = useState<State>("idle");
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear the pending error-reset timer on unmount (no state update after
+  // unmount) — S29.
+  useEffect(() => () => {
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+  }, []);
 
   async function handleClick() {
     if (state === "loading") return;
@@ -57,7 +64,7 @@ export function DownloadCSV({ endpoint, filename, columns, pick, label = "↓ CS
       console.error("[DownloadCSV] fetch failed", err);
       setState("error");
       // Reset to idle after a short delay so the user can retry.
-      setTimeout(() => setState("idle"), 1800);
+      resetTimer.current = setTimeout(() => setState("idle"), 1800);
     }
   }
 

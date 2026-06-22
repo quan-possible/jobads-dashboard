@@ -10,6 +10,7 @@ export function KpiTile({
   context,
   delta,
   deltaLabel,
+  valueTrend,
   spark,
   sparkColor,
   accent = false,
@@ -20,12 +21,18 @@ export function KpiTile({
   context?: string;
   delta?: number | null;
   deltaLabel?: string;
+  /** When set, the headline value itself is a trend metric: it gets the same
+   *  ▲/▼ + pos/neg colour treatment as the delta chip, so all four tiles share
+   *  one trend grammar (U03). */
+  valueTrend?: number | null;
   spark?: number[];
   sparkColor?: string;
   accent?: boolean;
 }) {
   const hasDelta = delta !== null && delta !== undefined;
   const up = (delta ?? 0) >= 0;
+  const hasValueTrend = valueTrend !== null && valueTrend !== undefined;
+  const valueUp = (valueTrend ?? 0) >= 0;
   return (
     <div
       className={[
@@ -39,10 +46,22 @@ export function KpiTile({
         {context && <span className="text-[0.68rem] text-ink-faint">{context}</span>}
       </div>
       <div className="flex items-end gap-1.5">
-        <span className="num text-[2.05rem] font-bold leading-none text-navy-deep">{value}</span>
+        {hasValueTrend && (
+          <span aria-hidden className={`text-[1.5rem] leading-none ${valueUp ? "text-pos" : "text-neg"}`}>
+            {valueUp ? "▲" : "▼"}
+          </span>
+        )}
+        <span
+          className={[
+            "num text-[2.05rem] font-bold leading-none",
+            hasValueTrend ? (valueUp ? "text-pos" : "text-neg") : "text-navy-deep",
+          ].join(" ")}
+        >
+          {value}
+        </span>
         {unit && <span className="mb-0.5 text-[0.85rem] font-bold text-ink-soft">{unit}</span>}
       </div>
-      <div className="mt-auto flex items-end gap-2">
+      <div className="mt-auto flex flex-col items-stretch gap-2 sm:flex-row sm:items-end">
         {hasDelta ? (
           <span
             className={[

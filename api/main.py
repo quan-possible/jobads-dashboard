@@ -16,6 +16,11 @@ app = FastAPI(
     title="ACLMR Labour Market API",
     version="0.1.0",
     description="Typed JSON over the local job-ads aggregates. Reads only derived parquet — never the upstream corpus at request time.",
+    # Serve docs + schema under /api/* so they reach the public surface: in the
+    # container only /api/* is proxied to this internal-only FastAPI process.
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
 )
 
 _origins = os.environ.get(

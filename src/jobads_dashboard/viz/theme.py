@@ -118,7 +118,10 @@ DARK = ThemePalette(
     axis="#3c4a54",
 )
 
-_FONT = "Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif"
+# Match the web app's font (web/app/globals.css --font-sans). The PT Sans face
+# is self-hosted by next/font under the --font-pt-sans CSS variable, so charts
+# render in the same type as their cards instead of Plotly's Inter/system fallback.
+_FONT = "var(--font-pt-sans), ui-sans-serif, system-ui, sans-serif"
 
 
 def _template(p: ThemePalette) -> go.layout.Template:

@@ -90,12 +90,12 @@ def resolve_scope(
     start: str | None,
     end: str | None,
 ) -> Scope:
-    end_m = core.month_floor(end) if end else core.latest_month()
-    if end_m > core.latest_month():
+    # Malformed start/end params degrade to the default window, not a 500.
+    end_m = core.safe_month_floor(end) if end else None
+    if end_m is None or end_m > core.latest_month():
         end_m = core.latest_month()
-    if start:
-        start_m = core.month_floor(start)
-    else:
+    start_m = core.safe_month_floor(start) if start else None
+    if start_m is None:
         # Default window: trailing 12 months (used for windowed context).
         y, m = end_m.year, end_m.month - 11
         while m <= 0:
@@ -380,7 +380,11 @@ def _kpis(scope: Scope, series: list[SeriesPoint]) -> tuple[Kpis, date]:
     as_of = core.month_floor(series[-1].month)
     last = series[-1]
     prev = series[-2] if len(series) >= 2 else None
-    yoy_ref = series[-13] if len(series) >= 13 else None
+    # Year-over-year matches the same calendar month a year ago by date, not by
+    # position: sparse scopes have month gaps where series[-13] lands on the
+    # wrong month (or years off), making the "YoY" label silently wrong.
+    yoy_month = _iso(date(as_of.year - 1, as_of.month, 1))
+    yoy_ref = next((p for p in series if p.month == yoy_month), None)
 
     # Wage at this scope/month.
     where, params = _scope_where(scope)
@@ -896,7 +900,10 @@ _LANGUAGE_MAP = {
 }
 
 
-def _long_shares(table: str, dimension: str, scope: Scope, as_of: date, label_map: dict | None = None) -> tuple[list[CategoryShare], int]:
+def _long_shares(table: str, dimension: str, scope: Scope, as_of: date, label_map: dict | None = None) -> tuple[list[CategoryShare], int, bool]:
+    """Return (shares, total, national_fallback). ``national_fallback`` is True
+    when the requested (non-national) scope had no rows and national figures were
+    substituted, so callers can flag the substitution to the user."""
     where, params = _scope_where(scope)
     df = core.query_df(
         f"""SELECT category, SUM(postings_total) AS count
@@ -905,8 +912,10 @@ def _long_shares(table: str, dimension: str, scope: Scope, as_of: date, label_ma
             GROUP BY category""",
         params + [as_of, dimension],
     )
-    if df.empty:
-        # Fall back to national if the exact scope has no rows.
+    fell_back = False
+    is_national = scope.geo == core.ALL_GEO and scope.occ == core.ALL_OCC and scope.ind == core.ALL_IND
+    if df.empty and not is_national:
+        # Fall back to national if the exact (narrower) scope has no rows.
         nat = Scope(geo=core.ALL_GEO, occ=core.ALL_OCC, ind=core.ALL_IND, start=scope.start, end=scope.end)
         nwhere, nparams = _scope_where(nat)
         df = core.query_df(
@@ -916,8 +925,9 @@ def _long_shares(table: str, dimension: str, scope: Scope, as_of: date, label_ma
                 GROUP BY category""",
             nparams + [as_of, dimension],
         )
+        fell_back = not df.empty
     if df.empty:
-        return [], 0
+        return [], 0, fell_back
     # Normalize categories via map (collapsing aliases).
     if label_map:
         df["label"] = df["category"].map(lambda c: label_map.get(c, c))
@@ -930,15 +940,16 @@ def _long_shares(table: str, dimension: str, scope: Scope, as_of: date, label_ma
         CategoryShare(category=str(r["category"]), label=str(r["label"]), count=int(r["count"]), share=round(r["count"] / total, 4) if total else 0.0)
         for _, r in df.iterrows()
     ]
-    return out, int(total)
+    return out, int(total), fell_back
 
 
 def requirements(scope: Scope) -> RequirementsResponse:
     as_of = core.month_floor(scope.end)
-    employment, n_emp = _long_shares("conditions", "Employment type", scope, as_of, _EMPLOYMENT_MAP)
-    education, _ = _long_shares("requirements", "Education", scope, as_of)
-    experience, _ = _long_shares("requirements", "Experience category", scope, as_of)
-    language, _ = _long_shares("language", "Primary posting language", scope, as_of, _LANGUAGE_MAP)
+    employment, n_emp, fb_emp = _long_shares("conditions", "Employment type", scope, as_of, _EMPLOYMENT_MAP)
+    education, _, fb_edu = _long_shares("requirements", "Education", scope, as_of)
+    experience, _, fb_exp = _long_shares("requirements", "Experience category", scope, as_of)
+    language, _, fb_lang = _long_shares("language", "Primary posting language", scope, as_of, _LANGUAGE_MAP)
+    national_fallback = any((fb_emp, fb_edu, fb_exp, fb_lang))
 
     # Remote: share of postings flagged remote/hybrid among those with a remote field.
     where, params = _scope_where(scope)
@@ -957,7 +968,7 @@ def requirements(scope: Scope) -> RequirementsResponse:
         ]
 
     return RequirementsResponse(
-        scope=scope, as_of=_iso(as_of), n=n_emp,
+        scope=scope, as_of=_iso(as_of), n=n_emp, national_fallback=national_fallback,
         remote=remote, employment_type=employment, education=education,
         experience=experience, language=language,
     )

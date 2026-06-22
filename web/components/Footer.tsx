@@ -21,7 +21,7 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
         </div>
 
         <nav aria-label={t.footer.sections} className="flex flex-col gap-2">
-          <span className="eyebrow text-orange-soft">{t.footer.dashboard}</span>
+          <span className="eyebrow text-orange-soft!">{t.footer.dashboard}</span>
           {NAV.map((item) => (
             <Link key={item.href} href={item.href} className="w-fit text-[0.9rem] text-ink-invert/80 transition-colors hover:text-orange-soft">
               {t.nav[item.key]}
@@ -33,7 +33,7 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
         </nav>
 
         <div className="flex flex-col gap-3 text-[0.82rem] text-ink-invert/65">
-          <span className="eyebrow text-orange-soft">{t.footer.aboutData}</span>
+          <span className="eyebrow text-orange-soft!">{t.footer.aboutData}</span>
           <p>{source ?? t.footer.sourceDefault}</p>
           {asOf && (
             <p className="num">

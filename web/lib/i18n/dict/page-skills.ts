@@ -8,7 +8,7 @@ export const skillsDict = {
   en: {
     // Hero section
     heroEyebrowPrefix: "Skills & requirements",
-    heroTitle: "What employers are asking for",
+    heroTitle: "What employers are asking for.",
     heroLede:
       "Skills and requirements drawn from job postings that explicitly list them. Coverage varies — education and remote-work fields are sparsely reported, so those figures reflect only the postings that include them.",
 
@@ -104,7 +104,7 @@ export const skillsDict = {
   fr: {
     // Hero section
     heroEyebrowPrefix: "Compétences et exigences",
-    heroTitle: "Ce que les employeurs demandent",
+    heroTitle: "Ce que les employeurs demandent.",
     heroLede:
       "Compétences et exigences tirées des offres d’emploi qui les mentionnent explicitement. La couverture varie — les champs liés à la scolarité et au télétravail sont peu renseignés; ces chiffres ne reflètent donc que les offres qui les incluent.",
 

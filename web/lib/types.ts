@@ -194,6 +194,9 @@ export interface RequirementsResponse {
   scope: Scope;
   as_of: string;
   n: number;
+  /** True if any dimension had no rows at the requested scope and national
+   *  figures were substituted (the echoed `scope` is still the requested one). */
+  national_fallback: boolean;
   remote: CategoryShare[];
   employment_type: CategoryShare[];
   education: CategoryShare[];

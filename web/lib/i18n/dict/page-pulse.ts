@@ -8,6 +8,11 @@ export const pulseDict = {
     // Hero
     eyebrowPrefix: "Labour Market Pulse",
     lede: "A monthly read on posted hiring demand across Canada’s regions, occupations and industries. Job ads measure posted demand — not employment or vacancies.",
+    // Headline composed from the demand index ({pct} = |gap|, {dir} = above/below).
+    heroFallback: "Canada’s posting demand",
+    heroTemplate: "Canada’s posting demand is {pct}% {dir} its 2019 baseline",
+    heroAbove: "above",
+    heroBelow: "below",
 
     // KPI tile labels
     kpiDemandLabel: "Demand index",
@@ -113,6 +118,10 @@ export const pulseDict = {
     // Hero
     eyebrowPrefix: "Pouls du marché du travail",
     lede: "Un bilan mensuel de la demande d’emploi affichée dans les régions, professions et industries au Canada. Les offres mesurent la demande affichée — non l’emploi ni les postes vacants.",
+    heroFallback: "La demande d’offres au Canada",
+    heroTemplate: "La demande d’offres au Canada est {pct} % {dir} son niveau de référence de 2019",
+    heroAbove: "au-dessus de",
+    heroBelow: "en dessous de",
 
     // KPI tile labels
     kpiDemandLabel: "Indice de demande",
@@ -124,7 +133,7 @@ export const pulseDict = {
     kpiYoyLabel: "Vs l’an dernier",
     kpiYoyContext: "d’une année à l’autre",
     kpiWageLabel: "Salaire médian",
-    kpiWageUnit: " $/h",
+    kpiWageUnit: "/h",
     kpiWageInsufficient: "échantillon insuffisant",
 
     // Demand chart Figure

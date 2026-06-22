@@ -145,6 +145,7 @@ def composition_area(ds: DataSource, top: int = 6) -> go.Figure:
             hovertemplate="%{x|%b %Y} · " + b + ": %{y:.1f}%<extra></extra>"))
     fig.update_yaxes(title_text="share of postings", ticksuffix="%", range=[0, 100])
     add_covid_band(fig, label=False)
+    add_provisional_band(fig, label=False)
     return titled(fig, "How the occupational mix shifts over time",
                   "Share of monthly postings by broad occupation group (top groups + Other)")
 

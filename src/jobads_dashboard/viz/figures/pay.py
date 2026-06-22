@@ -34,7 +34,8 @@ def wage_band(ds: DataSource) -> go.Figure:
     w["coverage"] = w["wage_postings"] / w["postings_total"] * 100
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(go.Scatter(x=w["month"], y=w["wage_p75"], mode="lines", name="P75",
-                             line=dict(width=0), showlegend=False, hoverinfo="skip"),
+                             line=dict(width=0), showlegend=False,
+                             hovertemplate="%{x|%b %Y} · P75: %{y:$,.0f}<extra></extra>"),
                   secondary_y=False)
     fig.add_trace(go.Scatter(x=w["month"], y=w["wage_p25"], mode="lines", name="P25–P75",
                              line=dict(width=0), fill="tonexty",

@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
 from ..labels import noc_short
-from ..theme import BRAND, CONTEXT, SEQUENTIAL, add_covid_band, add_reference_line
+from ..theme import BRAND, CONTEXT, SEQUENTIAL, add_covid_band, add_provisional_band, add_reference_line
 from ._common import titled
 
 from ..theme import COLORWAY
@@ -41,6 +41,7 @@ def top_skills_trend(ds: DataSource, top: int = 8) -> go.Figure:
             hovertemplate="%{x|%b %Y} · " + name + ": %{y:.0f}<extra></extra>"))
     add_reference_line(fig, 100, text=f"{BASE_YEAR}=100")
     add_covid_band(fig)
+    add_provisional_band(fig)
     fig.update_yaxes(title_text=f"index ({BASE_YEAR} = 100)")
     return titled(fig, "The most-demanded skills, and how each has trended",
                   "Top skills by posting volume, each indexed to its 2019 average · fastest/slowest movers highlighted")
@@ -63,6 +64,7 @@ def ai_skill_diffusion(ds: DataSource) -> go.Figure:
         line=dict(color=BRAND, width=2.8),
         hovertemplate="%{x|%b %Y}: %{y:.2f}%<extra>3-mo avg</extra>"))
     add_covid_band(fig)
+    add_provisional_band(fig)
     fig.update_yaxes(title_text="% of all skill mentions", ticksuffix="%", rangemode="tozero")
     fig.update_layout(showlegend=False)
     return titled(fig, "The rise of AI skills in hiring demand",

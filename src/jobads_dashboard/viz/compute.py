@@ -40,8 +40,11 @@ def index_to_base(df: pd.DataFrame, value: str, base_year: int, by: str | None =
 
     def _idx(g: pd.DataFrame) -> pd.Series:
         base = g.loc[g[x].dt.year == base_year, value].mean()
-        if not base or np.isnan(base):
-            base = g[value].iloc[0]
+        # A genuine base of 0 (or no base-year rows → NaN) can't anchor an index.
+        # Return NaN (a gap) rather than silently rescaling against the first
+        # observation, which would fabricate a misleading index.
+        if base is None or np.isnan(base) or base == 0:
+            return pd.Series(np.nan, index=g.index)
         return g[value] / base * 100.0
 
     if by:
@@ -190,9 +193,17 @@ def classical_decompose(series: pd.Series, period: int = 12) -> pd.DataFrame:
     "classical seasonal decomposition", not X-13/STL. Index must be the time axis.
     """
     s = series.astype("float64")
-    # centred moving average for even period
-    trend = s.rolling(period, center=True, min_periods=period).mean()
-    trend = trend.rolling(2, center=True, min_periods=1).mean() if period % 2 == 0 else trend
+    # Centred moving average. For an even period the canonical 2×period MA is a
+    # (period+1)-term symmetric weighted mean with half-weights at the ends,
+    # centred exactly on the period — this avoids the half-month shift that a
+    # plain even-window rolling().mean() introduces.
+    if period % 2 == 0:
+        weights = np.r_[0.5, np.ones(period - 1), 0.5] / period
+        trend = s.rolling(period + 1, center=True, min_periods=period + 1).apply(
+            lambda w: float(np.dot(w, weights)), raw=True
+        )
+    else:
+        trend = s.rolling(period, center=True, min_periods=period).mean()
     detr = s - trend
     seasonal_means = detr.groupby(detr.index.month if hasattr(detr.index, "month") else
                                   (np.arange(len(detr)) % period)).transform("mean")

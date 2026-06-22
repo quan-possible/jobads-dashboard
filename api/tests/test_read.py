@@ -637,3 +637,68 @@ def test_invalid_enum_returns_422(client: TestClient, path: str, params: dict) -
     assert r.status_code == 422, (
         f"Expected 422 for {path} params={params}, got {r.status_code}"
     )
+
+
+@pytest.mark.parametrize("param", ["start", "end"])
+@pytest.mark.parametrize("bad", ["garbage", "2026-13", "2026", "not-a-date", "2026-99-99"])
+def test_malformed_date_param_degrades_gracefully(client: TestClient, param: str, bad: str) -> None:
+    """A malformed start/end must fall back to the default window, never 500 (S04)."""
+    r = client.get("/api/overview", params={param: bad})
+    assert r.status_code == 200, (
+        f"Expected 200 (graceful default) for {param}={bad!r}, got {r.status_code}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 12. National fallback is surfaced, not silent (S02)
+# ---------------------------------------------------------------------------
+
+
+def test_long_shares_flags_national_fallback(monkeypatch) -> None:
+    """A non-national scope with no rows substitutes national data AND reports it."""
+    import pandas as pd
+    from datetime import date as _date
+
+    from api import core, queries
+    from api.models import Scope
+
+    calls = {"n": 0}
+    populated = pd.DataFrame({"category": ["Bachelor"], "count": [42]})
+
+    def fake_query_df(sql, params=None):  # noqa: ANN001
+        calls["n"] += 1
+        # First (scoped) query empty; the national requery has rows.
+        return pd.DataFrame({"category": [], "count": []}) if calls["n"] == 1 else populated
+
+    monkeypatch.setattr(core, "query_df", fake_query_df)
+    scope = Scope(geo="ON", occ="3 | Health occupations", ind="All industries", start="2026-01", end="2026-06")
+    shares, total, fell_back = queries._long_shares("requirements", "Education", scope, _date(2026, 6, 1))
+    assert fell_back is True
+    assert total == 42 and calls["n"] == 2  # scoped query + national requery
+
+
+def test_long_shares_no_fallback_when_already_national(monkeypatch) -> None:
+    """A national scope never re-queries (and never flags a fallback)."""
+    import pandas as pd
+    from datetime import date as _date
+
+    from api import core, queries
+    from api.models import Scope
+
+    calls = {"n": 0}
+
+    def fake_query_df(sql, params=None):  # noqa: ANN001
+        calls["n"] += 1
+        return pd.DataFrame({"category": [], "count": []})
+
+    monkeypatch.setattr(core, "query_df", fake_query_df)
+    scope = Scope(geo=core.ALL_GEO, occ=core.ALL_OCC, ind=core.ALL_IND, start="2026-01", end="2026-06")
+    shares, total, fell_back = queries._long_shares("requirements", "Education", scope, _date(2026, 6, 1))
+    assert fell_back is False and total == 0 and calls["n"] == 1
+
+
+def test_requirements_national_scope_no_fallback(client: TestClient) -> None:
+    """The default national requirements response is never a fallback (real data)."""
+    r = client.get("/api/requirements")
+    assert r.status_code == 200
+    assert r.json()["national_fallback"] is False

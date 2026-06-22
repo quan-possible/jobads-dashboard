@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchPosting } from "@/lib/explore";
 import { fmtMonth, fmtWage } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/provider";
+import type { Locale } from "@/lib/i18n/locale";
 import type { PostingDetail } from "@/lib/types";
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
@@ -16,11 +17,11 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function wageLine(d: PostingDetail): string | null {
-  if (d.wage_hourly != null) return `${fmtWage(d.wage_hourly)}/hr`;
+function wageLine(d: PostingDetail, locale: Locale, perHour: string): string | null {
+  if (d.wage_hourly != null) return `${fmtWage(d.wage_hourly, locale)}${perHour}`;
   if (d.wage_min != null || d.wage_max != null) {
-    const lo = d.wage_min != null ? fmtWage(d.wage_min) : "—";
-    const hi = d.wage_max != null ? fmtWage(d.wage_max) : "—";
+    const lo = d.wage_min != null ? fmtWage(d.wage_min, locale) : "—";
+    const hi = d.wage_max != null ? fmtWage(d.wage_max, locale) : "—";
     const unit = d.wage_unit ? ` ${d.wage_unit}` : "";
     return `${lo} – ${hi}${unit}`;
   }
@@ -28,10 +29,17 @@ function wageLine(d: PostingDetail): string | null {
 }
 
 export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () => void }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [detail, setDetail] = useState<PostingDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  // Keep the latest onClose without re-running the focus/scroll-lock effect on
+  // every parent render (S37).
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!id) return;
@@ -48,48 +56,94 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
     };
   }, [id]);
 
+  // Modal behaviour: lock scroll, move focus into the dialog, trap Tab, and
+  // restore focus to the trigger on close (S30). Depends only on `id` (S37).
   useEffect(() => {
     if (!id) return;
+    const panel = panelRef.current;
+    const prevFocused = document.activeElement as HTMLElement | null;
+
+    const focusables = (): HTMLElement[] =>
+      panel
+        ? Array.from(
+            panel.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter((el) => el.offsetParent !== null)
+        : [];
+
+    // Move focus into the dialog (the close button, marked data-autofocus).
+    (panel?.querySelector<HTMLElement>("[data-autofocus]") ?? panel)?.focus();
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== "Tab" || !panel) return;
+      const items = focusables();
+      if (items.length === 0) {
+        e.preventDefault();
+        panel.focus();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !panel.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
+
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      prevFocused?.focus?.();
     };
-  }, [id, onClose]);
+  }, [id]);
 
   if (!id) return null;
 
-  const wage = detail ? wageLine(detail) : null;
+  const wage = detail ? wageLine(detail, locale, t.explore.perHour) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label={t.explore.drawerPosting}>
+    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
       <button
         type="button"
         aria-label={t.common.close}
+        tabIndex={-1}
         onClick={onClose}
         className="absolute inset-0 bg-navy-deep/40 backdrop-blur-[1px]"
       />
-      <aside className="relative flex h-full w-full max-w-[560px] flex-col border-l border-card-border bg-surface shadow-pop animate-[drawerIn_220ms_ease-out]" style={{ boxShadow: "var(--shadow-pop)" }}>
+      <aside
+        ref={panelRef}
+        tabIndex={-1}
+        className="relative flex h-full w-full max-w-[560px] flex-col border-l border-card-border bg-surface shadow-pop outline-none animate-[drawerIn_220ms_ease-out]"
+        style={{ boxShadow: "var(--shadow-pop)" }}
+      >
         {/* gradient seam */}
         <span aria-hidden className="absolute inset-y-0 left-0 w-[3px]" style={{ background: "var(--gradient)" }} />
 
         <div className="flex items-start justify-between gap-4 border-b border-card-border px-6 py-4">
           <div className="min-w-0">
             <div className="eyebrow mb-1">{t.explore.drawerPosting}</div>
-            <h2 className="text-[1.08rem] font-bold leading-snug text-navy-deep">
+            <h2 id="drawer-title" className="text-[1.08rem] font-bold leading-snug text-navy-deep">
               {detail?.job_title ?? (loading ? t.common.loading : t.explore.drawerPosting)}
             </h2>
             {detail?.employer && <p className="mt-0.5 text-[0.85rem] text-ink-soft">{detail.employer}</p>}
           </div>
           <button
             type="button"
+            data-autofocus
             onClick={onClose}
             aria-label={t.common.close}
-            className="control shrink-0 border border-card-border px-2.5 py-1.5 text-[0.9rem] font-bold leading-none text-ink-soft transition-colors hover:border-orange hover:text-orange"
+            className="control shrink-0 border border-card-border px-2.5 py-1.5 text-[0.9rem] font-bold leading-none text-ink-soft transition-colors hover:border-orange hover:text-orange focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
           >
             ✕
           </button>
@@ -127,8 +181,8 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
               </div>
 
               <dl className="grid grid-cols-2 gap-x-5 gap-y-4">
-                <Field label={t.explore.fPosted} value={detail.date_found ? fmtMonth(detail.date_found) : null} />
-                <Field label={t.explore.fRefMonth} value={fmtMonth(detail.month)} />
+                <Field label={t.explore.fPosted} value={detail.date_found ? fmtMonth(detail.date_found, locale) : null} />
+                <Field label={t.explore.fRefMonth} value={fmtMonth(detail.month, locale)} />
                 <Field label={t.explore.fWage} value={wage} />
                 <Field label={t.explore.fEmployment} value={detail.employment_type} />
                 <Field label={t.explore.fDuration} value={detail.duration} />

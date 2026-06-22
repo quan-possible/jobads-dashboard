@@ -12,7 +12,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
       <span className="flex flex-col leading-none">
         <span className="text-[1.05rem] font-bold uppercase tracking-[0.01em] text-navy-deep">ACLMR</span>
         {!compact && (
-          <span className="text-[0.62rem] font-bold uppercase tracking-[0.03em] text-ink-soft">{t.nav.brandTagline}</span>
+          <span className="text-[0.7rem] font-bold uppercase tracking-[0.04em] text-ink-soft">{t.nav.brandTagline}</span>
         )}
       </span>
     </Link>
