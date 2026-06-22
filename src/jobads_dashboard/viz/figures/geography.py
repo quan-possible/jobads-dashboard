@@ -1,4 +1,10 @@
-"""Geography - where demand is, and what each region is known for."""
+"""Geography - where demand is, and how heavy it is relative to each region.
+
+One authoritative province choropleth with a measure toggle (count / share /
+per-capita / demand intensity), a ranked list, year-over-year momentum, a
+city/CMA view, and a shift-share decomposition. Location quotient lives on as a
+*measure* of the main map (demand vs labour-force share), not its own panel.
+"""
 
 from __future__ import annotations
 
@@ -7,9 +13,8 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from .. import compute as C
-from ..datasource import BASE_YEAR, PROVINCE_CENTROID, PROVINCE_NAMES, DataSource
-from ..labels import NOC_SHORT, noc_short
-from ..theme import BRAND, CONTEXT, DIVERGING, MUTED, SEQUENTIAL
+from ..datasource import BASE_YEAR, PROVINCE_NAMES, DataSource
+from ..theme import BRAND, CONTEXT, DIVERGING, SEQUENTIAL
 from ._common import add_time_slider, titled
 
 
@@ -32,23 +37,75 @@ def _stable_window() -> tuple[pd.Timestamp, pd.Timestamp]:
 # --------------------------------------------------------------------------- CORE
 
 
-def bubble_map(ds: DataSource) -> go.Figure:
-    prov = _last12(ds.province).groupby(["province_scope", "province_name"], as_index=False)["postings_total"].sum()
-    prov["lon"] = prov["province_scope"].map(lambda c: PROVINCE_CENTROID.get(c, (None, None))[0])
-    prov["lat"] = prov["province_scope"].map(lambda c: PROVINCE_CENTROID.get(c, (None, None))[1])
-    prov = prov.dropna(subset=["lon", "lat"])
-    fig = go.Figure(go.Scattergeo(
-        lon=prov["lon"], lat=prov["lat"], text=prov["province_name"],
-        marker=dict(size=prov["postings_total"], sizemode="area",
-                    sizeref=2.0 * prov["postings_total"].max() / (55 ** 2), sizemin=4,
-                    color=BRAND, opacity=0.8, line=dict(width=0.6, color="white")),
-        customdata=prov[["postings_total"]],
-        hovertemplate="%{text}: %{customdata[0]:,.0f} postings (12 mo)<extra></extra>"))
-    fig.update_geos(scope="north america", fitbounds="locations", visible=False,
-                    showland=True, landcolor="#f1ece6", showcountries=True, countrycolor="#dcd3c9")
+#: One authoritative map, four measures. Each entry: colorbar title, hover suffix,
+#: a value formatter, the colour language, and the editorial frame.
+_MEASURES = {
+    "count": dict(cb="postings", scale=SEQUENTIAL, div=False, fmt=",.0f", suf="",
+                  head="Where the demand is: postings by province",
+                  sub="Raw posting count by year — big provinces dominate; switch to per-capita to compare intensity"),
+    "share": dict(cb="% of national", scale=SEQUENTIAL, div=False, fmt=".1f", suf="%",
+                  head="Share of national demand by province",
+                  sub="Each province's share of all postings that year (normalised — the honest default for a choropleth)"),
+    "percap": dict(cb="postings / 10k LF", scale=SEQUENTIAL, div=False, fmt=",.0f", suf="",
+                   head="Demand intensity: postings per 10,000 in the labour force",
+                   sub="Posting count ÷ provincial labour force (StatCan LFS 2024) — controls for province size"),
+    "lq": dict(cb="demand LQ", scale=DIVERGING, div=True, fmt=".2f", suf="",
+               head="Demand relative to workforce size: a province location quotient",
+               sub="Posting share ÷ labour-force share · >1 (orange) = more job-ad demand than its workforce share, 1 = on par"),
+}
+
+
+def demand_map(ds: DataSource, measure: str = "share", animate: str | None = "by-year",
+               locale: str = "en") -> go.Figure:
+    """The authoritative province choropleth. ``measure`` selects what the fill
+    shows; the year slider scrubs through time. The frames omit the geojson (it
+    rides on the base trace) so the payload stays small."""
+    spec = _MEASURES.get(measure, _MEASURES["share"])
+    prov = ds.province.copy()
+    prov["year"] = prov["month"].dt.year
+    years = sorted(prov["year"].unique())
+    lf = ds.province_labour_force.set_index("code")["labour_force"]
+    lf_total = float(lf.sum())
+
+    def _z(year: int) -> pd.DataFrame:
+        g = (prov[prov["year"] == year].groupby("province_scope", as_index=False)["postings_total"].sum()
+             .rename(columns={"province_scope": "code"}))
+        tot = g["postings_total"].sum()
+        if measure == "count":
+            g["z"] = g["postings_total"]
+        elif measure == "percap":
+            g["z"] = g["postings_total"] / g["code"].map(lf) * 10000
+        elif measure == "lq":
+            g["z"] = (g["postings_total"] / tot) / (g["code"].map(lf) / lf_total)
+        else:  # share
+            g["z"] = g["postings_total"] / tot * 100
+        g["name"] = g["code"].map(PROVINCE_NAMES)
+        return g.dropna(subset=["z"])
+
+    def _trace(g: pd.DataFrame, *, with_geo: bool) -> go.Choropleth:
+        kw = dict(locations=g["code"], z=g["z"], featureidkey="properties.code",
+                  colorscale=spec["scale"], marker_line_color="white", marker_line_width=0.6,
+                  colorbar=dict(title=spec["cb"], ticksuffix=spec["suf"]), text=g["name"],
+                  hovertemplate="%{text}: %{z:" + spec["fmt"] + "}" + spec["suf"] + "<extra></extra>")
+        if spec["div"]:
+            kw.update(zmid=1.0, zmin=0, zmax=2)
+        if with_geo:
+            kw["geojson"] = ds.geojson
+        return go.Choropleth(**kw)
+
+    if animate == "by-year":
+        frames = [go.Frame(name=str(y), data=[_trace(_z(y), with_geo=False)]) for y in years]
+        fig = go.Figure(data=[_trace(_z(years[-1]), with_geo=True)], frames=frames)
+        fig.update_geos(fitbounds="locations", visible=False)
+        add_time_slider(fig, years, **_slider_chrome(locale))
+        fig.update_layout(height=480, margin=dict(l=10, r=10, t=10, b=44))
+        return titled(fig, spec["head"], spec["sub"])
+
+    g = _z(years[-1])
+    fig = go.Figure(_trace(g, with_geo=True))
+    fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(height=460, margin=dict(l=10, r=10, t=64, b=10))
-    return titled(fig, "Where the demand is: postings by province (last 12 months)",
-                  "Bubble area ∝ posting count · maps are weak at exact comparison — see the ranked list")
+    return titled(fig, spec["head"], spec["sub"])
 
 
 def ranked_provinces(ds: DataSource) -> go.Figure:
@@ -62,88 +119,32 @@ def ranked_provinces(ds: DataSource) -> go.Figure:
     fig.update_xaxes(title_text="postings (last 12 months)")
     fig.update_layout(height=420)
     return titled(fig, "Ranked: provinces by posting volume",
-                  "The list carries the precise ranking the bubble map cannot")
+                  "The list carries the precise ranking the map cannot")
 
 
-def share_choropleth(ds: DataSource) -> go.Figure:
-    prov = _last12(ds.province).groupby("province_scope", as_index=False)["postings_total"].sum()
-    prov["share"] = prov["postings_total"] / prov["postings_total"].sum() * 100
-    prov["name"] = prov["province_scope"].map(PROVINCE_NAMES)
-    fig = go.Figure(go.Choropleth(
-        geojson=ds.geojson, locations=prov["province_scope"], z=prov["share"],
-        featureidkey="properties.code", colorscale=SEQUENTIAL,
-        marker_line_color="white", marker_line_width=0.6,
-        colorbar=dict(title="% of national", ticksuffix="%"),
-        text=prov["name"], hovertemplate="%{text}: %{z:.1f}% of national<extra></extra>"))
-    fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(height=460, margin=dict(l=10, r=10, t=64, b=10))
-    return titled(fig, "Share of national demand by province",
-                  "Normalised fill (share of postings) — never raw counts on a choropleth")
+def cma_demand(ds: DataSource, top: int = 18) -> go.Figure:
+    """City / CMA-level demand — finer than province. The largest metropolitan
+    labour markets by posting volume over the last 12 months."""
+    mk = _last12(ds.market).groupby("market_label", as_index=False)["postings_total"].sum()
+    mk = mk.sort_values("postings_total", ascending=False).head(top).sort_values("postings_total")
+    # province prefix ("ON | Toronto (CMA)") colours the bar; keep the city name on the tick
+    mk["prov"] = mk["market_label"].str.split("|").str[0].str.strip()
+    mk["city"] = mk["market_label"].str.split("|").str[1].str.strip()
+    palette = {p: c for p, c in zip(sorted(mk["prov"].unique()),
+                                    (SEQUENTIAL[1][1], BRAND, "#345961", "#7b6b8d", "#55754e",
+                                     "#a64d3f", "#6e8790", "#c39e80", "#041c2c"))}
+    fig = go.Figure(go.Bar(
+        x=mk["postings_total"], y=mk["city"], orientation="h",
+        marker_color=[palette.get(p, CONTEXT) for p in mk["prov"]],
+        customdata=mk["prov"],
+        hovertemplate="%{y} (%{customdata}): %{x:,.0f} postings (12 mo)<extra></extra>"))
+    fig.update_xaxes(title_text="postings (last 12 months)")
+    fig.update_layout(height=520, margin=dict(l=170))
+    return titled(fig, f"The biggest metropolitan labour markets (top {top} CMAs)",
+                  "City-level demand from the census-metropolitan-area cut — finer than the province totals above")
 
 
 # --------------------------------------------------------------------------- DEEP
-
-
-def lq_choropleth(ds: DataSource, noc_code: str | None = None) -> go.Figure:
-    window = _last12(ds.province_occupation)
-    lq = C.location_quotient(window, "province_scope", "noc_code", "postings_total")
-    lq = lq[[c for c in lq.columns if c in NOC_SHORT]]
-    if noc_code is None:
-        # default: the group with the widest specialisation spread across provinces
-        noc_code = lq.std().sort_values(ascending=False).index[0]
-    col = lq[noc_code]
-    df = pd.DataFrame({"code": col.index, "lq": col.values})
-    df["name"] = df["code"].map(PROVINCE_NAMES)
-    fig = go.Figure(go.Choropleth(
-        geojson=ds.geojson, locations=df["code"], z=df["lq"], featureidkey="properties.code",
-        colorscale=DIVERGING, zmid=1.0, zmin=0, zmax=2,
-        marker_line_color="white", marker_line_width=0.6,
-        colorbar=dict(title="LQ"), text=df["name"],
-        hovertemplate="%{text}: LQ %{z:.2f}<extra></extra>"))
-    fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(height=470, margin=dict(l=10, r=10, t=70, b=10))
-    return titled(fig, f"Specialisation: location quotient — {noc_short(noc_code)}",
-                  "LQ = local share ÷ national share. >1 (orange) = relatively specialised; 1 = on par with Canada")
-
-
-def lq_heatmap(ds: DataSource, animate: str | None = None, locale: str = "en") -> go.Figure:
-    full = ds.province_occupation
-    # Fix the province (x) and occupation (y) order once, from the recent window,
-    # so every frame shares the same grid and the cells stay comparable over time.
-    window = _last12(full)
-    base = C.location_quotient(window, "province_scope", "noc_code", "postings_total")
-    base = base[[c for c in base.columns if c in NOC_SHORT]]
-    order = window.groupby("province_scope")["postings_total"].sum().sort_values(ascending=False)
-    prov_order = [p for p in order.index if p in base.index]
-    noc_order = list(base.columns)
-    y = [noc_short(c) for c in noc_order]
-
-    def _z(df: pd.DataFrame):
-        lq = C.location_quotient(df, "province_scope", "noc_code", "postings_total")
-        return lq.reindex(index=prov_order, columns=noc_order).T.values  # rows=occ, cols=prov
-
-    def _heat(z):
-        return go.Heatmap(z=z, x=prov_order, y=y, colorscale=DIVERGING, zmid=1.0, zmin=0, zmax=2,
-                          colorbar=dict(title="LQ"), xgap=1, ygap=1,
-                          hovertemplate="%{y} in %{x}: LQ %{z:.2f}<extra></extra>")
-
-    if animate == "by-year":
-        f = full.copy()
-        f["year"] = f["month"].dt.year
-        years = sorted(f["year"].unique())
-        frames = [go.Frame(name=str(yr), data=[_heat(_z(f[f["year"] == yr]))]) for yr in years]
-        fig = go.Figure(data=[_heat(_z(f[f["year"] == years[-1]]))], frames=frames)
-        fig.update_xaxes(title_text="province (ordered by demand volume)", type="category")
-        add_time_slider(fig, years, **_slider_chrome(locale))
-        fig.update_layout(height=460, margin=dict(l=170, b=44))
-        return titled(fig, "What each province is known for: LQ wall (occupation × province)",
-                      "Specialisation vs Canada by year — orange over-represented, teal under (>1 = specialised). Drag or press play.")
-
-    fig = go.Figure(_heat(_z(window)))
-    fig.update_xaxes(title_text="province (ordered by demand volume)", type="category")
-    fig.update_layout(height=440, margin=dict(l=170))
-    return titled(fig, "What each province is known for: LQ wall (occupation × province)",
-                  "Specialisation vs Canada — orange = over-represented, teal = under-represented (>1 = specialised)")
 
 
 def shift_share_bars(ds: DataSource) -> go.Figure:
@@ -166,7 +167,7 @@ def shift_share_bars(ds: DataSource) -> go.Figure:
                       legend=dict(y=-0.26))
     fig.update_xaxes(title_text="change in postings, decomposed")
     return titled(fig, f"Why provinces grew or shrank: shift-share, {BASE_YEAR}→{end.year}",
-                  "Accounting identity (not causation): national trend + occupation mix + local shift = actual change")
+                  "Secondary cut. Accounting identity (not causation): national trend + occupation mix + local shift = actual change")
 
 
 def _yoy_by_month(prov: pd.DataFrame, month: pd.Timestamp) -> pd.DataFrame:
@@ -216,31 +217,23 @@ def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en
                   "Diverging fill pinned at 0 — orange growing, teal cooling. Latest month is provisional")
 
 
-# Hand-assigned tile grid (row, col) approximating Canada's layout.
-_TILE = {
-    "YT": (0, 0), "NT": (0, 1), "NU": (0, 2),
-    "BC": (1, 0), "AB": (1, 1), "SK": (1, 2), "MB": (1, 3), "ON": (1, 4), "QC": (1, 5), "NL": (1, 7),
-    "NB": (2, 5), "PE": (2, 6), "NS": (2, 7),
-}
-
-
-def province_tile_grid(ds: DataSource) -> go.Figure:
-    prov = _last12(ds.province).groupby("province_scope", as_index=False)["postings_total"].sum()
-    vals = prov.set_index("province_scope")["postings_total"]
-    nrows, ncols = 3, 8
-    z = np.full((nrows, ncols), np.nan)
-    text = np.full((nrows, ncols), "", dtype=object)
-    for code, (r, c) in _TILE.items():
-        if code in vals.index:
-            z[r, c] = vals[code]
-            text[r, c] = f"<b>{code}</b><br>{vals[code]:,.0f}"
-    fig = go.Figure(go.Heatmap(
-        z=z, colorscale=SEQUENTIAL, xgap=4, ygap=4, showscale=True,
-        colorbar=dict(title="postings"), hoverinfo="skip"))
-    fig.update_traces(text=text, texttemplate="%{text}",
-                      textfont=dict(size=11, color="#132330"))
-    fig.update_yaxes(autorange="reversed", showticklabels=False, showgrid=False)
-    fig.update_xaxes(showticklabels=False, showgrid=False)
-    fig.update_layout(height=300)
-    return titled(fig, "Every province equally legible: tile grid",
-                  "Equal-area cells (last 12 months) — the North reads as clearly as Ontario")
+def ai_exposure_map(ds: DataSource) -> go.Figure:
+    """Provincial AI exposure: each province's demand-weighted average of broad-NOC
+    task exposure (Eloundou β). Provinces whose demand leans to office/knowledge work
+    score higher; those leaning to trades/resources score lower."""
+    po = _last12(ds.province_occupation).copy()
+    ex = ds.ai_exposure.set_index("noc_code")["exposure_beta"]
+    po = po.assign(beta=po["noc_code"].map(ex)).dropna(subset=["beta"])
+    prov = po.groupby("province_scope").apply(
+        lambda d: np.average(d["beta"], weights=d["postings_total"]), include_groups=False)
+    df = pd.DataFrame({"code": prov.index, "z": prov.values})
+    df["name"] = df["code"].map(PROVINCE_NAMES)
+    fig = go.Figure(go.Choropleth(
+        geojson=ds.geojson, locations=df["code"], z=df["z"], featureidkey="properties.code",
+        colorscale=SEQUENTIAL, marker_line_color="white", marker_line_width=0.6,
+        colorbar=dict(title="mean AI exposure (β)"), text=df["name"],
+        hovertemplate="%{text}: mean exposure β %{z:.3f}<extra></extra>"))
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(height=460, margin=dict(l=10, r=10, t=64, b=10))
+    return titled(fig, "AI exposure of provincial demand",
+                  "Demand-weighted mean of broad-NOC task exposure (Eloundou β) · a potential-exposure signal, not realized automation")

@@ -114,6 +114,43 @@ def wage_demand_quadrant(ds: DataSource) -> go.Figure:
                   "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation)")
 
 
+_DEGREE_CATEGORIES = (
+    "Undergraduate Degree (Bachelors)",
+    "Graduate Degree - Masters",
+    "Post-Graduate Degree - Doctorate",
+)
+
+
+def education_wage_proxy(ds: DataSource) -> go.Figure:
+    """Do credential-heavy occupations pay more? A descriptive cross-section: the
+    share of an occupation group's postings that ask for a university degree vs its
+    median advertised wage. Postings-only proxy for the conditioned wage premium."""
+    ed = ds.requirements_by_occupation("Education")
+    ed = ed[ed["category"] != "Unknown"]
+    recent = ed[ed["month"] > ed["month"].max() - pd.DateOffset(months=12)]
+    by_noc = recent.groupby("noc_name").apply(
+        lambda d: pd.Series({
+            "degree_share": d.loc[d["category"].isin(_DEGREE_CATEGORIES), "postings_total"].sum()
+            / d["postings_total"].sum() * 100 if d["postings_total"].sum() else np.nan,
+            "vol": d["postings_total"].sum(),
+        }), include_groups=False)
+    w = ds.wage_by_noc
+    wm = w[w["month"] == _STABLE_END].dropna(subset=["wage_median"]).set_index("noc_name")["wage_median"]
+    df = by_noc.join(wm.rename("wage")).dropna()
+    df = df[~df.index.str.contains("Unknown")]
+    fig = go.Figure(go.Scatter(
+        x=df["degree_share"], y=df["wage"], mode="markers+text", text=list(df.index),
+        textposition="top center", textfont=dict(size=9, color=MUTED),
+        marker=dict(size=np.sqrt(df["vol"]) / np.sqrt(df["vol"]).max() * 44 + 8,
+                    color=BRAND, opacity=0.85, line=dict(width=1, color="white")),
+        hovertemplate="%{text}<br>%{x:.0f}% ask a degree · median %{y:$,.0f}<extra></extra>"))
+    fig.update_xaxes(title_text="share of postings asking for a university degree", ticksuffix="%")
+    fig.update_yaxes(title_text="median advertised wage", tickprefix="$")
+    fig.update_layout(height=460)
+    return titled(fig, "Do credential-heavy occupations pay more?",
+                  "Each broad occupation group: degree-requirement share vs median advertised wage · bubble ∝ volume (correlation, not causation)")
+
+
 def conditions_mix(ds: DataSource) -> go.Figure:
     c = ds.conditions("Employment type")
     tot = c.groupby("month")["postings_total"].transform("sum")

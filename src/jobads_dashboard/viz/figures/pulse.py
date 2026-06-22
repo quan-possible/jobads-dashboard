@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -150,90 +152,68 @@ def composition_area(ds: DataSource, top: int = 6) -> go.Figure:
 # --------------------------------------------------------------------------- DEEP
 
 
-def stl_panel(ds: DataSource) -> go.Figure:
-    s = ds.overall.set_index("month")["postings_total"]
-    dec = C.classical_decompose(s, period=12)
-    fig = make_subplots(rows=4, cols=1, shared_xaxes=True, vertical_spacing=0.045,
-                        subplot_titles=("Observed", "Trend", "Seasonal", "Remainder"))
-    panels = [("observed", CONTEXT), ("trend", BRAND), ("seasonal", "#345961"), ("resid", "#7b6b8d")]
-    for r, (col, color) in enumerate(panels, start=1):
-        fig.add_trace(go.Scatter(x=dec.index, y=dec[col], mode="lines",
-                                 line=dict(color=color, width=2), showlegend=False), row=r, col=1)
-        if col == "resid":
-            fig.add_hline(y=0, line=dict(color=MUTED, width=1, dash="dot"), row=r, col=1)
-    for r in range(1, 5):
-        add_covid_band(fig, label=(r == 1), row=r, col=1)
-    fig.update_layout(height=560)
-    for ann in fig.layout.annotations:
-        ann.font.size = 12
-    return titled(fig, "Decomposition: trend, season, and shock pulled apart",
-                  "Classical additive decomposition (dependency-free stand-in for STL); COVID lands in the remainder")
-
-
-def anomaly_flags(ds: DataSource) -> go.Figure:
-    s = ds.overall.set_index("month")["postings_total"]
-    dec = C.classical_decompose(s, period=12)
-    z = C.robust_z(dec["resid"].dropna())
-    flagged = z.abs() > 3
-    colors = np.where(flagged, BRAND, CONTEXT)
-    fig = go.Figure(go.Bar(x=z.index, y=z.values, marker_color=colors,
-                           hovertemplate="%{x|%b %Y}: z=%{y:.1f}<extra></extra>"))
-    for yy in (3, -3):
-        fig.add_hline(y=yy, line=dict(color=DOWN, width=1, dash="dash"))
-    add_reference_line(fig, 0)
-    fig.update_yaxes(title_text="robust z of remainder")
-    return titled(fig, "Surprises vs the seasonal expectation",
-                  "Robust z-score on the decomposition remainder; |z|>3 (orange) flags an anomaly")
-
-
-def sa_vs_nsa(ds: DataSource) -> go.Figure:
-    s = ds.overall.set_index("month")["postings_total"]
-    dec = C.classical_decompose(s, period=12)
-    sa = dec["observed"] - dec["seasonal"]
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=dec.index, y=dec["observed"], name="Not seasonally adjusted",
-                             mode="lines", line=dict(color=CONTEXT, width=1.5)))
-    fig.add_trace(go.Scatter(x=dec.index, y=sa, name="Seasonally adjusted (approx.)",
-                             mode="lines", line=dict(color=BRAND, width=2.5)))
-    add_covid_band(fig)
-    fig.update_yaxes(title_text="postings / month", rangemode="tozero")
-    return titled(fig, "Seasonally adjusted vs raw demand",
-                  "SA ≈ observed − seasonal (decomposition-based, approximate — not an official X-13 series)")
-
-
 def diffusion_index(ds: DataSource) -> go.Figure:
     wide = ds.noc_broad.pivot_table(index="month", columns="noc_label", values="postings_total")
     di = C.diffusion_index(wide).dropna()
+    di = C.moving_average(di, 3)  # smooth the jagged month-to-month step rendering
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=di.index, y=di.values, mode="lines",
-                             line=dict(color=BRAND, width=2.5),
+                             line=dict(color=BRAND, width=2.5, shape="spline", smoothing=0.5),
                              hovertemplate="%{x|%b %Y}: %{y:.0f}<extra></extra>"))
     fig.add_hrect(y0=50, y1=100, fillcolor="rgba(47,111,119,0.06)", line_width=0, layer="below")
     add_reference_line(fig, 50, text="balanced")
     add_covid_band(fig)
     fig.update_yaxes(title_text="% of groups growing (YoY)", range=[0, 100])
     return titled(fig, "Is growth broad or narrow? Diffusion across occupation groups",
-                  "Share of broad occupation groups with positive year-over-year demand; 50 = evenly split")
+                  "Share of broad occupation groups with positive year-over-year demand; 50 = evenly split (3-month smoothed)")
 
 
-def cycle_plot(ds: DataSource) -> go.Figure:
-    ov = ds.overall.copy()
-    ov["mo"] = ov["month"].dt.month
-    ov["year"] = ov["month"].dt.year
-    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    fig = make_subplots(rows=1, cols=12, shared_yaxes=True, horizontal_spacing=0.004,
-                        subplot_titles=months)
-    for m in range(1, 13):
-        sub = ov[ov["mo"] == m].sort_values("year")
-        fig.add_trace(go.Scatter(x=sub["year"], y=sub["postings_total"], mode="lines",
-                                 line=dict(color=CONTEXT, width=1.3), showlegend=False,
-                                 hovertemplate="%{x}: %{y:,.0f}<extra></extra>"), row=1, col=m)
-        fig.add_hline(y=sub["postings_total"].mean(), line=dict(color=BRAND, width=1.2),
-                      row=1, col=m)
-    fig.update_xaxes(showticklabels=False)
-    fig.update_yaxes(rangemode="tozero")
-    fig.update_layout(height=320)
+def occupation_trends_grid(ds: DataSource) -> go.Figure:
+    """A sparkline grid: one mini demand-trend per broad occupation group. A rich,
+    descriptive overview — see every group's whole-decade trajectory at a glance."""
+    nb = ds.noc_broad[~ds.noc_broad["noc_name"].str.contains("Unknown", na=False)]
+    groups = (nb.groupby("noc_name")["postings_total"].sum()
+              .sort_values(ascending=False).index.tolist())
+    cols = 5
+    rows = math.ceil(len(groups) / cols)
+    fig = make_subplots(rows=rows, cols=cols, subplot_titles=groups,
+                        vertical_spacing=0.16, horizontal_spacing=0.03)
+    for i, g in enumerate(groups):
+        r, c = divmod(i, cols)
+        s = nb[nb["noc_name"] == g].sort_values("month")
+        peak = s["postings_total"].max()
+        fig.add_trace(go.Scatter(
+            x=s["month"], y=s["postings_total"], mode="lines",
+            line=dict(color=BRAND, width=1.5), fill="tozeroy",
+            fillcolor="rgba(207,119,48,0.10)", showlegend=False,
+            hovertemplate="%{x|%b %Y}: %{y:,.0f}<extra>" + g + "</extra>"),
+            row=r + 1, col=c + 1)
+        fig.update_xaxes(visible=False, row=r + 1, col=c + 1)
+        fig.update_yaxes(visible=False, rangemode="tozero", range=[0, peak * 1.1],
+                         row=r + 1, col=c + 1)
+    fig.update_layout(height=110 * rows + 40, margin=dict(l=12, r=12, t=44, b=12))
     for ann in fig.layout.annotations:
-        ann.font.size = 10
-    return titled(fig, "Cycle plot: each month's trend across the years",
-                  "Within each panel the line runs 2016→2026; orange line = that month's mean")
+        ann.font.size = 11
+        ann.font.color = "#132330"
+    return titled(fig, "Every occupation group's demand trajectory at a glance",
+                  "Monthly postings 2016–2026, one panel per broad NOC group (each panel scaled to its own peak)")
+
+
+def momentum(ds: DataSource) -> go.Figure:
+    """Is demand accelerating or cooling? The gap between the fast (3-month) and slow
+    (12-month) moving averages — positive = speeding up, negative = slowing."""
+    o = ds.overall.copy()
+    s = o.set_index("month")["postings_total"]
+    fast = C.moving_average(s, 3)
+    slow = C.moving_average(s, 12)
+    mom = (fast - slow).dropna()
+    colors = np.where(mom.values >= 0, UP, DOWN)
+    fig = go.Figure(go.Bar(
+        x=mom.index, y=mom.values, marker_color=colors,
+        hovertemplate="%{x|%b %Y}: %{y:+,.0f}<extra></extra>"))
+    add_reference_line(fig, 0)
+    add_covid_band(fig)
+    add_provisional_band(fig)
+    fig.update_yaxes(title_text="3-month avg − 12-month avg (postings)")
+    return titled(fig, "Momentum: is demand speeding up or cooling?",
+                  "Gap between the 3-month and 12-month averages · orange = accelerating, teal = cooling")

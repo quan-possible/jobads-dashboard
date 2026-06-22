@@ -21,6 +21,8 @@ from .labels import NAICS_SHORT, NOC_SHORT
 # Repo-relative default: <repo>/data/derived/labor_market_dashboard_v1
 _DEFAULT_ROOT = Path(__file__).resolve().parents[3] / "data" / "derived" / "labor_market_dashboard_v1"
 _GEO_PATH = Path(__file__).resolve().parents[3] / "data" / "geo" / "canada_provinces.geojson"
+_REFERENCE = Path(__file__).resolve().parents[3] / "data" / "reference"
+_AI_PATH = Path(__file__).resolve().parents[3] / "data" / "ai" / "occupation_ai_exposure.parquet"
 
 #: Last clean pre-COVID year - the cross-series indexing baseline (plan default).
 BASE_YEAR = 2019
@@ -153,6 +155,21 @@ class DataSource:
         ]
         return sub.sort_values("month").reset_index(drop=True)
 
+    def requirements_by_occupation(self, dimension: str) -> pd.DataFrame:
+        """A requirement dimension (e.g. ``Education``) broken by broad occupation
+        group, national (province = industry = all). Carries parsed NOC labels."""
+        df = self._tables["monthly_requirements"]
+        sub = df[
+            (df["dimension"] == dimension)
+            & (df["province_scope"] == ALL_CANADA)
+            & (df["industry_scope"] == ALL_INDUSTRIES)
+            & (df["occupation_scope"] != ALL_OCCUPATIONS)
+        ].copy()
+        cl = _parse_code_label(sub["occupation_scope"])
+        sub["noc_code"] = cl["code"].values
+        sub["noc_name"] = pd.Series(sub["noc_code"].values).map(NOC_SHORT).fillna("Unknown").values
+        return sub.sort_values("month").reset_index(drop=True)
+
     def language(self, dimension: str) -> pd.DataFrame:
         df = self._tables["monthly_language"]
         sub = df[
@@ -185,7 +202,75 @@ class DataSource:
         df["lift"] = df["occ_share"] / df["nat_share"]
         df = df[df["occ_postings"] >= min_postings]
         df = df.sort_values("lift", ascending=False).head(top)
-        return df.reset_index().rename(columns={"index": "skill_code"})
+        df = df.reset_index().rename(columns={"index": "skill_code"})
+        df["skill_code"] = df["skill_code"].astype(str)
+        names = self.skill_labels.set_index("skill_code")["skill_name"]
+        df["skill_name"] = df["skill_code"].map(names).fillna(df["skill_code"])
+        return df
+
+    @functools.cached_property
+    def skill_labels(self) -> pd.DataFrame:
+        """``skill_code`` → human label (leaf) and taxonomy group, from the bundled
+        reference table. Turns the cryptic taxonomy IDs into readable skill names."""
+        df = pd.read_csv(_REFERENCE / "skills.csv", dtype={"code": str})
+        return df[["code", "leaf_label", "group_label", "sub_group_label"]].rename(
+            columns={"code": "skill_code", "leaf_label": "skill_name",
+                     "group_label": "skill_group", "sub_group_label": "skill_subgroup"})
+
+    def skills_national(self, top: int = 8) -> pd.DataFrame:
+        """National monthly postings per skill (summed across the occupation groups,
+        since the skills table has no 'All occupations' row), for the top-``top``
+        skills by total volume, labelled. One tidy row per (month, skill)."""
+        sk = self._tables["monthly_skills_topk"].copy()
+        sk["skill_code"] = sk["skill_code"].astype(str)
+        nat = sk.groupby(["month", "skill_code"], as_index=False)["postings_total"].sum()
+        totals = nat.groupby("skill_code")["postings_total"].sum().sort_values(ascending=False)
+        keep = list(totals.index[:top])
+        out = nat[nat["skill_code"].isin(keep)].copy()
+        names = self.skill_labels.set_index("skill_code")["skill_name"]
+        out["skill_name"] = out["skill_code"].map(names).fillna(out["skill_code"])
+        return out.sort_values("month").reset_index(drop=True)
+
+    def skill_churn(self, base_year: int = 2019, end_year: int = 2024,
+                    top: int = 12, min_base: int = 150) -> pd.DataFrame:
+        """Per-skill demand growth, ``base_year`` vs a recent *stable* year (2025+ is
+        provisional), national. Returns the top risers and top fallers, labelled, with
+        a ``direction`` flag — a descriptive 'what is entering vs leaving demand' view."""
+        sk = self._tables["monthly_skills_topk"].copy()
+        sk["skill_code"] = sk["skill_code"].astype(str)
+        sk["year"] = sk["month"].dt.year
+        base = sk[sk["year"] == base_year].groupby("skill_code")["postings_total"].sum()
+        end = sk[sk["year"] == end_year].groupby("skill_code")["postings_total"].sum()
+        df = pd.DataFrame({"base": base, "end": end}).fillna(0.0)
+        df = df[df["base"] >= min_base]
+        df["growth_pct"] = (df["end"] / df["base"] - 1) * 100.0
+        names = self.skill_labels.set_index("skill_code")["skill_name"]
+        df = df.reset_index().rename(columns={"index": "skill_code"})
+        df["skill_name"] = df["skill_code"].map(names).fillna(df["skill_code"])
+        risers = df.sort_values("growth_pct", ascending=False).head(top).assign(direction="rising")
+        fallers = df.sort_values("growth_pct").head(top).assign(direction="falling")
+        out = pd.concat([fallers, risers]).drop_duplicates("skill_code")
+        return out.sort_values("growth_pct").reset_index(drop=True)
+
+    def skill_by_occupation(self, top: int = 16, month: pd.Timestamp | None = None) -> pd.DataFrame:
+        """For the most-demanded skills nationally, their postings within each broad
+        occupation group in ``month`` (latest by default), summed across the
+        province/industry cells (which partition postings) and labelled. One row per
+        (occupation, skill); the factory pivots and column-normalises."""
+        sk = self._tables["monthly_skills_topk"].copy()
+        sk["skill_code"] = sk["skill_code"].astype(str)
+        month = pd.Timestamp(month) if month is not None else pd.Timestamp(self.latest_month)
+        m = sk[sk["month"] == month]
+        nat = m.groupby("skill_code")["postings_total"].sum().sort_values(ascending=False)
+        keep = list(nat.index[:top])
+        sub = m[m["skill_code"].isin(keep)].copy()
+        cl = _parse_code_label(sub["occupation_scope"])
+        sub["noc_code"] = cl["code"].values
+        agg = sub.groupby(["noc_code", "skill_code"], as_index=False)["postings_total"].sum()
+        agg["noc_name"] = agg["noc_code"].map(NOC_SHORT).fillna("Unknown")
+        names = self.skill_labels.set_index("skill_code")["skill_name"]
+        agg["skill_name"] = agg["skill_code"].map(names).fillna(agg["skill_code"])
+        return agg[~agg["noc_name"].eq("Unknown")].reset_index(drop=True)
 
     # -- cubes for decomposition / cross-tabs -------------------------------- #
     @functools.cached_property
@@ -240,6 +325,20 @@ class DataSource:
     def geojson(self) -> dict:
         with _GEO_PATH.open() as fh:
             return json.load(fh)
+
+    @functools.cached_property
+    def province_labour_force(self) -> pd.DataFrame:
+        """Province labour-force + population (StatCan LFS, 2024) for per-capita demand.
+        Columns: ``code``, ``province``, ``labour_force``, ``population``, ``year``."""
+        return pd.read_csv(_REFERENCE / "province_labour_force.csv", dtype={"code": str})
+
+    @functools.cached_property
+    def ai_exposure(self) -> pd.DataFrame:
+        """Broad-NOC AI-exposure reference asset (Eloundou β, built by
+        ``tools/build_ai_exposure.py``). 10 rows, one per broad NOC group."""
+        df = pd.read_parquet(_AI_PATH)
+        df["noc_code"] = df["noc_code"].astype(str)
+        return df
 
     @functools.cached_property
     def metadata(self) -> dict:

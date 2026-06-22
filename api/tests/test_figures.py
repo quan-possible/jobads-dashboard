@@ -76,11 +76,42 @@ def test_fr_localizes_in_figure_chrome():
     assert "moyenne sur 3 mois" in [t.get("name") for t in fr["data"]]
 
 
-@pytest.mark.parametrize("chart_id", ["geography.yoy_choropleth", "geography.lq_heatmap"])
+@pytest.mark.parametrize("chart_id", [
+    "geography.yoy_choropleth", "geography.demand_map_share",
+    "geography.demand_map_count", "geography.demand_map_percap", "geography.demand_map_lq",
+])
 def test_added_charts_are_time_animated(chart_id: str):
     payload = json.loads(figures.build(chart_id))
     assert len(payload.get("frames") or []) >= 5, f"{chart_id}: missing yearly frames"
     assert (payload["layout"].get("sliders") or [{}])[0].get("steps"), chart_id
+
+
+def test_demand_map_measures_differ():
+    """The four measure variants of the authoritative map must produce different fills."""
+    import hashlib
+    sigs = {m: hashlib.md5(figures.build(f"geography.demand_map_{m}").encode()).hexdigest()
+            for m in ("share", "count", "percap", "lq")}
+    assert len(set(sigs.values())) == 4, f"measures not distinct: {sigs}"
+
+
+def test_skill_charts_use_human_labels():
+    """Skill charts must show readable names, not bare taxonomy IDs."""
+    blob = figures.build("skills.top_skills_trend")
+    assert "Customer Service" in blob or "Communication" in blob, "no skill labels in trend"
+
+
+@pytest.mark.parametrize("chart_id", ["occupations.ai_exposure", "geography.ai_exposure"])
+def test_ai_exposure_charts_build(chart_id: str):
+    """The Eloundou AI-exposure layer builds from the committed reference asset."""
+    payload = json.loads(figures.build(chart_id))
+    assert payload["data"], chart_id
+
+
+def test_ai_exposure_scatter_covers_broad_groups():
+    # Numeric arrays are base64-encoded by Plotly; the string `text` array is plain.
+    payload = json.loads(figures.build("occupations.ai_exposure"))
+    names = payload["data"][0].get("text") or []
+    assert len(names) >= 8, f"expected most broad groups, got {len(names)}"
 
 
 def test_animated_choropleth_payload_is_cheap():

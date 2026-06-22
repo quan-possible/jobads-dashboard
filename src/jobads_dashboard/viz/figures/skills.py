@@ -1,16 +1,52 @@
-"""Skills & requirements - lift-weighted skills, education and experience mix."""
+"""Skills & requirements - most-demanded skills and their trend, distinctive
+skills by occupation, the skill × occupation grid, education and experience mix.
+
+Skill codes carry human labels from the bundled reference taxonomy, so every
+panel reads in plain skill names rather than IDs.
+"""
 
 from __future__ import annotations
 
-import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 
-from ..datasource import DataSource
+from .. import compute as C
+from ..datasource import BASE_YEAR, DataSource
 from ..labels import noc_short
-from ..theme import BRAND, CONTEXT, MUTED, add_reference_line
+from ..theme import BRAND, CONTEXT, SEQUENTIAL, add_covid_band, add_reference_line
 from ._common import titled
 
 from ..theme import COLORWAY
+
+
+# --------------------------------------------------------------------------- CORE
+
+
+def top_skills_trend(ds: DataSource, top: int = 8) -> go.Figure:
+    """The most-demanded skills nationally and how each has trended since 2019.
+    Indexed to each skill's 2019 average so fast and slow movers are comparable."""
+    nat = ds.skills_national(top=top)
+    idx = C.index_to_base(nat, "postings_total", BASE_YEAR, by="skill_name")
+    latest = idx[idx["month"] == idx["month"].max()].set_index("skill_name")["index"]
+    movers = latest.sort_values(ascending=False)
+    highlight = set(list(movers.index[:2]) + list(movers.index[-1:]))
+    fig = go.Figure()
+    for name, sub in idx.groupby("skill_name"):
+        on = name in highlight
+        sub = sub.sort_values("month")
+        fig.add_trace(go.Scatter(
+            x=sub["month"], y=sub["index"], name=name, mode="lines",
+            line=dict(color=BRAND if on else CONTEXT, width=2.6 if on else 1),
+            opacity=1 if on else 0.55, showlegend=on,
+            hovertemplate="%{x|%b %Y} · " + name + ": %{y:.0f}<extra></extra>"))
+    add_reference_line(fig, 100, text=f"{BASE_YEAR}=100")
+    add_covid_band(fig)
+    fig.update_yaxes(title_text=f"index ({BASE_YEAR} = 100)")
+    return titled(fig, "The most-demanded skills, and how each has trended",
+                  "Top skills by posting volume, each indexed to its 2019 average · fastest/slowest movers highlighted")
+
+
+# --------------------------------------------------------------------------- DEEP
 
 
 def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None) -> go.Figure:
@@ -21,14 +57,35 @@ def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None) -> go.F
         occupation_scope = cands[0] if cands else scopes[0]
     df = ds.skill_lift(occupation_scope).sort_values("lift")
     fig = go.Figure(go.Bar(
-        x=df["lift"], y=df["skill_code"], orientation="h", marker_color=BRAND,
-        hovertemplate="skill %{y}: lift %{x:.1f}×<extra></extra>"))
+        x=df["lift"], y=df["skill_name"], orientation="h", marker_color=BRAND,
+        hovertemplate="%{y}: lift %{x:.1f}×<extra></extra>"))
     add_reference_line(fig, 1, text="national rate")
     fig.update_xaxes(title_text="lift (occupation share ÷ national share)", ticksuffix="×")
-    fig.update_yaxes(type="category", title_text="skill code")
-    fig.update_layout(height=440)
+    fig.update_yaxes(type="category", title_text="")
+    fig.update_layout(height=440, margin=dict(l=180))
     return titled(fig, f"Distinctive skills for {noc_short(occupation_scope)}",
-                  "Skills most over-represented vs the whole market (codes are taxonomy IDs; no public label table in v1)")
+                  "Skills most over-represented vs the whole market — what sets this occupation group apart")
+
+
+def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
+    """What each occupation group demands: the most-demanded skills (rows) by broad
+    occupation group (columns), each column showing how that occupation's skill
+    mentions split across the top skills (column-normalised)."""
+    df = ds.skill_by_occupation(top=16)
+    piv = df.pivot_table(index="skill_name", columns="noc_name", values="postings_total",
+                         aggfunc="sum", fill_value=0.0)
+    # order rows by total demand, columns by total demand — keeps the eye on the corner
+    piv = piv.loc[piv.sum(axis=1).sort_values(ascending=False).index,
+                  piv.sum(axis=0).sort_values(ascending=False).index]
+    norm = piv.div(piv.sum(axis=0).replace(0, np.nan), axis=1) * 100  # column share
+    fig = go.Figure(go.Heatmap(
+        z=norm.values, x=list(norm.columns), y=list(norm.index),
+        colorscale=SEQUENTIAL, colorbar=dict(title="% of group", ticksuffix="%"), xgap=1, ygap=1,
+        hovertemplate="%{y} in %{x}: %{z:.0f}% of the group's top-skill mentions<extra></extra>"))
+    fig.update_xaxes(title_text="", tickangle=-30)
+    fig.update_layout(height=520, margin=dict(l=190, b=120))
+    return titled(fig, "What each occupation group demands: skills × occupations",
+                  "Column-normalised: each occupation's mentions of the top skills (latest month)")
 
 
 def education_composition(ds: DataSource) -> go.Figure:

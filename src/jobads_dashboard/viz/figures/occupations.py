@@ -5,12 +5,11 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
 from ..theme import (
-    BRAND, CONTEXT, DIVERGING, MUTED, SEQUENTIAL, add_covid_band, add_reference_line,
+    BRAND, CONTEXT, MUTED, SEQUENTIAL, add_covid_band, add_reference_line,
 )
 from ._common import add_time_slider, titled
 
@@ -159,30 +158,6 @@ def dumbbell(ds: DataSource) -> go.Figure:
                   "Each line connects the two periods; colour shows direction")
 
 
-def bump_chart(ds: DataSource) -> go.Figure:
-    nb = _real_groups(ds.noc_broad).copy()
-    nb["year"] = nb["month"].dt.year
-    ann = nb.groupby(["year", "noc_name"], as_index=False)["postings_total"].sum()
-    ann = ann[ann["year"].between(2017, 2025)]
-    ann["rank"] = ann.groupby("year")["postings_total"].rank(ascending=False, method="first")
-    fig = go.Figure()
-    last = ann[ann["year"] == ann["year"].max()].set_index("noc_name")["rank"]
-    top = set(last.sort_values().index[:5])
-    for lbl, sub in ann.groupby("noc_name"):
-        on = lbl in top
-        sub = sub.sort_values("year")
-        fig.add_trace(go.Scatter(
-            x=sub["year"], y=sub["rank"], mode="lines+markers", name=lbl,
-            line=dict(color=BRAND if on else CONTEXT, width=2.5 if on else 1.2),
-            marker=dict(size=7 if on else 4), opacity=1 if on else 0.5, showlegend=on,
-            hovertemplate="%{x} · " + lbl + ": rank %{y:.0f}<extra></extra>"))
-    fig.update_yaxes(title_text="rank (1 = most postings)", autorange="reversed",
-                     dtick=1)
-    fig.update_layout(height=420)
-    return titled(fig, "Rank journey: occupation groups by demand, 2017–2025",
-                  "Lines that cross = groups that overtook one another; top-5 highlighted")
-
-
 def noc_naics_heatmap(ds: DataSource) -> go.Figure:
     df = ds.noc_by_naics
     cut = df["month"].max() - pd.DateOffset(months=12)
@@ -205,70 +180,52 @@ def noc_naics_heatmap(ds: DataSource) -> go.Figure:
                   "Column-normalised: each industry's postings split across occupation groups (last 12 months)")
 
 
-def concentration_trio(ds: DataSource) -> go.Figure:
-    mk = ds.market
-    # HHI over markets by month
-    hhi_series = mk.groupby("month").apply(
-        lambda d: C.hhi(d["postings_total"].values), include_groups=False)
-    cut = mk["month"].max() - pd.DateOffset(months=12)
-    latest_vals = mk[mk["month"] > cut].groupby("market_label")["postings_total"].sum().values
-    pop, cum, gini = C.lorenz_curve(latest_vals)
-    topk = C.topk_cumulative_share(latest_vals, k=20)
-
-    fig = make_subplots(rows=1, cols=3, horizontal_spacing=0.085,
-                        subplot_titles=("HHI over time (markets)",
-                                        f"Lorenz curve (Gini {gini:.2f})",
-                                        "Top-20 cumulative share"))
-    fig.add_trace(go.Scatter(x=hhi_series.index, y=hhi_series.values, mode="lines",
-                             line=dict(color=BRAND, width=2), showlegend=False,
-                             hovertemplate="%{x|%b %Y}: HHI %{y:.3f}<extra></extra>"), row=1, col=1)
-    fig.add_trace(go.Scatter(x=pop, y=cum, mode="lines", line=dict(color=BRAND, width=2.5),
-                             showlegend=False, fill="tozeroy", fillcolor="rgba(207,119,48,0.12)",
-                             hovertemplate="%{x:.0%} of markets → %{y:.0%} of demand<extra></extra>"),
-                  row=1, col=2)
-    fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines",
-                             line=dict(color=MUTED, width=1, dash="dash"), showlegend=False,
-                             hoverinfo="skip"), row=1, col=2)
-    fig.add_trace(go.Scatter(x=topk["rank"], y=topk["cum_share_pct"], mode="lines+markers",
-                             line=dict(color=BRAND, width=2), marker=dict(size=4), showlegend=False,
-                             hovertemplate="top %{x}: %{y:.0f}%<extra></extra>"), row=1, col=3)
-    fig.update_yaxes(title_text="HHI", row=1, col=1)
-    fig.update_xaxes(title_text="share of markets", tickformat=".0%", row=1, col=2)
-    fig.update_yaxes(title_text="share of demand", tickformat=".0%", row=1, col=2)
-    fig.update_xaxes(title_text="market rank", row=1, col=3)
-    fig.update_yaxes(title_text="cumulative %", ticksuffix="%", row=1, col=3)
-    fig.update_layout(height=360)
-    for ann in fig.layout.annotations:
-        ann.font.size = 12
-    return titled(fig, "Is demand concentrating? Three views of market concentration",
-                  "HHI trend · Lorenz inequality · top-20 markets' cumulative share")
+def skill_churn(ds: DataSource) -> go.Figure:
+    """Which skills are entering vs leaving demand: the biggest national risers and
+    fallers in posting volume since 2019. Descriptive 'what's changing in the skill
+    mix', now readable because skill codes carry their reference labels."""
+    df = ds.skill_churn(base_year=BASE_YEAR, end_year=2024, top=11)
+    df = df.copy()
+    df["growth_pct"] = df["growth_pct"].clip(upper=300)  # cap runaway small-base risers for readability
+    colors = np.where(df["direction"].values == "rising", UP, DOWN)
+    fig = go.Figure(go.Bar(
+        x=df["growth_pct"], y=df["skill_name"], orientation="h", marker_color=colors,
+        customdata=df["end"],
+        hovertemplate="%{y}: %{x:+.0f}% vs 2019 · %{customdata:,.0f} postings (2024)<extra></extra>"))
+    add_reference_line(fig, 0)
+    fig.update_xaxes(title_text="change in demand vs 2019", ticksuffix="%")
+    fig.update_layout(height=460, margin=dict(l=180))
+    return titled(fig, "Which skills are entering vs leaving demand, 2019 → 2024",
+                  "Top risers (teal) and fallers (orange) by change in posting volume · skills with ≥150 postings in 2019")
 
 
-def horizon_wall(ds: DataSource) -> go.Figure:
-    nb = _real_groups(ds.noc_broad)
-    idx = C.index_to_base(nb, "postings_total", BASE_YEAR, by="noc_name")
-    groups = list(idx.groupby("noc_name"))
-    n = len(groups)
-    fig = make_subplots(rows=n, cols=1, shared_xaxes=True, vertical_spacing=0.012)
-    band = 20.0  # index points per colour band; deviation from 100
-    pos_shades = ["rgba(47,111,119,0.45)", "rgba(47,111,119,0.85)"]
-    neg_shades = ["rgba(181,82,58,0.45)", "rgba(181,82,58,0.85)"]
-    for r, (lbl, sub) in enumerate(groups, start=1):
-        sub = sub.sort_values("month")
-        dev = sub["index"] - 100
-        for bi in range(2):
-            lo = bi * band
-            pos = np.clip(dev - lo, 0, band)
-            fig.add_trace(go.Scatter(x=sub["month"], y=pos, mode="lines", line=dict(width=0),
-                                     fill="tozeroy", fillcolor=pos_shades[bi], showlegend=False,
-                                     hoverinfo="skip"), row=r, col=1)
-            neg = np.clip(-dev - lo, 0, band)
-            fig.add_trace(go.Scatter(x=sub["month"], y=neg, mode="lines", line=dict(width=0),
-                                     fill="tozeroy", fillcolor=neg_shades[bi], showlegend=False,
-                                     hoverinfo="skip"), row=r, col=1)
-        fig.add_annotation(xref="paper", x=0, xanchor="right", y=band / 2, yref=f"y{r}" if r > 1 else "y",
-                           text=lbl, showarrow=False, font=dict(size=9, color=MUTED), xshift=-6)
-        fig.update_yaxes(range=[0, band], showticklabels=False, showgrid=False, row=r, col=1)
-    fig.update_layout(height=max(360, 42 * n), margin=dict(l=170, r=20, t=92, b=30))
-    return titled(fig, "Horizon wall: every occupation group's trajectory in one screen",
-                  "Each strip = deviation from its 2019 level, folded into colour bands (teal above, orange below)")
+def ai_exposure_scatter(ds: DataSource) -> go.Figure:
+    """AI exposure vs demand change, by broad occupation group. The deepest cut:
+    where is hiring demand moving relative to each group's task-based exposure to
+    generative AI? Quadrants are descriptive, not predictive."""
+    ex = ds.ai_exposure.set_index("noc_code")["exposure_beta"]
+    nb = _real_groups(ds.noc_broad).copy()
+    nb["year"] = nb["month"].dt.year
+    b = nb[nb["year"] == BASE_YEAR].groupby("noc_code")["postings_total"].mean()
+    e = nb[nb["year"] == 2024].groupby("noc_code")["postings_total"].mean()
+    chg = (e / b - 1) * 100
+    cut = nb["month"].max() - pd.DateOffset(months=12)
+    vol = nb[nb["month"] > cut].groupby("noc_code")["postings_total"].sum()
+    name = nb.groupby("noc_code")["noc_name"].first()
+    df = pd.DataFrame({"beta": ex, "chg": chg, "vol": vol, "name": name}).dropna()
+    colors = np.where(df["chg"] >= 0, UP, DOWN)
+    fig = go.Figure(go.Scatter(
+        x=df["beta"], y=df["chg"], mode="markers+text", text=df["name"],
+        textposition="top center", textfont=dict(size=9, color=MUTED),
+        marker=dict(size=np.sqrt(df["vol"]) / np.sqrt(df["vol"]).max() * 46 + 10,
+                    color=colors, opacity=0.85, line=dict(width=1, color="white")),
+        customdata=df["vol"],
+        hovertemplate="%{text}<br>exposure β %{x:.2f} · demand %{y:+.0f}% vs 2019"
+                      "<br>%{customdata:,.0f} postings (12 mo)<extra></extra>"))
+    add_reference_line(fig, 0)
+    fig.add_vline(x=float(df["beta"].median()), line=dict(color=MUTED, width=1, dash="dash"))
+    fig.update_xaxes(title_text="AI exposure (β)")
+    fig.update_yaxes(title_text="change in demand vs 2019", ticksuffix="%")
+    fig.update_layout(height=480, margin=dict(t=40))
+    return titled(fig, "AI exposure vs demand: where hiring is moving",
+                  "Eloundou et al. β (US task-based, mapped to NOC) vs demand change · bubble ∝ volume · right of the line = higher-exposure groups")
