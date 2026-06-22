@@ -17,8 +17,14 @@ const ptSans = PT_Sans({
   display: "swap",
 });
 
+// Public origin for absolute OG/canonical URLs. Prefer an explicit site URL;
+// on Render the platform injects RENDER_EXTERNAL_URL; fall back to localhost
+// only for local dev.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? process.env.RENDER_EXTERNAL_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Canadian Labour Market Pulse · ACLMR",
     template: "%s · ACLMR",
@@ -47,7 +53,7 @@ export default async function RootLayout({
   let asOf: string | undefined;
   try {
     const meta = await api.meta();
-    asOf = fmtMonth(meta.latest_month);
+    asOf = fmtMonth(meta.latest_month, locale);
   } catch {
     asOf = undefined;
   }
@@ -56,11 +62,17 @@ export default async function RootLayout({
     <html lang={locale} className={`${ptSans.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-canvas">
         <I18nProvider locale={locale} dict={t}>
+          <a
+            href="#main"
+            className="sr-only z-[100] bg-navy px-4 py-2 text-sm font-bold text-canvas focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:outline focus:outline-2 focus:outline-orange"
+          >
+            {t.nav.skipToContent}
+          </a>
           <TopNav />
           <Suspense fallback={<div className="h-[68px] border-b border-card-border bg-surface-alt/70" />}>
             <FilterSpine />
           </Suspense>
-          <main className="flex-1">{children}</main>
+          <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
           <Footer asOf={asOf} />
         </I18nProvider>
       </body>

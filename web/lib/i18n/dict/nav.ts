@@ -11,6 +11,7 @@ export const nav = {
     developers: "Developers",
     menu: "Menu",
     primary: "Primary",
+    skipToContent: "Skip to main content",
     brandTagline: "Labour Market",
   },
   fr: {
@@ -25,6 +26,7 @@ export const nav = {
     developers: "Développeurs",
     menu: "Menu",
     primary: "Principale",
+    skipToContent: "Aller au contenu principal",
     brandTagline: "Marché du travail",
   },
 } as const;

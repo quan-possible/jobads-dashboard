@@ -13,7 +13,7 @@ register_templates()  # ensure templates exist when figures are built standalone
 def treemap_trace(g: pd.DataFrame, name_col: str, root: str) -> go.Treemap:
     """Shared treemap trace for the occupation / industry volume treemaps."""
     g = g.copy()
-    g["short"] = g[name_col].map(lambda s: s.split("|")[-1].strip())
+    g["short"] = g[name_col].map(lambda s: s.split("|")[-1].strip() or s.strip())
     total = g["postings_total"].sum()
     return go.Treemap(
         labels=[root] + g["short"].tolist(),

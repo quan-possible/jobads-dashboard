@@ -111,7 +111,13 @@ LIGHT = ThemePalette(
     axis="#c8b3a2",
 )
 
-_FONT = "Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif"
+# Match the web app's font (web/app/globals.css --font-sans). The PT Sans face
+# is self-hosted by next/font under the --font-pt-sans CSS variable, so charts
+# render in the same type as their cards instead of Plotly's Inter/system fallback.
+_FONT = "var(--font-pt-sans), ui-sans-serif, system-ui, sans-serif"
+
+#: Standing provenance caption for the standalone static review page (``review.py``).
+DEMAND_SIGNAL_NOTE = "Vicinity Jobs online job ads · a labour-demand signal, not employment"
 
 
 def _template(p: ThemePalette) -> go.layout.Template:

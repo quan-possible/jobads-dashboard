@@ -73,7 +73,7 @@ export function AuthGate() {
             {t.common.signOut}
           </button>
         </div>
-        <ExploreView />
+        <ExploreView onSessionExpired={() => setPhase("locked")} />
       </div>
     );
   }

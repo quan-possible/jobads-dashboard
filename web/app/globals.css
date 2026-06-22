@@ -8,6 +8,11 @@
    =========================================================================== */
 
 :root {
+  /* The dashboard is intentionally light-only (no dark token set). Declaring the
+     scheme stops the UA from auto-darkening form controls/scrollbars under
+     prefers-color-scheme: dark (U07). */
+  color-scheme: light;
+
   /* Surfaces */
   --canvas: #fbf8f5;        /* warm cream page background */
   --surface: #ffffff;       /* cards */

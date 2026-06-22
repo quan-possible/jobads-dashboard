@@ -51,15 +51,15 @@ export default async function GeographyPage() {
       aiExposure,
     ] = await Promise.all([
       api.meta(),
-      api.figure("geography.demand_map_share", locale),
-      api.figure("geography.demand_map_count", locale),
-      api.figure("geography.demand_map_percap", locale),
-      api.figure("geography.demand_map_lq", locale),
-      api.figure("geography.ranked_provinces", locale),
-      api.figure("geography.cma_demand", locale),
-      api.figure("geography.yoy_choropleth", locale),
-      api.figure("geography.shift_share", locale),
-      api.figure("geography.ai_exposure", locale),
+      api.figureSafe("geography.demand_map_share", locale),
+      api.figureSafe("geography.demand_map_count", locale),
+      api.figureSafe("geography.demand_map_percap", locale),
+      api.figureSafe("geography.demand_map_lq", locale),
+      api.figureSafe("geography.ranked_provinces", locale),
+      api.figureSafe("geography.cma_demand", locale),
+      api.figureSafe("geography.yoy_choropleth", locale),
+      api.figureSafe("geography.shift_share", locale),
+      api.figureSafe("geography.ai_exposure", locale),
     ]);
     asOf = meta.latest_month;
     figs = {
@@ -89,7 +89,7 @@ export default async function GeographyPage() {
       {/* Hero */}
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">{t.eyebrow} · {fmtMonth(asOf)}</div>
+          <div className="eyebrow mb-3">{t.eyebrow} · {fmtMonth(asOf, locale)}</div>
           <h1 className="h-display max-w-3xl text-balance">{t.hero}</h1>
           <p className="lede mt-4 max-w-2xl">{t.lede}</p>
         </div>

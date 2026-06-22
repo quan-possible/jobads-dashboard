@@ -193,12 +193,39 @@ def _fr(s: str) -> str:
     return _FR_CHROME.get(s, s)
 
 
+# Literal phrases that appear *inside* hovertemplate / texttemplate strings (not
+# as the whole value), so exact-match can't reach them. Substring-replaced
+# longest-first, and only within hover keys, so Plotly format directives
+# (%{...|...}) elsewhere are never touched (S21). Keep these unambiguous literals.
+_FR_HOVER: dict[str, str] = {
+    "of sector demand": "de la demande du secteur",
+    "3-month average": "moyenne sur 3 mois",
+    "of year avg": "de la moyenne annuelle",
+    "3-mo avg": "moy. 3 mois",
+    "of sector": "du secteur",
+    "coverage": "couverture",
+    "median": "médiane",
+    "provisional": "provisoire",
+    "postings": "offres",
+}
+
+
+def _fr_hover(s: str) -> str:
+    for en in sorted(_FR_HOVER, key=len, reverse=True):
+        if en in s:
+            s = s.replace(en, _FR_HOVER[en])
+    return s
+
+
 def _localize_chrome(node) -> None:
-    """Recursively translate known English chrome strings in a figure JSON dict."""
+    """Recursively translate known English chrome strings in a figure JSON dict.
+
+    Whole-string chrome (axis titles, legends, …) is exact-matched; hover
+    templates are additionally substring-translated for their literal phrases."""
     if isinstance(node, dict):
         for k, v in node.items():
             if isinstance(v, str):
-                node[k] = _fr(v)
+                node[k] = _fr_hover(_fr(v)) if k in ("hovertemplate", "texttemplate") else _fr(v)
             else:
                 _localize_chrome(v)
     elif isinstance(node, list):

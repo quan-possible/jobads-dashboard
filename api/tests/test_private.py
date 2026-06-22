@@ -20,6 +20,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning, module="starlette
 
 from api import auth, core  # noqa: E402
 from api.main import app  # noqa: E402
+from api.routers import private as private_router  # noqa: E402
 
 PASSWORD = "test-explore-password"
 HEALTH = "3 | Health occupations"
@@ -30,9 +31,15 @@ needs_lookup = pytest.mark.skipif(not _lookup_present, reason="posting_lookup.pa
 
 @pytest.fixture()
 def configured(monkeypatch) -> None:
-    """Configure a known plaintext password for the auth layer."""
+    """Configure a known plaintext password for the auth layer.
+
+    The TestClient talks plain http to ``testserver``, so it cannot store/resend
+    a ``Secure`` cookie — opt out of secure cookies here, exactly as local http
+    dev does. (Secure-by-default is verified separately in
+    ``test_session_cookie_secure_attributes``.)"""
     monkeypatch.delenv(auth.PASSWORD_HASH_ENV, raising=False)
     monkeypatch.setenv(auth.PASSWORD_PLAIN_ENV, PASSWORD)
+    monkeypatch.setenv("JOBADS_API_COOKIE_SECURE", "false")
 
 
 @pytest.fixture()
@@ -104,11 +111,59 @@ def test_login_sets_cookie_and_status(signed_in):
     assert r.json()["authenticated"] is True
 
 
+def test_session_cookie_secure_attributes(monkeypatch, anon):
+    """In the default (production) config the session cookie carries
+    Secure + HttpOnly + SameSite=lax (S11)."""
+    monkeypatch.delenv(auth.PASSWORD_HASH_ENV, raising=False)
+    monkeypatch.setenv(auth.PASSWORD_PLAIN_ENV, PASSWORD)
+    monkeypatch.delenv("JOBADS_API_COOKIE_SECURE", raising=False)  # default → secure
+    r = anon.post("/api/auth", json={"password": PASSWORD})
+    assert r.status_code == 200
+    set_cookie = r.headers["set-cookie"].lower()
+    assert "secure" in set_cookie
+    assert "httponly" in set_cookie
+    assert "samesite=lax" in set_cookie
+
+
 def test_logout_clears(signed_in):
     signed_in.post("/api/auth/logout")
     # Cookie removed → data route rejects.
     r = signed_in.get("/api/postings")
     assert r.status_code == 401
+
+
+def test_auth_rate_limited(configured, anon):
+    """Repeated bad logins from one IP eventually get 429 (S12). A unique
+    X-Forwarded-For keeps this test's failures off the shared testserver IP."""
+    headers = {"x-forwarded-for": "203.0.113.50"}
+    statuses = [
+        anon.post("/api/auth", json={"password": "wrong"}, headers=headers).status_code
+        for _ in range(private_router._AUTH_MAX_FAILURES + 2)
+    ]
+    assert 429 in statuses, statuses
+    # The early attempts are ordinary auth failures, not throttled.
+    assert statuses[0] == 401
+
+
+def test_weak_pbkdf2_hash_rejected():
+    """A hash below the iteration floor is refused even with the right password (S13)."""
+    salt = b"sixteen_byte_salt"
+    weak = auth._hash_password("hunter2", salt, 100_000)  # < PASSWORD_HASH_MIN_ITERATIONS
+    encoded = f"pbkdf2_sha256$100000${_b64(salt)}${_b64(weak)}"
+    assert auth._verify_against_hash("hunter2", encoded) is False
+
+
+def test_session_secret_min_length(monkeypatch):
+    """A configured-but-short session secret fails fast; a long one is accepted;
+    unset yields a random per-process secret (S15)."""
+    monkeypatch.setenv(auth.SESSION_SECRET_ENV, "short")
+    with pytest.raises(RuntimeError):
+        auth._resolve_session_secret()
+    long_secret = "x" * auth.SESSION_SECRET_MIN_LENGTH
+    monkeypatch.setenv(auth.SESSION_SECRET_ENV, long_secret)
+    assert auth._resolve_session_secret() == long_secret
+    monkeypatch.delenv(auth.SESSION_SECRET_ENV, raising=False)
+    assert len(auth._resolve_session_secret()) >= auth.SESSION_SECRET_MIN_LENGTH
 
 
 # --------------------------------------------------------------------------- #

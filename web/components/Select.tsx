@@ -15,6 +15,22 @@ export function Select({
   onChange: (value: string) => void;
   id: string;
 }) {
+  // Guard an empty option set: render a disabled placeholder rather than
+  // crashing on options[0] (S28).
+  if (options.length === 0) {
+    return (
+      <label htmlFor={id} className="flex min-w-0 flex-col gap-1">
+        <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">{label}</span>
+        <select
+          id={id}
+          disabled
+          className="control w-full cursor-not-allowed appearance-none border border-card-border bg-surface py-2 pl-3 pr-9 text-[0.92rem] text-ink-faint opacity-60"
+        >
+          <option>—</option>
+        </select>
+      </label>
+    );
+  }
   const current = value ?? options[0].value;
   const isDefault = current === options[0].value;
   return (

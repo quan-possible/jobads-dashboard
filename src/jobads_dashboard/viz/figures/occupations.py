@@ -23,6 +23,13 @@ def _real_groups(df: pd.DataFrame, col: str = "noc_name") -> pd.DataFrame:
     return df[~df[col].str.contains("Unknown", na=False)]
 
 
+def _short_label(s: str) -> str:
+    """Compact label: the text after the last '|' (drop the code prefix), but
+    never blank — fall back to the full string when the split yields nothing."""
+    tail = s.split("|")[-1].strip()
+    return tail or s.strip()
+
+
 # --------------------------------------------------------------------------- CORE
 
 
@@ -78,7 +85,7 @@ def contribution_bars(ds: DataSource) -> go.Figure:
     base, end = _stable_window()
     nb = _real_groups(ds.noc_broad)
     c = C.contribution_to_growth(nb, "noc_name", "postings_total", base, end)
-    c["short"] = c["noc_name"].map(lambda s: s.split("|")[-1].strip())
+    c["short"] = c["noc_name"].map(_short_label)
     c = c.sort_values("contribution_pp")
     colors = np.where(c["contribution_pp"] >= 0, UP, DOWN)
     net = c["contribution_pp"].sum()
@@ -98,7 +105,7 @@ def waterfall(ds: DataSource) -> go.Figure:
     base, end = _stable_window()
     nb = _real_groups(ds.noc_broad)
     c = C.contribution_to_growth(nb, "noc_name", "postings_total", base, end)
-    c["short"] = c["noc_name"].map(lambda s: s.split("|")[-1].strip())
+    c["short"] = c["noc_name"].map(_short_label)
     c = c.sort_values("delta", ascending=False)
     base_total = c["base"].sum()
     end_total = c["end"].sum()
@@ -123,7 +130,7 @@ def dumbbell(ds: DataSource) -> go.Figure:
     b = nb[nb["month"] == base].set_index("noc_name")["postings_total"]
     e = nb[nb["month"] == end].set_index("noc_name")["postings_total"]
     df = pd.DataFrame({"base": b, "end": e}).dropna()
-    df["short"] = [s.split("|")[-1].strip() for s in df.index]
+    df["short"] = [_short_label(s) for s in df.index]
     df = df.sort_values("end")
     fig = go.Figure()
     for _, r in df.iterrows():

@@ -20,11 +20,14 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 import os
 import secrets
 import subprocess
 import sys
 import time
+
+_log = logging.getLogger("api.auth")
 
 # --------------------------------------------------------------------------- #
 # Password verification (PBKDF2, matching src/jobads_dashboard/dashboard/app.py)
@@ -32,7 +35,10 @@ import time
 
 PASSWORD_HASH_PREFIX = "pbkdf2_sha256"
 PASSWORD_HASH_ITERATIONS = 240_000
-PASSWORD_HASH_MIN_ITERATIONS = 10_000
+# Reject hashes below the current default — a hash weaker than what we generate
+# today should not be honoured (S13). 240k is the project default; OWASP guidance
+# for PBKDF2-SHA256 is higher still.
+PASSWORD_HASH_MIN_ITERATIONS = 240_000
 PASSWORD_HASH_MAX_ITERATIONS = 1_000_000
 
 PASSWORD_HASH_ENV = "JOBADS_DASHBOARD_PASSWORD_HASH"
@@ -114,6 +120,21 @@ def verify_password(password: str) -> bool:
     return hmac.compare_digest(password.encode("utf-8"), plain.encode("utf-8"))
 
 
+def _warn_if_plaintext_password() -> None:
+    """Warn (once, at import) if a plaintext password is the active source with no
+    hash configured — convenient for local dev, but discouraged in production (S14)."""
+    if os.environ.get(PASSWORD_PLAIN_ENV, "").strip() and not os.environ.get(PASSWORD_HASH_ENV, "").strip():
+        _log.warning(
+            "%s (plaintext) is set as the active password source; prefer %s "
+            "(a PBKDF2 hash) in production.",
+            PASSWORD_PLAIN_ENV,
+            PASSWORD_HASH_ENV,
+        )
+
+
+_warn_if_plaintext_password()
+
+
 # --------------------------------------------------------------------------- #
 # Session tokens — HMAC-signed, httpOnly cookie payload
 # --------------------------------------------------------------------------- #
@@ -122,7 +143,26 @@ SESSION_SECRET_ENV = "JOBADS_API_SESSION_SECRET"
 SESSION_TTL_SECONDS = 8 * 60 * 60  # 8 hours
 COOKIE_NAME = "jobads_session"
 
-_SESSION_SECRET = os.environ.get(SESSION_SECRET_ENV, "").strip() or secrets.token_hex(32)
+SESSION_SECRET_MIN_LENGTH = 32
+
+
+def _resolve_session_secret() -> str:
+    """Configured secret (validated) or a per-process random one.
+
+    A configured-but-short secret weakens the session HMAC, so fail fast at
+    startup rather than signing with it (S15). Unset means a random per-process
+    secret: sessions then drop on restart and don't validate across workers."""
+    configured = os.environ.get(SESSION_SECRET_ENV, "").strip()
+    if configured:
+        if len(configured) < SESSION_SECRET_MIN_LENGTH:
+            raise RuntimeError(
+                f"{SESSION_SECRET_ENV} must be at least {SESSION_SECRET_MIN_LENGTH} characters."
+            )
+        return configured
+    return secrets.token_hex(32)
+
+
+_SESSION_SECRET = _resolve_session_secret()
 
 
 def _b64e(raw: bytes) -> str:

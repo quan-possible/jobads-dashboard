@@ -170,3 +170,13 @@ def month_floor(value: str | date) -> date:
     parts = text.split("-")
     year, month = int(parts[0]), int(parts[1])
     return date(year, month, 1)
+
+
+def safe_month_floor(value: str | date) -> date | None:
+    """Like :func:`month_floor` but returns ``None`` on malformed input instead
+    of raising. Used for raw query params so a bad ``?start=``/``?end=`` value
+    degrades to the default window rather than a 500."""
+    try:
+        return month_floor(value)
+    except (ValueError, IndexError, TypeError):
+        return None

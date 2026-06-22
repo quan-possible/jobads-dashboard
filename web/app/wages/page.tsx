@@ -46,13 +46,13 @@ export default async function WagesPage() {
     const [meta, wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, wageByEducation, conditionsMix, languageGap] =
       await Promise.all([
         api.meta(),
-        api.figure("pay.wage_band", locale),
-        api.figure("pay.wage_dumbbell", locale),
-        api.figure("pay.wage_demand_quadrant", locale),
-        api.figure("pay.education_wage_proxy", locale),
-        api.figure("pay.wage_by_education", locale),
-        api.figure("pay.conditions_mix", locale),
-        api.figure("pay.language_gap", locale),
+        api.figureSafe("pay.wage_band", locale),
+        api.figureSafe("pay.wage_dumbbell", locale),
+        api.figureSafe("pay.wage_demand_quadrant", locale),
+        api.figureSafe("pay.education_wage_proxy", locale),
+        api.figureSafe("pay.wage_by_education", locale),
+        api.figureSafe("pay.conditions_mix", locale),
+        api.figureSafe("pay.language_gap", locale),
       ]);
     asOf = meta.latest_month;
     figs = { wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, wageByEducation, conditionsMix, languageGap };
@@ -66,7 +66,7 @@ export default async function WagesPage() {
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            {t.eyebrowPrefix} · {fmtMonth(asOf)}
+            {t.eyebrowPrefix} · {fmtMonth(asOf, locale)}
           </div>
           <h1 className="h-display max-w-4xl text-balance">{t.heroTitle}</h1>
           <p className="lede mt-4 max-w-2xl">{t.heroLede}</p>

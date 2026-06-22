@@ -302,3 +302,16 @@ def test_cross_filter_active_postings_smaller_than_national(
     assert filtered_ap < national_ap, (
         f"filtered active_postings ({filtered_ap}) should be < national ({national_ap})"
     )
+# ---------------------------------------------------------------------------
+# 11. Malformed date params degrade gracefully (S04)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("param", ["start", "end"])
+@pytest.mark.parametrize("bad", ["garbage", "2026-13", "2026", "not-a-date", "2026-99-99"])
+def test_malformed_date_param_degrades_gracefully(client: TestClient, param: str, bad: str) -> None:
+    """A malformed start/end must fall back to the default window, never 500 (S04)."""
+    r = client.get("/api/overview", params={param: bad})
+    assert r.status_code == 200, (
+        f"Expected 200 (graceful default) for {param}={bad!r}, got {r.status_code}"
+    )

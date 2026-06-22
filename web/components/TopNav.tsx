@@ -106,11 +106,14 @@ export function TopNav() {
         </div>
       </div>
 
-      {/* Mobile nav panel */}
+      {/* Mobile nav panel. `inert` when closed so its links leave the tab and
+          AT order, not just hidden visually (S32); a distinct landmark label
+          avoids two identically-named "Primary" navigations (S36). */}
       <div
         id="mobile-nav-panel"
         role="navigation"
-        aria-label={t.nav.primary}
+        aria-label={t.nav.menu}
+        inert={!menuOpen}
         className={[
           "border-b border-card-border bg-canvas md:hidden",
           "overflow-hidden transition-[max-height,opacity] duration-250",

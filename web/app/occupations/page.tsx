@@ -52,14 +52,14 @@ export default async function OccupationsPage() {
       nocNaicsHeatmap,
     ] = await Promise.all([
       api.meta(),
-      api.figure("occupations.treemap", locale),
-      api.figure("occupations.indexed_lines", locale),
-      api.figure("occupations.contribution_bars", locale),
-      api.figure("occupations.waterfall", locale),
-      api.figure("occupations.dumbbell", locale),
-      api.figure("occupations.skill_churn", locale),
-      api.figure("occupations.ai_exposure", locale),
-      api.figure("occupations.noc_naics_heatmap", locale),
+      api.figureSafe("occupations.treemap", locale),
+      api.figureSafe("occupations.indexed_lines", locale),
+      api.figureSafe("occupations.contribution_bars", locale),
+      api.figureSafe("occupations.waterfall", locale),
+      api.figureSafe("occupations.dumbbell", locale),
+      api.figureSafe("occupations.skill_churn", locale),
+      api.figureSafe("occupations.ai_exposure", locale),
+      api.figureSafe("occupations.noc_naics_heatmap", locale),
     ]);
     asOf = meta.latest_month;
     figs = {
@@ -82,7 +82,7 @@ export default async function OccupationsPage() {
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            {t.eyebrow} · {fmtMonth(asOf)}
+            {t.eyebrow} · {fmtMonth(asOf, locale)}
           </div>
           <h1 className="h-display max-w-4xl text-balance">{t.hero}.</h1>
           <p className="lede mt-4 max-w-2xl">{t.lede}</p>

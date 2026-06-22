@@ -42,12 +42,12 @@ export default async function SkillsPage() {
   try {
     const [meta, topSkillsTrend, aiSkillDiffusion, skillLift, skillOccupationHeatmap, education, experience] = await Promise.all([
       api.meta(),
-      api.figure("skills.top_skills_trend", locale),
-      api.figure("skills.ai_skill_diffusion", locale),
-      api.figure("skills.skill_lift", locale),
-      api.figure("skills.skill_occupation_heatmap", locale),
-      api.figure("skills.education", locale),
-      api.figure("skills.experience", locale),
+      api.figureSafe("skills.top_skills_trend", locale),
+      api.figureSafe("skills.ai_skill_diffusion", locale),
+      api.figureSafe("skills.skill_lift", locale),
+      api.figureSafe("skills.skill_occupation_heatmap", locale),
+      api.figureSafe("skills.education", locale),
+      api.figureSafe("skills.experience", locale),
     ]);
     asOf = meta.latest_month;
     figs = { topSkillsTrend, aiSkillDiffusion, skillLift, skillOccupationHeatmap, education, experience };
@@ -61,7 +61,7 @@ export default async function SkillsPage() {
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            {t.heroEyebrowPrefix} · {fmtMonth(asOf)}
+            {t.heroEyebrowPrefix} · {fmtMonth(asOf, locale)}
           </div>
           <h1 className="h-display max-w-4xl text-balance">{t.heroTitle}</h1>
           <p className="lede mt-4 max-w-2xl">{t.heroLede}</p>

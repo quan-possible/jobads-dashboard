@@ -25,7 +25,7 @@ export const occupationsDict = {
       treemap: {
         eyebrow: "Demand by volume · through time",
         title: "What work is in demand: occupation groups by volume",
-        note: "Area ∝ postings in the selected year. Drag the slider or press play to move through time.",
+        note: "Area ∝ postings in the selected year. Drag the slider or press play to move through time. “Unknown” = postings without an assigned NOC code, not an occupation group.",
         aria: "Treemap of occupation groups by postings, with a year slider to scrub through time",
       },
       indexedLines: {
@@ -92,7 +92,7 @@ export const occupationsDict = {
       treemap: {
         eyebrow: "Demande par volume · au fil du temps",
         title: "Quels métiers sont en demande : groupes professionnels par volume",
-        note: "Surface ∝ offres de l’année sélectionnée. Utilisez le curseur ou lancez la lecture pour parcourir le temps.",
+        note: "Surface ∝ offres de l’année sélectionnée. Utilisez le curseur ou lancez la lecture pour parcourir le temps. « Inconnu » = offres sans code CNP attribué, pas un groupe professionnel.",
         aria: "Carte proportionnelle des groupes professionnels par offres, avec un curseur annuel pour parcourir le temps",
       },
       indexedLines: {

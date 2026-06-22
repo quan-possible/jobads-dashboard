@@ -45,13 +45,13 @@ export default async function PulsePage() {
     const [overview, demand, yoy, seasonality, composition, occupationTrends, momentum, diffusion] =
       await Promise.all([
         api.overview(),
-        api.figure("pulse.demand_ribbon", locale),
-        api.figure("pulse.yoy_bars", locale),
-        api.figure("pulse.seasonality", locale),
-        api.figure("pulse.composition", locale),
-        api.figure("pulse.occupation_trends", locale),
-        api.figure("pulse.momentum", locale),
-        api.figure("pulse.diffusion", locale),
+        api.figureSafe("pulse.demand_ribbon", locale),
+        api.figureSafe("pulse.yoy_bars", locale),
+        api.figureSafe("pulse.seasonality", locale),
+        api.figureSafe("pulse.composition", locale),
+        api.figureSafe("pulse.occupation_trends", locale),
+        api.figureSafe("pulse.momentum", locale),
+        api.figureSafe("pulse.diffusion", locale),
       ]);
     data = overview;
     figs = { demand, yoy, seasonality, composition, occupationTrends, momentum, diffusion };
@@ -70,11 +70,13 @@ export default async function PulsePage() {
   const wageSpark = kpis.median_wage_trend ?? undefined;
 
   const baselineGap = kpis.demand_index !== null ? kpis.demand_index - 100 : null;
-  // Headline is API-derived (composed from data) — left in English as specified.
+  // Headline composed from the demand index, localized via the page dict (S18).
   const headline =
     baselineGap === null
-      ? "Canada's posting demand"
-      : `Canada's posting demand is ${Math.abs(Math.round(baselineGap))}% ${baselineGap >= 0 ? "above" : "below"} its 2019 baseline`;
+      ? t.heroFallback
+      : t.heroTemplate
+          .replace("{pct}", String(Math.abs(Math.round(baselineGap))))
+          .replace("{dir}", baselineGap >= 0 ? t.heroAbove : t.heroBelow);
 
   return (
     <div className="pb-4">
@@ -82,7 +84,7 @@ export default async function PulsePage() {
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            {t.eyebrowPrefix} · {fmtMonth(as_of)}
+            {t.eyebrowPrefix} · {fmtMonth(as_of, locale)}
           </div>
           <h1 className="h-display max-w-4xl text-balance">{headline}.</h1>
           <p className="lede mt-4 max-w-2xl">{t.lede}</p>
@@ -112,14 +114,15 @@ export default async function PulsePage() {
           />
           <KpiTile
             label={t.kpiYoyLabel}
-            value={fmtPct(kpis.active_yoy_pct, { sign: true })}
+            value={kpis.active_yoy_pct == null ? "—" : fmtPct(Math.abs(kpis.active_yoy_pct))}
+            valueTrend={kpis.active_yoy_pct}
             context={t.kpiYoyContext}
             spark={yoySpark.length > 1 ? yoySpark : undefined}
             sparkColor="var(--teal)"
           />
           <KpiTile
             label={t.kpiWageLabel}
-            value={fmtWage(kpis.median_wage)}
+            value={fmtWage(kpis.median_wage, locale)}
             unit={kpis.median_wage ? t.kpiWageUnit : undefined}
             context={kpis.wage_n ? `n = ${fmtCompact(kpis.wage_n)}` : t.kpiWageInsufficient}
             spark={wageSpark && wageSpark.length > 1 ? wageSpark : undefined}
