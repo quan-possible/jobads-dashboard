@@ -41,21 +41,19 @@ export default async function PulsePage() {
   let data;
   let figs;
   try {
-    const [overview, demand, yoy, seasonality, composition, stl, anomaly, saVsNsa, diffusion, cycle] =
+    const [overview, demand, yoy, seasonality, composition, occupationTrends, momentum, diffusion] =
       await Promise.all([
         api.overview(),
         api.figure("pulse.demand_ribbon", locale),
         api.figure("pulse.yoy_bars", locale),
         api.figure("pulse.seasonality", locale),
         api.figure("pulse.composition", locale),
-        api.figure("pulse.stl", locale),
-        api.figure("pulse.anomaly", locale),
-        api.figure("pulse.sa_vs_nsa", locale),
+        api.figure("pulse.occupation_trends", locale),
+        api.figure("pulse.momentum", locale),
         api.figure("pulse.diffusion", locale),
-        api.figure("pulse.cycle", locale),
       ]);
     data = overview;
-    figs = { demand, yoy, seasonality, composition, stl, anomaly, saVsNsa, diffusion, cycle };
+    figs = { demand, yoy, seasonality, composition, occupationTrends, momentum, diffusion };
   } catch {
     return <ApiDown t={t} />;
   }
@@ -165,31 +163,21 @@ export default async function PulsePage() {
         </div>
       </section>
 
-      {/* Deep: decomposition */}
+      {/* Deep: occupation small-multiples full width */}
       <section className="container-x py-4">
-        <Figure eyebrow={c.stl.eyebrow} title={c.stl.title} asOf={as_of} note={c.stl.note}>
-          <RemoteFigure fig={figs.stl} ariaLabel={c.stl.aria} />
+        <Figure eyebrow={c.occupationTrends.eyebrow} title={c.occupationTrends.title} asOf={as_of} note={c.occupationTrends.note}>
+          <RemoteFigure fig={figs.occupationTrends} ariaLabel={c.occupationTrends.aria} />
         </Figure>
       </section>
 
+      {/* Deep: momentum + diffusion */}
       <section className="container-x py-4">
         <div className="grid gap-5 lg:grid-cols-2">
-          <Figure eyebrow={c.anomaly.eyebrow} title={c.anomaly.title} asOf={as_of} note={c.anomaly.note}>
-            <RemoteFigure fig={figs.anomaly} height={340} ariaLabel={c.anomaly.aria} />
+          <Figure eyebrow={c.momentum.eyebrow} title={c.momentum.title} asOf={as_of} note={c.momentum.note}>
+            <RemoteFigure fig={figs.momentum} height={340} ariaLabel={c.momentum.aria} />
           </Figure>
-          <Figure eyebrow={c.saVsNsa.eyebrow} title={c.saVsNsa.title} asOf={as_of} note={c.saVsNsa.note}>
-            <RemoteFigure fig={figs.saVsNsa} height={340} ariaLabel={c.saVsNsa.aria} />
-          </Figure>
-        </div>
-      </section>
-
-      <section className="container-x py-4">
-        <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.diffusion.eyebrow} title={c.diffusion.title} asOf={as_of} note={c.diffusion.note}>
             <RemoteFigure fig={figs.diffusion} height={340} ariaLabel={c.diffusion.aria} />
-          </Figure>
-          <Figure eyebrow={c.cycle.eyebrow} title={c.cycle.title} asOf={as_of} note={c.cycle.note}>
-            <RemoteFigure fig={figs.cycle} ariaLabel={c.cycle.aria} />
           </Figure>
         </div>
       </section>

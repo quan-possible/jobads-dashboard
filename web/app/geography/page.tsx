@@ -1,4 +1,5 @@
 import { Figure } from "@/components/Figure";
+import { MapToggle } from "@/components/MapToggle";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { api } from "@/lib/api";
 import { fmtMonth } from "@/lib/format";
@@ -38,36 +39,49 @@ export default async function GeographyPage() {
   try {
     const [
       meta,
-      shareChoropleth,
+      mapShare,
+      mapCount,
+      mapPercap,
+      mapLq,
       rankedProvinces,
-      lqChoropleth,
-      lqHeatmap,
-      shiftShare,
+      cmaDemand,
       yoyChoropleth,
-      provinceTiles,
+      shiftShare,
+      aiExposure,
     ] = await Promise.all([
       api.meta(),
-      api.figure("geography.share_choropleth", locale),
+      api.figure("geography.demand_map_share", locale),
+      api.figure("geography.demand_map_count", locale),
+      api.figure("geography.demand_map_percap", locale),
+      api.figure("geography.demand_map_lq", locale),
       api.figure("geography.ranked_provinces", locale),
-      api.figure("geography.lq_choropleth", locale),
-      api.figure("geography.lq_heatmap", locale),
-      api.figure("geography.shift_share", locale),
+      api.figure("geography.cma_demand", locale),
       api.figure("geography.yoy_choropleth", locale),
-      api.figure("geography.province_tiles", locale),
+      api.figure("geography.shift_share", locale),
+      api.figure("geography.ai_exposure", locale),
     ]);
     asOf = meta.latest_month;
     figs = {
-      shareChoropleth,
+      mapShare,
+      mapCount,
+      mapPercap,
+      mapLq,
       rankedProvinces,
-      lqChoropleth,
-      lqHeatmap,
-      shiftShare,
+      cmaDemand,
       yoyChoropleth,
-      provinceTiles,
+      shiftShare,
+      aiExposure,
     };
   } catch {
     return <ApiDown t={t} />;
   }
+
+  const measureOptions = [
+    { value: "share", label: t.mapMeasures.share },
+    { value: "count", label: t.mapMeasures.count },
+    { value: "percap", label: t.mapMeasures.percap },
+    { value: "lq", label: t.mapMeasures.lq },
+  ];
 
   return (
     <div className="pb-4">
@@ -80,11 +94,21 @@ export default async function GeographyPage() {
         </div>
       </section>
 
-      {/* Core: share map + ranked list */}
+      {/* Core: authoritative map (measure toggle) + ranked list */}
       <section className="container-x py-8">
         <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
-          <Figure eyebrow={c.shareChoropleth.eyebrow} title={c.shareChoropleth.title} asOf={asOf} note={c.shareChoropleth.note}>
-            <RemoteFigure fig={figs.shareChoropleth} height={460} ariaLabel={c.shareChoropleth.aria} />
+          <Figure eyebrow={c.demandMap.eyebrow} title={c.demandMap.title} asOf={asOf} note={c.demandMap.note}>
+            <MapToggle
+              options={measureOptions}
+              figs={{
+                share: figs.mapShare,
+                count: figs.mapCount,
+                percap: figs.mapPercap,
+                lq: figs.mapLq,
+              }}
+              height={480}
+              ariaLabel={c.demandMap.aria}
+            />
           </Figure>
           <Figure eyebrow={c.rankedProvinces.eyebrow} title={c.rankedProvinces.title} asOf={asOf} note={c.rankedProvinces.note}>
             <RemoteFigure fig={figs.rankedProvinces} height={420} ariaLabel={c.rankedProvinces.aria} />
@@ -92,10 +116,10 @@ export default async function GeographyPage() {
         </div>
       </section>
 
-      {/* Core: specialisation map full width */}
+      {/* Core: city / CMA demand full width */}
       <section className="container-x py-4">
-        <Figure eyebrow={c.lqChoropleth.eyebrow} title={c.lqChoropleth.title} asOf={asOf} note={c.lqChoropleth.note}>
-          <RemoteFigure fig={figs.lqChoropleth} height={470} ariaLabel={c.lqChoropleth.aria} />
+        <Figure eyebrow={c.cmaDemand.eyebrow} title={c.cmaDemand.title} asOf={asOf} note={c.cmaDemand.note}>
+          <RemoteFigure fig={figs.cmaDemand} height={520} ariaLabel={c.cmaDemand.aria} />
         </Figure>
       </section>
 
@@ -107,29 +131,22 @@ export default async function GeographyPage() {
         </div>
       </section>
 
-      {/* Deep: LQ wall */}
-      <section className="container-x py-4">
-        <Figure eyebrow={c.lqHeatmap.eyebrow} title={c.lqHeatmap.title} asOf={asOf} note={c.lqHeatmap.note}>
-          <RemoteFigure fig={figs.lqHeatmap} height={440} ariaLabel={c.lqHeatmap.aria} />
-        </Figure>
-      </section>
-
-      {/* Deep: shift-share + momentum */}
+      {/* Deep: momentum + AI exposure */}
       <section className="container-x py-4">
         <div className="grid gap-5 lg:grid-cols-2">
-          <Figure eyebrow={c.shiftShare.eyebrow} title={c.shiftShare.title} asOf={asOf} note={c.shiftShare.note}>
-            <RemoteFigure fig={figs.shiftShare} height={460} ariaLabel={c.shiftShare.aria} />
-          </Figure>
           <Figure eyebrow={c.yoyChoropleth.eyebrow} title={c.yoyChoropleth.title} asOf={asOf} note={c.yoyChoropleth.note}>
             <RemoteFigure fig={figs.yoyChoropleth} height={460} ariaLabel={c.yoyChoropleth.aria} />
+          </Figure>
+          <Figure eyebrow={c.aiExposure.eyebrow} title={c.aiExposure.title} asOf={asOf} note={c.aiExposure.note}>
+            <RemoteFigure fig={figs.aiExposure} height={460} ariaLabel={c.aiExposure.aria} />
           </Figure>
         </div>
       </section>
 
-      {/* Deep: tile grid full width */}
+      {/* Deep: shift-share decomposition (secondary) */}
       <section className="container-x py-4">
-        <Figure eyebrow={c.provinceTiles.eyebrow} title={c.provinceTiles.title} asOf={asOf} note={c.provinceTiles.note}>
-          <RemoteFigure fig={figs.provinceTiles} height={300} ariaLabel={c.provinceTiles.aria} />
+        <Figure eyebrow={c.shiftShare.eyebrow} title={c.shiftShare.title} asOf={asOf} note={c.shiftShare.note}>
+          <RemoteFigure fig={figs.shiftShare} height={460} ariaLabel={c.shiftShare.aria} />
         </Figure>
       </section>
     </div>

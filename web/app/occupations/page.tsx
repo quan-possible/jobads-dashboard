@@ -46,8 +46,8 @@ export default async function OccupationsPage() {
       contributionBars,
       waterfall,
       dumbbell,
-      bump,
-      concentration,
+      skillChurn,
+      aiExposure,
       nocNaicsHeatmap,
     ] = await Promise.all([
       api.meta(),
@@ -56,8 +56,8 @@ export default async function OccupationsPage() {
       api.figure("occupations.contribution_bars", locale),
       api.figure("occupations.waterfall", locale),
       api.figure("occupations.dumbbell", locale),
-      api.figure("occupations.bump", locale),
-      api.figure("occupations.concentration", locale),
+      api.figure("occupations.skill_churn", locale),
+      api.figure("occupations.ai_exposure", locale),
       api.figure("occupations.noc_naics_heatmap", locale),
     ]);
     asOf = meta.latest_month;
@@ -67,8 +67,8 @@ export default async function OccupationsPage() {
       contributionBars,
       waterfall,
       dumbbell,
-      bump,
-      concentration,
+      skillChurn,
+      aiExposure,
       nocNaicsHeatmap,
     };
   } catch {
@@ -121,26 +121,26 @@ export default async function OccupationsPage() {
         </div>
       </section>
 
-      {/* Deep: then-vs-now + rank journey */}
+      {/* Deep: then-vs-now + skill churn */}
       <section className="container-x py-4">
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.dumbbell.eyebrow} title={c.dumbbell.title} asOf={asOf} note={c.dumbbell.note}>
             <RemoteFigure fig={figs.dumbbell} height={440} ariaLabel={c.dumbbell.aria} />
           </Figure>
-          <Figure eyebrow={c.bump.eyebrow} title={c.bump.title} asOf={asOf} note={c.bump.note}>
-            <RemoteFigure fig={figs.bump} height={420} ariaLabel={c.bump.aria} />
+          <Figure eyebrow={c.skillChurn.eyebrow} title={c.skillChurn.title} asOf={asOf} note={c.skillChurn.note}>
+            <RemoteFigure fig={figs.skillChurn} height={460} ariaLabel={c.skillChurn.aria} />
           </Figure>
         </div>
       </section>
 
-      {/* Deep: concentration + occupation-by-sector */}
+      {/* Deep: occupation-by-sector + AI exposure (the ceiling) */}
       <section className="container-x py-4">
         <div className="grid gap-5 lg:grid-cols-2">
-          <Figure eyebrow={c.concentration.eyebrow} title={c.concentration.title} asOf={asOf} note={c.concentration.note}>
-            <RemoteFigure fig={figs.concentration} height={360} ariaLabel={c.concentration.aria} />
-          </Figure>
           <Figure eyebrow={c.nocNaicsHeatmap.eyebrow} title={c.nocNaicsHeatmap.title} asOf={asOf} note={c.nocNaicsHeatmap.note}>
             <RemoteFigure fig={figs.nocNaicsHeatmap} height={460} ariaLabel={c.nocNaicsHeatmap.aria} />
+          </Figure>
+          <Figure eyebrow={c.aiExposure.eyebrow} title={c.aiExposure.title} asOf={asOf} note={c.aiExposure.note}>
+            <RemoteFigure fig={figs.aiExposure} height={480} ariaLabel={c.aiExposure.aria} />
           </Figure>
         </div>
       </section>

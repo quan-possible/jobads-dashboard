@@ -39,14 +39,16 @@ export default async function SkillsPage() {
   let figs;
   let asOf: string;
   try {
-    const [meta, skillLift, education, experience] = await Promise.all([
+    const [meta, topSkillsTrend, skillLift, skillOccupationHeatmap, education, experience] = await Promise.all([
       api.meta(),
+      api.figure("skills.top_skills_trend", locale),
       api.figure("skills.skill_lift", locale),
+      api.figure("skills.skill_occupation_heatmap", locale),
       api.figure("skills.education", locale),
       api.figure("skills.experience", locale),
     ]);
     asOf = meta.latest_month;
-    figs = { skillLift, education, experience };
+    figs = { topSkillsTrend, skillLift, skillOccupationHeatmap, education, experience };
   } catch {
     return <ApiDown t={t} />;
   }
@@ -64,10 +66,17 @@ export default async function SkillsPage() {
         </div>
       </section>
 
-      {/* Core: distinctive skills by lift */}
+      {/* Core: most-demanded skills and their trend */}
       <section className="container-x py-4">
-        <Figure eyebrow={c.skillLift.eyebrow} title={c.skillLift.title} asOf={asOf} note={c.skillLift.note}>
-          <RemoteFigure fig={figs.skillLift} height={420} ariaLabel={c.skillLift.aria} />
+        <Figure eyebrow={c.topSkillsTrend.eyebrow} title={c.topSkillsTrend.title} asOf={asOf} note={c.topSkillsTrend.note}>
+          <RemoteFigure fig={figs.topSkillsTrend} height={420} ariaLabel={c.topSkillsTrend.aria} />
+        </Figure>
+      </section>
+
+      {/* Core: what each occupation demands */}
+      <section className="container-x py-4">
+        <Figure eyebrow={c.skillOccupationHeatmap.eyebrow} title={c.skillOccupationHeatmap.title} asOf={asOf} note={c.skillOccupationHeatmap.note}>
+          <RemoteFigure fig={figs.skillOccupationHeatmap} height={520} ariaLabel={c.skillOccupationHeatmap.aria} />
         </Figure>
       </section>
 
@@ -77,6 +86,13 @@ export default async function SkillsPage() {
           <div className="eyebrow mb-1.5">{t.deepEyebrow}</div>
           <p className="lede max-w-2xl">{t.deepLede}</p>
         </div>
+      </section>
+
+      {/* Deep: distinctive skills by lift */}
+      <section className="container-x py-4">
+        <Figure eyebrow={c.skillLift.eyebrow} title={c.skillLift.title} asOf={asOf} note={c.skillLift.note}>
+          <RemoteFigure fig={figs.skillLift} height={440} ariaLabel={c.skillLift.aria} />
+        </Figure>
       </section>
 
       {/* Deep: education + experience requirements over time */}

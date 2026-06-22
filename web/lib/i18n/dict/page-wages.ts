@@ -75,6 +75,12 @@ export const wagesDict = {
         note: "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation).",
         aria: "Quadrant scatter of occupations by advertised median wage and year-over-year demand growth, bubble size by volume",
       },
+      educationWageProxy: {
+        eyebrow: "Credentials vs pay · by occupation",
+        title: "Do credential-heavy occupations pay more?",
+        note: "Each broad occupation group: share of postings asking for a university degree vs median advertised wage · bubble ∝ volume (correlation, not causation).",
+        aria: "Scatter of broad occupation groups by degree-requirement share and median advertised wage, bubble size by volume",
+      },
       conditionsMix: {
         eyebrow: "Posting conditions over time",
         title: "Employment-type mix over time",
@@ -159,6 +165,12 @@ export const wagesDict = {
         title: "Salaire vs élan : le quadrant salaire × demande",
         note: "Aire des bulles ∝ volume · en haut à droite = bien payé et en hausse (corrélation, non causalité).",
         aria: "Nuage en quadrant des professions selon le salaire médian affiché et la croissance de la demande sur un an, taille des bulles selon le volume",
+      },
+      educationWageProxy: {
+        eyebrow: "Diplômes vs salaire · par profession",
+        title: "Les professions exigeantes en diplômes paient-elles plus ?",
+        note: "Chaque grand groupe professionnel : part des offres exigeant un diplôme universitaire vs salaire médian affiché · bulle ∝ volume (corrélation, non causalité).",
+        aria: "Nuage de points des grands groupes professionnels selon la part d'exigence de diplôme et le salaire médian affiché, taille des bulles selon le volume",
       },
       conditionsMix: {
         eyebrow: "Conditions des offres au fil du temps",

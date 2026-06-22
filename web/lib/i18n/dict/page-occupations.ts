@@ -52,17 +52,17 @@ export const occupationsDict = {
         note: "Each line connects the two periods; colour marks the direction of the shift.",
         aria: "Dumbbell chart connecting each occupation group’s 2019 and latest monthly postings",
       },
-      bump: {
-        eyebrow: "Rank over time",
-        title: "Rank journey: occupation groups by demand, 2017–2025",
-        note: "Lines that cross mark groups that traded places; the top five are highlighted.",
-        aria: "Bump chart of occupation groups’ demand rank from 2017 to 2025",
+      skillChurn: {
+        eyebrow: "Skill churn",
+        title: "Which skills are entering vs leaving demand, 2019 → 2024",
+        note: "Top risers (teal) and fallers (orange) by change in posting volume · skills with ≥150 postings in 2019.",
+        aria: "Diverging bar chart of the skills rising and falling fastest in posting demand since 2019",
       },
-      concentration: {
-        eyebrow: "Market concentration",
-        title: "Is demand concentrating? Three views of market concentration",
-        note: "HHI trend · Lorenz inequality · top-20 markets’ cumulative share.",
-        aria: "Three panels: HHI over time, a Lorenz curve, and the top-20 markets’ cumulative share",
+      aiExposure: {
+        eyebrow: "AI exposure · Eloundou β",
+        title: "AI exposure vs demand: where hiring is moving",
+        note: "Eloundou et al. β (US task-based, mapped to NOC) vs demand change since 2019 · bubble ∝ volume. A potential-exposure signal, not realized automation, and not a forecast.",
+        aria: "Scatter plot of AI task exposure against demand change for each broad occupation group, with quadrant reference lines",
       },
       nocNaicsHeatmap: {
         eyebrow: "Occupations by sector",
@@ -119,17 +119,17 @@ export const occupationsDict = {
         note: "Chaque ligne relie les deux périodes ; la couleur indique le sens de l’évolution.",
         aria: "Graphique en haltères reliant les offres mensuelles de chaque groupe professionnel en 2019 et à la période récente",
       },
-      bump: {
-        eyebrow: "Rang au fil du temps",
-        title: "Parcours des rangs : groupes professionnels par demande, 2017–2025",
-        note: "Les lignes qui se croisent marquent les groupes qui ont changé de place ; les cinq premiers sont mis en évidence.",
-        aria: "Graphique de rangs des groupes professionnels selon la demande, de 2017 à 2025",
+      skillChurn: {
+        eyebrow: "Renouvellement des compétences",
+        title: "Quelles compétences entrent ou sortent de la demande, 2019 → 2024",
+        note: "Plus fortes hausses (sarcelle) et baisses (orange) selon la variation du volume d’offres · compétences avec ≥150 offres en 2019.",
+        aria: "Diagramme à barres divergentes des compétences qui montent et descendent le plus vite dans la demande depuis 2019",
       },
-      concentration: {
-        eyebrow: "Concentration des marchés",
-        title: "La demande se concentre-t-elle ? Trois vues de la concentration des marchés",
-        note: "Tendance de l’IHH · inégalité de Lorenz · part cumulée des 20 premiers marchés.",
-        aria: "Trois panneaux : IHH au fil du temps, courbe de Lorenz et part cumulée des 20 premiers marchés",
+      aiExposure: {
+        eyebrow: "Exposition à l'IA · β Eloundou",
+        title: "Exposition à l'IA et demande : où l'embauche se déplace",
+        note: "β d'Eloundou et al. (basée sur les tâches aux É.-U., rattachée à la CNP) vs variation de la demande depuis 2019 · bulle ∝ volume. Un signal d'exposition potentielle, non d'automatisation réalisée, et non une prévision.",
+        aria: "Nuage de points de l'exposition des tâches à l'IA en fonction de la variation de la demande pour chaque grand groupe professionnel, avec des lignes de référence en quadrants",
       },
       nocNaicsHeatmap: {
         eyebrow: "Professions par secteur",

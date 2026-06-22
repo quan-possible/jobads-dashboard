@@ -62,11 +62,23 @@ export const skillsDict = {
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
+      topSkillsTrend: {
+        eyebrow: "Most-demanded skills · trend",
+        title: "The most-demanded skills, and how each has trended",
+        note: "Top skills by posting volume, each indexed to its 2019 average so fast and slow movers are comparable.",
+        aria: "Indexed line chart of the most-demanded skills since 2019",
+      },
       skillLift: {
         eyebrow: "Distinctive skills · lift",
         title: "Distinctive skills for a specialised group",
-        note: "Skills most over-represented vs the whole market (codes are taxonomy IDs; no public label table in v1).",
+        note: "Skills most over-represented vs the whole market — what sets this occupation group apart.",
         aria: "Horizontal bars of skills ranked by lift over the national share",
+      },
+      skillOccupationHeatmap: {
+        eyebrow: "Skills × occupations",
+        title: "What each occupation group demands",
+        note: "Column-normalised: each occupation’s mentions of the top skills (latest month).",
+        aria: "Heatmap of the top skills against broad occupation groups, column-normalised",
       },
       education: {
         eyebrow: "Requirements · education",
@@ -141,11 +153,23 @@ export const skillsDict = {
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
+      topSkillsTrend: {
+        eyebrow: "Compétences les plus demandées · tendance",
+        title: "Les compétences les plus demandées, et leur évolution",
+        note: "Principales compétences par volume d’offres, chacune indexée à sa moyenne de 2019 pour comparer les fortes et faibles variations.",
+        aria: "Graphique linéaire indexé des compétences les plus demandées depuis 2019",
+      },
       skillLift: {
         eyebrow: "Compétences distinctives · indice",
         title: "Compétences distinctives d’un groupe spécialisé",
-        note: "Compétences les plus surreprésentées par rapport à l’ensemble du marché (les codes sont des identifiants de taxonomie; pas de table d’étiquettes publique en v1).",
+        note: "Compétences les plus surreprésentées par rapport à l’ensemble du marché — ce qui distingue ce groupe professionnel.",
         aria: "Barres horizontales des compétences classées par indice de spécificité vs la part nationale",
+      },
+      skillOccupationHeatmap: {
+        eyebrow: "Compétences × professions",
+        title: "Ce que demande chaque groupe professionnel",
+        note: "Normalisé par colonne : les mentions des principales compétences par profession (dernier mois).",
+        aria: "Carte de chaleur des principales compétences par grand groupe professionnel, normalisée par colonne",
       },
       education: {
         eyebrow: "Exigences · scolarité",

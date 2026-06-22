@@ -42,17 +42,18 @@ export default async function WagesPage() {
   let asOf: string;
   let figs;
   try {
-    const [meta, wageBand, wageDumbbell, wageDemandQuadrant, conditionsMix, languageGap] =
+    const [meta, wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, conditionsMix, languageGap] =
       await Promise.all([
         api.meta(),
         api.figure("pay.wage_band", locale),
         api.figure("pay.wage_dumbbell", locale),
         api.figure("pay.wage_demand_quadrant", locale),
+        api.figure("pay.education_wage_proxy", locale),
         api.figure("pay.conditions_mix", locale),
         api.figure("pay.language_gap", locale),
       ]);
     asOf = meta.latest_month;
-    figs = { wageBand, wageDumbbell, wageDemandQuadrant, conditionsMix, languageGap };
+    figs = { wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, conditionsMix, languageGap };
   } catch {
     return <ApiDown t={t} />;
   }
@@ -90,16 +91,26 @@ export default async function WagesPage() {
         </div>
       </section>
 
-      {/* Deep: pay vs demand quadrant */}
+      {/* Deep: pay vs demand quadrant + credentials vs pay */}
       <section className="container-x py-4">
-        <Figure
-          eyebrow={c.wageDemandQuadrant.eyebrow}
-          title={c.wageDemandQuadrant.title}
-          asOf={asOf}
-          note={c.wageDemandQuadrant.note}
-        >
-          <RemoteFigure fig={figs.wageDemandQuadrant} height={440} ariaLabel={c.wageDemandQuadrant.aria} />
-        </Figure>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Figure
+            eyebrow={c.wageDemandQuadrant.eyebrow}
+            title={c.wageDemandQuadrant.title}
+            asOf={asOf}
+            note={c.wageDemandQuadrant.note}
+          >
+            <RemoteFigure fig={figs.wageDemandQuadrant} height={440} ariaLabel={c.wageDemandQuadrant.aria} />
+          </Figure>
+          <Figure
+            eyebrow={c.educationWageProxy.eyebrow}
+            title={c.educationWageProxy.title}
+            asOf={asOf}
+            note={c.educationWageProxy.note}
+          >
+            <RemoteFigure fig={figs.educationWageProxy} height={440} ariaLabel={c.educationWageProxy.aria} />
+          </Figure>
+        </div>
       </section>
 
       {/* Deep: posting conditions */}
