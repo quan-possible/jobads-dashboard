@@ -1,6 +1,6 @@
 # Code simplification — make the dashboard codebase lean without changing what it renders
 
-- **Status:** BUILT & VERIFIED — all planned tiers implemented (Tier 3 deliberately deferred); the rendered dashboard is unchanged.
+- **Status:** BUILT & VERIFIED — all worthwhile simplifications implemented; a final dead-symbol sweep added one more pass; Tier 3 examined and rejected as not a real simplification. The rendered dashboard is unchanged.
 - **Date:** 2026-06-22
 - **Branch / worktree:** `sleepy-euler-04a7d0` (off `main`, started at `5b9f099`).
 - **Skill:** `simplify`.
@@ -19,6 +19,7 @@
 | `03df440` | Tier 2 (viz): hoisted duplicated chrome (`UP`/`DOWN`, `treemap_trace`, `PROVISIONAL_FROM`) |
 | `55f990d` | Tier 2 (web): shared `DeepDivider` component |
 | `58a170b` | Tier 2 (prepare): one `_build_stacked_dimension` helper for conditions/language/requirements |
+| `d817b12` | Final sweep: removed last dead helpers — viz `emphasise()`/`money()` (+ freed `BRAND`/`CONTEXT` imports), web `SkillsDict` type |
 
 **Verification evidence (the "unchanged" proof):**
 - **Figures**: all 86 renders (43 charts × en/fr) byte-identical to the pre-change baseline, checked after every Python change (`evidence/baseline/figures.sha256.json`).
@@ -27,7 +28,13 @@
 - **Tests**: 111 pass (down from 155 baseline — the 44 removed covered deleted endpoints + 2 dead metrics tests). `jobads-dashboard validate` reconciles (25,356,735 postings, no missing files, no schema issues).
 - **Live smoke**: home renders real charts; `/developers` now lists only `/api/meta` + `/api/overview`.
 
-**Deferred (Tier 3 — deliberately NOT done):** collapsing the two posting-lookup builders and folding `tools/build_wage_by_education.py` into `refresh`. Rationale: these change a private gitignored index and a committed asset's build path; they don't reduce the rendered dashboard, carry latent-bug risk to future refreshes, and have low ROI relative to the verification cost. Left as a clean future option.
+**Final dead-symbol sweep (commit `d817b12`):** ran an AST/grep dead-export scan across Python (`src`/`api`/`tools`) and TS (`web`). After filtering false positives (pytest test functions, FastAPI route handlers referenced by decorator, Next.js convention exports like `opengraph-image`'s `contentType`), three genuinely-dead exports remained and were removed: `viz/figures/_common.py`'s `emphasise()` and `money()` (zero call sites; their removal also freed the `BRAND`/`CONTEXT` imports) and `web/lib/i18n/dict/page-skills.ts`'s `SkillsDict` type (never imported — the page uses `typeof skillsDict.en` inline). Re-verified: all 86 figure renders byte-identical, 111 tests pass, web build green.
+
+**Tier 3 — examined closely and rejected (not merely deferred):** the two candidates are not actually code simplifications.
+- *Merge the two posting-lookup builders.* `build_posting_lookup_table` projects from the already-normalized in-memory `normalized_postings` view (the full-refresh path); `build_posting_lookup_from_source` re-normalizes inline from raw source so the standalone `posting-lookup` CLI can rebuild just the lookup without a 12-min refresh. They share only the output-schema tail — the column *sources* differ. Coupling them through a shared SQL fragment would preserve awkward structure to save ~15 lines, the opposite of the simplest coherent solution.
+- *Fold `tools/build_wage_by_education.py` into `refresh`.* The asset is a pandas percentile cut of the bounded latest-month `posting_lookup` sample. Folding it in either relocates ~40 lines with no net reduction and more coupling, or recomputes from the full corpus — which would change the rendered chart. Neither serves the goal.
+
+Both are left as standalone-by-design, not as pending work.
 
 **Environment note:** the venv was rebuilt from `uv.lock` (`uv sync --extra api --extra dev`); free numpy resolution breaks pandas, so always sync to the lock.
 
