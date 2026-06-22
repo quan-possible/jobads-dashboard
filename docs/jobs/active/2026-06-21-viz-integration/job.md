@@ -1,7 +1,7 @@
 # Job: Put the redesign2 visuals on the redesign website (figure-bridge, national, time sliders)
 
 **Slug:** 2026-06-21-viz-integration
-**Status:** IMPLEMENTED — S0–S5 all landed & verified (commits c06b82b, bb520fc, 585e641, 60d4c89, dc2ee5e). Open: confirm fate of the private `/explore` lookup; optional follow-ups (see §11). See §10 Progress.
+**Status:** COMPLETE — S0–S5 + all polish/deferred items landed & verified (commits c06b82b → 4ecdecd). `/explore` kept; filter bar scoped to it; 4 time sliders; FR in-figure chrome; API surface kept by design. See §10 Progress, §11 resolutions.
 **Target:** the `redesign` branch — **Next.js (`web/`) + FastAPI (`api/`)** app, worktree `.claude/worktrees/greenfield-aclmr` (the Streamlit app in `src/` is legacy, ignore).
 **Source of charts:** `redesign2`'s Python Plotly factories (`src/jobads_dashboard/viz/`), worktree `.claude/worktrees/redesign2`.
 **Detailed build spec (file-level, code skeletons):** see `implementation.md` in this folder.
@@ -112,12 +112,12 @@ Trace modules to add for the above: **treemap**, **waterfall** (Core/Deep need t
 - **S4 — remove old layer (DONE, verified).** Deleted 22 dead chart components + 2 orphaned explorer dicts; kept the shell (TopNav/FilterSpine/Footer), KpiTile/Sparkline/KeyPoints, Select, and everything `/explore` + `/method` use. tsc clean; home + bridged pages render (KPI sparklines + filter selects intact). Commit 60d4c89.
 - **S5 — FR (DONE, verified).** Page chrome was already bilingual via dicts; FR spot-check on /occupations confirms French eyebrows/titles/notes + `html lang=fr`. Localized the one remaining piece — the treemap slider prefix/play ("Année :"/"▶ Lecture"). Commit dc2ee5e.
 
-## 11. Deferred / decisions needed
-- **Private `/explore` posting lookup** — KEPT for now (untouched; distinct from the discarded public profession-selector). Confirm keep vs cut. If cut, FilterSpine + its shared components (Select, PixelTiles, DownloadCSV, etc.) can also go.
-- **FilterSpine (global filter bar)** — still in the shell on every page but the bridged visuals ignore it (national). Kept because `/explore` uses it. Remove from the layout if `/explore` is cut (or if you want the curated pages filter-free in the chrome too).
-- **Dead API endpoints** — `api/routers/read.py` still exposes rank/geography/wages/composition/etc. that the web no longer calls (only `overview`, `meta`, `figure`). Harmless + tested; left in place. Prune later with their `api.ts` methods + types + tests if desired.
-- **More time sliders** — only the two treemaps animate today. Choropleths animate cheaply visually but each frame would re-embed the ~300 KB province geojson (payload blow-up) — needs a shared-geometry approach before animating maps. Heatmaps/rankings could animate by year (light) if wanted.
-- **Choropleth payload** — the 3 geography choropleths embed the province geojson (~300 KB each, gzip-compressible, cached hourly). Could serve the geometry once as a shared asset.
-- **In-figure axis/hover text** stays English (factories bake it); only titles/notes/eyebrows + slider chrome are localized. Deeper localization is a separate factory seam if needed.
-- **Pre-existing lint** in `components/explore/PostingDrawer.tsx` (set-state-in-effect) — untouched, out of scope.
-- **Local dev:** API on 8531 (8530 was taken); web preview via the `redesign2-web` config added to the **main-repo** `.claude/launch.json` (uncommitted, dev-only); web points at 8531 via gitignored `web/.env.local`.
+## 11. Deferred items — all resolved (commits 4ecdecd, plus geography-notes commit)
+- **Private `/explore`** — DECISION: **kept** (a useful team tool, works; distinct from the discarded public explorer).
+- **FilterSpine** — RESOLVED: scoped to render **only on `/explore`** (the one filter-driven page). The curated national pages no longer carry a dead filter strip — verified gone from Pulse/geography/etc., present on `/explore`.
+- **More time sliders** — DONE: now **4 animated charts** — occupation & industry treemaps (by year), the **YoY province choropleth**, and the **LQ occupation×province heatmap**. A tasteful set (snapshot charts that benefit from "go through time"), not every chart.
+- **Choropleth payload** — SOLVED: animated choropleth frames carry only `z`/`locations`; the geojson lives in the base trace and Plotly persists it across frames. Payload ~340 KB (not 3.5 MB). Browser-verified: scrubbing keeps all 11 provinces drawn.
+- **In-figure FR** — DONE: a centralized exact-match translator (`_localize_chrome` in `api/figures.py`) localizes axis titles, colorbar labels, band/reference annotations, legend names, subplot titles and month ticks for `fr`. Hovertemplates stay EN (hover-only; format-code fragility) — acceptable.
+- **"Dead" API endpoints** — DECISION: **kept by design.** `api/routers/read.py` is a deliberate typed public data API ("Typed JSON over the local job-ads aggregates", surfaced via `/developers`), not dead code tied to the UI. Pruning would break that contract for no user-visible gain.
+- **Pre-existing lint** in `components/explore/PostingDrawer.tsx` — untouched, out of scope.
+- **Local dev:** API on 8531 (8530 was taken); web preview via the `redesign2-web` config added to the **main-repo** `.claude/launch.json` (uncommitted, dev-only); web points at 8531 via gitignored `web/.env.local`. Note: Next dev persists its fetch cache to `.next` + memory — `rm -rf .next` to force-refresh figures after a factory/registry change.
