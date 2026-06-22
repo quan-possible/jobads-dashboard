@@ -49,7 +49,6 @@ def _pages() -> list[Section]:
     return [
         Section("1", "Pulse — the market's vital signs", "pulse",
                 "How strong is demand, how is it moving, and what is driving it.", [
-            Item(pulse.kpi_row, "Four headline numbers with sparklines anchor the page.", "Core"),
             Item(pulse.demand_ribbon, "Demand fell from the 2022 peak; the dotted tail is provisional.", "Core"),
             Item(pulse.yoy_bars, "Year-over-year turns negative through the recent cooling.", "Core"),
             Item(pulse.seasonality_heatmap, "A repeatable within-year rhythm, separated from the trend.", "Core"),

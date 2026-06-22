@@ -21,6 +21,7 @@ dependencies = [
 dev = [
   "pytest>=8.0.0",
   "kaleido>=1.0.0",  # static PNG export for visual verification of viz figures
+  "hypothesis>=6.0.0",  # property-based invariants for the pure viz transforms
 ]
 api = [
   "fastapi>=0.115.0",

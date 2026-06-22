@@ -69,6 +69,16 @@ class DataSource:
         return pd.Timestamp(self.overall["month"].max())
 
     @functools.cached_property
+    def metadata(self) -> dict:
+        """Raw ``metadata.json`` (source window, headline counts). Used by the
+        standalone review page (``review.py``); the live bridge reads meta via the API."""
+        path = self.data_root / "metadata.json"
+        if path.exists():
+            with path.open() as fh:
+                return json.load(fh)
+        return {}
+
+    @functools.cached_property
     def noc_broad(self) -> pd.DataFrame:
         df = self._tables["monthly_by_noc_broad"].copy()
         cl = _parse_code_label(df["occupation_scope"])

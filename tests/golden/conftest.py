@@ -43,7 +43,6 @@ def fixture_bundle(tmp_path_factory) -> Path:
     refresh_dashboard_data(
         source_root=CORPUS_ROOT,
         output_root=out,
-        top_markets_per_province=10,
         skills_top_k=10,
         posting_lookup_recent_months=0,
     )
