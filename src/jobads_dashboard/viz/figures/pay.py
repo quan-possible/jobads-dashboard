@@ -15,14 +15,12 @@ from plotly.subplots import make_subplots
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
 from ..theme import (
-    BRAND, CONTEXT, MUTED, add_covid_band, add_provisional_band, add_reference_line,
-    add_unstable_band,
+    BRAND, CONTEXT, MUTED, UP, DOWN, add_covid_band, add_provisional_band,
+    add_reference_line, add_unstable_band,
 )
 from ._common import titled
 
 _STABLE_END = pd.Timestamp("2024-12-01")
-UP = "#2f6f77"
-DOWN = "#b5523a"
 
 
 # --------------------------------------------------------------------------- CORE

@@ -14,15 +14,13 @@ import plotly.graph_objects as go
 
 from .. import compute as C
 from ..datasource import BASE_YEAR, PROVINCE_NAMES, DataSource
-from ..theme import BRAND, CONTEXT, DIVERGING, SEQUENTIAL
+from ..theme import BRAND, CONTEXT, DIVERGING, PROVISIONAL_FROM, SEQUENTIAL
 from ._common import add_time_slider, titled
 
 
 def _slider_chrome(locale: str) -> dict:
     fr = locale == "fr"
     return dict(prefix="Année : " if fr else "Year: ", play="▶ Lecture" if fr else "▶ Play")
-
-_PROVISIONAL_FROM = pd.Timestamp("2025-01-01")
 
 
 def _last12(df: pd.DataFrame, value: str = "postings_total") -> pd.DataFrame:
@@ -31,7 +29,7 @@ def _last12(df: pd.DataFrame, value: str = "postings_total") -> pd.DataFrame:
 
 
 def _stable_window() -> tuple[pd.Timestamp, pd.Timestamp]:
-    return pd.Timestamp(f"{BASE_YEAR}-06-01"), _PROVISIONAL_FROM - pd.DateOffset(months=1)
+    return pd.Timestamp(f"{BASE_YEAR}-06-01"), PROVISIONAL_FROM - pd.DateOffset(months=1)
 
 
 # --------------------------------------------------------------------------- CORE

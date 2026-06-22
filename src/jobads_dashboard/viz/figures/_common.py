@@ -2,11 +2,27 @@
 
 from __future__ import annotations
 
+import pandas as pd
 import plotly.graph_objects as go
 
-from ..theme import BRAND, CONTEXT, MUTED, register_templates
+from ..theme import BRAND, CONTEXT, MUTED, SEQUENTIAL, register_templates
 
 register_templates()  # ensure templates exist when figures are built standalone
+
+
+def treemap_trace(g: pd.DataFrame, name_col: str, root: str) -> go.Treemap:
+    """Shared treemap trace for the occupation / industry volume treemaps."""
+    g = g.copy()
+    g["short"] = g[name_col].map(lambda s: s.split("|")[-1].strip())
+    total = g["postings_total"].sum()
+    return go.Treemap(
+        labels=[root] + g["short"].tolist(),
+        parents=[""] + [root] * len(g),
+        values=[total] + g["postings_total"].tolist(), branchvalues="total",
+        marker=dict(colors=[total] + g["postings_total"].tolist(), colorscale=SEQUENTIAL,
+                    line=dict(width=1, color="white")),
+        textinfo="label+value+percent root", maxdepth=2,
+        hovertemplate="%{label}: %{value:,.0f} (%{percentRoot})<extra></extra>")
 
 
 def titled(fig: go.Figure, headline: str, subtitle: str | None = None,

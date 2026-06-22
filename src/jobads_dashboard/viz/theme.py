@@ -34,6 +34,10 @@ BRAND_DEEP = "#a85c1f"
 CONTEXT = "#9aa7b0"
 MUTED = "#5d6b74"
 
+#: Semantic up/down accents for risers vs fallers (deltas, dumbbells, waterfalls).
+UP = "#2f6f77"
+DOWN = "#b5523a"
+
 #: Categorical colorway for multi-series charts (brand-harmonised, distinguishable).
 COLORWAY = [
     "#345961",  # teal

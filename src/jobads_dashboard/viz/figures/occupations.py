@@ -9,17 +9,14 @@ import plotly.graph_objects as go
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
 from ..theme import (
-    BRAND, CONTEXT, MUTED, SEQUENTIAL, add_covid_band, add_reference_line,
+    BRAND, CONTEXT, MUTED, PROVISIONAL_FROM, SEQUENTIAL, UP, DOWN,
+    add_covid_band, add_reference_line,
 )
-from ._common import add_time_slider, titled
-
-_PROVISIONAL_FROM = pd.Timestamp("2025-01-01")
-UP = "#2f6f77"
-DOWN = "#b5523a"
+from ._common import add_time_slider, titled, treemap_trace
 
 
 def _stable_window() -> tuple[pd.Timestamp, pd.Timestamp]:
-    return pd.Timestamp(f"{BASE_YEAR}-06-01"), _PROVISIONAL_FROM - pd.DateOffset(months=1)
+    return pd.Timestamp(f"{BASE_YEAR}-06-01"), PROVISIONAL_FROM - pd.DateOffset(months=1)
 
 
 def _real_groups(df: pd.DataFrame, col: str = "noc_name") -> pd.DataFrame:
@@ -27,20 +24,6 @@ def _real_groups(df: pd.DataFrame, col: str = "noc_name") -> pd.DataFrame:
 
 
 # --------------------------------------------------------------------------- CORE
-
-
-def _treemap_trace(g: pd.DataFrame, root: str = "All occupations") -> go.Treemap:
-    g = g.copy()
-    g["short"] = g["noc_name"].map(lambda s: s.split("|")[-1].strip())
-    total = g["postings_total"].sum()
-    return go.Treemap(
-        labels=[root] + g["short"].tolist(),
-        parents=[""] + [root] * len(g),
-        values=[total] + g["postings_total"].tolist(), branchvalues="total",
-        marker=dict(colors=[total] + g["postings_total"].tolist(), colorscale=SEQUENTIAL,
-                    line=dict(width=1, color="white")),
-        textinfo="label+value+percent root", maxdepth=2,
-        hovertemplate="%{label}: %{value:,.0f} (%{percentRoot})<extra></extra>")
 
 
 def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> go.Figure:
@@ -51,7 +34,7 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
         years = sorted(nb["year"].unique())
         agg = {y: nb[nb["year"] == y].groupby("noc_name", as_index=False)["postings_total"].sum()
                for y in years}
-        frames = [go.Frame(name=str(y), data=[_treemap_trace(agg[y])]) for y in years]
+        frames = [go.Frame(name=str(y), data=[treemap_trace(agg[y], "noc_name", "All occupations")]) for y in years]
         fig = go.Figure(data=frames[-1].data, frames=frames)
         fr = locale == "fr"
         add_time_slider(fig, years, prefix="Année : " if fr else "Year: ",
@@ -61,7 +44,7 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
                       "Area ∝ postings in the selected year — drag the slider or press play")
     cut = nb["month"].max() - pd.DateOffset(months=12)
     g = nb[nb["month"] > cut].groupby("noc_name", as_index=False)["postings_total"].sum()
-    fig = go.Figure(_treemap_trace(g))
+    fig = go.Figure(treemap_trace(g, "noc_name", "All occupations"))
     fig.update_layout(height=460, margin=dict(l=8, r=8, t=64, b=8))
     return titled(fig, "What work is in demand: occupation groups by volume",
                   "Area ∝ postings (last 12 months); click a tile to zoom")

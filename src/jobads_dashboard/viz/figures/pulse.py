@@ -12,13 +12,10 @@ from plotly.subplots import make_subplots
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
 from ..theme import (
-    BRAND, CONTEXT, DIVERGING, MUTED, add_covid_band, add_provisional_band,
+    BRAND, CONTEXT, DIVERGING, MUTED, UP, DOWN, add_covid_band, add_provisional_band,
     add_reference_line, split_provisional,
 )
 from ._common import titled
-
-UP = "#2f6f77"
-DOWN = "#b5523a"
 
 
 # --------------------------------------------------------------------------- CORE
