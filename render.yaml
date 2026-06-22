@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     repo: https://github.com/quan-possible/jobads-dashboard
-    branch: worktree-greenfield-aclmr
+    branch: main
     dockerfilePath: ./Dockerfile
     dockerContext: .
     # Web liveness probe (Next route handler), independent of the API/data.
