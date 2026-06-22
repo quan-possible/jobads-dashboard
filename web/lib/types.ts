@@ -210,6 +210,15 @@ export interface Filters {
   cmp?: string;
 }
 
+// --- Figure bridge (Plotly factories served as figure JSON) ---
+// The Python factories own the figure shape; the front-end draws it verbatim, so
+// data/layout/frames are intentionally opaque (Plotly's own contract).
+export interface FigJSON {
+  data: unknown[];
+  layout: Record<string, unknown>;
+  frames?: unknown[];
+}
+
 // --- Private Explore (posting-level lookup) ---
 
 export interface AuthStatus {

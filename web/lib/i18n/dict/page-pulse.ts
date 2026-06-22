@@ -58,6 +58,68 @@ export const pulseDict = {
     apiDownTitle: "Data service unavailable",
     apiDownBody: "The API isn’t responding. Start it with",
     apiDownCmd: "uvicorn api.main:app --port 8530",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Going deeper",
+    deepLede: "Decomposition and diagnostics for readers who want the mechanics behind the headline.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      demandRibbon: {
+        eyebrow: "Posting demand over time",
+        title: "Labour demand: monthly job-ad postings",
+        note: "Faint line = raw monthly count · bold = 3-month average · dotted tail = provisional.",
+        aria: "Monthly job-ad postings with a 3-month average and a provisional tail",
+      },
+      yoyBars: {
+        eyebrow: "Year over year",
+        title: "Growth and decline in postings, year over year",
+        note: "Each bar compares a month with the same month a year earlier.",
+        aria: "Year-over-year percentage change in postings, by month",
+      },
+      seasonality: {
+        eyebrow: "Seasonality · month by year",
+        title: "When in the year is demand strongest?",
+        note: "Each cell is that month relative to its own year’s average, so the seasonal shape shows through the trend.",
+        aria: "Heatmap of monthly demand relative to each year’s average",
+      },
+      composition: {
+        eyebrow: "Occupational mix",
+        title: "How the occupational mix shifts over time",
+        note: "Share of monthly postings by broad occupation group (top groups + Other).",
+        aria: "Stacked area of posting share by broad occupation group over time",
+      },
+      stl: {
+        eyebrow: "Decomposition",
+        title: "Trend, season and shock, pulled apart",
+        note: "Classical additive decomposition (a dependency-free stand-in for STL); COVID lands in the remainder.",
+        aria: "Four-panel decomposition: observed, trend, seasonal and remainder",
+      },
+      anomaly: {
+        eyebrow: "Anomalies",
+        title: "Surprises versus the seasonal expectation",
+        note: "Robust z-score on the decomposition remainder; |z| > 3 (orange) flags an anomaly.",
+        aria: "Bar chart of robust z-scores flagging anomalous months",
+      },
+      saVsNsa: {
+        eyebrow: "Seasonal adjustment",
+        title: "Seasonally adjusted versus raw demand",
+        note: "Seasonally adjusted ≈ observed − seasonal (decomposition-based, approximate — not an official X-13 series).",
+        aria: "Seasonally adjusted demand against the raw series",
+      },
+      diffusion: {
+        eyebrow: "Breadth of growth",
+        title: "Is growth broad or narrow?",
+        note: "Share of broad occupation groups with positive year-over-year demand; 50 = evenly split.",
+        aria: "Diffusion index of occupation groups with positive year-over-year demand",
+      },
+      cycle: {
+        eyebrow: "Seasonal cycle",
+        title: "Each month’s trend across the years",
+        note: "Within each panel the line runs 2016 → 2026; the orange line marks that month’s mean.",
+        aria: "Cycle plot of each calendar month’s trend across years",
+      },
+    },
   },
   fr: {
     // Hero
@@ -113,5 +175,67 @@ export const pulseDict = {
     apiDownTitle: "Service de données indisponible",
     apiDownBody: "L’API ne répond pas. Démarrez-la avec",
     apiDownCmd: "uvicorn api.main:app --port 8530",
+
+    // Section dividers (Core → Deep)
+    deepEyebrow: "Pour aller plus loin",
+    deepLede: "Décomposition et diagnostics pour qui veut la mécanique derrière le chiffre principal.",
+
+    // Bridged figures (chrome only; the figure bodies come from the API)
+    charts: {
+      demandRibbon: {
+        eyebrow: "Demande affichée au fil du temps",
+        title: "Demande de travail : offres d’emploi mensuelles",
+        note: "Ligne pâle = total mensuel brut · ligne grasse = moyenne sur 3 mois · pointillé = provisoire.",
+        aria: "Offres d’emploi mensuelles avec moyenne sur trois mois et fin provisoire",
+      },
+      yoyBars: {
+        eyebrow: "D’une année à l’autre",
+        title: "Hausse et baisse des offres, sur un an",
+        note: "Chaque barre compare un mois au même mois un an plus tôt.",
+        aria: "Variation en pourcentage des offres sur un an, par mois",
+      },
+      seasonality: {
+        eyebrow: "Saisonnalité · mois par année",
+        title: "Quand la demande est-elle la plus forte dans l’année ?",
+        note: "Chaque cellule représente le mois par rapport à la moyenne de son année, révélant la forme saisonnière au-delà de la tendance.",
+        aria: "Carte de chaleur de la demande mensuelle par rapport à la moyenne annuelle",
+      },
+      composition: {
+        eyebrow: "Composition professionnelle",
+        title: "Comment la composition professionnelle évolue",
+        note: "Part des offres mensuelles par grand groupe professionnel (principaux groupes + Autres).",
+        aria: "Aires empilées de la part des offres par grand groupe professionnel dans le temps",
+      },
+      stl: {
+        eyebrow: "Décomposition",
+        title: "Tendance, saison et choc, séparés",
+        note: "Décomposition additive classique (substitut sans dépendance à STL) ; la COVID se loge dans le résidu.",
+        aria: "Décomposition en quatre panneaux : observé, tendance, saisonnier et résidu",
+      },
+      anomaly: {
+        eyebrow: "Anomalies",
+        title: "Les surprises par rapport à l’attente saisonnière",
+        note: "Cote z robuste sur le résidu de la décomposition ; |z| > 3 (orange) signale une anomalie.",
+        aria: "Diagramme à barres des cotes z robustes signalant les mois anormaux",
+      },
+      saVsNsa: {
+        eyebrow: "Ajustement saisonnier",
+        title: "Demande désaisonnalisée et demande brute",
+        note: "Désaisonnalisée ≈ observée − saisonnière (basée sur la décomposition, approximative — pas une série X-13 officielle).",
+        aria: "Demande désaisonnalisée par rapport à la série brute",
+      },
+      diffusion: {
+        eyebrow: "Ampleur de la croissance",
+        title: "La croissance est-elle large ou étroite ?",
+        note: "Part des grands groupes professionnels en hausse sur un an ; 50 = partagé également.",
+        aria: "Indice de diffusion des groupes professionnels en hausse sur un an",
+      },
+      cycle: {
+        eyebrow: "Cycle saisonnier",
+        title: "La tendance de chaque mois au fil des années",
+        note: "Dans chaque panneau, la ligne va de 2016 à 2026 ; la ligne orange marque la moyenne du mois.",
+        aria: "Graphique cyclique de la tendance de chaque mois civil au fil des années",
+      },
+    },
   },
 } as const;

@@ -22,3 +22,11 @@ declare module "plotly.js/lib/choropleth" {
   const trace: unknown;
   export default trace;
 }
+declare module "plotly.js/lib/treemap" {
+  const trace: unknown;
+  export default trace;
+}
+declare module "plotly.js/lib/waterfall" {
+  const trace: unknown;
+  export default trace;
+}

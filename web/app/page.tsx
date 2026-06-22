@@ -1,18 +1,11 @@
-import Link from "next/link";
-import { ExplorerChart } from "@/components/ExplorerChart";
-import { SeasonalityHeatmap } from "@/components/SeasonalityHeatmap";
-import { DivergingMovers } from "@/components/DivergingMovers";
 import { Figure } from "@/components/Figure";
 import { KeyPoints } from "@/components/KeyPoints";
 import { KpiTile } from "@/components/KpiTile";
-import { SparklineTable, type SparkRow } from "@/components/SparklineTable";
+import { RemoteFigure } from "@/components/RemoteFigure";
 import { api } from "@/lib/api";
 import { fmtCompact, fmtInt, fmtMonth, fmtPct, fmtWage } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { pulseDict } from "@/lib/i18n/dict/page-pulse";
-import { explorerDict } from "@/lib/i18n/dict/explorer";
-import { GEO_OPTIONS, labelFor } from "@/lib/options";
-import type { Filters } from "@/lib/types";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -37,31 +30,37 @@ function ApiDown({ t }: { t: (typeof pulseDict)[keyof typeof pulseDict] }) {
   );
 }
 
-export default async function PulsePage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const [sp, locale] = await Promise.all([searchParams, getLocale()]);
+export default async function PulsePage() {
+  const locale = await getLocale();
   const t = pulseDict[locale];
+  const c = t.charts;
 
-  const filters: Filters = {
-    geo: typeof sp.geo === "string" ? sp.geo : undefined,
-    occ: typeof sp.occ === "string" ? sp.occ : undefined,
-    ind: typeof sp.ind === "string" ? sp.ind : undefined,
-  };
-
+  // National only (the figure bridge is national by construction). KPIs + key
+  // points come from the overview endpoint; every chart body comes from the
+  // figure bridge, fetched (and cached) server-side in parallel.
   let data;
-  let geo;
+  let figs;
   try {
-    [data, geo] = await Promise.all([api.overview(filters), api.geography(filters, "count")]);
+    const [overview, demand, yoy, seasonality, composition, stl, anomaly, saVsNsa, diffusion, cycle] =
+      await Promise.all([
+        api.overview(),
+        api.figure("pulse.demand_ribbon", locale),
+        api.figure("pulse.yoy_bars", locale),
+        api.figure("pulse.seasonality", locale),
+        api.figure("pulse.composition", locale),
+        api.figure("pulse.stl", locale),
+        api.figure("pulse.anomaly", locale),
+        api.figure("pulse.sa_vs_nsa", locale),
+        api.figure("pulse.diffusion", locale),
+        api.figure("pulse.cycle", locale),
+      ]);
+    data = overview;
+    figs = { demand, yoy, seasonality, composition, stl, anomaly, saVsNsa, diffusion, cycle };
   } catch {
     return <ApiDown t={t} />;
   }
 
-  const { kpis, series, key_points, top_growing, top_cooling, as_of } = data;
-  const regionLabel = labelFor(GEO_OPTIONS, filters.geo);
-  const possessive = regionLabel === "All Canada" ? "Canada's" : `${regionLabel}'s`;
+  const { kpis, series, key_points, as_of } = data;
 
   const indexSpark = series.slice(-24).map((p) => p.index ?? 0);
   const postingsSpark = series.slice(-24).map((p) => p.postings);
@@ -75,21 +74,8 @@ export default async function PulsePage({
   // Headline is API-derived (composed from data) — left in English as specified.
   const headline =
     baselineGap === null
-      ? `${possessive} posting demand`
-      : `${possessive} posting demand is ${Math.abs(Math.round(baselineGap))}% ${baselineGap >= 0 ? "above" : "below"} its 2019 baseline`;
-
-  const growing = top_growing.filter((i) => (i.yoy ?? 0) > 0);
-  const cooling = top_cooling.filter((i) => (i.yoy ?? 0) < 0);
-  // One honest scale: growth + decline in a single diverging chart.
-  const movers = [...growing, ...cooling];
-
-  const geoRows: SparkRow[] = geo.items.slice(0, 8).map((g) => ({
-    code: g.code,
-    label: g.label,
-    value: g.count ?? 0,
-    yoy: g.yoy,
-    trend: g.trend,
-  }));
+      ? "Canada's posting demand"
+      : `Canada's posting demand is ${Math.abs(Math.round(baselineGap))}% ${baselineGap >= 0 ? "above" : "below"} its 2019 baseline`;
 
   return (
     <div className="pb-4">
@@ -97,7 +83,7 @@ export default async function PulsePage({
       <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
         <div className="container-x py-10 md:py-14">
           <div className="eyebrow mb-3">
-            {t.eyebrowPrefix} · {regionLabel} · {fmtMonth(as_of)}
+            {t.eyebrowPrefix} · {fmtMonth(as_of)}
           </div>
           <h1 className="h-display max-w-4xl text-balance">{headline}.</h1>
           <p className="lede mt-4 max-w-2xl">{t.lede}</p>
@@ -143,62 +129,69 @@ export default async function PulsePage({
         </div>
       </section>
 
-      {/* Demand chart + key points */}
+      {/* Demand ribbon + key points */}
       <section className="container-x py-4">
         <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Figure
-            eyebrow={t.demandEyebrow}
-            title={t.demandTitle}
-            asOf={as_of}
-            note={t.demandNote}
-          >
-            <ExplorerChart
-              series={series}
-              labels={explorerDict[locale]}
-              ariaLabel="Posting demand over time — switch between index, postings and year-over-year"
-            />
+          <Figure eyebrow={c.demandRibbon.eyebrow} title={c.demandRibbon.title} asOf={as_of} note={c.demandRibbon.note}>
+            <RemoteFigure fig={figs.demand} height={420} ariaLabel={c.demandRibbon.aria} />
           </Figure>
           <KeyPoints points={key_points} title={t.keyPointsTitle} />
         </div>
       </section>
 
-      {/* Movers + regional snapshot */}
+      {/* Core: year-over-year, seasonality, occupational mix */}
       <section className="container-x py-4">
-        <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
-          <Figure
-            eyebrow={t.moversEyebrow}
-            title={t.moversTitle}
-            asOf={as_of}
-            note={t.moversNote}
-          >
-            <DivergingMovers items={movers} emptyHint={t.moversEmpty} />
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Figure eyebrow={c.yoyBars.eyebrow} title={c.yoyBars.title} asOf={as_of} note={c.yoyBars.note}>
+            <RemoteFigure fig={figs.yoy} height={360} ariaLabel={c.yoyBars.aria} />
           </Figure>
-          <Figure
-            eyebrow={t.regionalEyebrow}
-            title={t.regionalTitle}
-            asOf={as_of}
-            actions={
-              <Link href="/geography" className="text-[0.74rem] font-bold uppercase tracking-[0.02em] text-orange-deep hover:underline">
-                {t.fullMap}
-              </Link>
-            }
-            note={t.regionalNote}
-          >
-            <SparklineTable rows={geoRows} valueLabel={t.regionalValueLabel} trendLabel={t.trendLabel} />
+          <Figure eyebrow={c.composition.eyebrow} title={c.composition.title} asOf={as_of} note={c.composition.note}>
+            <RemoteFigure fig={figs.composition} height={360} ariaLabel={c.composition.aria} />
           </Figure>
         </div>
       </section>
 
-      {/* Seasonality — month × year, normalised to each year's average */}
       <section className="container-x py-4">
-        <Figure
-          eyebrow={t.seasonalityEyebrow}
-          title={t.seasonalityTitle}
-          asOf={as_of}
-          note={t.seasonalityNote}
-        >
-          <SeasonalityHeatmap series={series} monthLabels={t.monthsShort} />
+        <Figure eyebrow={c.seasonality.eyebrow} title={c.seasonality.title} asOf={as_of} note={c.seasonality.note}>
+          <RemoteFigure fig={figs.seasonality} height={360} ariaLabel={c.seasonality.aria} />
         </Figure>
+      </section>
+
+      {/* Deep divider */}
+      <section className="container-x pt-8 pb-1">
+        <div className="border-t border-card-border pt-6">
+          <div className="eyebrow mb-1.5">{t.deepEyebrow}</div>
+          <p className="lede max-w-2xl">{t.deepLede}</p>
+        </div>
+      </section>
+
+      {/* Deep: decomposition */}
+      <section className="container-x py-4">
+        <Figure eyebrow={c.stl.eyebrow} title={c.stl.title} asOf={as_of} note={c.stl.note}>
+          <RemoteFigure fig={figs.stl} ariaLabel={c.stl.aria} />
+        </Figure>
+      </section>
+
+      <section className="container-x py-4">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Figure eyebrow={c.anomaly.eyebrow} title={c.anomaly.title} asOf={as_of} note={c.anomaly.note}>
+            <RemoteFigure fig={figs.anomaly} height={340} ariaLabel={c.anomaly.aria} />
+          </Figure>
+          <Figure eyebrow={c.saVsNsa.eyebrow} title={c.saVsNsa.title} asOf={as_of} note={c.saVsNsa.note}>
+            <RemoteFigure fig={figs.saVsNsa} height={340} ariaLabel={c.saVsNsa.aria} />
+          </Figure>
+        </div>
+      </section>
+
+      <section className="container-x py-4">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Figure eyebrow={c.diffusion.eyebrow} title={c.diffusion.title} asOf={as_of} note={c.diffusion.note}>
+            <RemoteFigure fig={figs.diffusion} height={340} ariaLabel={c.diffusion.aria} />
+          </Figure>
+          <Figure eyebrow={c.cycle.eyebrow} title={c.cycle.title} asOf={as_of} note={c.cycle.note}>
+            <RemoteFigure fig={figs.cycle} ariaLabel={c.cycle.aria} />
+          </Figure>
+        </div>
       </section>
     </div>
   );

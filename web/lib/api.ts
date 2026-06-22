@@ -17,6 +17,7 @@ import type {
   CoverageTrendResponse,
   GeoTrendResponse,
   RankItem,
+  FigJSON,
 } from "./types";
 
 export const API_BASE =
@@ -67,4 +68,7 @@ export const api = {
   skills: (f?: Filters, opts: { mode?: string; limit?: number } = {}) =>
     get<SkillsResponse>(`/api/skills${qs(f, { mode: opts.mode, limit: opts.limit })}`),
   requirements: (f?: Filters) => get<RequirementsResponse>(`/api/requirements${qs(f)}`),
+  // Figure bridge: a redesign2 Plotly factory rendered to figure JSON.
+  figure: (id: string, locale: string) =>
+    get<FigJSON>(`/api/figure/${id}${qs({}, { locale })}`),
 };

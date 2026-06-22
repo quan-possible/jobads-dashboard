@@ -10,7 +10,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import private, read
+from .routers import figures, private, read
 
 app = FastAPI(
     title="ACLMR Labour Market API",
@@ -33,6 +33,7 @@ app.add_middleware(
 
 app.include_router(read.router)
 app.include_router(private.router)
+app.include_router(figures.router)
 
 
 @app.get("/health", tags=["meta"])
