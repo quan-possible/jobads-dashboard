@@ -44,7 +44,7 @@ def _treemap_trace(g: pd.DataFrame, root: str = "All occupations") -> go.Treemap
         hovertemplate="%{label}: %{value:,.0f} (%{percentRoot})<extra></extra>")
 
 
-def treemap(ds: DataSource, animate: str | None = None) -> go.Figure:
+def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> go.Figure:
     nb = ds.noc_broad
     if animate == "by-year":
         nb = nb.copy()
@@ -54,7 +54,9 @@ def treemap(ds: DataSource, animate: str | None = None) -> go.Figure:
                for y in years}
         frames = [go.Frame(name=str(y), data=[_treemap_trace(agg[y])]) for y in years]
         fig = go.Figure(data=frames[-1].data, frames=frames)
-        add_time_slider(fig, years)
+        fr = locale == "fr"
+        add_time_slider(fig, years, prefix="Année : " if fr else "Year: ",
+                        play="▶ Lecture" if fr else "▶ Play")
         fig.update_layout(height=480, margin=dict(l=8, r=8, t=64, b=44))
         return titled(fig, "What work is in demand: occupation groups by volume",
                       "Area ∝ postings in the selected year — drag the slider or press play")
