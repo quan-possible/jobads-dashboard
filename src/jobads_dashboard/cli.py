@@ -3,12 +3,7 @@
 from __future__ import annotations
 
 import argparse
-import importlib.resources as resources
 import json
-import os
-import subprocess
-import sys
-from contextlib import ExitStack
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -74,16 +69,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     validate.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     validate.add_argument("--source-root", type=Path, default=DEFAULT_SOURCE_ROOT)
 
-    app = subparsers.add_parser("app", help="Launch the Streamlit dashboard.")
-    app.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
-
-    args, extra = parser.parse_known_args(argv)
-    if args.command == "app" and extra[:1] == ["--"]:
-        extra = extra[1:]
-    if args.command != "app" and extra:
-        parser.error(f"unrecognized arguments: {' '.join(extra)}")
-    args.streamlit_args = extra
-    return args
+    return parser.parse_args(argv)
 
 
 def main() -> None:
@@ -118,22 +104,6 @@ def main() -> None:
             posting_lookup_recent_months=args.posting_lookup_recent_months,
         )
         print(json.dumps({"posting_lookup": path.as_posix()}, indent=2, default=str))
-        return
-
-    if args.command == "app":
-        env = os.environ.copy()
-        env["JOBADS_DASHBOARD_DATA_ROOT"] = args.output_root.as_posix()
-        extra = getattr(args, "streamlit_args", []) or []
-        package_app = resources.files("jobads_dashboard").joinpath("streamlit_app.py")
-        with ExitStack() as stack:
-            app_path = Path(stack.enter_context(resources.as_file(package_app)))
-            cmd = [sys.executable, "-m", "streamlit", "run", app_path.as_posix(), *extra]
-            try:
-                result = subprocess.run(cmd, env=env)
-            except KeyboardInterrupt:
-                return
-            if result.returncode:
-                raise SystemExit(result.returncode)
         return
 
 

@@ -8,5 +8,6 @@ services:
     branch: main
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    healthCheckPath: /_stcore/health
+    # Web liveness probe (Next route handler), independent of the API/data.
+    healthCheckPath: /healthz
     autoDeployTrigger: commit
