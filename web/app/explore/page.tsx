@@ -1,10 +1,11 @@
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { api } from "@/lib/api";
 import { getServerDict } from "@/lib/i18n/server";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Explore",
   description:
     "Build a chart from any breakdown and measure, or search the individual job postings behind the ACLMR aggregates (team access).",

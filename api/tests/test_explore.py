@@ -90,13 +90,64 @@ def test_each_measure_builds_on_bar_dim(measure: str) -> None:
     assert payload["data"], f"{measure}: no traces"
 
 
-@pytest.mark.parametrize("measure", ["postings", "share", "yoy", "two_year", "wage"])
+# two_year is intentionally excluded here — it has no honest line representation
+# and is gated to a "switch to a category" note (see test below).
+@pytest.mark.parametrize("measure", ["postings", "share", "yoy", "wage"])
 def test_each_measure_builds_on_time_dim(measure: str) -> None:
     payload = _payload(
         explore.build_explore_figure("time", measure, start_year=2019, end_year=2024)
     )
     _is_themed_figure(payload)
     assert payload["data"], f"{measure}: no traces"
+
+
+def test_two_year_on_time_returns_breakdown_note() -> None:
+    """two_year has no honest line form → a 'switch to a category' note, no line,
+    and never a raw "change {a}→{b}" placeholder leaking onto the axis (S03)."""
+    payload = _payload(
+        explore.build_explore_figure("time", "two_year", start_year=2019, end_year=2024)
+    )
+    _is_themed_figure(payload)
+    assert not any(t.get("type") == "scatter" for t in payload["data"])
+    txt = _annotation_text(payload).lower()
+    assert "breakdown" in txt or "répartition" in txt
+    # the unfilled placeholder must never reach a label
+    assert "{a}" not in json.dumps(payload) and "{b}" not in json.dumps(payload)
+
+
+def test_two_year_equal_years_returns_note() -> None:
+    """From a year to itself is 0% everywhere → a friendly note, not a flat chart (S16)."""
+    payload = _payload(
+        explore.build_explore_figure("occupation", "two_year", start_year=2022, end_year=2022)
+    )
+    _is_themed_figure(payload)
+    assert not _has_bars(payload)
+    txt = _annotation_text(payload).lower()
+    assert "different" in txt or "différentes" in txt
+
+
+def test_share_bar_excludes_unknown_from_numerator_but_not_denominator() -> None:
+    """Breakdown shares are against the All-dimension total (Unknown included in
+    the denominator), so the shown bars sum to clearly under 100% — matching the
+    curated treemaps instead of overstating against a survivors-only base (S02)."""
+    payload = _payload(explore.build_explore_figure("occupation", "share"))
+    assert _has_bars(payload)
+    shares = _values(payload["data"][0]["x"])
+    assert shares, "share bars empty"
+    # Old (buggy) behaviour summed to ~100; the honest denominator leaves the
+    # uncategorized + sub-sample remainder out of the visible bars.
+    assert sum(shares) < 99.0, f"shares sum to {sum(shares):.1f}; Unknown not in denominator"
+    # the axis discloses the exclusion
+    assert "excludes" in json.dumps(payload).lower() or "hors" in json.dumps(payload).lower()
+
+
+def test_time_yoy_values_are_finite() -> None:
+    """The calendar-aligned YoY (reindexed to a contiguous monthly index) never
+    emits inf/NaN from a sparse-cube row mispair (S01)."""
+    payload = _payload(explore.build_explore_figure("time", "yoy"))
+    ys = _values(payload["data"][0]["y"])
+    assert ys, "no yoy points"
+    assert all(np.isfinite(v) for v in ys), "YoY produced a non-finite value"
 
 
 def test_postings_bar_is_horizontal_bars() -> None:

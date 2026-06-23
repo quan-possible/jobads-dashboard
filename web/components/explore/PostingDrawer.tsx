@@ -11,8 +11,8 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   if (value === null || value === undefined || value === "" || value === "—") return null;
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">{label}</dt>
-      <dd className="text-[0.88rem] text-navy-deep">{value}</dd>
+      <dt className="t-label font-bold uppercase tracking-[0.05em] text-ink-faint">{label}</dt>
+      <dd className="t-body-sm text-navy-deep">{value}</dd>
     </div>
   );
 }
@@ -33,6 +33,15 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
   const [detail, setDetail] = useState<PostingDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Clear the previous posting *during render* the moment the id changes, so a
+  // reopen with a new id never paints the prior posting for a frame before the
+  // fetch effect runs (S20).
+  const [shownId, setShownId] = useState(id);
+  if (id !== shownId) {
+    setShownId(id);
+    setDetail(null);
+    setError(null);
+  }
   const panelRef = useRef<HTMLElement>(null);
   // Keep the latest onClose without re-running the focus/scroll-lock effect on
   // every parent render (S37).
@@ -136,45 +145,45 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
             <h2 id="drawer-title" className="text-[1.08rem] font-bold leading-snug text-navy-deep">
               {detail?.job_title ?? (loading ? t.common.loading : t.explore.drawerPosting)}
             </h2>
-            {detail?.employer && <p className="mt-0.5 text-[0.85rem] text-ink-soft">{detail.employer}</p>}
+            {detail?.employer && <p className="mt-0.5 t-body-sm text-ink-soft">{detail.employer}</p>}
           </div>
           <button
             type="button"
             data-autofocus
             onClick={onClose}
             aria-label={t.common.close}
-            className="control shrink-0 border border-card-border px-2.5 py-1.5 text-[0.9rem] font-bold leading-none text-ink-soft transition-colors hover:border-orange hover:text-orange focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
+            className="control shrink-0 border border-card-border px-2.5 py-1.5 t-body font-bold leading-none text-ink-soft transition-colors hover:border-orange hover:text-orange focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
           >
             ✕
           </button>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-          {loading && <div className="py-10 text-center text-[0.85rem] text-ink-faint">{t.explore.loadingPosting}</div>}
-          {error && <div className="py-10 text-center text-[0.85rem] text-neg">{error}</div>}
+          {loading && <div className="py-10 text-center t-body-sm text-ink-faint">{t.explore.loadingPosting}</div>}
+          {error && <div className="py-10 text-center t-body-sm text-neg">{error}</div>}
 
           {detail && (
             <div className="flex flex-col gap-6">
               {/* chips */}
               <div className="flex flex-wrap gap-1.5">
                 {detail.province && (
-                  <span className="border border-card-border bg-surface-alt px-2 py-1 text-[0.72rem] font-bold text-navy">
+                  <span className="border border-card-border bg-surface-alt px-2 py-1 t-caption font-bold text-navy">
                     {detail.province}
                     {detail.market ? ` · ${detail.market}` : ""}
                   </span>
                 )}
                 {detail.noc_code && (
-                  <span className="border border-card-border bg-surface-alt px-2 py-1 text-[0.72rem] text-ink-soft">
+                  <span className="border border-card-border bg-surface-alt px-2 py-1 t-caption text-ink-soft">
                     NOC {detail.noc_code}
                   </span>
                 )}
                 {detail.naics_code && (
-                  <span className="border border-card-border bg-surface-alt px-2 py-1 text-[0.72rem] text-ink-soft">
+                  <span className="border border-card-border bg-surface-alt px-2 py-1 t-caption text-ink-soft">
                     NAICS {detail.naics_code}
                   </span>
                 )}
                 {detail.remote_class && detail.remote_class !== "Not reported" && (
-                  <span className="border border-orange/40 bg-orange/5 px-2 py-1 text-[0.72rem] font-bold text-orange-deep">
+                  <span className="border border-orange/40 bg-orange/5 px-2 py-1 t-caption font-bold text-orange-deep">
                     {detail.remote_class}
                   </span>
                 )}
@@ -196,17 +205,17 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
               {detail.description_full ? (
                 <div>
                   <div className="eyebrow mb-2 border-t border-hairline pt-4">{t.explore.descHeading}</div>
-                  <p className="whitespace-pre-wrap text-[0.86rem] leading-relaxed text-ink-soft">
+                  <p className="whitespace-pre-wrap t-body-sm leading-relaxed text-ink-soft">
                     {detail.description_full}
                   </p>
-                  <p className="mt-4 text-[0.72rem] italic leading-relaxed text-ink-faint">{t.explore.descNote}</p>
+                  <p className="mt-4 t-caption italic leading-relaxed text-ink-faint">{t.explore.descNote}</p>
                 </div>
               ) : (
-                <p className="border-t border-hairline pt-4 text-[0.8rem] italic text-ink-faint">{t.explore.noDesc}</p>
+                <p className="border-t border-hairline pt-4 t-meta italic text-ink-faint">{t.explore.noDesc}</p>
               )}
 
               {detail.data_source && (
-                <p className="text-[0.72rem] text-ink-faint">
+                <p className="t-caption text-ink-faint">
                   {t.explore.source} · <span className="text-ink-soft">{detail.data_source}</span>
                 </p>
               )}

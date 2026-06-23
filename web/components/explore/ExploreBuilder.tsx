@@ -102,12 +102,12 @@ export function ExploreBuilder({ minYear, maxYear }: { minYear: number; maxYear:
   const measureOptions: Option[] = MEASURES.map((m) => ({ value: m, label: b.measures[m] }));
 
   const yearSelectCls =
-    "num rounded border border-card-border bg-surface-alt px-2 py-2 text-[0.9rem] font-bold text-navy outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange";
+    "num rounded border border-card-border bg-surface-alt px-2 py-2 t-body font-bold text-navy outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange";
   const hasTrace = Boolean((fig?.data?.[0] as { x?: unknown[] } | undefined)?.x);
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="max-w-3xl text-[0.86rem] leading-relaxed text-ink-soft">{b.intro}</p>
+      <p className="max-w-3xl t-body-sm leading-relaxed text-ink-soft">{b.intro}</p>
 
       <div className="card card-pad grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto] lg:items-end">
         <Select
@@ -125,7 +125,7 @@ export function ExploreBuilder({ minYear, maxYear }: { minYear: number; maxYear:
           onChange={(v) => setMeasure(v as Measure)}
         />
         <div className="flex flex-col gap-1">
-          <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">{b.from}</span>
+          <span className="t-label font-bold uppercase tracking-[0.05em] text-ink-faint">{b.from}</span>
           <div className="flex items-center gap-1.5">
             <select
               aria-label={b.from}
@@ -137,7 +137,7 @@ export function ExploreBuilder({ minYear, maxYear }: { minYear: number; maxYear:
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
-            <span className="text-[0.78rem] text-ink-faint">{b.to}</span>
+            <span className="t-meta text-ink-faint">{b.to}</span>
             <select
               aria-label={b.to}
               className={yearSelectCls}
@@ -153,18 +153,24 @@ export function ExploreBuilder({ minYear, maxYear }: { minYear: number; maxYear:
       </div>
 
       <figure className="card card-pad flex flex-col">
-        <div className="mb-3 flex items-center justify-end">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          {/* Names what the chart shows + gives the <figure> an accessible name (U08). */}
+          <figcaption className="num t-caption uppercase tracking-[0.03em] text-ink-faint">
+            {b.dims[effectiveDim]} · {b.measures[measure]} · {startYear}–{endYear}
+          </figcaption>
           <button
             type="button"
-            disabled={!hasTrace}
-            onClick={() => fig && downloadCsv(fig, `explore-${effectiveDim}-${measure}.csv`)}
-            className="control border border-card-border px-3 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
+            // Disable mid-refetch so the file can never disagree with the chart
+            // it's drawn next to (U05).
+            disabled={!hasTrace || loading}
+            onClick={() => fig && downloadCsv(fig, `explore-${effectiveDim}-${measure}-${startYear}-${endYear}.csv`)}
+            className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
           >
             {b.download}
           </button>
         </div>
         <div className={`min-w-0 flex-1 transition-opacity duration-200 ${loading ? "opacity-50" : ""}`}>
-          <RemoteFigure fig={fig} height={460} ariaLabel={b.aria} />
+          <RemoteFigure fig={fig} height={460} ariaLabel={b.aria} loading={loading} />
         </div>
       </figure>
     </div>

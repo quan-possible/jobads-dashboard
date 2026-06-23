@@ -165,4 +165,4 @@ export const methodDict = {
     versionRelease: "première publication. Données à jour jusqu'au",
     versionGenerated: "généré le",
   },
-};
+} as const;

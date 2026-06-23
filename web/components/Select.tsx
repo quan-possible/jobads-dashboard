@@ -20,11 +20,11 @@ export function Select({
   if (options.length === 0) {
     return (
       <label htmlFor={id} className="flex min-w-0 flex-col gap-1">
-        <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">{label}</span>
+        <span className="t-label font-bold uppercase tracking-[0.05em] text-ink-faint">{label}</span>
         <select
           id={id}
           disabled
-          className="control w-full cursor-not-allowed appearance-none border border-card-border bg-surface py-2 pl-3 pr-9 text-[0.92rem] text-ink-faint opacity-60"
+          className="control w-full cursor-not-allowed appearance-none border border-card-border bg-surface py-2 pl-3 pr-9 t-body text-ink-faint opacity-60"
         >
           <option>—</option>
         </select>
@@ -35,14 +35,14 @@ export function Select({
   const isDefault = current === options[0].value;
   return (
     <label htmlFor={id} className="flex min-w-0 flex-col gap-1">
-      <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">{label}</span>
+      <span className="t-label font-bold uppercase tracking-[0.05em] text-ink-faint">{label}</span>
       <div className="relative">
         <select
           id={id}
           value={current}
           onChange={(e) => onChange(e.target.value)}
           className={[
-            "control w-full cursor-pointer appearance-none border bg-surface py-2 pl-3 pr-9 text-[0.92rem] font-bold transition-colors",
+            "control w-full cursor-pointer appearance-none border bg-surface py-2 pl-3 pr-9 t-body font-bold transition-colors",
             "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange",
             isDefault ? "border-card-border text-navy" : "border-orange/60 text-navy-deep",
           ].join(" ")}

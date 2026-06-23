@@ -31,6 +31,12 @@ import plotly.graph_objects as go
 import plotly.io as pio
 
 from jobads_dashboard.viz.datasource import DataSource
+from jobads_dashboard.viz.labels import (
+    NAICS_SHORT,
+    NAICS_SHORT_FR,
+    NOC_SHORT,
+    NOC_SHORT_FR,
+)
 from jobads_dashboard.viz.figures import (
     geography,
     industries,
@@ -187,8 +193,18 @@ _FR_CHROME: dict[str, str] = {
     "Top-20 cumulative share": "Part cumulée du top 20",
     # month ticks (cycle plot + seasonality)
     "Jan": "Janv", "Feb": "Févr", "Mar": "Mars", "Apr": "Avr", "May": "Mai",
-    "Jun": "Juin", "Jul": "Juil", "Aug": "Août", "Sep": "Sept", "Dec": "Déc",
+    "Jun": "Juin", "Jul": "Juil", "Aug": "Août", "Sep": "Sept",
+    "Oct": "Oct", "Nov": "Nov", "Dec": "Déc",
 }
+
+# Occupation/industry short group names translate to French wherever they appear
+# as exact-match chrome (treemap tiles, axis ticks, legends) — the curated half of
+# the shared NOC/NAICS code→{en,fr} label map (S07). Keyed by the English short
+# name so the existing exact-match localizer reaches them with no factory changes.
+_FR_CHROME.update({NOC_SHORT[c]: NOC_SHORT_FR[c] for c in NOC_SHORT})
+_FR_CHROME.update({NAICS_SHORT[c]: NAICS_SHORT_FR[c] for c in NAICS_SHORT})
+_FR_CHROME.setdefault("Unknown", "Inconnu")
+
 
 def _fr(s: str) -> str:
     return _FR_CHROME.get(s, s)
@@ -270,10 +286,23 @@ def apply_house_style(fig: go.Figure, *, locale: str = "en") -> str:
     return payload
 
 
+@lru_cache(maxsize=1)
+def _year_window() -> tuple[int, int]:
+    """The (min, max) calendar years actually present in the data — the bounds a
+    year param may take."""
+    m = _ds().overall["month"]
+    return int(m.dt.year.min()), int(m.dt.year.max())
+
+
 def _year_kw(k: dict, *names: str) -> dict:
     """Pull the year params a factory accepts out of the registry kwargs, dropping
-    any left unset so the factory's own default (e.g. ``latest_complete_year``) wins."""
-    return {n: int(k[n]) for n in names if k.get(n) is not None}
+    any left unset so the factory's own default (e.g. ``latest_complete_year``) wins.
+
+    Year values are clamped to the data window so a crafted out-of-range param
+    (e.g. ``base_year=1990`` via a direct URL) yields a clamped chart, not a
+    silently empty one (S19)."""
+    lo, hi = _year_window()
+    return {n: max(lo, min(hi, int(k[n]))) for n in names if k.get(n) is not None}
 
 
 def build(chart_id: str, *, locale: str = "en", **params) -> str:

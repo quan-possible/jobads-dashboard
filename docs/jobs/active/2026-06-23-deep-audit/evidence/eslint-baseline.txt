@@ -1,0 +1,1 @@
+eslint (web): 6 errors + 1 warning — all react-hooks/set-state-in-effect + immutability (Next-16 lint-noise, documented in prior rejected.md). Lines: ExploreView, PostingDrawer, TopNav(legacy?), LocaleToggle.

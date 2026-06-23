@@ -15,6 +15,8 @@ from datetime import date
 
 import pandas as pd
 
+from jobads_dashboard.viz.labels import short_label
+
 from . import core
 from .models import (
     CoverageItem,
@@ -381,30 +383,75 @@ def _streak(series: list[SeriesPoint]) -> tuple[int, str]:
     return n, "risen" if last_sign > 0 else "fallen"
 
 
-def _key_points(scope: Scope, kpis: Kpis, growing: list[RankItem], cooling: list[RankItem], series: list[SeriesPoint]) -> list[str]:
+# Localized sentence frames for the "What stands out" narrative. The numbers are
+# computed in Python; only the framing differs by locale (S05). Descriptive only —
+# no causal verbs (guarded by test_no_causal_language).
+_KEY_POINT_I18N: dict[str, dict[str, str]] = {
+    "en": {
+        "baseline": "Posting demand is {pct}% {dir} its January 2019 baseline.",
+        "above": "above",
+        "below": "below",
+        "streak": "Postings have {dir} for {n} consecutive months.",
+        "risen": "risen",
+        "fallen": "fallen",
+        "yoy": "Active postings are {pct}% {dir} than a year ago.",
+        "higher": "higher",
+        "lower": "lower",
+        "lead": "{label} shows the strongest year-over-year change at {yoy:+.0f}%.",
+        "cool": "{label} sits at the bottom of the range at {yoy:+.0f}% year over year.",
+    },
+    "fr": {
+        "baseline": "La demande d’offres est {pct}% {dir} son niveau de référence de janvier 2019.",
+        "above": "au-dessus de",
+        "below": "en dessous de",
+        "streak": "Les offres ont {dir} pendant {n} mois consécutifs.",
+        "risen": "augmenté",
+        "fallen": "diminué",
+        "yoy": "Les offres actives sont {pct}% {dir} qu’il y a un an.",
+        "higher": "plus élevées",
+        "lower": "plus faibles",
+        "lead": "{label} affiche la plus forte variation sur un an à {yoy:+.0f}%.",
+        "cool": "{label} se situe au bas de la fourchette à {yoy:+.0f}% sur un an.",
+    },
+}
+
+
+def _key_points(
+    scope: Scope,
+    kpis: Kpis,
+    growing: list[RankItem],
+    cooling: list[RankItem],
+    series: list[SeriesPoint],
+    locale: str = "en",
+) -> list[str]:
     """Descriptive only. No causal verbs (guarded by test_no_causal_language)."""
+    fr = _KEY_POINT_I18N.get(locale, _KEY_POINT_I18N["en"])
     pts: list[str] = []
-    base = _iso(core.INDEX_BASE_MONTH)
     if kpis.demand_index is not None:
         delta = kpis.demand_index - 100
-        direction = "above" if delta >= 0 else "below"
-        pts.append(f"Posting demand is {abs(round(delta))}% {direction} its January 2019 baseline.")
+        direction = fr["above"] if delta >= 0 else fr["below"]
+        pts.append(fr["baseline"].format(pct=abs(round(delta)), dir=direction))
     streak_n, streak_dir = _streak(series)
     if streak_n >= 2:
-        pts.append(f"Postings have {streak_dir} for {streak_n} consecutive months.")
+        pts.append(fr["streak"].format(dir=fr[streak_dir], n=streak_n))
     if kpis.active_yoy_pct is not None:
-        d = "higher" if kpis.active_yoy_pct >= 0 else "lower"
-        pts.append(f"Active postings are {abs(kpis.active_yoy_pct)}% {d} than a year ago.")
+        d = fr["higher"] if kpis.active_yoy_pct >= 0 else fr["lower"]
+        pts.append(fr["yoy"].format(pct=abs(kpis.active_yoy_pct), dir=d))
+    # In FR, use the localized short occupation name so the whole sentence reads
+    # French (the ranking carries the English long label); EN keeps its label (S05/S07).
+    def _lab(item: RankItem) -> str:
+        return short_label("occupation", item.code, "fr") if locale == "fr" else item.label
+
     lead = next((i for i in growing if i.yoy is not None), None)
     if lead:
-        pts.append(f"{lead.label} shows the strongest year-over-year change at {lead.yoy:+.0f}%.")
+        pts.append(fr["lead"].format(label=_lab(lead), yoy=lead.yoy))
     cool = next((i for i in reversed(cooling) if i.yoy is not None), None)
     if cool and (not lead or cool.code != lead.code):
-        pts.append(f"{cool.label} sits at the bottom of the range at {cool.yoy:+.0f}% year over year.")
+        pts.append(fr["cool"].format(label=_lab(cool), yoy=cool.yoy))
     return pts
 
 
-def overview(scope: Scope) -> OverviewResponse:
+def overview(scope: Scope, locale: str = "en") -> OverviewResponse:
     series = postings_series(scope)
     kpis, as_of = _kpis(scope, series)
     ranked = _rank_dim(scope, "occupations", 10)
@@ -412,7 +459,7 @@ def overview(scope: Scope) -> OverviewResponse:
     by_yoy.sort(key=lambda i: i.yoy, reverse=True)
     growing = by_yoy[:5]
     cooling = list(reversed(by_yoy[-5:])) if len(by_yoy) >= 5 else list(reversed(by_yoy))
-    key_points = _key_points(scope, kpis, growing, cooling, series)
+    key_points = _key_points(scope, kpis, growing, cooling, series, locale)
     return OverviewResponse(
         scope=scope,
         as_of=_iso(as_of),

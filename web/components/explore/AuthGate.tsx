@@ -40,7 +40,7 @@ export function AuthGate() {
       setPassword("");
       setPhase("open");
     } catch (err) {
-      setAuthError(err instanceof AuthError ? err.message : "Sign-in failed. Try again.");
+      setAuthError(err instanceof AuthError ? err.message : t.explore.signinFailed);
     } finally {
       setSubmitting(false);
     }
@@ -55,12 +55,6 @@ export function AuthGate() {
     setPhase("locked");
   };
 
-  if (phase === "checking") {
-    return (
-      <div className="flex items-center justify-center py-24 text-[0.85rem] text-ink-faint">{t.explore.checking}</div>
-    );
-  }
-
   if (phase === "open") {
     return (
       <div className="flex flex-col gap-4">
@@ -68,7 +62,7 @@ export function AuthGate() {
           <button
             type="button"
             onClick={onSignOut}
-            className="control border border-card-border px-3 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.02em] text-ink-faint transition-colors hover:border-orange hover:text-orange"
+            className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-faint transition-colors hover:border-orange hover:text-orange"
           >
             {t.common.signOut}
           </button>
@@ -78,7 +72,8 @@ export function AuthGate() {
     );
   }
 
-  // Locked / unconfigured / error all show a centered card.
+  // Checking / locked / unconfigured / error all share one centered card shell
+  // so the non-open phases read as designed, not as unfinished text (U09).
   return (
     <div className="mx-auto max-w-md py-10">
       <div className="card card-pad">
@@ -90,18 +85,22 @@ export function AuthGate() {
           </div>
         </div>
 
-        {phase === "unconfigured" && (
-          <p className="text-[0.86rem] leading-relaxed text-ink-soft">{t.explore.unconfigured}</p>
+        {phase === "checking" && (
+          <p className="t-body-sm leading-relaxed text-ink-faint" aria-busy="true">{t.explore.checking}</p>
         )}
 
-        {phase === "error" && <p className="text-[0.86rem] leading-relaxed text-neg">{t.explore.authError}</p>}
+        {phase === "unconfigured" && (
+          <p className="t-body-sm leading-relaxed text-ink-soft">{t.explore.unconfigured}</p>
+        )}
+
+        {phase === "error" && <p className="t-body-sm leading-relaxed text-neg">{t.explore.authError}</p>}
 
         {phase === "locked" && (
           <>
-            <p className="mb-5 text-[0.86rem] leading-relaxed text-ink-soft">{t.explore.lockedBody}</p>
+            <p className="mb-5 t-body-sm leading-relaxed text-ink-soft">{t.explore.lockedBody}</p>
             <form onSubmit={onSubmit} className="flex flex-col gap-3">
               <label className="flex flex-col gap-1">
-                <span className="text-[0.62rem] font-bold uppercase tracking-[0.05em] text-ink-faint">
+                <span className="t-label font-bold uppercase tracking-[0.05em] text-ink-faint">
                   {t.explore.password}
                 </span>
                 <input
@@ -109,14 +108,14 @@ export function AuthGate() {
                   autoFocus
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="control border border-card-border bg-surface px-3 py-2 text-[0.92rem] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
+                  className="control border border-card-border bg-surface px-3 py-2 t-body focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
                 />
               </label>
-              {authError && <p className="text-[0.78rem] text-neg">{authError}</p>}
+              {authError && <p className="t-meta text-neg">{authError}</p>}
               <button
                 type="submit"
                 disabled={submitting || !password}
-                className="control bg-navy px-4 py-2.5 text-[0.8rem] font-bold uppercase tracking-[0.03em] text-canvas transition-colors enabled:hover:bg-orange disabled:opacity-50"
+                className="control bg-navy px-4 py-2.5 t-meta font-bold uppercase tracking-[0.03em] text-canvas transition-colors enabled:hover:bg-orange disabled:opacity-50"
               >
                 {submitting ? t.explore.unlocking : t.explore.unlock}
               </button>
@@ -124,7 +123,7 @@ export function AuthGate() {
           </>
         )}
       </div>
-      <p className="mt-4 text-center text-[0.72rem] leading-relaxed text-ink-faint">{t.explore.gateHint}</p>
+      <p className="mt-4 text-center t-caption leading-relaxed text-ink-faint">{t.explore.gateHint}</p>
     </div>
   );
 }

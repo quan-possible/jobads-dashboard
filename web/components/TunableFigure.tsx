@@ -80,24 +80,33 @@ export function TunableFigure({
   }, [chartId, locale, mode, baseYear, endYear]);
 
   const selectCls =
-    "num rounded border border-card-border bg-surface-alt px-1.5 py-0.5 text-[0.72rem] font-bold text-ink-soft outline-none focus:border-brand";
-  const labelCls = "text-[0.7rem] uppercase tracking-[0.03em] text-ink-faint";
+    "num rounded border border-card-border bg-surface-alt px-1.5 py-0.5 t-caption font-bold text-ink-soft outline-none focus:border-brand";
+  const labelCls = "t-caption uppercase tracking-[0.03em] text-ink-faint";
 
+  // Each <select> carries its own accessible name (the visible label spans are
+  // decorative), and the pair is a labelled group so AT announces what the
+  // comboboxes are for (S13).
   const picker =
     mode === "base" ? (
-      <div className="flex items-center gap-1.5" aria-label={yc.aria}>
-        <span className={labelCls}>{yc.base}</span>
-        <select className={selectCls} value={baseYear} onChange={(e) => setBaseYear(+e.target.value)}>
+      <div className="flex items-center gap-1.5" role="group" aria-label={yc.aria}>
+        <span className={labelCls} aria-hidden>{yc.base}</span>
+        <select
+          className={selectCls}
+          aria-label={yc.base}
+          value={baseYear}
+          onChange={(e) => setBaseYear(+e.target.value)}
+        >
           {range(minYear, maxYear - 1).map((y) => (
             <option key={y} value={y}>{y}</option>
           ))}
         </select>
       </div>
     ) : (
-      <div className="flex items-center gap-1.5" aria-label={yc.aria}>
-        <span className={labelCls}>{yc.from}</span>
+      <div className="flex items-center gap-1.5" role="group" aria-label={yc.aria}>
+        <span className={labelCls} aria-hidden>{yc.from}</span>
         <select
           className={selectCls}
+          aria-label={yc.fromYear}
           value={baseYear}
           onChange={(e) => setBaseYear(Math.min(+e.target.value, endYear - 1))}
         >
@@ -105,9 +114,10 @@ export function TunableFigure({
             <option key={y} value={y}>{y}</option>
           ))}
         </select>
-        <span className="text-[0.7rem] text-ink-faint">{yc.to}</span>
+        <span className="t-caption text-ink-faint" aria-hidden>{yc.to}</span>
         <select
           className={selectCls}
+          aria-label={yc.toYear}
           value={endYear}
           onChange={(e) => setEndYear(Math.max(+e.target.value, baseYear + 1))}
         >

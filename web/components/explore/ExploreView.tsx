@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AuthError, fetchPostings } from "@/lib/explore";
 import { fmtInt, fmtMonth, fmtWage } from "@/lib/format";
-import { labelFor } from "@/lib/options";
-import { GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS } from "@/lib/options";
+import { ALL_GEO, GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS, labelFor } from "@/lib/options";
 import { useI18n } from "@/lib/i18n/provider";
 import type { Locale } from "@/lib/i18n/locale";
 import type { PostingRow, PostingsResponse } from "@/lib/types";
@@ -87,11 +86,12 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
 
   const scopeSummary = useMemo(() => {
     const parts: string[] = [];
-    if (filters.geo) parts.push(labelFor(GEO_OPTIONS, filters.geo));
-    if (filters.occ) parts.push(labelFor(OCC_OPTIONS, filters.occ));
-    if (filters.ind) parts.push(labelFor(IND_OPTIONS, filters.ind));
-    return parts.length ? parts.join(" · ") : "All Canada";
-  }, [filters.geo, filters.occ, filters.ind]);
+    if (filters.geo) parts.push(labelFor(GEO_OPTIONS, filters.geo, locale));
+    if (filters.occ) parts.push(labelFor(OCC_OPTIONS, filters.occ, locale));
+    if (filters.ind) parts.push(labelFor(IND_OPTIONS, filters.ind, locale));
+    // Default (no scope) → the localized "All Canada" sentinel, not a hardcoded string.
+    return parts.length ? parts.join(" · ") : labelFor(GEO_OPTIONS, ALL_GEO, locale);
+  }, [filters.geo, filters.occ, filters.ind, locale]);
 
   const goPage = (next: number) => {
     setOffset(next);
@@ -120,15 +120,15 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t.explore.searchPlaceholder}
-            className="control w-full border border-card-border bg-surface py-2 pl-9 pr-3 text-[0.9rem] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
+            className="control w-full border border-card-border bg-surface py-2 pl-9 pr-3 t-body focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
           />
         </label>
-        <div className="num text-[0.78rem] text-ink-soft">
+        <div className="num t-meta text-ink-soft">
           {loading && !data ? (
             t.common.loading
           ) : (
             <>
-              <span className="font-bold text-navy-deep">{fmtInt(total)}</span> {t.explore.postings} · {scopeSummary}
+              <span className="font-bold text-navy-deep">{fmtInt(total, locale)}</span> {t.explore.postings} · {scopeSummary}
             </>
           )}
         </div>
@@ -137,9 +137,9 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
       {/* Table */}
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-[0.85rem]">
+          <table className="w-full border-collapse text-left t-body-sm">
             <thead>
-              <tr className="border-b border-card-border bg-surface-alt text-[0.62rem] uppercase tracking-[0.05em] text-ink-faint">
+              <tr className="border-b border-card-border bg-surface-alt t-label uppercase tracking-[0.05em] text-ink-faint">
                 <th className="px-4 py-2.5 font-bold">{t.explore.colPosted}</th>
                 <th className="px-4 py-2.5 font-bold">{t.explore.colTitle}</th>
                 <th className="hidden px-4 py-2.5 font-bold md:table-cell">{t.explore.colEmployer}</th>
@@ -152,14 +152,14 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
             <tbody>
               {error && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-[0.85rem] text-neg">
+                  <td colSpan={7} className="px-4 py-12 text-center t-body-sm text-neg">
                     {error}
                   </td>
                 </tr>
               )}
               {!error && rows.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-[0.85rem] text-ink-faint">
+                  <td colSpan={7} className="px-4 py-12 text-center t-body-sm text-ink-faint">
                     {t.explore.emptyRows}
                   </td>
                 </tr>
@@ -201,10 +201,10 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
 
       {/* Pagination */}
       <div className="flex items-center justify-between gap-3">
-        <div className="num text-[0.76rem] text-ink-soft">
+        <div className="num t-caption text-ink-soft">
           {total > 0 ? (
             <>
-              {fmtInt(from)}–{fmtInt(to)} {t.common.of} {fmtInt(total)}
+              {fmtInt(from, locale)}–{fmtInt(to, locale)} {t.common.of} {fmtInt(total, locale)}
             </>
           ) : (
             "—"
@@ -215,7 +215,7 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
             type="button"
             onClick={() => goPage(Math.max(0, offset - PAGE))}
             disabled={offset === 0 || loading}
-            className="control border border-card-border px-3 py-1.5 text-[0.74rem] font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
+            className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
           >
             ← {t.common.prev}
           </button>
@@ -223,7 +223,7 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
             type="button"
             onClick={() => goPage(offset + PAGE)}
             disabled={to >= total || loading}
-            className="control border border-card-border px-3 py-1.5 text-[0.74rem] font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
+            className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
           >
             {t.common.next} →
           </button>

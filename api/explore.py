@@ -25,6 +25,8 @@ from datetime import date
 import pandas as pd
 import plotly.graph_objects as go
 
+from jobads_dashboard.viz.labels import short_label
+
 from . import core
 from .figures import apply_house_style
 
@@ -66,6 +68,10 @@ _I18N: dict[str, dict[str, str]] = {
         "share": "share of postings",
         "yoy": "year-over-year %",
         "two_year": "change {a}→{b}",
+        "two_year_generic": "two-year change",
+        "two_year_needs_breakdown": "Two-year change needs a breakdown — switch to a category.",
+        "two_year_same_year": "Pick two different years to see a change.",
+        "share_caveat": "share of all postings (excludes uncategorized)",
         "wage": "median advertised wage",
         "province": "province",
         "occupation": "occupation",
@@ -80,6 +86,10 @@ _I18N: dict[str, dict[str, str]] = {
         "share": "part des offres",
         "yoy": "% d’une année à l’autre",
         "two_year": "variation {a}→{b}",
+        "two_year_generic": "variation sur deux ans",
+        "two_year_needs_breakdown": "La variation sur deux ans exige une répartition — choisissez une catégorie.",
+        "two_year_same_year": "Choisissez deux années différentes pour voir une variation.",
+        "share_caveat": "part de toutes les offres (hors non classées)",
         "wage": "salaire médian affiché",
         "province": "province",
         "occupation": "profession",
@@ -177,6 +187,33 @@ def _bar_frame(
     return core.query_df(sql, params)
 
 
+def _scope_total(dim: str, scope: dict[str, str], lo: date | None, hi: date | None) -> float:
+    """Total postings across the *whole* breakdown dimension for the pinned scope.
+
+    Pins the breakdown column to its "All" marginal (which already includes the
+    Unknown bucket and every sub-sample category), so a share computed against
+    this denominator matches the curated treemaps instead of overstating against
+    a survivors-only base."""
+    col = _DIM_COLUMN[dim]
+    pin = dict(scope)
+    pin[col] = _DIM_ALL[dim]
+    where = "province_scope = ? AND occupation_scope = ? AND industry_scope = ?"
+    params: list = [pin["province_scope"], pin["occupation_scope"], pin["industry_scope"]]
+    if lo is not None:
+        where += " AND month >= ?"
+        params.append(lo)
+    if hi is not None:
+        where += " AND month <= ?"
+        params.append(hi)
+    sql = f"""
+        SELECT COALESCE(SUM(postings_total), 0) AS total
+        FROM {core.parquet('filter_cube')}
+        WHERE {where}
+    """
+    out = core.query_df(sql, params)
+    return float(out["total"].iloc[0]) if not out.empty else 0.0
+
+
 def _time_frame(scope: dict[str, str], lo: date | None, hi: date | None) -> pd.DataFrame:
     """Monthly postings for the pinned scope cell (All/All/All-style marginal)."""
     where = "province_scope = ? AND occupation_scope = ? AND industry_scope = ?"
@@ -242,13 +279,12 @@ def _wage_time_frame(scope: dict[str, str], lo: date | None, hi: date | None) ->
 # --------------------------------------------------------------------------- #
 
 
-def _pretty(dim: str, category: str) -> str:
+def _pretty(dim: str, category: str, locale: str = "en") -> str:
     if dim == "province":
         return core.PROVINCE_NAMES.get(category, category)
-    # occupation / industry scope strings are 'code | label'
-    if " | " in category:
-        return category.split(" | ", 1)[1].strip()
-    return category
+    # occupation / industry: the shared short-name map (en + fr) so the Explore
+    # bars match the curated treemaps in both locales (S07).
+    return short_label(dim, category, locale)
 
 
 # --------------------------------------------------------------------------- #
@@ -263,10 +299,12 @@ def _bar_postings(df: pd.DataFrame) -> pd.DataFrame:
     return g.rename(columns={"postings_total": "value"}).sort_values("value")
 
 
-def _bar_share(df: pd.DataFrame) -> pd.DataFrame:
+def _bar_share(df: pd.DataFrame, total: float) -> pd.DataFrame:
+    """Share of *all* postings for the scope (denominator passed in by the
+    caller as the All-dimension marginal), so shown shares match the treemaps
+    and sum to <100% when an Unknown bucket is excluded from the bars."""
     g = df.groupby("category", as_index=False)["postings_total"].sum()
     g = g[g["postings_total"] >= MIN_SAMPLE]
-    total = g["postings_total"].sum()
     if total <= 0:
         return g.iloc[0:0].assign(value=[])
     g["value"] = (g["postings_total"] / total * 100).round(2)
@@ -307,7 +345,7 @@ def _bar_two_year(df: pd.DataFrame, lo_year: int, hi_year: int) -> pd.DataFrame:
     if out.empty:
         return pd.DataFrame(columns=["category", "value"])
     out["value"] = ((out["end"] - out["base"]) / out["base"] * 100).round(1)
-    out = out.reset_index().rename(columns={"index": "category"})
+    out = out.reset_index()  # the groupby index is already named "category"
     return out[["category", "value"]].sort_values("value")
 
 
@@ -388,7 +426,7 @@ def _build_bar(
     if measure == "postings":
         agg = _bar_postings(raw)
     elif measure == "share":
-        agg = _bar_share(raw)
+        agg = _bar_share(raw, _scope_total(dim, scope, lo, hi))
     elif measure == "yoy":
         agg = _bar_yoy(raw)
     elif measure == "wage":
@@ -396,14 +434,19 @@ def _build_bar(
     else:  # two_year
         ly = int(start_year) if start_year else int(pd.to_datetime(raw["month"]).dt.year.min())
         hy = int(end_year) if end_year else int(pd.to_datetime(raw["month"]).dt.year.max())
+        if ly == hy:
+            # A two-year change between one year and itself is 0% everywhere.
+            return _message_figure(_t(locale, "two_year_same_year"), locale=locale)
         agg = _bar_two_year(raw, ly, hy)
 
     if agg.empty:
         # Every category fell below the sample floor (or no rows survived).
         return _message_figure(_t(locale, "low_sample"), locale=locale)
 
-    labels = [_pretty(dim, c) for c in agg["category"]]
-    title = _measure_axis(measure, locale, start_year, end_year)
+    labels = [_pretty(dim, c, locale) for c in agg["category"]]
+    # The breakdown share is against the All-dimension total (Unknown included in
+    # the denominator), so disclose that the bars exclude the uncategorized bucket.
+    title = _t(locale, "share_caveat") if measure == "share" else _measure_axis(measure, locale, start_year, end_year)
     fig = go.Figure(
         go.Bar(
             x=agg["value"],
@@ -426,6 +469,12 @@ def _build_time(
     end_year: int | None,
     locale: str,
 ) -> str:
+    # "Two-year change" is a single delta between two years — there is no honest
+    # way to draw it as a line over time, so steer the user to a category instead
+    # of plotting a raw postings level under a "change a→b" axis.
+    if measure == "two_year":
+        return _message_figure(_t(locale, "two_year_needs_breakdown"), locale=locale)
+
     if measure == "wage":
         df = _wage_time_frame(scope, lo, hi)
     else:
@@ -452,17 +501,21 @@ def _build_time(
             total = float(df["postings_total"].sum())
             x = df["month"]
             y = (df["postings_total"] / total * 100).round(2)
-        elif measure == "yoy":
+        else:  # yoy
             if df["month"].nunique() < 13:
                 return _message_figure(_t(locale, "low_sample"), locale=locale)
-            s = df.set_index("month")["postings_total"]
+            # Reindex to a contiguous monthly index first: the cube is a sparse
+            # marginal table (no zero-fill), so a row-positional shift(12) would
+            # mis-pair across any skipped month. shift(12) on the dense index is
+            # a true 12-calendar-month lag; gaps become NaN and drop out.
+            s = df.set_index("month")["postings_total"].sort_index()
+            s.index = pd.to_datetime(s.index)
+            s = s.reindex(pd.date_range(s.index.min(), s.index.max(), freq="MS"))
             yoy = (s / s.shift(12) - 1) * 100
             yoy = yoy.dropna().round(1)
             if yoy.empty:
                 return _message_figure(_t(locale, "low_sample"), locale=locale)
             x, y = yoy.index, yoy.values
-        else:  # two_year on a line: show the level series over the window
-            x, y = df["month"], df["postings_total"]
 
     title = _measure_axis(measure, locale, start_year, end_year)
     fig = go.Figure(
@@ -479,6 +532,10 @@ def _build_time(
 
 
 def _measure_axis(measure: str, locale: str, start_year: int | None, end_year: int | None) -> str:
-    if measure == "two_year" and start_year and end_year:
-        return _t(locale, "two_year", a=start_year, b=end_year)
+    if measure == "two_year":
+        # Only interpolate the years when both are present; otherwise fall back to
+        # a generic label so an unfilled "change {a}→{b}" can never reach the chart.
+        if start_year and end_year:
+            return _t(locale, "two_year", a=start_year, b=end_year)
+        return _t(locale, "two_year_generic")
     return _t(locale, measure)

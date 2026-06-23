@@ -197,4 +197,4 @@ export const skillsDict = {
       },
     },
   },
-};
+} as const;

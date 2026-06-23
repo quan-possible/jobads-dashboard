@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "How the ACLMR dashboard works — data sources, field coverage, caveats and key term definitions.",
 };
 
-function ApiDown({ t }: { t: typeof methodDict.en }) {
+function ApiDown({ t }: { t: (typeof methodDict)[keyof typeof methodDict] }) {
   return (
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
@@ -55,7 +55,7 @@ export default async function MethodPage() {
         <div className="grid gap-5 md:grid-cols-2">
           <div className="card card-pad">
             <h2 className="h-card mb-3">{t.measuresTitle}</h2>
-            <ul className="flex flex-col gap-2 text-[0.95rem] leading-snug text-ink">
+            <ul className="flex flex-col gap-2 t-body leading-snug text-ink">
               {t.measuresItems.map((item, i) => (
                 <li key={i} className="flex gap-3">
                   <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-teal" />
@@ -67,7 +67,7 @@ export default async function MethodPage() {
 
           <div className="card card-pad">
             <h2 className="h-card mb-3">{t.notMeasuresTitle}</h2>
-            <ul className="flex flex-col gap-2 text-[0.95rem] leading-snug text-ink">
+            <ul className="flex flex-col gap-2 t-body leading-snug text-ink">
               {t.notMeasuresItems.map((item, i) => (
                 <li key={i} className="flex gap-3">
                   <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
@@ -86,9 +86,9 @@ export default async function MethodPage() {
           title={t.coverageTitle}
           note={t.coverageNote}
         >
-          <p className="mb-4 text-[0.95rem] text-ink-soft">
+          <p className="mb-4 t-body text-ink-soft">
             {t.coverageBuiltFrom}{" "}
-            <span className="num font-bold text-navy">{fmtInt(meta.postings_total)}</span>{" "}
+            <span className="num font-bold text-navy">{fmtInt(meta.postings_total, locale)}</span>{" "}
             {t.coveragePostingsSpanning}{" "}
             <span className="num font-bold text-navy">
               {fmtMonth(meta.source_window.min_date, locale)} – {fmtMonth(meta.source_window.max_date, locale)}
@@ -103,6 +103,7 @@ export default async function MethodPage() {
                 share={item.share}
                 count={item.postings}
                 postingsLabel={t.coveragePostingsLabel}
+                locale={locale}
               />
             ))}
           </div>
@@ -114,7 +115,7 @@ export default async function MethodPage() {
         <Figure eyebrow={t.caveatsEyebrow} title={t.caveatsTitle}>
           <ul className="flex flex-col gap-3.5">
             {meta.caveats.map((caveat, i) => (
-              <li key={i} className="flex gap-3 text-[0.95rem] leading-snug text-ink">
+              <li key={i} className="flex gap-3 t-body leading-snug text-ink">
                 <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
                 <span>{caveat}</span>
               </li>
@@ -130,7 +131,7 @@ export default async function MethodPage() {
             {t.glossaryTerms.map(({ term, def }) => (
               <div key={term}>
                 <dt className="h-card mb-1">{term}</dt>
-                <dd className="text-[0.92rem] text-ink-soft">{def}</dd>
+                <dd className="t-body text-ink-soft">{def}</dd>
               </div>
             ))}
           </dl>
@@ -140,7 +141,7 @@ export default async function MethodPage() {
       {/* Version */}
       <section className="container-x py-4">
         <Figure eyebrow={t.versionEyebrow} title={t.versionTitle}>
-          <p className="text-[0.95rem] text-ink-soft">
+          <p className="t-body text-ink-soft">
             <span className="num font-bold text-navy">v1</span> ·{" "}
             {fmtMonth(meta.latest_month, locale)} — {t.versionRelease}{" "}
             {fmtMonth(meta.latest_month, locale)}; {t.versionGenerated}{" "}

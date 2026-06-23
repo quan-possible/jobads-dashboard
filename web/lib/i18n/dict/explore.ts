@@ -42,6 +42,7 @@ export const explore = {
     unconfigured:
       "Access control isn’t configured on this server, so the private lookup is unavailable here. On the deployed dashboard this view is unlocked with the team password.",
     authError: "Couldn’t reach the access service. Confirm the API is running, then reload.",
+    signinFailed: "Sign-in failed. Try again.",
     password: "Password",
     unlock: "Unlock",
     unlocking: "Unlocking…",
@@ -114,6 +115,7 @@ export const explore = {
     unconfigured:
       "Le contrôle d’accès n’est pas configuré sur ce serveur; la consultation privée est donc indisponible ici. Sur le tableau de bord déployé, cette vue se déverrouille avec le mot de passe d’équipe.",
     authError: "Impossible de joindre le service d’accès. Vérifiez que l’API tourne, puis rechargez.",
+    signinFailed: "Échec de la connexion. Réessayez.",
     password: "Mot de passe",
     unlock: "Déverrouiller",
     unlocking: "Déverrouillage…",

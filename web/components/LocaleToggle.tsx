@@ -19,8 +19,8 @@ export function LocaleToggle() {
   return (
     <div
       role="group"
-      aria-label={t.common.switchLanguage}
-      className="control flex shrink-0 overflow-hidden border border-card-border text-[0.7rem] font-bold uppercase tracking-[0.04em]"
+      aria-label={t.common.language}
+      className="control flex shrink-0 overflow-hidden border border-card-border t-caption font-bold uppercase tracking-[0.04em]"
     >
       {LOCALES.map((l) => {
         const active = l === locale;

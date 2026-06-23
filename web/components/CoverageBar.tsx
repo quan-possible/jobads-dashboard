@@ -1,4 +1,5 @@
 import { fmtCompact } from "@/lib/format";
+import type { Locale } from "@/lib/i18n/locale";
 
 // A single row showing how completely a field is populated across postings.
 // The bar fills teal when the field is well-covered, orange when sparse (<40%).
@@ -8,12 +9,14 @@ export function CoverageBar({
   share,
   count,
   postingsLabel = "postings",
+  locale = "en",
 }: {
   label: string;
   share: number;
   count: number;
   /** Localised word for "postings" — defaults to English for backward compat. */
   postingsLabel?: string;
+  locale?: Locale;
 }) {
   const pct = (share * 100).toFixed(0);
   const isSparse = share < 0.4;
@@ -23,11 +26,11 @@ export function CoverageBar({
   return (
     <div
       role="img"
-      aria-label={`${label}: ${pct}% coverage, ${fmtCompact(count)} ${postingsLabel}`}
+      aria-label={`${label}: ${pct}% coverage, ${fmtCompact(count, locale)} ${postingsLabel}`}
     >
       <div className="mb-1 grid grid-cols-[1fr_auto] items-baseline gap-2">
-        <span className="text-[0.88rem] font-bold text-navy">{label}</span>
-        <span className={`num text-[0.88rem] font-bold ${accentClass}`}>{pct}%</span>
+        <span className="t-body-sm font-bold text-navy">{label}</span>
+        <span className={`num t-body-sm font-bold ${accentClass}`}>{pct}%</span>
       </div>
       <div className="h-2.5 w-full rounded-sm bg-surface-alt">
         <div
@@ -35,7 +38,7 @@ export function CoverageBar({
           style={{ width: `${share * 100}%` }}
         />
       </div>
-      <p className="mt-1 text-[0.74rem] text-ink-faint">{fmtCompact(count)} {postingsLabel}</p>
+      <p className="mt-1 t-caption text-ink-faint">{fmtCompact(count, locale)} {postingsLabel}</p>
     </div>
   );
 }

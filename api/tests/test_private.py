@@ -42,6 +42,14 @@ def configured(monkeypatch) -> None:
     monkeypatch.setenv("JOBADS_API_COOKIE_SECURE", "false")
 
 
+@pytest.fixture(autouse=True)
+def _clear_rate_limit() -> None:
+    """The per-IP login throttle keeps module-global state; clear it before each
+    test so one test's failed logins can't bleed into another's (the rate-limit
+    key is now the socket peer unless a trusted proxy is configured — S06)."""
+    private_router._AUTH_FAILURES.clear()
+
+
 @pytest.fixture()
 def anon() -> TestClient:
     return TestClient(app)
@@ -132,9 +140,13 @@ def test_logout_clears(signed_in):
     assert r.status_code == 401
 
 
-def test_auth_rate_limited(configured, anon):
-    """Repeated bad logins from one IP eventually get 429 (S12). A unique
-    X-Forwarded-For keeps this test's failures off the shared testserver IP."""
+def test_auth_rate_limited(configured, anon, monkeypatch):
+    """Repeated bad logins from one IP eventually get 429 (S12). Behind a trusted
+    proxy the per-IP key comes from X-Forwarded-For, so a unique value keeps this
+    test's failures off the shared peer."""
+    # Simulate running behind a trusted proxy: the TestClient socket peer is
+    # "testclient", so honour its forwarded header (S06).
+    monkeypatch.setenv("JOBADS_API_TRUSTED_PROXY", "testclient")
     headers = {"x-forwarded-for": "203.0.113.50"}
     statuses = [
         anon.post("/api/auth", json={"password": "wrong"}, headers=headers).status_code
@@ -143,6 +155,21 @@ def test_auth_rate_limited(configured, anon):
     assert 429 in statuses, statuses
     # The early attempts are ordinary auth failures, not throttled.
     assert statuses[0] == 401
+
+
+def test_xff_spoof_does_not_bypass_throttle(configured, anon):
+    """With no trusted proxy configured, the rate limit keys on the socket peer,
+    so rotating X-Forwarded-For per request can no longer reset the backoff and
+    brute-force the password (S06)."""
+    statuses = [
+        anon.post(
+            "/api/auth",
+            json={"password": "wrong"},
+            headers={"x-forwarded-for": f"198.51.100.{i}"},  # a fresh spoofed IP each time
+        ).status_code
+        for i in range(private_router._AUTH_MAX_FAILURES + 2)
+    ]
+    assert 429 in statuses, "rotating XFF must not defeat the per-peer throttle"
 
 
 def test_weak_pbkdf2_hash_rejected():

@@ -42,12 +42,33 @@ _AUTH_FAILURES: dict[str, list[float]] = {}
 _AUTH_MAX_FAILURES = 8          # allowed failures per window before lockout
 _AUTH_WINDOW = 900.0            # 15 minutes
 
+# Loopback peers are the single-container default: the Next proxy connects to
+# FastAPI over localhost, so its X-Forwarded-For carries the real client IP.
+# Override with a comma-separated allowlist of proxy socket addresses if the
+# proxy hop is elsewhere.
+_DEFAULT_TRUSTED_PROXIES = {"127.0.0.1", "::1", "localhost"}
+
+
+def _trusted_proxies() -> set[str]:
+    raw = os.environ.get("JOBADS_API_TRUSTED_PROXY", "").strip()
+    if not raw:
+        return _DEFAULT_TRUSTED_PROXIES
+    return {p.strip() for p in raw.split(",") if p.strip()}
+
 
 def _client_ip(request: Request) -> str:
-    xff = request.headers.get("x-forwarded-for")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    """The per-IP rate-limit key.
+
+    Only honour the client-supplied ``X-Forwarded-For`` when the request's
+    socket peer is a trusted proxy; otherwise an attacker rotates the header to
+    reset their own backoff and brute-forces the shared password (S06). When the
+    peer is untrusted we key on the real socket address."""
+    peer = request.client.host if request.client else "unknown"
+    if peer in _trusted_proxies():
+        xff = request.headers.get("x-forwarded-for")
+        if xff:
+            return xff.split(",")[0].strip()
+    return peer
 
 
 def _auth_rate_check(ip: str) -> None:

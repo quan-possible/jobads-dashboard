@@ -57,7 +57,7 @@ export function MapToggle({
               onClick={() => setActive(o.value)}
               onKeyDown={onKeyDown}
               className={[
-                "rounded px-3 py-1 text-[0.82rem] font-bold transition-colors",
+                "rounded px-3 py-1 t-meta font-bold transition-colors",
                 "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange",
                 on ? "bg-orange text-white shadow-sm" : "text-ink-soft hover:text-navy-deep",
               ].join(" ")}

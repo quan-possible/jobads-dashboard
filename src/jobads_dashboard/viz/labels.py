@@ -53,7 +53,47 @@ NAICS_SHORT: dict[str, str] = {
     "91": "Public administration",
 }
 
+# French short names, keyed by the same codes. The single source of truth for
+# the bilingual category labels shown on both the curated treemaps/bars (via the
+# figure chrome localizer) and the Explore builder (S07).
+NOC_SHORT_FR: dict[str, str] = {
+    "0": "Gestion",
+    "1": "Affaires et finance",
+    "2": "Sciences et génie",
+    "3": "Santé",
+    "4": "Éducation, droit et gouv.",
+    "5": "Arts, culture et sport",
+    "6": "Vente et services",
+    "7": "Métiers et transport",
+    "8": "Ressources et agriculture",
+    "9": "Fabrication et services publics",
+}
+
+NAICS_SHORT_FR: dict[str, str] = {
+    "11": "Agriculture et foresterie",
+    "21": "Mines, pétrole et gaz",
+    "22": "Services publics",
+    "23": "Construction",
+    "31-33": "Fabrication",
+    "41": "Commerce de gros",
+    "44-45": "Commerce de détail",
+    "48-49": "Transport et entreposage",
+    "51": "Information et culture",
+    "52": "Finance et assurances",
+    "53": "Immobilier",
+    "54": "Services professionnels",
+    "55": "Gestion d’entreprises",
+    "56": "Admin. et soutien",
+    "61": "Services d’enseignement",
+    "62": "Santé et services sociaux",
+    "71": "Arts et loisirs",
+    "72": "Hébergement et restauration",
+    "81": "Autres services",
+    "91": "Administration publique",
+}
+
 _UNKNOWN = "Unknown"
+_UNKNOWN_FR = "Inconnu"
 
 
 def _code_of(value: str) -> str:
@@ -66,3 +106,18 @@ def _code_of(value: str) -> str:
 def noc_short(value: str) -> str:
     """Short occupation-group name from a code or 'code | label' string."""
     return NOC_SHORT.get(_code_of(value), _UNKNOWN)
+
+
+def short_label(dim: str, value: str, locale: str = "en") -> str:
+    """Localized short name for an occupation/industry code or 'code | label'
+    string. The shared lookup used by the Explore builder so its bars match the
+    curated treemaps in both locales (S07)."""
+    code = _code_of(value)
+    if dim == "occupation":
+        en, fr = NOC_SHORT, NOC_SHORT_FR
+    elif dim == "industry":
+        en, fr = NAICS_SHORT, NAICS_SHORT_FR
+    else:
+        return value
+    table = fr if locale == "fr" else en
+    return table.get(code) or en.get(code) or (_UNKNOWN_FR if locale == "fr" else _UNKNOWN)

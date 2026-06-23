@@ -7,7 +7,7 @@ dataset metadata (``/meta``) and the homepage snapshot (``/overview``).
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from .. import queries
 from ..deps import scope_dependency
@@ -22,5 +22,8 @@ def meta() -> Meta:
 
 
 @router.get("/overview", response_model=OverviewResponse)
-def overview(scope: Scope = Depends(scope_dependency)) -> OverviewResponse:
-    return queries.overview(scope)
+def overview(
+    scope: Scope = Depends(scope_dependency),
+    locale: str = Query("en", pattern="^(en|fr)$"),
+) -> OverviewResponse:
+    return queries.overview(scope, locale)

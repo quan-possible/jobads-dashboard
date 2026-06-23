@@ -35,7 +35,7 @@ export function Figure({
         <div className="flex shrink-0 items-center gap-3">
           {actions}
           {asOf && (
-            <span className="num whitespace-nowrap text-[0.7rem] font-bold uppercase tracking-[0.03em] text-ink-faint">
+            <span className="num whitespace-nowrap t-caption font-bold uppercase tracking-[0.03em] text-ink-faint">
               {fmtMonth(asOf, locale)}
             </span>
           )}
@@ -44,7 +44,7 @@ export function Figure({
       <div className="min-w-0 flex-1">{children}</div>
       {/* A <figure> may contain only one <figcaption> (the title above); the
           source/denominator note is a plain element (S35). */}
-      {note && <div className="mt-3 border-t border-hairline pt-3 text-[0.78rem] leading-relaxed text-ink-soft">{note}</div>}
+      {note && <div className="mt-3 border-t border-hairline pt-3 t-meta leading-relaxed text-ink-soft">{note}</div>}
     </figure>
   );
 }

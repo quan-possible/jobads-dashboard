@@ -31,7 +31,10 @@ async function get<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   meta: () => get<Meta>(`/api/meta`),
-  overview: (f?: Filters) => get<OverviewResponse>(`/api/overview${qs(f)}`),
+  // `locale` localizes the server-built "key points" narrative (S05); scope
+  // filters (if any) ride along in the query string.
+  overview: (f?: Filters, locale: string = "en") =>
+    get<OverviewResponse>(`/api/overview${qs(f, { locale })}`),
   // Figure bridge: a redesign2 Plotly factory rendered to figure JSON. `extra`
   // carries optional params the year-anchored charts accept (base_year/end_year),
   // so a client component can re-fetch the same chart for a user-chosen window.

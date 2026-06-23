@@ -51,7 +51,7 @@ export function TopNav() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={[
-                      "relative whitespace-nowrap px-3 py-2 text-[0.78rem] font-bold uppercase tracking-[0.01em] transition-colors",
+                      "relative whitespace-nowrap px-3 py-2 t-meta font-bold uppercase tracking-[0.01em] transition-colors",
                       active ? "text-navy-deep" : "text-ink-soft hover:text-navy",
                     ].join(" ")}
                   >
@@ -131,7 +131,7 @@ export function TopNav() {
                 aria-current={active ? "page" : undefined}
                 onClick={() => setMenuOpen(false)}
                 className={[
-                  "relative flex min-h-[44px] items-center border-b border-card-border/50 text-[0.95rem] font-bold uppercase last:border-b-0",
+                  "relative flex min-h-[44px] items-center border-b border-card-border/50 t-body font-bold uppercase last:border-b-0",
                   "pl-4 transition-colors duration-150",
                   active ? "text-navy-deep" : "text-ink-soft hover:text-navy",
                 ].join(" ")}

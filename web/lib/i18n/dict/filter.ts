@@ -1,7 +1,7 @@
 export const filter = {
   en: {
     eyebrow: "Filter",
-    scope: "Across the dashboard",
+    scope: "The Explore views",
     region: "Region",
     occupation: "Occupation",
     industry: "Industry",
@@ -9,7 +9,7 @@ export const filter = {
   },
   fr: {
     eyebrow: "Filtre",
-    scope: "Sur tout le tableau de bord",
+    scope: "Les vues Explorer",
     region: "Région",
     occupation: "Profession",
     industry: "Industrie",

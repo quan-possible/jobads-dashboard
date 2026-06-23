@@ -2,26 +2,38 @@
 
 import type { Locale } from "./i18n/locale";
 
-const NF = new Intl.NumberFormat("en-CA");
-const NF1 = new Intl.NumberFormat("en-CA", { maximumFractionDigits: 1 });
-
 const intlLocale = (locale: Locale): string => (locale === "fr" ? "fr-CA" : "en-CA");
 
-export function fmtInt(n: number | null | undefined): string {
-  if (n === null || n === undefined) return "—";
-  return NF.format(Math.round(n));
+// Memoize the Intl formatters per locale so FR renders "1 234,5" (space thousands,
+// comma decimal) and EN "1,234.5" without rebuilding a formatter on every call (S09).
+const _nf = new Map<Locale, Intl.NumberFormat>();
+const _nf1 = new Map<Locale, Intl.NumberFormat>();
+function NF(locale: Locale): Intl.NumberFormat {
+  let f = _nf.get(locale);
+  if (!f) { f = new Intl.NumberFormat(intlLocale(locale)); _nf.set(locale, f); }
+  return f;
+}
+function NF1(locale: Locale): Intl.NumberFormat {
+  let f = _nf1.get(locale);
+  if (!f) { f = new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 1 }); _nf1.set(locale, f); }
+  return f;
 }
 
-export function fmtCompact(n: number | null | undefined): string {
+export function fmtInt(n: number | null | undefined, locale: Locale = "en"): string {
   if (n === null || n === undefined) return "—";
-  if (Math.abs(n) >= 1_000_000) return `${NF1.format(n / 1_000_000)}M`;
-  if (Math.abs(n) >= 10_000) return `${NF1.format(n / 1_000)}k`;
-  return NF.format(Math.round(n));
+  return NF(locale).format(Math.round(n));
 }
 
-export function fmtPct(n: number | null | undefined, opts: { sign?: boolean } = {}): string {
+export function fmtCompact(n: number | null | undefined, locale: Locale = "en"): string {
   if (n === null || n === undefined) return "—";
-  const s = `${NF1.format(Math.abs(n))}%`;
+  if (Math.abs(n) >= 1_000_000) return `${NF1(locale).format(n / 1_000_000)}M`;
+  if (Math.abs(n) >= 10_000) return `${NF1(locale).format(n / 1_000)}k`;
+  return NF(locale).format(Math.round(n));
+}
+
+export function fmtPct(n: number | null | undefined, opts: { sign?: boolean; locale?: Locale } = {}): string {
+  if (n === null || n === undefined) return "—";
+  const s = `${NF1(opts.locale ?? "en").format(Math.abs(n))}%`;
   if (opts.sign) return `${n >= 0 ? "+" : "−"}${s}`;
   return n < 0 ? `−${s}` : s;
 }

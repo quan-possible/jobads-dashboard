@@ -19,11 +19,15 @@ export function RemoteFigure({
   height,
   ariaLabel,
   className = "",
+  loading = false,
 }: {
   fig: FigJSON | null | undefined;
   height?: number;
   ariaLabel: string;
   className?: string;
+  /** True while a fetch is in flight. A null figure then reads as *loading*
+   *  (neutral skeleton), not *failed* ("unavailable") — S15. */
+  loading?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { t } = useI18n();
@@ -71,6 +75,23 @@ export function RemoteFigure({
     };
   }, [fig, figHeight]);
 
+  // While a fetch is in flight and nothing has rendered yet, show a neutral
+  // loading skeleton — not the error notice — so a normal load never reads as
+  // broken (S15).
+  if (!fig && loading && !failed) {
+    return (
+      <div
+        style={{ height: figHeight, width: "100%" }}
+        role="img"
+        aria-busy="true"
+        aria-label={t.common.loading}
+        className={`flex animate-pulse items-center justify-center rounded-md border border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
+      >
+        {t.common.loading}
+      </div>
+    );
+  }
+
   // Per-figure fallback: a missing figure (server fetch failed) or a render
   // error degrades to a small notice — it never blanks the rest of the page (S23).
   if (!fig || failed) {
@@ -79,7 +100,7 @@ export function RemoteFigure({
         style={{ height: figHeight, width: "100%" }}
         role="img"
         aria-label={ariaLabel}
-        className={`flex items-center justify-center rounded-md border border-dashed border-card-border bg-surface-alt/40 px-4 text-center text-[0.82rem] text-ink-faint ${className}`}
+        className={`flex items-center justify-center rounded-md border border-dashed border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
       >
         {t.common.chartUnavailable}
       </div>

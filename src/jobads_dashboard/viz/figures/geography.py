@@ -125,15 +125,21 @@ def cma_demand(ds: DataSource, top: int = 18) -> go.Figure:
     labour markets by posting volume over the last 12 months."""
     mk = _last12(ds.market).groupby("market_label", as_index=False)["postings_total"].sum()
     mk = mk.sort_values("postings_total", ascending=False).head(top).sort_values("postings_total")
-    # province prefix ("ON | Toronto (CMA)") colours the bar; keep the city name on the tick
     mk["prov"] = mk["market_label"].str.split("|").str[0].str.strip()
     mk["city"] = mk["market_label"].str.split("|").str[1].str.strip()
-    palette = {p: c for p, c in zip(sorted(mk["prov"].unique()),
-                                    (SEQUENTIAL[1][1], BRAND, "#345961", "#7b6b8d", "#55754e",
-                                     "#a64d3f", "#6e8790", "#c39e80", "#041c2c"))}
+    # Disambiguate any city name shared by more than one province — the "Rural
+    # area not in a CMA/CA" catch-all repeats per province — by suffixing the
+    # province, so no two bars carry an identical tick label (S18).
+    dup = mk["city"].duplicated(keep=False)
+    mk["label"] = mk["city"].where(~dup, mk["city"] + " (" + mk["prov"] + ")")
+    # One measure → one hue, with the leader highlighted (matching the province
+    # ranked bars above). A province-categorical rainbow implies a grouping the
+    # reader isn't being asked about (U07).
+    n = len(mk)
+    colors = [BRAND if i == n - 1 else CONTEXT for i in range(n)]
     fig = go.Figure(go.Bar(
-        x=mk["postings_total"], y=mk["city"], orientation="h",
-        marker_color=[palette.get(p, CONTEXT) for p in mk["prov"]],
+        x=mk["postings_total"], y=mk["label"], orientation="h",
+        marker_color=colors,
         customdata=mk["prov"],
         hovertemplate="%{y} (%{customdata}): %{x:,.0f} postings (12 mo)<extra></extra>"))
     fig.update_xaxes(title_text="postings (last 12 months)")

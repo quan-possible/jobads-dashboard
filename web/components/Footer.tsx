@@ -17,22 +17,22 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
             <PixelTiles rows={3} cols={3} size={8} gap={2} />
             <span className="text-lg font-bold uppercase tracking-[0.01em]">ACLMR</span>
           </div>
-          <p className="mt-4 max-w-sm text-[0.9rem] leading-relaxed text-ink-invert/70">{t.footer.tagline}</p>
+          <p className="mt-4 max-w-sm t-body leading-relaxed text-ink-invert/70">{t.footer.tagline}</p>
         </div>
 
         <nav aria-label={t.footer.sections} className="flex flex-col gap-2">
           <span className="eyebrow text-orange-soft!">{t.footer.dashboard}</span>
           {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="w-fit text-[0.9rem] text-ink-invert/80 transition-colors hover:text-orange-soft">
+            <Link key={item.href} href={item.href} className="w-fit t-body text-ink-invert/80 transition-colors hover:text-orange-soft">
               {t.nav[item.key]}
             </Link>
           ))}
-          <Link href="/developers" className="w-fit text-[0.9rem] text-ink-invert/80 transition-colors hover:text-orange-soft">
+          <Link href="/developers" className="w-fit t-body text-ink-invert/80 transition-colors hover:text-orange-soft">
             {t.nav.developers}
           </Link>
         </nav>
 
-        <div className="flex flex-col gap-3 text-[0.82rem] text-ink-invert/65">
+        <div className="flex flex-col gap-3 t-meta text-ink-invert/65">
           <span className="eyebrow text-orange-soft!">{t.footer.aboutData}</span>
           <p>{source ?? t.footer.sourceDefault}</p>
           {asOf && (
@@ -53,7 +53,7 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="container-x flex flex-col items-start justify-between gap-2 py-5 text-[0.74rem] text-ink-invert/50 sm:flex-row sm:items-center">
+        <div className="container-x flex flex-col items-start justify-between gap-2 py-5 t-caption text-ink-invert/50 sm:flex-row sm:items-center">
           <span>© {year} {t.footer.rights}</span>
           <span className="uppercase tracking-[0.04em]">{t.footer.disclaimer}</span>
         </div>

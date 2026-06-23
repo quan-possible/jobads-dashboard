@@ -191,6 +191,16 @@ body {
   line-height: 1.55;
 }
 
+/* Small-text scale — one source of truth for label / caption / body sizes,
+   replacing ~15 near-duplicate ad-hoc `text-[0.xx rem]` literals (U01). The five
+   steps sit at the centres of the prior clusters, so the visual change from the
+   old values is negligible while the rhythm is now systematic. */
+.t-label   { font-size: 0.625rem; }  /* micro labels, table heads, eyebrow chips */
+.t-caption { font-size: 0.72rem; }   /* captions, chips, small controls */
+.t-meta    { font-size: 0.8rem; }    /* secondary / meta text */
+.t-body-sm { font-size: 0.86rem; }   /* dense body */
+.t-body    { font-size: 0.92rem; }   /* body */
+
 /* ------------------------------------------------------------- layout ----- */
 
 .container-x {

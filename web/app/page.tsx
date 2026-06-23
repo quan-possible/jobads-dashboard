@@ -44,7 +44,7 @@ export default async function PulsePage() {
   try {
     const [overview, demand, yoy, seasonality, composition, occupationTrends, momentum, diffusion] =
       await Promise.all([
-        api.overview(),
+        api.overview(undefined, locale),
         api.figureSafe("pulse.demand_ribbon", locale),
         api.figureSafe("pulse.yoy_bars", locale),
         api.figureSafe("pulse.seasonality", locale),
@@ -96,25 +96,27 @@ export default async function PulsePage() {
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiTile
             label={t.kpiDemandLabel}
-            value={fmtInt(kpis.demand_index)}
+            value={fmtInt(kpis.demand_index, locale)}
             context={t.kpiDemandContext}
             delta={baselineGap}
             deltaLabel={t.kpiDemandDeltaLabel}
             spark={indexSpark}
             accent
+            locale={locale}
           />
           <KpiTile
             label={t.kpiPostingsLabel}
-            value={fmtCompact(kpis.active_postings)}
+            value={fmtCompact(kpis.active_postings, locale)}
             context={t.kpiPostingsContext}
             delta={kpis.active_mom_pct}
             deltaLabel={t.kpiPostingsDeltaLabel}
             spark={postingsSpark}
             sparkColor="var(--teal)"
+            locale={locale}
           />
           <KpiTile
             label={t.kpiYoyLabel}
-            value={kpis.active_yoy_pct == null ? "—" : fmtPct(Math.abs(kpis.active_yoy_pct))}
+            value={kpis.active_yoy_pct == null ? "—" : fmtPct(Math.abs(kpis.active_yoy_pct), { locale })}
             valueTrend={kpis.active_yoy_pct}
             context={t.kpiYoyContext}
             spark={yoySpark.length > 1 ? yoySpark : undefined}
@@ -124,7 +126,7 @@ export default async function PulsePage() {
             label={t.kpiWageLabel}
             value={fmtWage(kpis.median_wage, locale)}
             unit={kpis.median_wage ? t.kpiWageUnit : undefined}
-            context={kpis.wage_n ? `n = ${fmtCompact(kpis.wage_n)}` : t.kpiWageInsufficient}
+            context={kpis.wage_n ? `n = ${fmtCompact(kpis.wage_n, locale)}` : t.kpiWageInsufficient}
             spark={wageSpark && wageSpark.length > 1 ? wageSpark : undefined}
             sparkColor="var(--teal)"
           />
@@ -137,7 +139,7 @@ export default async function PulsePage() {
           <Figure eyebrow={c.demandRibbon.eyebrow} title={c.demandRibbon.title} asOf={as_of} note={c.demandRibbon.note}>
             <RemoteFigure fig={figs.demand} height={420} ariaLabel={c.demandRibbon.aria} />
           </Figure>
-          <KeyPoints points={key_points} title={t.keyPointsTitle} />
+          <KeyPoints points={key_points} title={t.keyPointsTitle} note={t.keyPointsNote} />
         </div>
       </section>
 

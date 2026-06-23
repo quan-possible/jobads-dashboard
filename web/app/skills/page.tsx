@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "Skills and requirements most commonly listed in Canadian job postings, by region, occupation and industry.",
 };
 
-function ApiDown({ t }: { t: typeof skillsDict.en }) {
+function ApiDown({ t }: { t: (typeof skillsDict)[keyof typeof skillsDict] }) {
   return (
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">

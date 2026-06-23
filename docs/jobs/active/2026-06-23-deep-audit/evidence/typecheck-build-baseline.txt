@@ -1,0 +1,2 @@
+tsc --noEmit: clean (exit 0)
+next build: success (exit 0)
