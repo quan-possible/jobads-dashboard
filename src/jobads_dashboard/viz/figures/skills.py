@@ -1,4 +1,4 @@
-"""Skills & requirements - most-demanded skills and their trend, distinctive
+"""Skills & requirements - most-requested skills and their trend, distinctive
 skills by occupation, the skill × occupation grid, education and experience mix.
 
 Skill codes carry human labels from the bundled reference taxonomy, so every
@@ -22,11 +22,11 @@ from ..theme import COLORWAY
 # --------------------------------------------------------------------------- CORE
 
 
-def top_skills_trend(ds: DataSource, top: int = 8) -> go.Figure:
-    """The most-demanded skills nationally and how each has trended since 2019.
-    Indexed to each skill's 2019 average so fast and slow movers are comparable."""
+def top_skills_trend(ds: DataSource, base_year: int = BASE_YEAR, top: int = 8) -> go.Figure:
+    """The most-requested skills nationally and how each has trended. Indexed to each
+    skill's base-year average so fast and slow movers are comparable; base is selectable."""
     nat = ds.skills_national(top=top)
-    idx = C.index_to_base(nat, "postings_total", BASE_YEAR, by="skill_name")
+    idx = C.index_to_base(nat, "postings_total", base_year, by="skill_name")
     latest = idx[idx["month"] == idx["month"].max()].set_index("skill_name")["index"]
     movers = latest.sort_values(ascending=False)
     highlight = set(list(movers.index[:2]) + list(movers.index[-1:]))
@@ -39,16 +39,16 @@ def top_skills_trend(ds: DataSource, top: int = 8) -> go.Figure:
             line=dict(color=BRAND if on else CONTEXT, width=2.6 if on else 1),
             opacity=1 if on else 0.55, showlegend=on,
             hovertemplate="%{x|%b %Y} · " + name + ": %{y:.0f}<extra></extra>"))
-    add_reference_line(fig, 100, text=f"{BASE_YEAR}=100")
+    add_reference_line(fig, 100, text=f"{base_year}=100")
     add_covid_band(fig)
     add_provisional_band(fig)
-    fig.update_yaxes(title_text=f"index ({BASE_YEAR} = 100)")
-    return titled(fig, "The most-demanded skills, and how each has trended",
-                  "Top skills by posting volume, each indexed to its 2019 average · fastest/slowest movers highlighted")
+    fig.update_yaxes(title_text="index (base year = 100)")
+    return titled(fig, "The most-requested skills, and how each has trended",
+                  f"Top skills by posting volume, each indexed to its {base_year} average · fastest/slowest movers highlighted")
 
 
 def ai_skill_diffusion(ds: DataSource) -> go.Figure:
-    """The rise of AI skills in hiring demand: AI skills as a share of all skill
+    """The rise of AI skills in hiring: AI skills as a share of all skill
     mentions over time. AI skills = the reference taxonomy's 'Artificial Intelligence'
     sub-group. Mention-share, smoothed; the generative-AI surge shows from 2024."""
     d = ds.ai_skill_diffusion()
@@ -67,7 +67,7 @@ def ai_skill_diffusion(ds: DataSource) -> go.Figure:
     add_provisional_band(fig)
     fig.update_yaxes(title_text="% of all skill mentions", ticksuffix="%", rangemode="tozero")
     fig.update_layout(showlegend=False)
-    return titled(fig, "The rise of AI skills in hiring demand",
+    return titled(fig, "The rise of AI skills in postings",
                   "AI-related skills (machine learning, generative AI, LLMs, …) as a share of all skill mentions · faint = monthly, bold = 3-month average")
 
 
@@ -93,7 +93,7 @@ def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None) -> go.F
 
 
 def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
-    """What each occupation group demands: the most-demanded skills (rows) by broad
+    """What each occupation group requires: the most-requested skills (rows) by broad
     occupation group (columns), each column showing how that occupation's skill
     mentions split across the top skills (column-normalised)."""
     df = ds.skill_by_occupation(top=16)
@@ -109,7 +109,7 @@ def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
         hovertemplate="%{y} in %{x}: %{z:.0f}% of the group's top-skill mentions<extra></extra>"))
     fig.update_xaxes(title_text="", tickangle=-30)
     fig.update_layout(height=520, margin=dict(l=190, b=120))
-    return titled(fig, "What each occupation group demands: skills × occupations",
+    return titled(fig, "What each occupation group requires: skills × occupations",
                   "Column-normalised: each occupation's mentions of the top skills (latest month)")
 
 

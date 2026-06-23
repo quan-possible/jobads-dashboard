@@ -1,5 +1,6 @@
 import { Figure } from "@/components/Figure";
 import { RemoteFigure } from "@/components/RemoteFigure";
+import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
 import { fmtMonth } from "@/lib/format";
@@ -53,6 +54,12 @@ export default async function IndustriesPage() {
     return <ApiDown t={t} />;
   }
 
+  // Year-picker bounds for the general (tunable) contribution chart.
+  const FIRST_YEAR = 2016;
+  const asOfYear = Number(asOf.slice(0, 4));
+  const latestComplete = asOf.slice(5, 7) === "12" ? asOfYear : asOfYear - 1;
+  const BASE_YEAR = 2019;
+
   return (
     <div className="pb-4">
       {/* Hero */}
@@ -87,11 +94,13 @@ export default async function IndustriesPage() {
 
       <DeepDivider eyebrow={t.deepEyebrow} lede={t.deepLede} />
 
-      {/* Deep: contribution to growth */}
+      {/* Deep: contribution to growth (general window) */}
       <section className="container-x py-4">
-        <Figure eyebrow={c.contributionBars.eyebrow} title={c.contributionBars.title} asOf={asOf} note={c.contributionBars.note}>
-          <RemoteFigure fig={figs.contributionBars} height={420} ariaLabel={c.contributionBars.aria} />
-        </Figure>
+        <TunableFigure
+          chartId="industries.contribution_bars" initialFig={figs.contributionBars} mode="baseEnd"
+          minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR} defaultEndYear={latestComplete}
+          eyebrow={c.contributionBars.eyebrow} title={c.contributionBars.title} asOf={asOf}
+          note={c.contributionBars.note} ariaLabel={c.contributionBars.aria} height={420} />
       </section>
     </div>
   );

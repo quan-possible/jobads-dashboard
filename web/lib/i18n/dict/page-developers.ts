@@ -39,12 +39,12 @@ const FR_SCOPE = scopeParams({
 
 const EN_ENDPOINTS: Endpoint[] = [
   { method: "GET", path: "/api/meta", purpose: "Dataset metadata: date window, total posting count, field coverage rates, caveats, and glossary.", params: [] },
-  { method: "GET", path: "/api/overview", purpose: "High-level snapshot of posting demand for the active scope: current level, YoY change, and context.", params: EN_SCOPE },
+  { method: "GET", path: "/api/overview", purpose: "High-level snapshot of postings for the active scope: current level, YoY change, and context.", params: EN_SCOPE },
 ];
 
 const FR_ENDPOINTS: Endpoint[] = [
   { method: "GET", path: "/api/meta", purpose: "Métadonnées du jeu de données : fenêtre temporelle, nombre total d’offres, taux de couverture des champs, mises en garde et glossaire.", params: [] },
-  { method: "GET", path: "/api/overview", purpose: "Aperçu de la demande d’offres pour la portée active : niveau actuel, variation sur un an et contexte.", params: FR_SCOPE },
+  { method: "GET", path: "/api/overview", purpose: "Aperçu des offres pour la portée active : niveau actuel, variation sur un an et contexte.", params: FR_SCOPE },
 ];
 
 export const developersDict = {

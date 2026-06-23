@@ -1,6 +1,7 @@
 import { Figure } from "@/components/Figure";
 import { MapToggle } from "@/components/MapToggle";
 import { RemoteFigure } from "@/components/RemoteFigure";
+import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
 import { fmtMonth } from "@/lib/format";
@@ -84,6 +85,12 @@ export default async function GeographyPage() {
     { value: "lq", label: t.mapMeasures.lq },
   ];
 
+  // Year-picker bounds for the general (tunable) shift-share decomposition.
+  const FIRST_YEAR = 2016;
+  const asOfYear = Number(asOf.slice(0, 4));
+  const latestComplete = asOf.slice(5, 7) === "12" ? asOfYear : asOfYear - 1;
+  const BASE_YEAR = 2019;
+
   return (
     <div className="pb-4">
       {/* Hero */}
@@ -138,11 +145,13 @@ export default async function GeographyPage() {
         </div>
       </section>
 
-      {/* Deep: shift-share decomposition (secondary) */}
+      {/* Deep: shift-share decomposition (secondary, general window) */}
       <section className="container-x py-4">
-        <Figure eyebrow={c.shiftShare.eyebrow} title={c.shiftShare.title} asOf={asOf} note={c.shiftShare.note}>
-          <RemoteFigure fig={figs.shiftShare} height={460} ariaLabel={c.shiftShare.aria} />
-        </Figure>
+        <TunableFigure
+          chartId="geography.shift_share" initialFig={figs.shiftShare} mode="baseEnd"
+          minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR} defaultEndYear={latestComplete}
+          eyebrow={c.shiftShare.eyebrow} title={c.shiftShare.title} asOf={asOf}
+          note={c.shiftShare.note} ariaLabel={c.shiftShare.aria} height={460} />
       </section>
     </div>
   );

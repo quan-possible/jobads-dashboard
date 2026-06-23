@@ -107,9 +107,9 @@ def wage_demand_quadrant(ds: DataSource) -> go.Figure:
     add_reference_line(fig, 0)
     fig.add_vline(x=xmid, line=dict(color=MUTED, width=1, dash="dash"))
     fig.update_xaxes(title_text="advertised median wage", tickprefix="$")
-    fig.update_yaxes(title_text="YoY demand growth", ticksuffix="%")
+    fig.update_yaxes(title_text="YoY posting growth", ticksuffix="%")
     fig.update_layout(height=460)
-    return titled(fig, "Pay vs momentum: the wage × demand quadrant",
+    return titled(fig, "Pay vs momentum: the wage × postings quadrant",
                   "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation)")
 
 

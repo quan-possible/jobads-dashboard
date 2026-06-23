@@ -6,13 +6,13 @@ export const geographyDict = {
   en: {
     // Hero section
     eyebrow: "Geography",
-    hero: "Where in Canada is demand concentrated?",
+    hero: "Where in Canada are postings concentrated?",
     lede:
       "Active postings by province, as a share of the labour force, a location quotient, or a raw count. Two territories report no postings.",
 
     // Figure section
     figureEyebrow: "By province",
-    figureTitle: "Posted hiring demand across Canada",
+    figureTitle: "Posted hiring across Canada",
 
     // Measure toggle labels — kept short so the segmented toggle doesn't overflow
     measurePer10k: "Per 10k",
@@ -37,21 +37,21 @@ export const geographyDict = {
     territoryNote: 'Nunavut and Yukon are not covered in the source data and show as "no data."',
 
     // SegmentToggle accessibility label
-    toggleAriaLabel: "Choose how to measure demand",
+    toggleAriaLabel: "Choose how to measure postings",
 
     // Ranked header prefix
     rankedPrefix: "Ranked · ",
 
     // Time-scrubbed choropleth
-    timeEyebrow: "Demand over time · by province",
-    timeTitle: "How posted demand shifted across the country",
+    timeEyebrow: "Postings over time · by province",
+    timeTitle: "How posted hiring shifted across the country",
     timeNote: "Active postings per province, animated by month. Colour scale is fixed across all months, so growth reads as the map brightening. Drag the slider or press play.",
     playLabel: "▶ Play",
     monthPrefix: "Month: ",
 
     // Cumulative concentration
     cumEyebrow: "Market concentration",
-    cumTitle: "How concentrated demand is across provinces",
+    cumTitle: "How concentrated postings are across provinces",
     cumNote: "Cumulative share of all postings as provinces are added largest-first.",
     cumUnit: "provinces",
 
@@ -75,16 +75,16 @@ export const geographyDict = {
     deepEyebrow: "Going deeper",
     deepLede: "Specialisation, structure and momentum for readers who want the regional detail beneath the headline map.",
 
-    // Measure-toggle labels for the authoritative demand map.
-    mapMeasures: { share: "Share", count: "Count", percap: "Per-capita", lq: "Demand LQ" },
+    // Measure-toggle labels for the authoritative postings map.
+    mapMeasures: { share: "Share", count: "Count", percap: "Per-capita", lq: "Posting LQ" },
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       demandMap: {
         eyebrow: "By province · through time",
-        title: "Posted hiring demand across Canada",
-        note: "Switch the measure: share of national demand, raw count, per-capita intensity (per 10k labour force, StatCan LFS 2024), or a demand location quotient (postings share ÷ labour-force share). Drag the year slider or press play.",
-        aria: "Animated choropleth map of posted demand by province with a measure toggle and a year slider",
+        title: "Posted hiring across Canada",
+        note: "Switch the measure: share of national postings, raw count, per-capita intensity (per 10k labour force, StatCan LFS 2024), or a posting location quotient (postings share ÷ labour-force share). The per-capita denominator is the fixed 2024 labour force across all years, so early-year per-capita values are approximate. Drag the year slider or press play.",
+        aria: "Animated choropleth map of posted hiring by province with a measure toggle and a year slider",
       },
       rankedProvinces: {
         eyebrow: "Ranked · volume",
@@ -95,7 +95,7 @@ export const geographyDict = {
       cmaDemand: {
         eyebrow: "City level · CMAs",
         title: "The biggest metropolitan labour markets",
-        note: "City / census-metropolitan-area demand over the last 12 months — finer than the province totals above.",
+        note: "City / census-metropolitan-area postings over the last 12 months — finer than the province totals above. Counts partly reflect scraping coverage, not hiring alone.",
         aria: "Horizontal bar chart ranking the largest census metropolitan areas by posting volume",
       },
       yoyChoropleth: {
@@ -107,27 +107,27 @@ export const geographyDict = {
       shiftShare: {
         eyebrow: "Structure vs local · secondary",
         title: "Why provinces grew or shrank: shift-share",
-        note: "A secondary cut. Accounting identity (not causation): national trend + occupation mix + local shift = actual change.",
+        note: "A secondary cut. Accounting identity (not causation): national trend + occupation mix + local shift = actual change. Choose the years, top-right.",
         aria: "Stacked bar chart decomposing each province’s change into national, mix and local components",
       },
       aiExposure: {
         eyebrow: "AI exposure · Eloundou β",
-        title: "AI exposure of provincial demand",
-        note: "Each province's demand-weighted average task exposure to generative AI (Eloundou et al. β, US task-based, mapped to broad NOC). A potential-exposure signal, not realized automation.",
-        aria: "Choropleth map of demand-weighted mean AI task exposure by province",
+        title: "AI exposure of provincial hiring",
+        note: "Each province's posting-weighted average task exposure to generative AI (Eloundou et al. β, US task-based, mapped to broad NOC). A potential-exposure signal, not realized automation.",
+        aria: "Choropleth map of posting-weighted mean AI task exposure by province",
       },
     },
   },
   fr: {
     // Hero section
     eyebrow: "Géographie",
-    hero: "Où la demande se concentre-t-elle au Canada ?",
+    hero: "Où les offres se concentrent-elles au Canada ?",
     lede:
       "Offres actives par province, en proportion de la population active, en quotient de localisation, ou en nombre brut. Deux territoires ne déclarent aucune offre.",
 
     // Figure section
     figureEyebrow: "Par province",
-    figureTitle: "Demande d'embauche affichée à travers le Canada",
+    figureTitle: "Embauche affichée à travers le Canada",
 
     // Measure toggle labels — short to avoid overflow
     measurePer10k: "Pour 10k",
@@ -153,21 +153,21 @@ export const geographyDict = {
       "Le Nunavut et le Yukon ne sont pas couverts par les données sources et apparaissent comme « sans données ».",
 
     // SegmentToggle accessibility label
-    toggleAriaLabel: "Choisir la mesure de la demande",
+    toggleAriaLabel: "Choisir la mesure des offres",
 
     // Ranked header prefix
     rankedPrefix: "Classement · ",
 
     // Time-scrubbed choropleth
-    timeEyebrow: "Demande au fil du temps · par province",
-    timeTitle: "Comment la demande affichée a évolué au pays",
+    timeEyebrow: "Offres au fil du temps · par province",
+    timeTitle: "Comment l'embauche affichée a évolué au pays",
     timeNote: "Offres actives par province, animées par mois. L'échelle de couleur est fixe sur tous les mois : la croissance se lit comme un éclaircissement de la carte. Glissez le curseur ou appuyez sur lecture.",
     playLabel: "▶ Lecture",
     monthPrefix: "Mois : ",
 
     // Cumulative concentration
     cumEyebrow: "Concentration du marché",
-    cumTitle: "À quel point la demande est concentrée entre provinces",
+    cumTitle: "À quel point les offres sont concentrées entre provinces",
     cumNote: "Part cumulée de toutes les offres à mesure que les provinces s'ajoutent, des plus grandes aux plus petites.",
     cumUnit: "provinces",
 
@@ -192,16 +192,16 @@ export const geographyDict = {
     deepEyebrow: "Pour aller plus loin",
     deepLede: "Spécialisation, structure et dynamique pour qui veut le détail régional sous la carte principale.",
 
-    // Measure-toggle labels for the authoritative demand map.
-    mapMeasures: { share: "Part", count: "Nombre", percap: "Par habitant", lq: "QL demande" },
+    // Measure-toggle labels for the authoritative postings map.
+    mapMeasures: { share: "Part", count: "Nombre", percap: "Par habitant", lq: "QL des offres" },
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       demandMap: {
         eyebrow: "Par province · au fil du temps",
-        title: "Demande d'embauche affichée à travers le Canada",
-        note: "Changez la mesure : part de la demande nationale, nombre brut, intensité par habitant (pour 10k actifs, EPA StatCan 2024), ou quotient de localisation de la demande (part des offres ÷ part de la population active). Glissez le curseur annuel ou lancez la lecture.",
-        aria: "Carte choroplèthe animée de la demande par province avec un sélecteur de mesure et un curseur annuel",
+        title: "Embauche affichée à travers le Canada",
+        note: "Changez la mesure : part des offres nationales, nombre brut, intensité par habitant (pour 10k actifs, EPA StatCan 2024), ou quotient de localisation des offres (part des offres ÷ part de la population active). Le dénominateur par habitant est la population active de 2024, fixe pour toutes les années; les valeurs par habitant des premières années sont donc approximatives. Glissez le curseur annuel ou lancez la lecture.",
+        aria: "Carte choroplèthe animée des offres par province avec un sélecteur de mesure et un curseur annuel",
       },
       rankedProvinces: {
         eyebrow: "Classement · volume",
@@ -212,7 +212,7 @@ export const geographyDict = {
       cmaDemand: {
         eyebrow: "Niveau ville · RMR",
         title: "Les plus grands marchés du travail métropolitains",
-        note: "Demande au niveau des villes / régions métropolitaines de recensement sur les 12 derniers mois — plus fin que les totaux provinciaux ci-dessus.",
+        note: "Offres au niveau des villes / régions métropolitaines de recensement sur les 12 derniers mois — plus fin que les totaux provinciaux ci-dessus. Les nombres reflètent en partie la couverture de collecte, pas seulement l’embauche.",
         aria: "Diagramme à barres horizontales classant les plus grandes régions métropolitaines de recensement par volume d'offres",
       },
       yoyChoropleth: {
@@ -224,14 +224,14 @@ export const geographyDict = {
       shiftShare: {
         eyebrow: "Structure vs local · secondaire",
         title: "Pourquoi les provinces ont crû ou reculé : analyse structurelle-résiduelle",
-        note: "Une lecture secondaire. Identité comptable (non causale) : tendance nationale + composition professionnelle + écart local = variation réelle.",
+        note: "Une lecture secondaire. Identité comptable (non causale) : tendance nationale + composition professionnelle + écart local = variation réelle. Choisissez les années, en haut à droite.",
         aria: "Diagramme à barres empilées décomposant la variation de chaque province en composantes nationale, de composition et locale",
       },
       aiExposure: {
         eyebrow: "Exposition à l'IA · β Eloundou",
-        title: "Exposition à l'IA de la demande provinciale",
-        note: "Exposition moyenne des tâches à l'IA générative, pondérée par la demande (β d'Eloundou et al., basée sur les tâches aux É.-U., rattachée à la CNP large). Un signal d'exposition potentielle, non d'automatisation réalisée.",
-        aria: "Carte choroplèthe de l'exposition moyenne des tâches à l'IA pondérée par la demande, par province",
+        title: "Exposition à l'IA de l'embauche provinciale",
+        note: "Exposition moyenne des tâches à l'IA générative, pondérée par les offres (β d'Eloundou et al., basée sur les tâches aux É.-U., rattachée à la CNP large). Un signal d'exposition potentielle, non d'automatisation réalisée.",
+        aria: "Carte choroplèthe de l'exposition moyenne des tâches à l'IA pondérée par les offres, par province",
       },
     },
   },

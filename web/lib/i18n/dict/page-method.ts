@@ -19,8 +19,8 @@ export const methodDict = {
     // What it measures
     measuresTitle: "What this measures",
     measuresItems: [
-      "Posted hiring demand from Canadian online job ads",
-      "Demand by month, region, occupation (NOC), and industry (NAICS)",
+      "Posted hiring from Canadian online job ads",
+      "Postings by month, region, occupation (NOC), and industry (NAICS)",
       "Wage ranges posted in ads (25th / median / 75th percentile)",
       "Skills mentioned in postings and their relative frequency",
     ],
@@ -53,7 +53,7 @@ export const methodDict = {
     glossaryTitle: "Key terms defined",
     glossaryTerms: [
       {
-        term: "Demand index",
+        term: "Postings index",
         def: "Monthly active postings indexed to January 2019 = 100. A value of 110 means 10% more postings than in the 2019 baseline.",
       },
       {
@@ -100,8 +100,8 @@ export const methodDict = {
     // What it measures
     measuresTitle: "Ce que cela mesure",
     measuresItems: [
-      "Demande d'embauche affichée dans les offres d'emploi en ligne au Canada",
-      "Demande par mois, région, profession (CNP) et industrie (SCIAN)",
+      "Embauche affichée dans les offres d'emploi en ligne au Canada",
+      "Offres par mois, région, profession (CNP) et industrie (SCIAN)",
       "Fourchettes salariales affichées dans les offres (25e centile / médiane / 75e centile)",
       "Compétences mentionnées dans les offres et leur fréquence relative",
     ],
@@ -134,7 +134,7 @@ export const methodDict = {
     glossaryTitle: "Définition des termes clés",
     glossaryTerms: [
       {
-        term: "Indice de demande",
+        term: "Indice des offres",
         def: "Offres actives mensuelles indexées à janvier 2019 = 100. Une valeur de 110 signifie 10 % d'offres de plus que dans la période de référence de 2019.",
       },
       {

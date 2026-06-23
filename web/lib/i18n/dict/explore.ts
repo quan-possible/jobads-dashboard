@@ -5,9 +5,36 @@
 export const explore = {
   en: {
     eyebrow: "Explore",
-    hero: "The postings behind the numbers",
+    hero: "Explore the data your way",
     lede:
-      "Every figure on this dashboard rolls up from individual job ads. Search and inspect those raw postings — title, employer, wage, requirements and the original text — filtered by the same region, occupation and industry controls used everywhere else.",
+      "Build your own chart from any breakdown and measure — or, with team access, search the individual job postings behind the aggregates. Both use the same region, occupation and industry filters above.",
+    tabs: {
+      build: "Build a chart",
+      find: "Find postings",
+    },
+    builder: {
+      intro:
+        "Pick a breakdown and a measure. Narrow the scope with the filter bar above — the chart updates as you change anything. Postings are posted hiring demand, not employment or vacancies.",
+      dimLabel: "Break down by",
+      measureLabel: "Measure",
+      from: "From",
+      to: "to",
+      download: "Download CSV",
+      aria: "Self-built Explore chart",
+      dims: {
+        province: "Province",
+        occupation: "Occupation",
+        industry: "Industry",
+        time: "Over time",
+      },
+      measures: {
+        postings: "Postings",
+        share: "Share of total",
+        yoy: "Year-over-year %",
+        two_year: "Two-year change",
+        wage: "Median wage",
+      },
+    },
     protected: "Protected",
     lookupTitle: "Posting-level lookup",
     lockedBody:
@@ -50,9 +77,36 @@ export const explore = {
   },
   fr: {
     eyebrow: "Explorer",
-    hero: "Les offres derrière les chiffres",
+    hero: "Explorez les données à votre façon",
     lede:
-      "Chaque chiffre de ce tableau de bord provient d’offres d’emploi individuelles. Cherchez et examinez ces offres brutes — titre, employeur, salaire, exigences et texte d’origine — filtrées par les mêmes contrôles de région, profession et industrie qu’ailleurs.",
+      "Construisez votre propre graphique à partir de n’importe quelle répartition et mesure — ou, avec un accès d’équipe, cherchez les offres d’emploi individuelles derrière les agrégats. Les deux utilisent les mêmes filtres de région, profession et industrie ci-dessus.",
+    tabs: {
+      build: "Construire un graphique",
+      find: "Trouver des offres",
+    },
+    builder: {
+      intro:
+        "Choisissez une répartition et une mesure. Affinez la portée avec la barre de filtres ci-dessus — le graphique se met à jour à chaque changement. Les offres mesurent la demande affichée, non l’emploi ni les postes vacants.",
+      dimLabel: "Répartir par",
+      measureLabel: "Mesure",
+      from: "De",
+      to: "à",
+      download: "Télécharger CSV",
+      aria: "Graphique Explorer construit sur mesure",
+      dims: {
+        province: "Province",
+        occupation: "Profession",
+        industry: "Industrie",
+        time: "Au fil du temps",
+      },
+      measures: {
+        postings: "Offres",
+        share: "Part du total",
+        yoy: "Variation sur un an %",
+        two_year: "Variation sur deux ans",
+        wage: "Salaire médian",
+      },
+    },
     protected: "Protégé",
     lookupTitle: "Consultation au niveau des offres",
     lockedBody:

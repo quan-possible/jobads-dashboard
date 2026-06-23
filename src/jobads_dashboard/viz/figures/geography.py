@@ -1,9 +1,9 @@
-"""Geography - where demand is, and how heavy it is relative to each region.
+"""Geography - where postings are, and how heavy they are relative to each region.
 
 One authoritative province choropleth with a measure toggle (count / share /
-per-capita / demand intensity), a ranked list, year-over-year momentum, a
+per-capita / posting intensity), a ranked list, year-over-year momentum, a
 city/CMA view, and a shift-share decomposition. Location quotient lives on as a
-*measure* of the main map (demand vs labour-force share), not its own panel.
+*measure* of the main map (postings vs labour-force share), not its own panel.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 
 from .. import compute as C
 from ..datasource import BASE_YEAR, PROVINCE_NAMES, DataSource
-from ..theme import BRAND, CONTEXT, DIVERGING, PROVISIONAL_FROM, SEQUENTIAL
+from ..theme import BRAND, CONTEXT, DIVERGING, SEQUENTIAL
 from ._common import add_time_slider, titled
 
 
@@ -28,8 +28,8 @@ def _last12(df: pd.DataFrame, value: str = "postings_total") -> pd.DataFrame:
     return df[df["month"] > cut]
 
 
-def _stable_window() -> tuple[pd.Timestamp, pd.Timestamp]:
-    return pd.Timestamp(f"{BASE_YEAR}-06-01"), PROVISIONAL_FROM - pd.DateOffset(months=1)
+def _window(base_year: int, end_year: int) -> tuple[pd.Timestamp, pd.Timestamp]:
+    return pd.Timestamp(f"{base_year}-06-01"), pd.Timestamp(f"{end_year}-12-01")
 
 
 # --------------------------------------------------------------------------- CORE
@@ -39,17 +39,17 @@ def _stable_window() -> tuple[pd.Timestamp, pd.Timestamp]:
 #: a value formatter, the colour language, and the editorial frame.
 _MEASURES = {
     "count": dict(cb="postings", scale=SEQUENTIAL, div=False, fmt=",.0f", suf="",
-                  head="Where the demand is: postings by province",
+                  head="Where the postings are: by province",
                   sub="Raw posting count by year — big provinces dominate; switch to per-capita to compare intensity"),
     "share": dict(cb="% of national", scale=SEQUENTIAL, div=False, fmt=".1f", suf="%",
-                  head="Share of national demand by province",
+                  head="Share of national postings by province",
                   sub="Each province's share of all postings that year (normalised — the honest default for a choropleth)"),
     "percap": dict(cb="postings / 10k LF", scale=SEQUENTIAL, div=False, fmt=",.0f", suf="",
-                   head="Demand intensity: postings per 10,000 in the labour force",
+                   head="Posting intensity: postings per 10,000 in the labour force",
                    sub="Posting count ÷ provincial labour force (StatCan LFS 2024) — controls for province size"),
-    "lq": dict(cb="demand LQ", scale=DIVERGING, div=True, fmt=".2f", suf="",
-               head="Demand relative to workforce size: a province location quotient",
-               sub="Posting share ÷ labour-force share · >1 (orange) = more job-ad demand than its workforce share, 1 = on par"),
+    "lq": dict(cb="posting LQ", scale=DIVERGING, div=True, fmt=".2f", suf="",
+               head="Postings relative to workforce size: a province location quotient",
+               sub="Posting share ÷ labour-force share · >1 (orange) = more job ads than its workforce share, 1 = on par"),
 }
 
 
@@ -121,7 +121,7 @@ def ranked_provinces(ds: DataSource) -> go.Figure:
 
 
 def cma_demand(ds: DataSource, top: int = 18) -> go.Figure:
-    """City / CMA-level demand — finer than province. The largest metropolitan
+    """City / CMA-level postings — finer than province. The largest metropolitan
     labour markets by posting volume over the last 12 months."""
     mk = _last12(ds.market).groupby("market_label", as_index=False)["postings_total"].sum()
     mk = mk.sort_values("postings_total", ascending=False).head(top).sort_values("postings_total")
@@ -139,14 +139,16 @@ def cma_demand(ds: DataSource, top: int = 18) -> go.Figure:
     fig.update_xaxes(title_text="postings (last 12 months)")
     fig.update_layout(height=520, margin=dict(l=170))
     return titled(fig, f"The biggest metropolitan labour markets (top {top} CMAs)",
-                  "City-level demand from the census-metropolitan-area cut — finer than the province totals above")
+                  "City-level postings from the census-metropolitan-area cut — finer than the province totals above")
 
 
 # --------------------------------------------------------------------------- DEEP
 
 
-def shift_share_bars(ds: DataSource) -> go.Figure:
-    base, end = _stable_window()
+def shift_share_bars(ds: DataSource, base_year: int = BASE_YEAR,
+                     end_year: int | None = None) -> go.Figure:
+    end_year = end_year if end_year is not None else ds.latest_complete_year
+    base, end = _window(base_year, end_year)
     ss = C.shift_share(ds.province_occupation, "province_name", "noc_label",
                        "postings_total", base, end)
     ss = ss.sort_values("actual_change")
@@ -164,7 +166,7 @@ def shift_share_bars(ds: DataSource) -> go.Figure:
     fig.update_layout(barmode="relative", height=460, margin=dict(b=96),
                       legend=dict(y=-0.26))
     fig.update_xaxes(title_text="change in postings, decomposed")
-    return titled(fig, f"Why provinces grew or shrank: shift-share, {BASE_YEAR}→{end.year}",
+    return titled(fig, f"Why provinces grew or shrank: shift-share, {base_year}→{end_year}",
                   "Secondary cut. Accounting identity (not causation): national trend + occupation mix + local shift = actual change")
 
 
@@ -216,8 +218,8 @@ def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en
 
 
 def ai_exposure_map(ds: DataSource) -> go.Figure:
-    """Provincial AI exposure: each province's demand-weighted average of broad-NOC
-    task exposure (Eloundou β). Provinces whose demand leans to office/knowledge work
+    """Provincial AI exposure: each province's posting-weighted average of broad-NOC
+    task exposure (Eloundou β). Provinces whose postings lean to office/knowledge work
     score higher; those leaning to trades/resources score lower."""
     po = _last12(ds.province_occupation).copy()
     ex = ds.ai_exposure.set_index("noc_code")["exposure_beta"]
@@ -233,5 +235,5 @@ def ai_exposure_map(ds: DataSource) -> go.Figure:
         hovertemplate="%{text}: mean exposure β %{z:.3f}<extra></extra>"))
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(height=460, margin=dict(l=10, r=10, t=64, b=10))
-    return titled(fig, "AI exposure of provincial demand",
-                  "Demand-weighted mean of broad-NOC task exposure (Eloundou β) · a potential-exposure signal, not realized automation")
+    return titled(fig, "AI exposure of provincial postings",
+                  "Posting-weighted mean of broad-NOC task exposure (Eloundou β) · a potential-exposure signal, not realized automation")

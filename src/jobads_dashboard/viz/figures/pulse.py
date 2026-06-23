@@ -39,7 +39,7 @@ def demand_ribbon(ds: DataSource) -> go.Figure:
     add_provisional_band(fig)
     fig.update_yaxes(title_text="postings / month", rangemode="tozero")
     fig.update_layout(showlegend=False)
-    return titled(fig, "Labour demand: monthly job-ad postings, 2016–2026",
+    return titled(fig, "Job-ad postings: monthly, 2016–2026",
                   "Faint line = raw monthly count · bold = 3-month average · dotted tail = provisional")
 
 
@@ -70,7 +70,7 @@ def seasonality_heatmap(ds: DataSource) -> go.Figure:
         colorscale=DIVERGING, zmid=1.0, colorbar=dict(title="vs year avg", tickformat=".0%"),
         hovertemplate="%{y} %{x}: %{z:.0%} of year avg<extra></extra>"))
     fig.update_yaxes(autorange="reversed")
-    return titled(fig, "When in the year is demand? Seasonal shape by month",
+    return titled(fig, "When in the year are postings? Seasonal shape by month",
                   "Each cell = that month relative to its own year's average (controls for the trend)")
 
 
@@ -115,11 +115,11 @@ def diffusion_index(ds: DataSource) -> go.Figure:
     add_covid_band(fig)
     fig.update_yaxes(title_text="% of groups growing (YoY)", range=[0, 100])
     return titled(fig, "Is growth broad or narrow? Diffusion across occupation groups",
-                  "Share of broad occupation groups with positive year-over-year demand; 50 = evenly split (3-month smoothed)")
+                  "Share of broad occupation groups with positive year-over-year posting growth; 50 = evenly split (3-month smoothed)")
 
 
 def occupation_trends_grid(ds: DataSource) -> go.Figure:
-    """A sparkline grid: one mini demand-trend per broad occupation group. A rich,
+    """A sparkline grid: one mini posting-trend per broad occupation group. A rich,
     descriptive overview — see every group's whole-decade trajectory at a glance."""
     nb = ds.noc_broad[~ds.noc_broad["noc_name"].str.contains("Unknown", na=False)]
     groups = (nb.groupby("noc_name")["postings_total"].sum()
@@ -145,12 +145,12 @@ def occupation_trends_grid(ds: DataSource) -> go.Figure:
     for ann in fig.layout.annotations:
         ann.font.size = 11
         ann.font.color = "#132330"
-    return titled(fig, "Every occupation group's demand trajectory at a glance",
+    return titled(fig, "Every occupation group's posting trajectory at a glance",
                   "Monthly postings 2016–2026, one panel per broad NOC group (each panel scaled to its own peak)")
 
 
 def momentum(ds: DataSource) -> go.Figure:
-    """Is demand accelerating or cooling? The gap between the fast (3-month) and slow
+    """Are postings accelerating or cooling? The gap between the fast (3-month) and slow
     (12-month) moving averages — positive = speeding up, negative = slowing."""
     o = ds.overall.copy()
     s = o.set_index("month")["postings_total"]
@@ -165,5 +165,5 @@ def momentum(ds: DataSource) -> go.Figure:
     add_covid_band(fig)
     add_provisional_band(fig)
     fig.update_yaxes(title_text="3-month avg − 12-month avg (postings)")
-    return titled(fig, "Momentum: is demand speeding up or cooling?",
+    return titled(fig, "Momentum: are postings speeding up or cooling?",
                   "Gap between the 3-month and 12-month averages · orange = accelerating, teal = cooling")

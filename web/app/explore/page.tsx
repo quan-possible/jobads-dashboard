@@ -1,15 +1,32 @@
-import { AuthGate } from "@/components/explore/AuthGate";
+import { ExploreTabs } from "@/components/explore/ExploreTabs";
+import { api } from "@/lib/api";
 import { getServerDict } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Explore",
-  description: "Search the individual job postings behind the ACLMR aggregates (team access).",
+  description:
+    "Build a chart from any breakdown and measure, or search the individual job postings behind the ACLMR aggregates (team access).",
 };
 
 export default async function ExplorePage() {
   const { t } = await getServerDict();
+
+  // Year-picker bounds for the builder. Data starts 2016; the upper bound is the
+  // latest complete year (the partial current year is excluded). Fall back to a
+  // fixed span if meta is unavailable — the builder still renders.
+  let minYear = 2016;
+  let maxYear = 2025;
+  try {
+    const meta = await api.meta();
+    const y = Number(meta.latest_month.slice(0, 4));
+    maxYear = meta.latest_month.slice(5, 7) === "12" ? y : y - 1;
+    minYear = Number(meta.earliest_month.slice(0, 4));
+  } catch {
+    /* keep the fixed fallback span */
+  }
+
   return (
     <div>
       {/* Shared hero template (eyebrow · big headline · lede), matching every
@@ -22,7 +39,7 @@ export default async function ExplorePage() {
         </div>
       </section>
       <div className="container-x py-8">
-        <AuthGate />
+        <ExploreTabs minYear={minYear} maxYear={maxYear} />
       </div>
     </div>
   );

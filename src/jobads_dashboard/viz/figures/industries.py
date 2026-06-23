@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
 from ..theme import (
-    BRAND, CONTEXT, MUTED, PROVISIONAL_FROM, UP, DOWN,
+    BRAND, CONTEXT, MUTED, UP, DOWN,
     add_covid_band, add_provisional_band, add_reference_line,
 )
 from ._common import add_time_slider, titled, treemap_trace
@@ -51,7 +51,7 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
         add_time_slider(fig, years, prefix="Année : " if fr else "Year: ",
                         play="▶ Lecture" if fr else "▶ Play")
         fig.update_layout(height=480, margin=dict(l=8, r=8, t=64, b=44))
-        return titled(fig, "Demand by industry sector (where coded)",
+        return titled(fig, "Postings by industry sector (where coded)",
                       "Area ∝ postings with a NAICS code in the selected year — drag or press play")
     cut = nb["month"].max() - pd.DateOffset(months=12)
     g = nb[nb["month"] > cut].groupby("naics_name", as_index=False)["postings_total"].sum()
@@ -83,8 +83,10 @@ def share_over_time(ds: DataSource, top: int = 7) -> go.Figure:
                   "Share of postings with a NAICS code, by sector")
 
 
-def contribution_bars(ds: DataSource) -> go.Figure:
-    base, end = pd.Timestamp(f"{BASE_YEAR}-06-01"), PROVISIONAL_FROM - pd.DateOffset(months=1)
+def contribution_bars(ds: DataSource, base_year: int = BASE_YEAR,
+                      end_year: int | None = None) -> go.Figure:
+    end_year = end_year if end_year is not None else ds.latest_complete_year
+    base, end = pd.Timestamp(f"{base_year}-06-01"), pd.Timestamp(f"{end_year}-12-01")
     nb = _real(ds.naics_broad)
     c = C.contribution_to_growth(nb, "naics_name", "postings_total", base, end)
     c["short"] = c["naics_name"].map(lambda s: s.split("|")[-1].strip()[:30])
@@ -95,5 +97,5 @@ def contribution_bars(ds: DataSource) -> go.Figure:
     add_reference_line(fig, 0)
     fig.update_xaxes(title_text="contribution to growth (pp)", ticksuffix=" pp")
     fig.update_layout(height=480)
-    return titled(fig, f"Which sectors drove the change, {BASE_YEAR}→{end.year}",
+    return titled(fig, f"Which sectors drove the change, {base_year}→{end_year}",
                   "Contribution to growth among coded postings (accounting identity)")

@@ -73,23 +73,23 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "geography.demand_map_lq": lambda ds, **k: geography.demand_map(ds, measure="lq", animate="by-year", locale=k.get("locale", "en")),
     "geography.ranked_provinces": lambda ds, **k: geography.ranked_provinces(ds),
     "geography.cma_demand": lambda ds, **k: geography.cma_demand(ds),
-    "geography.shift_share": lambda ds, **k: geography.shift_share_bars(ds),
+    "geography.shift_share": lambda ds, **k: geography.shift_share_bars(ds, **_year_kw(k, "base_year", "end_year")),
     "geography.yoy_choropleth": lambda ds, **k: geography.yoy_choropleth(ds, animate="by-year", locale=k.get("locale", "en")),
     "geography.ai_exposure": lambda ds, **k: geography.ai_exposure_map(ds),
     # --- Occupations --------------------------------------------------------
     "occupations.treemap": lambda ds, **k: occupations.treemap(ds, animate="by-year", locale=k.get("locale", "en")),
-    "occupations.indexed_lines": lambda ds, **k: occupations.indexed_lines(ds),
-    "occupations.contribution_bars": lambda ds, **k: occupations.contribution_bars(ds),
-    "occupations.waterfall": lambda ds, **k: occupations.waterfall(ds),
-    "occupations.dumbbell": lambda ds, **k: occupations.dumbbell(ds),
-    "occupations.skill_churn": lambda ds, **k: occupations.skill_churn(ds),
-    "occupations.ai_exposure": lambda ds, **k: occupations.ai_exposure_scatter(ds),
+    "occupations.indexed_lines": lambda ds, **k: occupations.indexed_lines(ds, **_year_kw(k, "base_year")),
+    "occupations.contribution_bars": lambda ds, **k: occupations.contribution_bars(ds, **_year_kw(k, "base_year", "end_year")),
+    "occupations.waterfall": lambda ds, **k: occupations.waterfall(ds, **_year_kw(k, "base_year", "end_year")),
+    "occupations.dumbbell": lambda ds, **k: occupations.dumbbell(ds, **_year_kw(k, "base_year", "end_year")),
+    "occupations.skill_churn": lambda ds, **k: occupations.skill_churn(ds, **_year_kw(k, "base_year", "end_year")),
+    "occupations.ai_exposure": lambda ds, **k: occupations.ai_exposure_scatter(ds, **_year_kw(k, "base_year", "end_year")),
     "occupations.noc_naics_heatmap": lambda ds, **k: occupations.noc_naics_heatmap(ds),
     # --- Industries ---------------------------------------------------------
     "industries.coverage_line": lambda ds, **k: industries.coverage_line(ds),
     "industries.treemap": lambda ds, **k: industries.treemap(ds, animate="by-year", locale=k.get("locale", "en")),
     "industries.share_over_time": lambda ds, **k: industries.share_over_time(ds),
-    "industries.contribution_bars": lambda ds, **k: industries.contribution_bars(ds),
+    "industries.contribution_bars": lambda ds, **k: industries.contribution_bars(ds, **_year_kw(k, "base_year", "end_year")),
     # --- Pay & conditions ---------------------------------------------------
     "pay.wage_band": lambda ds, **k: pay.wage_band(ds),
     "pay.wage_dumbbell": lambda ds, **k: pay.wage_dumbbell(ds),
@@ -99,7 +99,7 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "pay.conditions_mix": lambda ds, **k: pay.conditions_mix(ds),
     "pay.language_gap": lambda ds, **k: pay.language_gap(ds),
     # --- Skills & requirements ----------------------------------------------
-    "skills.top_skills_trend": lambda ds, **k: skills.top_skills_trend(ds),
+    "skills.top_skills_trend": lambda ds, **k: skills.top_skills_trend(ds, **_year_kw(k, "base_year")),
     "skills.ai_skill_diffusion": lambda ds, **k: skills.ai_skill_diffusion(ds),
     "skills.skill_lift": lambda ds, **k: skills.skill_lift_bars(ds),
     "skills.skill_occupation_heatmap": lambda ds, **k: skills.skill_occupation_heatmap(ds),
@@ -125,7 +125,7 @@ _FR_CHROME: dict[str, str] = {
     "% of postings with the field": "% des offres avec le champ",
     "% of postings": "% des offres",
     "HHI": "IHH",
-    "YoY demand growth": "croissance de la demande (a/a)",
+    "YoY posting growth": "croissance des offres (a/a)",
     "advertised hourly wage": "salaire horaire affiché",
     "advertised median wage": "salaire médian affiché",
     "change in postings, decomposed": "variation des offres, décomposée",
@@ -146,9 +146,10 @@ _FR_CHROME: dict[str, str] = {
     "share of postings": "part des offres",
     "skill code": "code de compétence",
     "year-over-year %": "% d’une année à l’autre",
-    "index (2019 = 100)": "indice (2019 = 100)",
+    "index (base year = 100)": "indice (année de base = 100)",
     "3-month avg − 12-month avg (postings)": "moy. 3 mois − moy. 12 mois (offres)",
-    "change in demand vs 2019": "variation de la demande vs 2019",
+    "change in postings": "variation des offres",
+    "change in share of skill mentions (pp)": "variation de la part des mentions (pp)",
     "share of postings asking for a university degree": "part des offres exigeant un diplôme universitaire",
     "median advertised wage": "salaire médian affiché",
     "AI exposure (β)": "exposition à l’IA (β)",
@@ -158,7 +159,7 @@ _FR_CHROME: dict[str, str] = {
     "% of sector": "% du secteur",
     "% of group": "% du groupe",
     "LQ": "QL",
-    "demand LQ": "QL de la demande",
+    "posting LQ": "QL des offres",
     "postings / 10k LF": "offres / 10k pop. active",
     "mean AI exposure (β)": "exposition moyenne à l’IA (β)",
     "YoY %": "% a/a",
@@ -198,7 +199,7 @@ def _fr(s: str) -> str:
 # longest-first, and only within hover keys, so Plotly format directives
 # (%{...|...}) elsewhere are never touched (S21). Keep these unambiguous literals.
 _FR_HOVER: dict[str, str] = {
-    "of sector demand": "de la demande du secteur",
+    "of sector postings": "des offres du secteur",
     "3-month average": "moyenne sur 3 mois",
     "of year avg": "de la moyenne annuelle",
     "3-mo avg": "moy. 3 mois",
@@ -236,13 +237,13 @@ def _localize_chrome(node) -> None:
                 _localize_chrome(v)
 
 
-def build(chart_id: str, *, locale: str = "en", **params) -> str:
-    """Render a registered factory to a Plotly figure JSON string.
+def apply_house_style(fig: go.Figure, *, locale: str = "en") -> str:
+    """Strip the editorial title, inline the redesign2 look, reclaim the title
+    margin, and serialise to a (locale-aware) Plotly JSON string.
 
-    Raises ``KeyError`` for an unknown ``chart_id`` (the router maps that to 404).
+    Shared by the registry bridge (:func:`build`) and the Explore endpoint so a
+    dynamically-built figure travels and themes exactly like a registered one.
     """
-    fig = REGISTRY[chart_id](_ds(), locale=locale, **params)
-
     # The editorial <Figure> frame owns the localized headline.
     fig.update_layout(title=None)
     # Inline the redesign2 look so it travels to a browser that has no
@@ -267,3 +268,18 @@ def build(chart_id: str, *, locale: str = "en", **params) -> str:
         _localize_chrome(data)
         return json.dumps(data, ensure_ascii=False)
     return payload
+
+
+def _year_kw(k: dict, *names: str) -> dict:
+    """Pull the year params a factory accepts out of the registry kwargs, dropping
+    any left unset so the factory's own default (e.g. ``latest_complete_year``) wins."""
+    return {n: int(k[n]) for n in names if k.get(n) is not None}
+
+
+def build(chart_id: str, *, locale: str = "en", **params) -> str:
+    """Render a registered factory to a Plotly figure JSON string.
+
+    Raises ``KeyError`` for an unknown ``chart_id`` (the router maps that to 404).
+    """
+    fig = REGISTRY[chart_id](_ds(), locale=locale, **params)
+    return apply_house_style(fig, locale=locale)

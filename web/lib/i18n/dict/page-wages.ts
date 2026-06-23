@@ -34,11 +34,11 @@ export const wagesDict = {
     // Figure — province
     provTitle: "Hourly wage range by province",
 
-    // Wage vs demand scatter
-    scatterEyebrow: "Pay vs demand · by occupation",
-    scatterTitle: "Where pay and hiring demand meet",
-    scatterNote: "Each bubble is a broad occupational group: horizontal = posting demand, vertical = median advertised wage, size = volume. Dashed lines mark the medians.",
-    scatterNotEnough: "Not enough paired wage-and-demand data for this selection.",
+    // Wage vs hiring scatter
+    scatterEyebrow: "Pay vs hiring · by occupation",
+    scatterTitle: "Where pay and hiring meet",
+    scatterNote: "Each bubble is a broad occupational group: horizontal = postings, vertical = median advertised wage, size = volume. Dashed lines mark the medians.",
+    scatterNotEnough: "Not enough paired wage-and-hiring data for this selection.",
 
     // Figure — shared note (minSample interpolated by the page)
     notePrefix:
@@ -53,7 +53,7 @@ export const wagesDict = {
     // Section dividers (Core → Deep)
     deepEyebrow: "Going deeper",
     deepLede:
-      "Provincial spread, the pay-versus-demand quadrant, and posting conditions for readers who want the texture behind the headline pay.",
+      "Provincial spread, the pay-versus-hiring quadrant, and posting conditions for readers who want the texture behind the headline pay.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
@@ -70,15 +70,15 @@ export const wagesDict = {
         aria: "Dumbbell chart of advertised hourly wage spread by province, P25 to P75 with the median marked",
       },
       wageDemandQuadrant: {
-        eyebrow: "Pay vs demand · by occupation",
-        title: "Pay vs momentum: the wage × demand quadrant",
-        note: "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation).",
-        aria: "Quadrant scatter of occupations by advertised median wage and year-over-year demand growth, bubble size by volume",
+        eyebrow: "Pay vs hiring · by occupation",
+        title: "Pay vs momentum: the wage × hiring quadrant",
+        note: "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation). Median wage shown only for groups that clear the wage-sample floor.",
+        aria: "Quadrant scatter of occupations by advertised median wage and year-over-year posting growth, bubble size by volume",
       },
       educationWageProxy: {
         eyebrow: "Credentials vs pay · by occupation",
         title: "Do credential-heavy occupations pay more?",
-        note: "Each broad occupation group: share of postings asking for a university degree vs median advertised wage · bubble ∝ volume (correlation, not causation).",
+        note: "Each broad occupation group: share of postings asking for a university degree vs median advertised wage · bubble ∝ volume (correlation, not causation). Median wage shown only for groups that clear the wage-sample floor.",
         aria: "Scatter of broad occupation groups by degree-requirement share and median advertised wage, bubble size by volume",
       },
       wageByEducation: {
@@ -131,11 +131,11 @@ export const wagesDict = {
     // Figure — province
     provTitle: "Fourchette salariale horaire par province",
 
-    // Wage vs demand scatter
-    scatterEyebrow: "Salaire vs demande · par profession",
-    scatterTitle: "Où le salaire et la demande se rencontrent",
-    scatterNote: "Chaque bulle est un grand groupe professionnel : horizontal = demande d'offres, vertical = salaire médian affiché, taille = volume. Les lignes pointillées marquent les médianes.",
-    scatterNotEnough: "Données appariées salaire-demande insuffisantes pour cette sélection.",
+    // Wage vs hiring scatter
+    scatterEyebrow: "Salaire vs embauche · par profession",
+    scatterTitle: "Où le salaire et l'embauche se rencontrent",
+    scatterNote: "Chaque bulle est un grand groupe professionnel : horizontal = offres, vertical = salaire médian affiché, taille = volume. Les lignes pointillées marquent les médianes.",
+    scatterNotEnough: "Données appariées salaire-embauche insuffisantes pour cette sélection.",
 
     // Figure — shared note (minSample interpolated by the page)
     notePrefix:
@@ -150,7 +150,7 @@ export const wagesDict = {
     // Section dividers (Core → Deep)
     deepEyebrow: "Pour aller plus loin",
     deepLede:
-      "L'écart entre provinces, le quadrant salaire-demande et les conditions des offres, pour qui veut la texture derrière la rémunération principale.",
+      "L'écart entre provinces, le quadrant salaire-embauche et les conditions des offres, pour qui veut la texture derrière la rémunération principale.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
@@ -167,15 +167,15 @@ export const wagesDict = {
         aria: "Graphique en haltère de l'écart de salaire horaire affiché par province, du P25 au P75 avec la médiane indiquée",
       },
       wageDemandQuadrant: {
-        eyebrow: "Salaire vs demande · par profession",
-        title: "Salaire vs élan : le quadrant salaire × demande",
-        note: "Aire des bulles ∝ volume · en haut à droite = bien payé et en hausse (corrélation, non causalité).",
-        aria: "Nuage en quadrant des professions selon le salaire médian affiché et la croissance de la demande sur un an, taille des bulles selon le volume",
+        eyebrow: "Salaire vs embauche · par profession",
+        title: "Salaire vs élan : le quadrant salaire × embauche",
+        note: "Aire des bulles ∝ volume · en haut à droite = bien payé et en hausse (corrélation, non causalité). Salaire médian affiché uniquement pour les groupes atteignant le seuil d’échantillon salarial.",
+        aria: "Nuage en quadrant des professions selon le salaire médian affiché et la croissance des offres sur un an, taille des bulles selon le volume",
       },
       educationWageProxy: {
         eyebrow: "Diplômes vs salaire · par profession",
         title: "Les professions exigeantes en diplômes paient-elles plus ?",
-        note: "Chaque grand groupe professionnel : part des offres exigeant un diplôme universitaire vs salaire médian affiché · bulle ∝ volume (corrélation, non causalité).",
+        note: "Chaque grand groupe professionnel : part des offres exigeant un diplôme universitaire vs salaire médian affiché · bulle ∝ volume (corrélation, non causalité). Salaire médian affiché uniquement pour les groupes atteignant le seuil d’échantillon salarial.",
         aria: "Nuage de points des grands groupes professionnels selon la part d'exigence de diplôme et le salaire médian affiché, taille des bulles selon le volume",
       },
       wageByEducation: {

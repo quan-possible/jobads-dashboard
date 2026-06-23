@@ -68,6 +68,16 @@ class DataSource:
     def latest_month(self) -> pd.Timestamp:
         return pd.Timestamp(self.overall["month"].max())
 
+    @property
+    def latest_complete_year(self) -> int:
+        """The most recent calendar year with all 12 months present — the honest
+        default *end* for any year-over-year comparison, so the current partial year
+        is never compared as if it were whole."""
+        m = self.overall["month"]
+        counts = m.dt.year.value_counts()
+        complete = sorted(int(y) for y, n in counts.items() if n >= 12)
+        return complete[-1] if complete else int(m.dt.year.max())
+
     @functools.cached_property
     def metadata(self) -> dict:
         """Raw ``metadata.json`` (source window, headline counts). Used by the
@@ -102,7 +112,21 @@ class DataSource:
 
     @functools.cached_property
     def market(self) -> pd.DataFrame:
-        return self._tables["monthly_by_market"].sort_values("month").reset_index(drop=True)
+        """Per-market (CMA) postings, the national marginal.
+
+        ``monthly_by_market`` is a *cube*: each market is also broken out by
+        province / occupation / industry scope, and those columns each carry an
+        "All …" total alongside the parts. Summing a market over every row would
+        add the total to its own parts on all three dimensions (2×2×2), inflating
+        each market's volume 8×. Filter to the All/All/All cell first — the same
+        discipline as :pyattr:`wage_overall` — so each market is counted once."""
+        df = self._tables["monthly_by_market"]
+        m = (
+            (df["province_scope"] == ALL_CANADA)
+            & (df["occupation_scope"] == ALL_OCCUPATIONS)
+            & (df["industry_scope"] == ALL_INDUSTRIES)
+        )
+        return df[m].sort_values("month").reset_index(drop=True)
 
     # -- wages --------------------------------------------------------------- #
     @functools.cached_property
@@ -234,26 +258,38 @@ class DataSource:
         out["skill_name"] = out["skill_code"].map(names).fillna(out["skill_code"])
         return out.sort_values("month").reset_index(drop=True)
 
-    def skill_churn(self, base_year: int = 2019, end_year: int = 2024,
-                    top: int = 12, min_base: int = 150) -> pd.DataFrame:
-        """Per-skill demand growth, ``base_year`` vs a recent *stable* year (2025+ is
-        provisional), national. Returns the top risers and top fallers, labelled, with
-        a ``direction`` flag — a descriptive 'what is entering vs leaving demand' view."""
+    def skill_churn(self, base_year: int = 2019, end_year: int | None = None,
+                    top: int = 12, min_volume: int = 150) -> pd.DataFrame:
+        """Which skills are entering vs leaving, ``base_year`` → ``end_year``, national.
+
+        Measured as the change in each skill's **share of skill mentions** (pp), not
+        raw % growth: share is bounded, so a genuinely new skill surfaces as a riser
+        without a small-base blow-up (no readability clip needed), and a skill is kept
+        when it clears ``min_volume`` in *either* year — so new entrants are not
+        structurally excluded the way a base-year-only floor would exclude them.
+        ``end_year`` defaults to the latest complete calendar year. Returns the top
+        gainers and losers, labelled, with a ``direction`` flag."""
+        end_year = int(end_year) if end_year is not None else self.latest_complete_year
         sk = self._tables["monthly_skills_topk"].copy()
         sk["skill_code"] = sk["skill_code"].astype(str)
         sk["year"] = sk["month"].dt.year
         base = sk[sk["year"] == base_year].groupby("skill_code")["postings_total"].sum()
         end = sk[sk["year"] == end_year].groupby("skill_code")["postings_total"].sum()
         df = pd.DataFrame({"base": base, "end": end}).fillna(0.0)
-        df = df[df["base"] >= min_base]
-        df["growth_pct"] = (df["end"] / df["base"] - 1) * 100.0
+        df = df[df[["base", "end"]].max(axis=1) >= min_volume]   # keep new entrants AND leavers
+        base_tot, end_tot = df["base"].sum(), df["end"].sum()
+        df["base_share"] = df["base"] / base_tot * 100.0 if base_tot else 0.0
+        df["end_share"] = df["end"] / end_tot * 100.0 if end_tot else 0.0
+        df["share_delta_pp"] = df["end_share"] - df["base_share"]
+        # secondary, NaN-safe % growth for the hover (undefined when the base is zero)
+        df["growth_pct"] = (df["end"] / df["base"].where(df["base"] > 0) - 1) * 100.0
         names = self.skill_labels.set_index("skill_code")["skill_name"]
         df = df.reset_index().rename(columns={"index": "skill_code"})
         df["skill_name"] = df["skill_code"].map(names).fillna(df["skill_code"])
-        risers = df.sort_values("growth_pct", ascending=False).head(top).assign(direction="rising")
-        fallers = df.sort_values("growth_pct").head(top).assign(direction="falling")
+        risers = df.sort_values("share_delta_pp", ascending=False).head(top).assign(direction="rising")
+        fallers = df.sort_values("share_delta_pp").head(top).assign(direction="falling")
         out = pd.concat([fallers, risers]).drop_duplicates("skill_code")
-        return out.sort_values("growth_pct").reset_index(drop=True)
+        return out.sort_values("share_delta_pp").reset_index(drop=True)
 
     def skill_by_occupation(self, top: int = 16, month: pd.Timestamp | None = None) -> pd.DataFrame:
         """For the most-demanded skills nationally, their postings within each broad

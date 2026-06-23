@@ -19,11 +19,17 @@ router = APIRouter(prefix="/api", tags=["figures"])
 def figure(
     chart_id: str,
     locale: str = Query("en", pattern="^(en|fr)$"),
+    base_year: int | None = Query(None, ge=2010, le=2100),
+    end_year: int | None = Query(None, ge=2010, le=2100),
 ) -> Response:
+    """Year-anchored charts (indexed lines, contribution / waterfall / dumbbell,
+    skill-churn, AI-exposure scatter, shift-share) accept an optional ``base_year``
+    / ``end_year`` so the front-end can make them general; other charts ignore them."""
     if chart_id not in figures.REGISTRY:
         raise HTTPException(status_code=404, detail=f"unknown chart_id: {chart_id}")
+    params = {k: v for k, v in (("base_year", base_year), ("end_year", end_year)) if v is not None}
     return Response(
-        content=figures.build(chart_id, locale=locale),
+        content=figures.build(chart_id, locale=locale, **params),
         media_type="application/json",
     )
 

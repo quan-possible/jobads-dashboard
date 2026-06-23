@@ -274,14 +274,18 @@ def test_geo_ranked_provinces(_fig_ds):
     assert list(np.asarray(tr.x, dtype=float)) == [48, 72, 120]
 
 
-def test_geo_cma_demand_ordering(_fig_ds):
-    # NOTE: cma_demand sums across the market table's grouping-set rows (province +
-    # national scopes), so absolute volumes are inflated; the *ordering* is still
-    # correct and is the chart's claim. (Magnitude inflation flagged to maintainers.)
+def test_geo_cma_demand_magnitude_and_ordering(_fig_ds):
+    # H1 fix: cma_demand reads the All/All/All market marginal, NOT the raw cube.
+    # Each fixture province has exactly one CMA (ON→Toronto, AB→Calgary, BC→Vancouver),
+    # so the market marginal equals the province last-12 (2024) sums {120, 72, 48}.
+    # Summing the raw grouping-set rows would inflate every market 8× (2×2×2 over
+    # province × occupation × industry "All"+parts) — the bug this test now pins.
     tr = fig("geography.cma_demand").data[0]
     cities = list(tr.y)                            # ascending by volume
     assert cities[-1] == "Toronto"                 # ON is the biggest market
     assert set(cities) == {"Toronto", "Calgary", "Vancouver"}
+    vals = dict(zip(cities, np.asarray(tr.x, dtype=float)))
+    assert vals == {"Toronto": 120, "Calgary": 72, "Vancouver": 48}   # not 8× inflated
     assert list(np.asarray(tr.x, dtype=float)) == sorted(np.asarray(tr.x, dtype=float))
 
 
@@ -364,10 +368,23 @@ def test_occ_dumbbell_base_end(_fig_ds):
     assert base["Health"] == 3 and end["Health"] == 6
 
 
-def test_occ_skill_churn_is_empty_under_min_base(_fig_ds):
-    # min_base=150 with ≤2 AI mentions/month in one base month → nothing clears.
+def test_occ_skill_churn_empty_under_min_volume(_fig_ds):
+    # The minimal fixture has only a few skill mentions/year (well under the 150
+    # min_volume), so nothing clears the sample gate and the chart is empty. The gate
+    # now keys off max(base, end) volume — not a base-year-only floor — so genuinely
+    # new skills are no longer structurally excluded (see the inclusion test below).
     tr = fig("occupations.skill_churn").data[0]
     assert len(np.asarray(tr.x)) == 0
+
+
+def test_skill_churn_share_measure_and_inclusion(_fig_ds):
+    # Lower the volume floor so the fixture's 3 skills clear the gate; exercises the
+    # share-of-mentions measure (bounded, no clip) and the max(base, end) inclusion rule.
+    df = _fig_ds.skill_churn(base_year=2019, end_year=2024, min_volume=5)
+    assert set(df["skill_code"]) == {"30080004", "10010001", "10010002"}
+    assert {"base_share", "end_share", "share_delta_pp"} <= set(df.columns)
+    # Skills are injected at fixed monthly counts (not year-scaled) → flat share → 0 pp.
+    assert np.allclose(df["share_delta_pp"].to_numpy(dtype=float), 0.0)
 
 
 def test_occ_ai_exposure_scatter_beta_and_growth(_fig_ds):

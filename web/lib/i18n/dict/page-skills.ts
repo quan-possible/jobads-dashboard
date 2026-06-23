@@ -63,14 +63,14 @@ export const skillsDict = {
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       topSkillsTrend: {
-        eyebrow: "Most-demanded skills · trend",
-        title: "The most-demanded skills, and how each has trended",
-        note: "Top skills by posting volume, each indexed to its 2019 average so fast and slow movers are comparable.",
-        aria: "Indexed line chart of the most-demanded skills since 2019",
+        eyebrow: "Most-requested skills · trend",
+        title: "The most-requested skills, and how each has trended",
+        note: "Top skills by posting volume, each indexed to its base-year average so fast and slow movers are comparable. Choose the base year, top-right.",
+        aria: "Indexed line chart of the most-requested skills relative to a chosen base year",
       },
       aiSkillDiffusion: {
         eyebrow: "AI skills · diffusion",
-        title: "The rise of AI skills in hiring demand",
+        title: "The rise of AI skills in hiring",
         note: "AI-related skills (machine learning, generative AI, LLMs, …) as a share of all skill mentions · faint = monthly, bold = 3-month average. The generative-AI surge shows from 2024.",
         aria: "Line chart of AI skills as a share of all skill mentions over time",
       },
@@ -82,7 +82,7 @@ export const skillsDict = {
       },
       skillOccupationHeatmap: {
         eyebrow: "Skills × occupations",
-        title: "What each occupation group demands",
+        title: "What each occupation group requires",
         note: "Column-normalised: each occupation’s mentions of the top skills (latest month).",
         aria: "Heatmap of the top skills against broad occupation groups, column-normalised",
       },
@@ -104,13 +104,13 @@ export const skillsDict = {
   fr: {
     // Hero section
     heroEyebrowPrefix: "Compétences et exigences",
-    heroTitle: "Ce que les employeurs demandent.",
+    heroTitle: "Ce que les employeurs recherchent.",
     heroLede:
       "Compétences et exigences tirées des offres d’emploi qui les mentionnent explicitement. La couverture varie — les champs liés à la scolarité et au télétravail sont peu renseignés; ces chiffres ne reflètent donc que les offres qui les incluent.",
 
     // Most-requested skills section
     mostRequestedEyebrow: "Part des offres · compétences",
-    mostRequestedTitle: "Compétences les plus demandées",
+    mostRequestedTitle: "Compétences les plus requises",
     mostRequestedNote: (n: string) =>
       `Parmi les ${n} offres qui mentionnent des compétences.`,
 
@@ -143,7 +143,7 @@ export const skillsDict = {
     apiDownCode: "uvicorn api.main:app --port 8530",
 
     // SkillBars aria-labels
-    skillBarsShareLabel: "Compétences les plus demandées par part des offres",
+    skillBarsShareLabel: "Compétences les plus requises par part des offres",
     skillBarsLiftLabel: "Compétences distinctives par indice de spécificité",
     liftRefLabel: "1× = moyenne nationale",
     skillBarsEmpty: "Aucune donnée pour cette sélection.",
@@ -160,14 +160,14 @@ export const skillsDict = {
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       topSkillsTrend: {
-        eyebrow: "Compétences les plus demandées · tendance",
-        title: "Les compétences les plus demandées, et leur évolution",
-        note: "Principales compétences par volume d’offres, chacune indexée à sa moyenne de 2019 pour comparer les fortes et faibles variations.",
-        aria: "Graphique linéaire indexé des compétences les plus demandées depuis 2019",
+        eyebrow: "Compétences les plus requises · tendance",
+        title: "Les compétences les plus requises, et leur évolution",
+        note: "Principales compétences par volume d’offres, chacune indexée à sa moyenne de l’année de base pour comparer les fortes et faibles variations. Choisissez l’année de base, en haut à droite.",
+        aria: "Graphique linéaire indexé des compétences les plus requises par rapport à une année de base choisie",
       },
       aiSkillDiffusion: {
         eyebrow: "Compétences en IA · diffusion",
-        title: "L’essor des compétences en IA dans la demande",
+        title: "L’essor des compétences en IA dans l’embauche",
         note: "Compétences liées à l’IA (apprentissage automatique, IA générative, LLM, …) en part de toutes les mentions de compétences · pâle = mensuel, gras = moyenne sur 3 mois. La poussée de l’IA générative apparaît à partir de 2024.",
         aria: "Graphique linéaire des compétences en IA en part de toutes les mentions de compétences au fil du temps",
       },
@@ -179,7 +179,7 @@ export const skillsDict = {
       },
       skillOccupationHeatmap: {
         eyebrow: "Compétences × professions",
-        title: "Ce que demande chaque groupe professionnel",
+        title: "Ce que requiert chaque groupe professionnel",
         note: "Normalisé par colonne : les mentions des principales compétences par profession (dernier mois).",
         aria: "Carte de chaleur des principales compétences par grand groupe professionnel, normalisée par colonne",
       },

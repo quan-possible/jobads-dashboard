@@ -1,5 +1,6 @@
 import { Figure } from "@/components/Figure";
 import { RemoteFigure } from "@/components/RemoteFigure";
+import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
 import { fmtMonth } from "@/lib/format";
@@ -55,6 +56,13 @@ export default async function SkillsPage() {
     return <ApiDown t={t} />;
   }
 
+  // Year-picker bounds for the general (tunable) charts. Data starts 2016; the
+  // index base defaults to 2019 (the conventional, rebaseable base).
+  const FIRST_YEAR = 2016;
+  const asOfYear = Number(asOf.slice(0, 4));
+  const latestComplete = asOf.slice(5, 7) === "12" ? asOfYear : asOfYear - 1;
+  const BASE_YEAR = 2019;
+
   return (
     <div className="pb-4">
       {/* Hero */}
@@ -68,11 +76,13 @@ export default async function SkillsPage() {
         </div>
       </section>
 
-      {/* Core: most-demanded skills and their trend */}
+      {/* Core: most-demanded skills and their trend (rebaseable index) */}
       <section className="container-x py-4">
-        <Figure eyebrow={c.topSkillsTrend.eyebrow} title={c.topSkillsTrend.title} asOf={asOf} note={c.topSkillsTrend.note}>
-          <RemoteFigure fig={figs.topSkillsTrend} height={420} ariaLabel={c.topSkillsTrend.aria} />
-        </Figure>
+        <TunableFigure
+          chartId="skills.top_skills_trend" initialFig={figs.topSkillsTrend} mode="base"
+          minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR}
+          eyebrow={c.topSkillsTrend.eyebrow} title={c.topSkillsTrend.title} asOf={asOf}
+          note={c.topSkillsTrend.note} ariaLabel={c.topSkillsTrend.aria} height={420} />
       </section>
 
       {/* Core: the AI-skill surge */}
