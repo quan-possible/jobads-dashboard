@@ -62,6 +62,32 @@ def build_naics_case() -> str:
     return "\n".join(lines)
 
 
+# Bucket free-text experience requirements by the leading year count. Substring
+# matching (e.g. LIKE '%2 year%') misreads "12 years" as 2 and drops "10 years"
+# entirely; extract the number and compare it numerically instead. Kept as a
+# module constant (referencing the ``experienceDetails`` column) so it is unit
+# testable in isolation.
+EXPERIENCE_BAND_SQL = """CASE
+        WHEN experienceDetails IS NULL OR TRIM(experienceDetails) = '' THEN 'Not reported'
+        WHEN lower(experienceDetails) LIKE '%less than 1 year%' THEN '<1 year'
+        WHEN lower(experienceDetails) LIKE '%more than 5%' THEN '5+ years'
+        WHEN lower(experienceDetails) LIKE '%more than %'
+             AND TRY_CAST(regexp_extract(lower(experienceDetails), 'more than (\\d+)', 1) AS INTEGER) >= 5
+             THEN '5+ years'
+        WHEN regexp_extract(lower(experienceDetails), '(\\d+)\\s*year', 1) <> ''
+             AND TRY_CAST(regexp_extract(lower(experienceDetails), '(\\d+)\\s*year', 1) AS INTEGER) >= 5
+             THEN '5+ years'
+        WHEN regexp_extract(lower(experienceDetails), '(\\d+)\\s*year', 1) <> ''
+             AND TRY_CAST(regexp_extract(lower(experienceDetails), '(\\d+)\\s*year', 1) AS INTEGER) BETWEEN 3 AND 4
+             THEN '3-5 years'
+        WHEN regexp_extract(lower(experienceDetails), '(\\d+)\\s*year', 1) <> ''
+             AND TRY_CAST(regexp_extract(lower(experienceDetails), '(\\d+)\\s*year', 1) AS INTEGER) BETWEEN 1 AND 2
+             THEN '1-3 years'
+        WHEN experienceDetails IS NOT NULL AND TRIM(experienceDetails) <> '' THEN 'Other specified'
+        ELSE 'Other specified'
+    END"""
+
+
 def normalized_view_sql(source_glob: str) -> str:
     noc_case = build_noc_case()
     naics_case = build_naics_case()
@@ -103,14 +129,7 @@ SELECT
     remunerationUnit,
     COALESCE(NULLIF(TRIM(experience), ''), 'Unknown') AS experience,
     NULLIF(TRIM(experienceDetails), '') AS experience_details,
-    CASE
-        WHEN experienceDetails IS NULL OR TRIM(experienceDetails) = '' THEN 'Not reported'
-        WHEN lower(experienceDetails) LIKE '%less than 1 year%' THEN '<1 year'
-        WHEN lower(experienceDetails) LIKE '%1 year%' OR lower(experienceDetails) LIKE '%2 year%' THEN '1-3 years'
-        WHEN lower(experienceDetails) LIKE '%3 year%' OR lower(experienceDetails) LIKE '%4 year%' THEN '3-5 years'
-        WHEN lower(experienceDetails) LIKE '%5 year%' OR lower(experienceDetails) LIKE '%more than 5%' THEN '5+ years'
-        ELSE 'Other specified'
-    END AS experience_band,
+    {EXPERIENCE_BAND_SQL} AS experience_band,
     COALESCE(NULLIF(TRIM(education), ''), 'Unknown') AS education,
     COALESCE(NULLIF(TRIM(type), ''), 'Unknown') AS employment_type,
     COALESCE(NULLIF(TRIM(duration), ''), 'Unknown') AS duration,
@@ -677,6 +696,12 @@ SELECT
 FROM normalized_postings
 """
     ).fetchone()
+    min_date, max_date = summary[0], summary[1]
+    if min_date is None or max_date is None:
+        raise ValueError(
+            "Source data has no valid dateFound values — cannot compute metadata window. "
+            "Check that the source parquet files contain non-null dateFound rows."
+        )
     return {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "source_root": source_root.as_posix(),
@@ -684,8 +709,8 @@ FROM normalized_postings
         "output_root": output_root.as_posix(),
         "source_file_count": len(source_files),
         "source_window": {
-            "min_date": str(summary[0]),
-            "max_date": str(summary[1]),
+            "min_date": min_date.isoformat() if hasattr(min_date, "isoformat") else str(min_date),
+            "max_date": max_date.isoformat() if hasattr(max_date, "isoformat") else str(max_date),
         },
         "headline_counts": {
             "postings_total": int(summary[2]),
@@ -696,7 +721,7 @@ FROM normalized_postings
         },
         "known_caveats": [
             "Job ads measure posted labor demand, not employment or unemployment.",
-            "The 2025 upstream raw fetch provenance remains under audit; freshness should be read with caution.",
+            f"The {max_date.year if hasattr(max_date, 'year') else str(max_date)[:4]} upstream raw fetch provenance remains under audit; freshness should be read with caution.",
             "Wages, remote work, language, and detailed experience fields are sparse or historically unstable.",
             "Posting-level lookup is private and may be bounded by the configured lookup window and row limit.",
         ],
@@ -733,7 +758,12 @@ def validate_derived_package(output_root: Path, *, source_root: Path | None = No
         "noc_postings",
         "naics_postings",
         "remote_field_postings",
+        "remote_or_hybrid_postings",
         "primary_language_postings",
+        "english_requirement_postings",
+        "french_requirement_postings",
+        "experience_detail_postings",
+        "education_postings",
         "skills_postings",
         "employment_type_postings",
         "duration_postings",

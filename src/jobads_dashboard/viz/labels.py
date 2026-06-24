@@ -95,6 +95,42 @@ NAICS_SHORT_FR: dict[str, str] = {
 _UNKNOWN = "Unknown"
 _UNKNOWN_FR = "Inconnu"
 
+# French translations for soft-skill / generic skill labels that appear in
+# top_skills_trend, skill_lift, and AI-skill charts.  Proper-noun tech skills
+# (Python, SQL, Excel, AutoCAD, …) are intentionally absent — they stay in EN
+# in both locales.
+SKILL_NAME_FR: dict[str, str] = {
+    # Soft / generic skills
+    "English language": "Langue anglaise",
+    "French language": "Langue française",
+    "Teamwork": "Travail d'équipe",
+    "Flexibility": "Flexibilité",
+    "Communication": "Communication",
+    "Communication skills": "Compétences en communication",
+    "Problem solving": "Résolution de problèmes",
+    "Time management": "Gestion du temps",
+    "Leadership": "Leadership",
+    "Attention to detail": "Souci du détail",
+    "Customer service": "Service à la clientèle",
+    "Adaptability": "Adaptabilité",
+    "Critical thinking": "Pensée critique",
+    "Multitasking": "Multitâche",
+    "Organization": "Organisation",
+    "Organizational skills": "Sens de l'organisation",
+    "Writing": "Rédaction",
+    "Research": "Recherche",
+    "Planning": "Planification",
+    # AI-skill display labels
+    "Machine learning": "Apprentissage automatique",
+    "Artificial intelligence": "Intelligence artificielle",
+    "Deep learning": "Apprentissage profond",
+    "Natural language processing": "Traitement du langage naturel",
+    "Computer vision": "Vision par ordinateur",
+    "Data science": "Science des données",
+    "Generative AI": "IA générative",
+    "Large language models": "Grands modèles de langage",
+}
+
 
 def _code_of(value: str) -> str:
     """Accept either a code ('3'), a full scope ('3 | Health...'), or a bare label."""
@@ -106,6 +142,25 @@ def _code_of(value: str) -> str:
 def noc_short(value: str) -> str:
     """Short occupation-group name from a code or 'code | label' string."""
     return NOC_SHORT.get(_code_of(value), _UNKNOWN)
+
+
+# Case-insensitive index: the upstream taxonomy capitalises inconsistently
+# ("Customer Service" vs "Customer service", "Attention to Detail" vs
+# "Attention to detail"), so match on a lowercased key.
+_SKILL_NAME_FR_CI: dict[str, str] = {k.lower(): v for k, v in SKILL_NAME_FR.items()}
+
+
+def localize_skill(name: str, locale: str = "en") -> str:
+    """Return the localized display name for a skill.
+
+    Proper-noun tech skills (Python, SQL, Excel, …) and specialised clinical
+    terms (ACLS, PALS, …) are left in EN even under FR because they have no
+    standard French equivalent. Only soft / generic skill labels that appear in
+    the ``SKILL_NAME_FR`` map are translated; the match is case-insensitive.
+    """
+    if locale != "fr" or not name:
+        return name
+    return _SKILL_NAME_FR_CI.get(name.lower(), name)
 
 
 def short_label(dim: str, value: str, locale: str = "en") -> str:

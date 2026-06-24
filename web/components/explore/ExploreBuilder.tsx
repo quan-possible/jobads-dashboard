@@ -30,11 +30,12 @@ const yearRange = (lo: number, hi: number): number[] => {
 
 // CSV of the figure's first trace (bar: category→value; line: month→value). The
 // gate figures carry no trace, so the button is disabled for them.
-function downloadCsv(fig: FigJSON, filename: string) {
+// colX/colY are the localized breakdown/measure labels for the header row (S20).
+function downloadCsv(fig: FigJSON, filename: string, colX: string, colY: string) {
   const tr = (fig.data?.[0] ?? {}) as { x?: unknown[]; y?: unknown[] };
   if (!tr.x || !tr.y) return;
   const esc = (c: unknown) => `"${String(c ?? "").replace(/"/g, '""')}"`;
-  const rows: unknown[][] = [["x", "y"], ...tr.x.map((x, i) => [x, tr.y![i]])];
+  const rows: unknown[][] = [[colX, colY], ...tr.x.map((x, i) => [x, tr.y![i]])];
   const csv = rows.map((r) => r.map(esc).join(",")).join("\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   const a = document.createElement("a");
@@ -163,7 +164,15 @@ export function ExploreBuilder({ minYear, maxYear }: { minYear: number; maxYear:
             // Disable mid-refetch so the file can never disagree with the chart
             // it's drawn next to (U05).
             disabled={!hasTrace || loading}
-            onClick={() => fig && downloadCsv(fig, `explore-${effectiveDim}-${measure}-${startYear}-${endYear}.csv`)}
+            onClick={() =>
+              fig &&
+              downloadCsv(
+                fig,
+                `${t.explore.csvFilename}-${effectiveDim}-${measure}-${startYear}-${endYear}.csv`,
+                b.dims[effectiveDim],
+                b.measures[measure],
+              )
+            }
             className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
           >
             {b.download}

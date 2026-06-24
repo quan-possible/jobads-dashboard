@@ -4,7 +4,46 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
-from jobads_dashboard.dashboard.prepare import SOURCE_GLOB, discover_source_root, normalized_view_sql, validate_derived_package
+import pytest
+
+from jobads_dashboard.dashboard.prepare import (
+    EXPERIENCE_BAND_SQL,
+    SOURCE_GLOB,
+    discover_source_root,
+    normalized_view_sql,
+    validate_derived_package,
+)
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        (None, "Not reported"),
+        ("", "Not reported"),
+        ("less than 1 year", "<1 year"),
+        ("1 year", "1-3 years"),
+        ("2 years", "1-3 years"),
+        ("3 years", "3-5 years"),
+        ("4 years", "3-5 years"),
+        ("5 years", "5+ years"),
+        ("6 years", "5+ years"),
+        ("6-9 years", "5+ years"),   # leading-substring "6 year" would never match the old chain
+        ("10 years", "5+ years"),    # old chain dropped this to "Other specified"
+        ("12 years", "5+ years"),    # old chain misread as "1-3 years" via "2 year"
+        ("more than 5 years", "5+ years"),
+        ("more than 10 years", "5+ years"),
+        ("negotiable", "Other specified"),
+    ],
+)
+def test_experience_band_numeric_bucketing(text, expected):
+    """S07: bucket by the extracted leading year count, not substring match."""
+    con = duckdb.connect()
+    got = con.execute(
+        f"SELECT {EXPERIENCE_BAND_SQL} AS band "
+        "FROM (SELECT CAST(? AS VARCHAR) AS experienceDetails) t",
+        [text],
+    ).fetchone()[0]
+    assert got == expected, (text, got, expected)
 
 
 def write_minimal_bundle(tmp_path: Path, source_glob: str | None = None, source_total: int = 3) -> None:

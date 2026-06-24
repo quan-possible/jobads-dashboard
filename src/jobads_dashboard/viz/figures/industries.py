@@ -16,7 +16,7 @@ from ..theme import (
     BRAND, CONTEXT, MUTED, UP, DOWN,
     add_covid_band, add_provisional_band, add_reference_line,
 )
-from ._common import add_time_slider, titled, treemap_trace
+from ._common import add_time_slider, annual_means, titled, treemap_trace
 
 
 def _real(df: pd.DataFrame) -> pd.DataFrame:
@@ -86,8 +86,11 @@ def share_over_time(ds: DataSource, top: int = 7) -> go.Figure:
 def contribution_bars(ds: DataSource, base_year: int = BASE_YEAR,
                       end_year: int | None = None) -> go.Figure:
     end_year = end_year if end_year is not None else ds.latest_complete_year
-    base, end = pd.Timestamp(f"{base_year}-06-01"), pd.Timestamp(f"{end_year}-12-01")
-    nb = _real(ds.naics_broad)
+    # Compare annual means (see annual_means): averaging each year's months
+    # removes the within-year seasonal swing that a June-base vs December-end
+    # snapshot would misattribute to sector trend. Keyed at {year}-12-01.
+    base, end = pd.Timestamp(f"{base_year}-12-01"), pd.Timestamp(f"{end_year}-12-01")
+    nb = annual_means(_real(ds.naics_broad), "postings_total", "naics_name")
     c = C.contribution_to_growth(nb, "naics_name", "postings_total", base, end)
     c["short"] = c["naics_name"].map(lambda s: s.split("|")[-1].strip()[:30])
     c = c.sort_values("contribution_pp")

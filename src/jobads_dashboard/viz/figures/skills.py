@@ -12,8 +12,8 @@ import plotly.graph_objects as go
 
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
-from ..labels import noc_short
-from ..theme import BRAND, CONTEXT, SEQUENTIAL, add_covid_band, add_provisional_band, add_reference_line
+from ..labels import localize_skill, noc_short
+from ..theme import BRAND, CONTEXT, MUTED, SEQUENTIAL, UP, DOWN, add_covid_band, add_provisional_band, add_reference_line
 from ._common import titled
 
 from ..theme import COLORWAY
@@ -22,27 +22,51 @@ from ..theme import COLORWAY
 # --------------------------------------------------------------------------- CORE
 
 
-def top_skills_trend(ds: DataSource, base_year: int = BASE_YEAR, top: int = 8) -> go.Figure:
+def top_skills_trend(ds: DataSource, base_year: int = BASE_YEAR, top: int = 8,
+                     locale: str = "en") -> go.Figure:
     """The most-requested skills nationally and how each has trended. Indexed to each
     skill's base-year average so fast and slow movers are comparable; base is selectable."""
     nat = ds.skills_national(top=top)
     idx = C.index_to_base(nat, "postings_total", base_year, by="skill_name")
-    latest = idx[idx["month"] == idx["month"].max()].set_index("skill_name")["index"]
-    movers = latest.sort_values(ascending=False)
-    highlight = set(list(movers.index[:2]) + list(movers.index[-1:]))
+    last_month = idx["month"].max()
+    latest = idx[idx["month"] == last_month].set_index("skill_name")["index"]
+    # Cap at 4 biggest movers by absolute distance from 100 (the base line).
+    abs_change = (latest - 100).abs()
+    highlight_names = set(abs_change.nlargest(4).index)
+    # Rise vs fall: final index value vs 100.
+    def _line_color(skill: str) -> str:
+        return UP if latest.get(skill, 100) >= 100 else DOWN
+
+    annotations = []
     fig = go.Figure()
     for name, sub in idx.groupby("skill_name"):
-        on = name in highlight
+        on = name in highlight_names
         sub = sub.sort_values("month")
+        display = localize_skill(name, locale)
+        color = _line_color(name) if on else CONTEXT
         fig.add_trace(go.Scatter(
-            x=sub["month"], y=sub["index"], name=name, mode="lines",
-            line=dict(color=BRAND if on else CONTEXT, width=2.6 if on else 1),
-            opacity=1 if on else 0.55, showlegend=on,
-            hovertemplate="%{x|%b %Y} · " + name + ": %{y:.0f}<extra></extra>"))
+            x=sub["month"], y=sub["index"], name=display, mode="lines",
+            line=dict(color=color, width=2.6 if on else 1),
+            opacity=1 if on else 0.35, showlegend=on,
+            hovertemplate="%{x|%b %Y} · " + display + ": %{y:.0f}<extra></extra>"))
+        if on:
+            last_row = sub[sub["month"] == last_month]
+            if not last_row.empty:
+                y_end = float(last_row["index"].iloc[0])
+                annotations.append(dict(
+                    x=last_month, y=y_end,
+                    xref="x", yref="y",
+                    xanchor="left", yanchor="middle",
+                    text=f"<b>{display}</b>",
+                    showarrow=False,
+                    font=dict(size=10, color=color),
+                    xshift=6,
+                ))
     add_reference_line(fig, 100, text=f"{base_year}=100")
     add_covid_band(fig)
     add_provisional_band(fig)
     fig.update_yaxes(title_text="index (base year = 100)")
+    fig.update_layout(annotations=annotations)
     return titled(fig, "The most-requested skills, and how each has trended",
                   f"Top skills by posting volume, each indexed to its {base_year} average · fastest/slowest movers highlighted")
 
@@ -74,15 +98,17 @@ def ai_skill_diffusion(ds: DataSource) -> go.Figure:
 # --------------------------------------------------------------------------- DEEP
 
 
-def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None) -> go.Figure:
+def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None,
+                    locale: str = "en") -> go.Figure:
     if occupation_scope is None:
         # default to a clearly-specialised group: Health occupations ("3 | ...")
         scopes = ds.noc_broad["occupation_scope"].unique()
         cands = [s for s in scopes if s.startswith("3 |")]
         occupation_scope = cands[0] if cands else scopes[0]
     df = ds.skill_lift(occupation_scope).sort_values("lift")
+    display_names = [localize_skill(n, locale) for n in df["skill_name"]]
     fig = go.Figure(go.Bar(
-        x=df["lift"], y=df["skill_name"], orientation="h", marker_color=BRAND,
+        x=df["lift"], y=display_names, orientation="h", marker_color=BRAND,
         hovertemplate="%{y}: lift %{x:.1f}×<extra></extra>"))
     add_reference_line(fig, 1, text="national rate")
     fig.update_xaxes(title_text="lift (occupation share ÷ national share)", ticksuffix="×")

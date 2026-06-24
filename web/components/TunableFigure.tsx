@@ -80,7 +80,7 @@ export function TunableFigure({
   }, [chartId, locale, mode, baseYear, endYear]);
 
   const selectCls =
-    "num rounded border border-card-border bg-surface-alt px-1.5 py-0.5 t-caption font-bold text-ink-soft outline-none focus:border-brand";
+    "num rounded border border-card-border bg-surface-alt px-1.5 py-0.5 t-caption font-bold text-ink-soft focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange";
   const labelCls = "t-caption uppercase tracking-[0.03em] text-ink-faint";
 
   // Each <select> carries its own accessible name (the visible label spans are

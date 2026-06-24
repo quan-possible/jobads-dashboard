@@ -20,6 +20,8 @@ export const common = {
     apiDownBody: "The data service may be unavailable. Confirm the API is running on port 8530, then try again.",
     somethingWrong: "Something went wrong",
     chartUnavailable: "This chart is temporarily unavailable.",
+    up: "up",
+    down: "down",
     yearControl: { base: "Base year", from: "From", to: "to", aria: "Choose the years to compare", fromYear: "Start year", toYear: "End year" },
   },
   fr: {
@@ -43,6 +45,8 @@ export const common = {
     apiDownBody: "Le service de données est peut-être indisponible. Vérifiez que l’API tourne sur le port 8530, puis réessayez.",
     somethingWrong: "Une erreur est survenue",
     chartUnavailable: "Ce graphique est momentanément indisponible.",
+    up: "en hausse",
+    down: "en baisse",
     yearControl: { base: "Année de base", from: "De", to: "à", aria: "Choisir les années à comparer", fromYear: "Année de début", toYear: "Année de fin" },
   },
 } as const;

@@ -5,12 +5,44 @@ Run locally:  uvicorn api.main:app --reload --port 8530
 
 from __future__ import annotations
 
+import logging
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import explore, figures, private, read
+
+_log = logging.getLogger("api.main")
+
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI):
+    """S09: warm up the DuckDB connection + explore cubes at startup so the first
+    real request does not block for ~2 minutes while DuckDB opens the parquet files
+    and builds in-memory structures. Runs the default explore query (province /
+    postings, no filters) and primes latest_month / earliest_month.
+
+    All warm-up calls are wrapped in a broad try/except: a missing parquet or any
+    other startup error must never prevent the app from starting."""
+    try:
+        from . import core
+        from .explore import build_explore_figure
+
+        # Prime the DuckDB connection and the month-boundary caches.
+        core.latest_month()
+        core.earliest_month()
+        # Run the default explore figure (province × postings, no scope filters)
+        # which touches both filter_cube and wage_cube code paths.
+        build_explore_figure("province", "postings")
+    except Exception:
+        _log.warning(
+            "Explore warm-up failed — first request may be slow.",
+            exc_info=True,
+        )
+    yield  # application runs
+
 
 app = FastAPI(
     title="ACLMR Labour Market API",
@@ -21,6 +53,7 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
+    lifespan=_lifespan,
 )
 
 _origins = os.environ.get(

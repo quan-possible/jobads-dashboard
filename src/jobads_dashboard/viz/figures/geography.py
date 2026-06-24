@@ -15,7 +15,7 @@ import plotly.graph_objects as go
 from .. import compute as C
 from ..datasource import BASE_YEAR, PROVINCE_NAMES, DataSource
 from ..theme import BRAND, CONTEXT, DIVERGING, SEQUENTIAL
-from ._common import add_time_slider, titled
+from ._common import add_time_slider, annual_means, titled
 
 
 def _slider_chrome(locale: str) -> dict:
@@ -29,7 +29,14 @@ def _last12(df: pd.DataFrame, value: str = "postings_total") -> pd.DataFrame:
 
 
 def _window(base_year: int, end_year: int) -> tuple[pd.Timestamp, pd.Timestamp]:
-    return pd.Timestamp(f"{base_year}-06-01"), pd.Timestamp(f"{end_year}-12-01")
+    """Comparison endpoints for the year-over-year shift-share.
+
+    Returns the ``{year}-12-01`` keys that select each year's *annual mean*
+    (see ``annual_means``). Comparing annual averages — not a June-base vs
+    December-end snapshot — keeps the comparison like-for-like and free of the
+    within-year seasonal swing.
+    """
+    return pd.Timestamp(f"{base_year}-12-01"), pd.Timestamp(f"{end_year}-12-01")
 
 
 # --------------------------------------------------------------------------- CORE
@@ -123,7 +130,10 @@ def ranked_provinces(ds: DataSource) -> go.Figure:
 def cma_demand(ds: DataSource, top: int = 18) -> go.Figure:
     """City / CMA-level postings — finer than province. The largest metropolitan
     labour markets by posting volume over the last 12 months."""
-    mk = _last12(ds.market).groupby("market_label", as_index=False)["postings_total"].sum()
+    _non_metro = r"unknown market|rural area not in a cma"
+    mk = _last12(ds.market)
+    mk = mk[~mk["market_label"].str.contains(_non_metro, case=False, regex=True)]
+    mk = mk.groupby("market_label", as_index=False)["postings_total"].sum()
     mk = mk.sort_values("postings_total", ascending=False).head(top).sort_values("postings_total")
     mk["prov"] = mk["market_label"].str.split("|").str[0].str.strip()
     mk["city"] = mk["market_label"].str.split("|").str[1].str.strip()
@@ -155,7 +165,9 @@ def shift_share_bars(ds: DataSource, base_year: int = BASE_YEAR,
                      end_year: int | None = None) -> go.Figure:
     end_year = end_year if end_year is not None else ds.latest_complete_year
     base, end = _window(base_year, end_year)
-    ss = C.shift_share(ds.province_occupation, "province_name", "noc_label",
+    pa = annual_means(ds.province_occupation, "postings_total",
+                      "province_name", "noc_label")
+    ss = C.shift_share(pa, "province_name", "noc_label",
                        "postings_total", base, end)
     ss = ss.sort_values("actual_change")
     fig = go.Figure()
@@ -201,11 +213,18 @@ def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en
 
     if animate == "by-year":
         # One frame per December (a stable annual YoY read), most recent last.
+        # For the latest year the data may not yet reach December, so label that
+        # frame with the actual latest month present (e.g. "March 2026") instead
+        # of implying December.
         prov2 = prov.copy()
         prov2["year"] = prov2["month"].dt.year
         decembers = [prov2[prov2["year"] == y]["month"].max() for y in sorted(prov2["year"].unique())]
         decembers = [m for m in decembers if not prov[prov["month"] == m - pd.DateOffset(months=12)].empty]
-        labels = [str(m.year) for m in decembers]
+        last_m = decembers[-1]
+        labels = [
+            (m.strftime("%B %Y") if m == last_m and m.month != 12 else str(m.year))
+            for m in decembers
+        ]
         frames = [go.Frame(name=lbl, data=[_trace(_yoy_by_month(prov, m), with_geo=False)])
                   for lbl, m in zip(labels, decembers)]
         fig = go.Figure(data=[_trace(_yoy_by_month(prov, decembers[-1]), with_geo=True)], frames=frames)

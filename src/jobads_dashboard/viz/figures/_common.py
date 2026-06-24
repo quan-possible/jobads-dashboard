@@ -10,18 +10,49 @@ from ..theme import MUTED, SEQUENTIAL, register_templates
 register_templates()  # ensure templates exist when figures are built standalone
 
 
+def annual_means(df: pd.DataFrame, value: str, *group_cols: str,
+                 x: str = "month") -> pd.DataFrame:
+    """Collapse a monthly frame to one row per year per group, holding the year's
+    *mean* of ``value`` and keyed at a representative ``{year}-12-01`` timestamp.
+
+    Year-to-year decompositions (contribution, waterfall, dumbbell, shift-share)
+    compare a base year to an end year. Snapshotting a single month at each end
+    mixes the within-year seasonal swing (a June peak vs a December trough) into
+    the "change" and misattributes it to trend/mix/competitive components. Taking
+    each year's mean over its observed months removes that seasonality, so the
+    comparison is like-for-like. The ``-12-01`` key lets callers keep selecting
+    base/end with a December timestamp (``_window``)."""
+    out = df.copy()
+    out["_year"] = out[x].dt.year
+    agg = out.groupby(["_year", *group_cols], as_index=False)[value].mean()
+    agg[x] = pd.to_datetime(agg["_year"].astype(str) + "-12-01")
+    return agg.drop(columns="_year")
+
+
 def treemap_trace(g: pd.DataFrame, name_col: str, root: str) -> go.Treemap:
-    """Shared treemap trace for the occupation / industry volume treemaps."""
+    """Shared treemap trace for the occupation / industry volume treemaps.
+
+    Large tiles (>=3% of root) show label+value+percent; small tiles show only
+    the label so cramped text does not overflow. Value and percent always appear
+    on hover regardless of tile size.
+    """
     g = g.copy()
     g["short"] = g[name_col].map(lambda s: s.split("|")[-1].strip() or s.strip())
     total = g["postings_total"].sum()
+    # Per-tile text: full detail for large tiles, label-only for small ones.
+    threshold = 0.03 * total
+    tile_text = [
+        lbl if val < threshold else f"{lbl}<br>{val:,.0f} ({val/total:.1%})"
+        for lbl, val in zip(g["short"].tolist(), g["postings_total"].tolist())
+    ]
     return go.Treemap(
         labels=[root] + g["short"].tolist(),
         parents=[""] + [root] * len(g),
         values=[total] + g["postings_total"].tolist(), branchvalues="total",
         marker=dict(colors=[total] + g["postings_total"].tolist(), colorscale=SEQUENTIAL,
                     line=dict(width=1, color="white")),
-        textinfo="label+value+percent root", maxdepth=2,
+        text=[""] + tile_text,
+        textinfo="text", maxdepth=2,
         hovertemplate="%{label}: %{value:,.0f} (%{percentRoot})<extra></extra>")
 
 

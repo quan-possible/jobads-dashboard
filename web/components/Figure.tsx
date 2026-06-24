@@ -30,7 +30,7 @@ export function Figure({
       <div className="mb-4 flex items-start justify-between gap-4">
         <div className="min-w-0">
           {eyebrow && <div className="eyebrow mb-1.5">{eyebrow}</div>}
-          <figcaption className="text-[1.02rem] font-bold leading-snug text-navy-deep">{title}</figcaption>
+          <figcaption className="t-figure-title font-bold leading-snug text-navy-deep">{title}</figcaption>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           {actions}
