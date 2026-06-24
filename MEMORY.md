@@ -1,6 +1,6 @@
 # MEMORY
 
-Last updated: 2026-06-03
+Last updated: 2026-06-23
 
 ## Objective
 - Keep `jobads-dashboard` as the standalone implementation home for the labor-market dashboard.
@@ -91,6 +91,8 @@ Last updated: 2026-06-03
 - Posting lookup uses month-level dashboard filters but posting-level `date_found` values. Keep the end bound at the last day of the selected end month; using the first day of the selected end month silently drops most current-month postings from Explore search.
 - The public password gate is app-level Streamlit authentication, not network-edge access control. It protects the dashboard UI for ordinary link sharing, but a stronger shared deployment should use a reserved domain plus edge/basic auth or an identity-aware proxy.
 - As of 2026-06-11, local port `8522` is healthy from the external-drive app/data. The ngrok URL returned `ERR_NGROK_727` because the account hit its monthly HTTP request limit, so a Cloudflare quick tunnel LaunchAgent now hosts the app publicly at the current `trycloudflare.com` URL recorded in `memory/2026-06-11.md`.
+- As of the 2026-06-23 Tuesday readiness check, the public dashboard runs from the current Next/FastAPI checkout through `com.aclmr.jobads-dashboard-public`: FastAPI on `127.0.0.1:8530`, Next on `127.0.0.1:8522`, and Cloudflare quick tunnel `https://friends-reality-requirements-enemies.trycloudflare.com`.
+- The previous Cloudflare quick tunnel URL `https://invitation-discount-refuse-nonprofit.trycloudflare.com` no longer resolves. The current web health route is `/healthz`; the old Streamlit `/_stcore/health` route returns `404` because the live app is no longer Streamlit.
 
 ## Sources
 - `docs/analyses/labor_market_dashboard_spec/report.md`
