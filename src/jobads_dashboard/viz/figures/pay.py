@@ -109,7 +109,7 @@ def wage_demand_quadrant(ds: DataSource) -> go.Figure:
     fig.update_xaxes(title_text="advertised median wage", tickprefix="$")
     fig.update_yaxes(title_text="YoY posting growth", ticksuffix="%")
     fig.update_layout(height=460)
-    return titled(fig, "Pay vs momentum: the wage × postings quadrant",
+    return titled(fig, f"Pay vs momentum: the wage × postings quadrant ({_STABLE_END:%b %Y})",
                   "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation)")
 
 
@@ -146,7 +146,7 @@ def education_wage_proxy(ds: DataSource) -> go.Figure:
     fig.update_xaxes(title_text="share of postings asking for a university degree", ticksuffix="%")
     fig.update_yaxes(title_text="median advertised wage", tickprefix="$")
     fig.update_layout(height=460)
-    return titled(fig, "Do credential-heavy occupations pay more?",
+    return titled(fig, f"Do credential-heavy occupations pay more? ({_STABLE_END:%b %Y})",
                   "Each broad occupation group: degree-requirement share vs median advertised wage · bubble ∝ volume (correlation, not causation)")
 
 

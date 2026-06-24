@@ -16,7 +16,17 @@ export function FilterSpine() {
   if (!pathname.startsWith("/explore")) return null;
 
   return (
-    <div className="sticky top-16 z-30 border-b border-card-border bg-surface-alt/80 backdrop-blur-md">
+    /* U06: FilterSpine renders in the root layout (above <main>) so it
+       structurally precedes the page hero. We compensate with a distinct
+       "toolbar" treatment — full-bleed opaque chrome + orange accent bar —
+       so the strip reads as persistent navigation chrome, not page content,
+       and the hero below still opens the page visually. */
+    <div
+      role="toolbar"
+      aria-label={t.filter.scope}
+      className="sticky top-16 z-30 border-y border-card-border bg-surface-alt backdrop-blur-md"
+      style={{ borderTopColor: "var(--orange)", borderTopWidth: "2px" }}
+    >
       <div className="container-x flex flex-wrap items-end gap-x-4 gap-y-3 py-3">
         <div className="mr-1 flex flex-col">
           <span className="t-label font-bold uppercase tracking-[0.05em] text-orange-deep">{t.filter.eyebrow}</span>

@@ -236,8 +236,15 @@ def add_reference_line(fig: go.Figure, y: float, *, text: str | None = None,
     """Horizontal reference line (0 for growth, 100 for index, 1 for LQ, 50 for diffusion)."""
     fig.add_hline(
         y=y, line=dict(color=color, width=1, dash=dash),
-        **(_ann(text, "right", color)),
     )
+    if text:
+        fig.add_annotation(
+            text=text,
+            xref="paper", x=0.99, xanchor="right",
+            yref="y", y=y, yanchor="bottom",
+            showarrow=False,
+            font=dict(size=10, color=color),
+        )
     return fig
 
 
@@ -246,12 +253,16 @@ def split_provisional(
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a time-indexed frame into (solid, provisional) for two-trace rendering.
 
-    The provisional frame keeps one overlapping point so the dotted tail joins the
-    solid line without a visual gap.
+    The solid trace is strictly *before* PROVISIONAL_FROM, plus exactly one bridge
+    point at the boundary so the line connects visually. The provisional trace
+    starts at PROVISIONAL_FROM (dotted/styled). Together the two traces share only
+    the single boundary point, so the dotted styling begins exactly at frm with no
+    solid overlap into the provisional zone.
     """
-    solid = df[df[x] <= frm]
+    solid = df[df[x] < frm]
     prov = df[df[x] >= frm]
     if len(solid) and len(prov):
-        bridge = solid.iloc[[-1]]
-        prov = pd.concat([bridge, prov]).drop_duplicates(subset=[x])
+        # Append the boundary point to solid so the line reaches frm before going dotted.
+        bridge = prov.iloc[[0]]
+        solid = pd.concat([solid, bridge]).drop_duplicates(subset=[x])
     return solid, prov

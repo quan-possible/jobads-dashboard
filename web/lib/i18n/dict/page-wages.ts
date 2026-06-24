@@ -71,13 +71,13 @@ export const wagesDict = {
       },
       wageDemandQuadrant: {
         eyebrow: "Pay vs hiring · by occupation",
-        title: "Pay vs momentum: the wage × hiring quadrant",
+        title: "Pay vs momentum: the wage × hiring quadrant (Dec 2024)",
         note: "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation). Median wage shown only for groups that clear the wage-sample floor.",
         aria: "Quadrant scatter of occupations by advertised median wage and year-over-year posting growth, bubble size by volume",
       },
       educationWageProxy: {
         eyebrow: "Credentials vs pay · by occupation",
-        title: "Do credential-heavy occupations pay more?",
+        title: "Do credential-heavy occupations pay more? (Dec 2024)",
         note: "Each broad occupation group: share of postings asking for a university degree vs median advertised wage · bubble ∝ volume (correlation, not causation). Median wage shown only for groups that clear the wage-sample floor.",
         aria: "Scatter of broad occupation groups by degree-requirement share and median advertised wage, bubble size by volume",
       },
@@ -168,13 +168,13 @@ export const wagesDict = {
       },
       wageDemandQuadrant: {
         eyebrow: "Salaire vs embauche · par profession",
-        title: "Salaire vs élan : le quadrant salaire × embauche",
+        title: "Salaire vs élan : le quadrant salaire × embauche (déc. 2024)",
         note: "Aire des bulles ∝ volume · en haut à droite = bien payé et en hausse (corrélation, non causalité). Salaire médian affiché uniquement pour les groupes atteignant le seuil d’échantillon salarial.",
         aria: "Nuage en quadrant des professions selon le salaire médian affiché et la croissance des offres sur un an, taille des bulles selon le volume",
       },
       educationWageProxy: {
         eyebrow: "Diplômes vs salaire · par profession",
-        title: "Les professions exigeantes en diplômes paient-elles plus ?",
+        title: "Les professions exigeantes en diplômes paient-elles plus ? (déc. 2024)",
         note: "Chaque grand groupe professionnel : part des offres exigeant un diplôme universitaire vs salaire médian affiché · bulle ∝ volume (corrélation, non causalité). Salaire médian affiché uniquement pour les groupes atteignant le seuil d’échantillon salarial.",
         aria: "Nuage de points des grands groupes professionnels selon la part d'exigence de diplôme et le salaire médian affiché, taille des bulles selon le volume",
       },

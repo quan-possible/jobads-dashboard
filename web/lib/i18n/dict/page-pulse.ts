@@ -104,7 +104,7 @@ export const pulseDict = {
       momentum: {
         eyebrow: "Momentum",
         title: "Is hiring speeding up or cooling?",
-        note: "Gap between the 3-month and 12-month averages · orange = accelerating, teal = cooling.",
+        note: "Gap between the 3-month and 12-month averages · teal = accelerating, orange = cooling.",
         aria: "Bar chart of the gap between the 3-month and 12-month moving averages",
       },
       diffusion: {
@@ -214,7 +214,7 @@ export const pulseDict = {
       momentum: {
         eyebrow: "Dynamique",
         title: "L’embauche accélère-t-elle ou ralentit-elle ?",
-        note: "Écart entre la moyenne sur 3 mois et celle sur 12 mois · orange = accélère, sarcelle = ralentit.",
+        note: "Écart entre la moyenne sur 3 mois et celle sur 12 mois · sarcelle = accélère, orange = ralentit.",
         aria: "Diagramme à barres de l’écart entre les moyennes mobiles sur 3 et 12 mois",
       },
       diffusion: {

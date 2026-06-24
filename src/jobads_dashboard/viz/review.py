@@ -170,12 +170,15 @@ _TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Job-ads dashboard — visualization review</title>
 <script src="{cdn}" charset="utf-8"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <style>
 :root{{--canvas:#fbf8f5;--surface:#fff;--ink:#132330;--muted:#5d6b74;--line:#ece3da;
---brand:#cf7730;--teal:#345961;}}
+--brand:#cf7730;--teal:#345961;--font-pt-sans:"PT Sans";}}
 *{{box-sizing:border-box}}
 body{{margin:0;background:var(--canvas);color:var(--ink);
-font-family:Inter,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.5}}
+font-family:var(--font-pt-sans),-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.5}}
 header.top{{background:linear-gradient(110deg,#041c2c 0%,#345961 55%,#cf7730 130%);
 color:#fff;padding:34px 32px 30px}}
 header.top h1{{margin:0 0 6px;font-size:25px;font-weight:650}}

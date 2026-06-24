@@ -10,6 +10,8 @@ import type { PostingRow, PostingsResponse } from "@/lib/types";
 import { useFilters } from "@/lib/useFilters";
 import { PostingDrawer } from "./PostingDrawer";
 
+const SLOW_THRESHOLD_MS = 20_000;
+
 const PAGE = 25;
 
 function shortScope(occ: string): string {
@@ -31,9 +33,18 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState<PostingsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [slow, setSlow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [fetchKey, setFetchKey] = useState(0);
   const tableTop = useRef<HTMLDivElement>(null);
+
+  // S21: Keep the latest onSessionExpired in a ref so it never becomes a
+  // dependency of the fetch effect (same pattern as onCloseRef in PostingDrawer).
+  const onSessionExpiredRef = useRef(onSessionExpired);
+  useEffect(() => {
+    onSessionExpiredRef.current = onSessionExpired;
+  });
 
   // Debounce the search box.
   useEffect(() => {
@@ -51,10 +62,22 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
     setOffset(0);
   }
 
+  // S09+S21: fetch effect. onSessionExpired is read from a ref so it is never
+  // a dep here — the effect only re-runs when the actual query inputs change.
+  // Capture the localized fallback error message synchronously so the async
+  // .catch branch never closes over a stale `t`.
+  const loadingErrorMsg = t.explore.loadingError;
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setSlow(false);
     setError(null);
+
+    // S09: bounded loading — after SLOW_THRESHOLD_MS show a "still loading" hint.
+    const slowTimer = setTimeout(() => {
+      if (!cancelled) setSlow(true);
+    }, SLOW_THRESHOLD_MS);
+
     fetchPostings({
       geo: filters.geo,
       occ: filters.occ,
@@ -63,21 +86,32 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
       limit: PAGE,
       offset,
     })
-      .then((d) => !cancelled && setData(d))
+      .then((d) => {
+        if (cancelled) return;
+        setData(d);
+      })
       .catch((e) => {
         if (cancelled) return;
         // Session expired mid-use → hand back to the gate for re-login (S27).
         if (e instanceof AuthError) {
-          onSessionExpired?.();
+          onSessionExpiredRef.current?.();
           return;
         }
-        setError(e?.message ?? "Could not load postings.");
+        setError(e?.message ?? loadingErrorMsg);
       })
-      .finally(() => !cancelled && setLoading(false));
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+          setSlow(false);
+          clearTimeout(slowTimer);
+        }
+      });
     return () => {
       cancelled = true;
+      clearTimeout(slowTimer);
     };
-  }, [filters.geo, filters.occ, filters.ind, debouncedQ, offset, onSessionExpired]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.geo, filters.occ, filters.ind, debouncedQ, offset, fetchKey, loadingErrorMsg]);
 
   const total = data?.total ?? 0;
   const from = total === 0 ? 0 : offset + 1;
@@ -125,7 +159,11 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
         </label>
         <div className="num t-meta text-ink-soft">
           {loading && !data ? (
-            t.common.loading
+            slow ? (
+              <span className="text-ink-faint">{t.explore.loadingSlowHint}</span>
+            ) : (
+              t.common.loading
+            )
           ) : (
             <>
               <span className="font-bold text-navy-deep">{fmtInt(total, locale)}</span> {t.explore.postings} · {scopeSummary}
@@ -150,12 +188,34 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
               </tr>
             </thead>
             <tbody>
+              {/* S09 error state with retry */}
               {error && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center t-body-sm text-neg">
-                    {error}
+                  <td colSpan={7} className="px-4 py-12 text-center t-body-sm">
+                    <p className="text-neg">{error}</p>
+                    <button
+                      type="button"
+                      onClick={() => setFetchKey((k) => k + 1)}
+                      className="mt-3 control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors hover:border-orange hover:text-orange"
+                    >
+                      {t.explore.retryLoad}
+                    </button>
                   </td>
                 </tr>
+              )}
+              {/* S09 skeleton rows on cold start (no prior data) */}
+              {!error && loading && !data && (
+                Array.from({ length: PAGE }, (_, i) => (
+                  <tr key={i} aria-hidden="true" className="border-b border-hairline last:border-0">
+                    <td className="px-4 py-3"><div className="h-3 w-16 animate-pulse rounded bg-surface-alt" /></td>
+                    <td className="px-4 py-3"><div className="h-3 w-36 animate-pulse rounded bg-surface-alt" /></td>
+                    <td className="hidden px-4 py-3 md:table-cell"><div className="h-3 w-28 animate-pulse rounded bg-surface-alt" /></td>
+                    <td className="px-4 py-3"><div className="h-3 w-12 animate-pulse rounded bg-surface-alt" /></td>
+                    <td className="hidden px-4 py-3 lg:table-cell"><div className="h-3 w-24 animate-pulse rounded bg-surface-alt" /></td>
+                    <td className="px-4 py-3 text-right"><div className="ml-auto h-3 w-14 animate-pulse rounded bg-surface-alt" /></td>
+                    <td className="hidden px-4 py-3 sm:table-cell"><div className="h-3 w-16 animate-pulse rounded bg-surface-alt" /></td>
+                  </tr>
+                ))
               )}
               {!error && rows.length === 0 && !loading && (
                 <tr>
@@ -181,7 +241,7 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
                         e.stopPropagation();
                         setActiveId(r.posting_id);
                       }}
-                      aria-label={`Open ${r.job_title ?? "posting"}`}
+                      aria-label={r.job_title ? `${t.explore.openPosting} — ${r.job_title}` : t.explore.openPosting}
                       className="line-clamp-2 text-left hover:underline focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
                     >
                       {r.job_title ?? "—"}

@@ -351,6 +351,23 @@ def test_occ_contribution_bars_sum_to_growth(_fig_ds):
     assert np.isclose(sum(by.values()), 100.0)     # +100% overall growth
 
 
+def test_decomposition_base_equals_end_is_zero(_fig_ds):
+    # S05: the year-over-year decompositions compare annual means, so comparing a
+    # year to itself must net to ~0 — no within-year seasonal swing leaks in as
+    # "change". (Under the old June-base vs December-end window this was a large
+    # spurious drop even for base_year == end_year.)
+    from jobads_dashboard.viz.figures import geography as G
+    from jobads_dashboard.viz.figures import industries as I
+    from jobads_dashboard.viz.figures import occupations as O
+
+    occ = O.contribution_bars(_fig_ds, base_year=2024, end_year=2024).data[0]
+    assert np.allclose(np.asarray(occ.x, dtype=float), 0.0)
+    ind = I.contribution_bars(_fig_ds, base_year=2024, end_year=2024).data[0]
+    assert np.allclose(np.asarray(ind.x, dtype=float), 0.0)
+    ss = by_name(G.shift_share_bars(_fig_ds, base_year=2024, end_year=2024))
+    assert np.allclose(np.asarray(ss["Actual change"].x, dtype=float), 0.0)
+
+
 def test_occ_waterfall_reconciles(_fig_ds):
     tr = fig("occupations.waterfall").data[0]
     y = np.asarray(tr.y, dtype=float)

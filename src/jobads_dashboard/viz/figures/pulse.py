@@ -166,4 +166,4 @@ def momentum(ds: DataSource) -> go.Figure:
     add_provisional_band(fig)
     fig.update_yaxes(title_text="3-month avg − 12-month avg (postings)")
     return titled(fig, "Momentum: are postings speeding up or cooling?",
-                  "Gap between the 3-month and 12-month averages · orange = accelerating, teal = cooling")
+                  "Gap between the 3-month and 12-month averages · teal = accelerating, orange = cooling")

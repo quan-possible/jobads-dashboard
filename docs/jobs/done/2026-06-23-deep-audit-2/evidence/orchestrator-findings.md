@@ -1,0 +1,20 @@
+# Orchestrator cross-check findings (hand-verified)
+
+Findings I verified myself by reading source, to merge in synthesis alongside the fan-out.
+
+## ORCH-1 — Login rate-limit IP key is spoofable via leftmost X-Forwarded-For (MEDIUM, security)
+- `api/routers/private.py:59-71` `_client_ip()` honours `X-Forwarded-For` when the socket peer is a trusted proxy (correct so far), but returns `xff.split(",")[0].strip()` — the **leftmost** element.
+- `web/next.config.ts:13-15` proxies `/api/:path*` via Next.js `rewrites()` to the FastAPI origin. Next.js, acting as the proxy, **appends** the connecting client's IP to any incoming `X-Forwarded-For` rather than replacing it. So a request that arrives at Next with a forged `X-Forwarded-For: 9.9.9.9` reaches FastAPI as `9.9.9.9, <real-client-ip>`, and `_client_ip` keys the limiter on `9.9.9.9`.
+- Impact: an attacker rotates the header per request to get a fresh rate-limit bucket each time → the `_auth_rate_check` (8 failures / 15 min) brute-force protection on the single shared password is bypassed. This is a residual of the prior S06 fix — the trust gate was added, but the element selection re-opens the same class of bypass.
+- Fix: with exactly one trusted proxy hop (Next), key on the **rightmost** XFF element (the IP Next itself observed): `xff.split(",")[-1].strip()`. More robust: walk XFF right-to-left skipping known-trusted proxy IPs, or configure a proxy-hop count. Add a unit test that a client-supplied leftmost XFF does not reset the limiter.
+- Confidence: medium — depends on Next's append behaviour for external rewrites; confirm by forging XFF through the proxy and asserting the limiter key. The leftmost-selection bug is real regardless.
+
+## ORCH-2 — Explore default query cold-starts behind an unbounded "Loading…" (MEDIUM, perf/UX)
+- Measured: first `/api/explore/figure?dim=occupation&measure=postings&start_year=2016&end_year=2025` after a fresh API boot = **124.8 s**; a second different combo (industry/wage) right after = 0.26 s; same combo warm via proxy = 0.33 s. One-time warm-up, not per-combo. (124 s measured under dev-server contention — clean prod re-measure warranted; the warm-up + UX are real regardless.)
+- Root cause (code): `api/core.py:125-136` lazily builds the DuckDB `:memory:` connection on first `connection()` call; queries read parquet via `read_parquet('…')` literals (`api/core.py:115-118`) with **no startup warm-up**, so the first explore aggregation pays the full cold read/parse/group-by. `web/components/explore/ExploreView.tsx`/`ExploreBuilder.tsx` auto-fire the default occupation/postings query on mount and render only the bare "Loading…" placeholder with no timeout/skeleton/progress.
+- Impact: the first visitor after every server (re)start — in prod, the first request post-deploy on the single container — sees the explore chart hang for a long time with no feedback; may read as broken.
+- Fix options: (a) warm the cubes at startup (a FastAPI startup hook that runs the default explore aggregation + `latest_month()`/`earliest_month()` once, off the request path); (b) bound the client wait with a skeleton + a "still loading…" affordance and an error fallback after N seconds; (c) persist the cube as a real DuckDB table (CREATE TABLE … AS read_parquet) at startup instead of re-scanning parquet per query. (a)+(b) together is cheapest.
+- Confidence: high on the warm-up cause + unbounded-Loading UX; medium on the exact 124 s under prod.
+
+## Coverage note for synthesis
+- The FastAPI **HTTP endpoints** live in `api/routers/*.py` (read, explore, figures, private) and `api/queries.py`, NOT in the `api/*.py` files I listed in the api-backend finder prompt (those are the logic/data layer). The api-backend agent must reach routers/ + queries.py via Glob; if its findings don't cite them, spawn a supplementary Opus pass over `api/routers/*.py` + `api/queries.py` before closing synthesis. I have personally audited `api/routers/private.py` (auth/security — the highest-risk router) and `api/auth.py` (solid: constant-time compares, iteration bounds 240k–1M, session-secret min length, 503/401/429 handling).

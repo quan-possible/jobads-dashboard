@@ -33,7 +33,9 @@ export function fmtCompact(n: number | null | undefined, locale: Locale = "en"):
 
 export function fmtPct(n: number | null | undefined, opts: { sign?: boolean; locale?: Locale } = {}): string {
   if (n === null || n === undefined) return "—";
-  const s = `${NF1(opts.locale ?? "en").format(Math.abs(n))}%`;
+  // S18: French typography requires a narrow no-break space (U+202F) before "%".
+  const pct = opts.locale === "fr" ? " %" : "%";
+  const s = `${NF1(opts.locale ?? "en").format(Math.abs(n))}${pct}`;
   if (opts.sign) return `${n >= 0 ? "+" : "−"}${s}`;
   return n < 0 ? `−${s}` : s;
 }
@@ -42,10 +44,11 @@ export function fmtWage(n: number | null | undefined, locale: Locale = "en"): st
   if (n === null || n === undefined) return "—";
   // Locale-correct currency: "$25.50" (en) vs "25,50 $" (fr). The symbol comes
   // from the formatter, so callers must not add their own "$" (S17).
+  // U07: lock to 2 decimal places so "$25.00–$25.50" is consistent, not "$25–$25.50".
   return new Intl.NumberFormat(intlLocale(locale), {
     style: "currency",
     currency: "CAD",
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(n);
 }

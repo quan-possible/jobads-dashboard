@@ -78,8 +78,12 @@ def _scope_filters(scope: Scope, q: str | None) -> tuple[str, list]:
         clauses.append("month <= ?")
         params.append(f"{scope.end}-01")
     if q and q.strip():
-        clauses.append("(lower(job_title) LIKE ? OR lower(employer) LIKE ?)")
-        like = f"%{q.strip().lower()}%"
+        # S12: escape LIKE special characters in the user term so that a search
+        # for e.g. "100%" or "_nurse" matches the literal characters rather than
+        # acting as wildcards. The escape character itself must be escaped first.
+        term = q.strip().lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        like = f"%{term}%"
+        clauses.append("(lower(job_title) LIKE ? ESCAPE '\\' OR lower(employer) LIKE ? ESCAPE '\\')")
         params.extend([like, like])
     where = " AND ".join(clauses) if clauses else "TRUE"
     return where, params

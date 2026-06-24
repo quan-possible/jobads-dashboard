@@ -42,6 +42,13 @@ _AUTH_FAILURES: dict[str, list[float]] = {}
 _AUTH_MAX_FAILURES = 8          # allowed failures per window before lockout
 _AUTH_WINDOW = 900.0            # 15 minutes
 
+# Global login-failure ceiling across ALL per-IP keys (S01). A single list of
+# timestamps; if total failures across all IPs within the window exceeds this
+# cap, all further login attempts are rejected. This prevents an attacker from
+# rotating XFF-spoofed per-key buckets to bypass the per-IP lockout.
+_GLOBAL_FAILURES: list[float] = []
+_GLOBAL_MAX_FAILURES = 50       # global cap within _AUTH_WINDOW
+
 # Loopback peers are the single-container default: the Next proxy connects to
 # FastAPI over localhost, so its X-Forwarded-For carries the real client IP.
 # Override with a comma-separated allowlist of proxy socket addresses if the
@@ -62,17 +69,44 @@ def _client_ip(request: Request) -> str:
     Only honour the client-supplied ``X-Forwarded-For`` when the request's
     socket peer is a trusted proxy; otherwise an attacker rotates the header to
     reset their own backoff and brute-forces the shared password (S06). When the
-    peer is untrusted we key on the real socket address."""
+    peer is untrusted we key on the real socket address.
+
+    Single-trusted-hop assumption: the Next.js proxy is the only hop between
+    the internet and FastAPI, running on loopback. In a standard
+    ``client → Next (public) → FastAPI (localhost)`` chain, ``X-Forwarded-For``
+    contains exactly one entry: the IP that *Next observed* (the real client).
+    We take the RIGHTMOST entry so an attacker who adds extra leftmost entries
+    cannot rotate their own bucket. If a multi-proxy topology is ever added,
+    extend ``_JOBADS_API_TRUSTED_PROXY`` with each additional proxy and adjust
+    this logic to remove as many rightmost entries as there are trusted hops."""
     peer = request.client.host if request.client else "unknown"
     if peer in _trusted_proxies():
         xff = request.headers.get("x-forwarded-for")
         if xff:
-            return xff.split(",")[0].strip()
+            return xff.split(",")[-1].strip()
     return peer
 
 
+_AUTH_FAILURES_MAX_KEYS = 1024   # S10: cap dict size to resist memory exhaustion
+
+
 def _auth_rate_check(ip: str) -> None:
+    global _GLOBAL_FAILURES
     now = time.time()
+
+    # S10: sweep stale per-IP keys on every check to keep memory bounded.
+    stale = [k for k, ts in _AUTH_FAILURES.items() if all(now - t >= _AUTH_WINDOW for t in ts)]
+    for k in stale:
+        del _AUTH_FAILURES[k]
+
+    # S10: if the dict is still over the size cap, drop the keys whose most-recent
+    # failure is the oldest (they are the coldest, least-active attackers).
+    if len(_AUTH_FAILURES) > _AUTH_FAILURES_MAX_KEYS:
+        sorted_keys = sorted(_AUTH_FAILURES, key=lambda k: max(_AUTH_FAILURES[k]))
+        for k in sorted_keys[: len(_AUTH_FAILURES) - _AUTH_FAILURES_MAX_KEYS]:
+            del _AUTH_FAILURES[k]
+
+    # Per-IP check.
     fails = [t for t in _AUTH_FAILURES.get(ip, []) if now - t < _AUTH_WINDOW]
     _AUTH_FAILURES[ip] = fails
     if len(fails) >= _AUTH_MAX_FAILURES:
@@ -84,9 +118,21 @@ def _auth_rate_check(ip: str) -> None:
             headers={"Retry-After": str(int(retry))},
         )
 
+    # S01: global ceiling — reject if total failures across ALL keys within the
+    # window exceed the global cap. Prune old entries first.
+    _GLOBAL_FAILURES = [t for t in _GLOBAL_FAILURES if now - t < _AUTH_WINDOW]
+    if len(_GLOBAL_FAILURES) >= _GLOBAL_MAX_FAILURES:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many login attempts. Try again later.",
+            headers={"Retry-After": str(int(_AUTH_WINDOW))},
+        )
+
 
 def _auth_record_failure(ip: str) -> None:
-    _AUTH_FAILURES.setdefault(ip, []).append(time.time())
+    ts = time.time()
+    _AUTH_FAILURES.setdefault(ip, []).append(ts)
+    _GLOBAL_FAILURES.append(ts)
 
 
 def _auth_record_success(ip: str) -> None:

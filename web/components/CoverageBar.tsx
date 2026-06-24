@@ -35,7 +35,7 @@ export function CoverageBar({
       <div className="h-2.5 w-full rounded-sm bg-surface-alt">
         <div
           className={`h-full rounded-sm ${barClass}`}
-          style={{ width: `${share * 100}%` }}
+          style={{ width: `${Math.min(1, share) * 100}%` }}
         />
       </div>
       <p className="mt-1 t-caption text-ink-faint">{fmtCompact(count, locale)} {postingsLabel}</p>

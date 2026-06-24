@@ -96,13 +96,27 @@ def _keychain_password() -> str | None:
     return value or None
 
 
+# S11: cache the keychain presence result so the subprocess fork runs at most
+# once per process. The production env-hash/plain-password paths short-circuit
+# before reaching this and are intentionally NOT cached (they honour runtime env
+# changes without a restart). Only the slow Keychain fallback is memoized.
+_keychain_presence_cache: list[bool | None] = [None]  # list so we can mutate in-place
+
+
+def _keychain_present() -> bool:
+    """Return True if the macOS Keychain has a dev password, cached after first call."""
+    if _keychain_presence_cache[0] is None:
+        _keychain_presence_cache[0] = _keychain_password() is not None
+    return _keychain_presence_cache[0]
+
+
 def auth_configured() -> bool:
     """True if any password source is available (so the surface can be unlocked)."""
     if os.environ.get(PASSWORD_HASH_ENV, "").strip():
         return True
     if os.environ.get(PASSWORD_PLAIN_ENV, "").strip():
         return True
-    return _keychain_password() is not None
+    return _keychain_present()
 
 
 def verify_password(password: str) -> bool:

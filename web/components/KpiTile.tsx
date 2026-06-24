@@ -1,4 +1,5 @@
 import { fmtPct } from "@/lib/format";
+import { common } from "@/lib/i18n/dict/common";
 import type { Locale } from "@/lib/i18n/locale";
 import { Sparkline } from "./Sparkline";
 
@@ -73,6 +74,7 @@ export function KpiTile({
               up ? "text-pos" : "text-neg",
             ].join(" ")}
           >
+            <span className="sr-only">{up ? common[locale].up : common[locale].down}{" "}</span>
             <span aria-hidden>{up ? "▲" : "▼"}</span>
             {fmtPct(Math.abs(delta as number), { locale })}
             {deltaLabel && <span className="font-normal text-ink-faint">{deltaLabel}</span>}

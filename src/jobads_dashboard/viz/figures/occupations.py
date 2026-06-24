@@ -12,13 +12,18 @@ from ..theme import (
     BRAND, CONTEXT, MUTED, SEQUENTIAL, UP, DOWN,
     add_covid_band, add_reference_line,
 )
-from ._common import add_time_slider, titled, treemap_trace
+from ._common import add_time_slider, annual_means, titled, treemap_trace
 
 
 def _window(base_year: int, end_year: int) -> tuple[pd.Timestamp, pd.Timestamp]:
-    """Comparison window — June of the base year → December of the end year (the
-    established convention), now driven by user-selectable years."""
-    return pd.Timestamp(f"{base_year}-06-01"), pd.Timestamp(f"{end_year}-12-01")
+    """Comparison endpoints for the year-over-year decompositions.
+
+    Returns the ``{year}-12-01`` keys that select each year's *annual mean*
+    (see ``annual_means``). Comparing annual averages — not a June-base vs
+    December-end snapshot — keeps the comparison like-for-like and free of the
+    within-year seasonal swing.
+    """
+    return pd.Timestamp(f"{base_year}-12-01"), pd.Timestamp(f"{end_year}-12-01")
 
 
 def _real_groups(df: pd.DataFrame, col: str = "noc_name") -> pd.DataFrame:
@@ -62,20 +67,43 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
 def indexed_lines(ds: DataSource, base_year: int = BASE_YEAR) -> go.Figure:
     nb = _real_groups(ds.noc_broad)
     idx = C.index_to_base(nb, "postings_total", base_year, by="noc_name")
-    latest = idx[idx["month"] == idx["month"].max()].set_index("noc_name")["index"]
-    movers = latest.sort_values(ascending=False)
-    highlight = set(list(movers.index[:2]) + list(movers.index[-1:]))
+    last_month = idx["month"].max()
+    latest = idx[idx["month"] == last_month].set_index("noc_name")["index"]
+    # Cap at 4 biggest movers by absolute distance from 100 (the base line).
+    abs_change = (latest - 100).abs()
+    highlight_names = set(abs_change.nlargest(4).index)
+    # Rise vs fall: final index value vs 100.
+    def _line_color(lbl: str) -> str:
+        return UP if latest.get(lbl, 100) >= 100 else DOWN
+
+    annotations = []
     fig = go.Figure()
     for lbl, sub in idx.groupby("noc_name"):
-        on = lbl in highlight
+        on = lbl in highlight_names
+        sub = sub.sort_values("month")
+        color = _line_color(lbl) if on else CONTEXT
         fig.add_trace(go.Scatter(
             x=sub["month"], y=sub["index"], name=lbl,
-            mode="lines", line=dict(color=BRAND if on else CONTEXT, width=2.6 if on else 1),
-            opacity=1 if on else 0.5, showlegend=on,
+            mode="lines", line=dict(color=color, width=2.6 if on else 1),
+            opacity=1 if on else 0.35, showlegend=on,
             hovertemplate="%{x|%b %Y} · " + lbl + ": %{y:.0f}<extra></extra>"))
+        if on:
+            last_row = sub[sub["month"] == last_month]
+            if not last_row.empty:
+                y_end = float(last_row["index"].iloc[0])
+                annotations.append(dict(
+                    x=last_month, y=y_end,
+                    xref="x", yref="y",
+                    xanchor="left", yanchor="middle",
+                    text=f"<b>{lbl}</b>",
+                    showarrow=False,
+                    font=dict(size=10, color=color),
+                    xshift=6,
+                ))
     add_reference_line(fig, 100, text=f"{base_year}=100")
     add_covid_band(fig)
     fig.update_yaxes(title_text="index (base year = 100)")
+    fig.update_layout(annotations=annotations)
     return titled(fig, "Which occupation groups grew fastest, indexed to a base year",
                   f"Each group indexed to its {base_year} average; fastest/slowest movers highlighted")
 
@@ -87,7 +115,7 @@ def contribution_bars(ds: DataSource, base_year: int = BASE_YEAR,
                       end_year: int | None = None) -> go.Figure:
     end_year = end_year if end_year is not None else ds.latest_complete_year
     base, end = _window(base_year, end_year)
-    nb = _real_groups(ds.noc_broad)
+    nb = annual_means(_real_groups(ds.noc_broad), "postings_total", "noc_name")
     c = C.contribution_to_growth(nb, "noc_name", "postings_total", base, end)
     c["short"] = c["noc_name"].map(_short_label)
     c = c.sort_values("contribution_pp")
@@ -109,7 +137,7 @@ def waterfall(ds: DataSource, base_year: int = BASE_YEAR,
               end_year: int | None = None) -> go.Figure:
     end_year = end_year if end_year is not None else ds.latest_complete_year
     base, end = _window(base_year, end_year)
-    nb = _real_groups(ds.noc_broad)
+    nb = annual_means(_real_groups(ds.noc_broad), "postings_total", "noc_name")
     c = C.contribution_to_growth(nb, "noc_name", "postings_total", base, end)
     c["short"] = c["noc_name"].map(_short_label)
     c = c.sort_values("delta", ascending=False)
@@ -134,7 +162,7 @@ def dumbbell(ds: DataSource, base_year: int = BASE_YEAR,
              end_year: int | None = None) -> go.Figure:
     end_year = end_year if end_year is not None else ds.latest_complete_year
     base, end = _window(base_year, end_year)
-    nb = _real_groups(ds.noc_broad)
+    nb = annual_means(_real_groups(ds.noc_broad), "postings_total", "noc_name")
     b = nb[nb["month"] == base].set_index("noc_name")["postings_total"]
     e = nb[nb["month"] == end].set_index("noc_name")["postings_total"]
     df = pd.DataFrame({"base": b, "end": e}).dropna()

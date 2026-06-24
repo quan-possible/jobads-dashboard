@@ -201,6 +201,11 @@ body {
 .t-body-sm { font-size: 0.86rem; }   /* dense body */
 .t-body    { font-size: 0.92rem; }   /* body */
 
+/* Figure / card title — collapsed from 1.02rem / 1.05rem / 1.08rem / 1.1rem
+   ad-hoc literals (U05). One token for all figure, drawer, and modal titles. */
+:root { --t-figure-title: 1.05rem; }
+.t-figure-title { font-size: var(--t-figure-title); }
+
 /* ------------------------------------------------------------- layout ----- */
 
 .container-x {
