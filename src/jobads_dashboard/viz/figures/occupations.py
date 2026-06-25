@@ -12,7 +12,7 @@ from ..theme import (
     BRAND, CONTEXT, MUTED, SEQUENTIAL, UP, DOWN,
     add_covid_band, add_reference_line,
 )
-from ._common import add_time_slider, annual_means, titled, treemap_trace
+from ._common import add_time_slider, annual_means, cap_columns, cap_other, titled, treemap_trace
 
 
 def _window(base_year: int, end_year: int) -> tuple[pd.Timestamp, pd.Timestamp]:
@@ -46,7 +46,10 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
         nb = nb.copy()
         nb["year"] = nb["month"].dt.year
         years = sorted(nb["year"].unique())
-        agg = {y: nb[nb["year"] == y].groupby("noc_name", as_index=False)["postings_total"].sum()
+        # Cap each year at ten tiles: nine biggest groups + a summed "Other"
+        # (the Unknown bucket and the long tail fold in, so the root stays whole).
+        agg = {y: cap_other(nb[nb["year"] == y].groupby("noc_name", as_index=False)["postings_total"].sum(),
+                            "postings_total", "noc_name", other_label="Other")
                for y in years}
         frames = [go.Frame(name=str(y), data=[treemap_trace(agg[y], "noc_name", "All occupations")]) for y in years]
         fig = go.Figure(data=frames[-1].data, frames=frames)
@@ -58,6 +61,7 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
                       "Area ∝ postings in the selected year — drag the slider or press play")
     cut = nb["month"].max() - pd.DateOffset(months=12)
     g = nb[nb["month"] > cut].groupby("noc_name", as_index=False)["postings_total"].sum()
+    g = cap_other(g, "postings_total", "noc_name", other_label="Other")
     fig = go.Figure(treemap_trace(g, "noc_name", "All occupations"))
     fig.update_layout(height=460, margin=dict(l=8, r=8, t=64, b=8))
     return titled(fig, "What work is posted most: occupation groups by volume",
@@ -191,9 +195,13 @@ def noc_naics_heatmap(ds: DataSource) -> go.Figure:
     g = g[~g["noc_name"].str.contains("Unknown") & ~g["naics_name"].str.contains("Unknown")]
     piv = g.pivot_table(index="noc_name", columns="naics_code", values="postings_total",
                         aggfunc="sum", fill_value=0.0)
+    # Cap the sector columns at ten: keep the nine biggest, fold the rest into one
+    # "Other" column (its postings sum the tail) so no row spreads over >10 cells.
+    piv = cap_columns(piv, other_label="Other")
     norm = piv.div(piv.sum(axis=0).replace(0, np.nan), axis=1) * 100  # column share
     # full sector name on hover (the x tick stays a compact NAICS code)
     code2name = dict(zip(g["naics_code"], g["naics_name"]))
+    code2name["Other"] = "Other sectors"
     sector_names = [code2name.get(c, c) for c in norm.columns]
     customdata = np.tile(sector_names, (len(norm.index), 1))
     fig = go.Figure(go.Heatmap(
@@ -212,7 +220,8 @@ def skill_churn(ds: DataSource, base_year: int = BASE_YEAR,
     in *share of skill mentions* between two years. Share-based so a genuinely new
     skill surfaces without a small-base blow-up. Descriptive 'what's changing in the
     skill mix'; both years are selectable."""
-    df = ds.skill_churn(base_year=base_year, end_year=end_year, top=11)
+    # Five risers + five fallers = ten bars total, the most-moved skills each way.
+    df = ds.skill_churn(base_year=base_year, end_year=end_year, top=5)
     end_year = int(end_year) if end_year is not None else ds.latest_complete_year
     colors = np.where(df["direction"].values == "rising", UP, DOWN)
     fig = go.Figure(go.Bar(

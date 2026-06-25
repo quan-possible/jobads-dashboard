@@ -59,6 +59,12 @@ _DIM_DROP = {
 # Minimum postings before we draw anything (mirrors core.SHARE_MIN_SAMPLE).
 MIN_SAMPLE = 100
 
+# Every Explore chart shows at most this many categories. A broad breakdown
+# (industries, provinces) can exceed it, so additive measures fold the long tail
+# into one "Other" bar (totals preserved) and rate measures keep the largest ten.
+MAX_CATEGORIES = 10
+_OTHER = "__other__"
+
 _I18N: dict[str, dict[str, str]] = {
     "en": {
         "axis_gate": "Pick a different breakdown — you've already filtered to one {dim}.",
@@ -73,6 +79,7 @@ _I18N: dict[str, dict[str, str]] = {
         "two_year_same_year": "Pick two different years to see a change.",
         "share_caveat": "share of all postings (excludes uncategorized)",
         "wage": "median advertised wage",
+        "other": "Other",
         "province": "province",
         "occupation": "occupation",
         "industry": "industry",
@@ -91,6 +98,7 @@ _I18N: dict[str, dict[str, str]] = {
         "two_year_same_year": "Choisissez deux années différentes pour voir une variation.",
         "share_caveat": "part de toutes les offres (hors non classées)",
         "wage": "salaire médian affiché",
+        "other": "Autres",
         "province": "province",
         "occupation": "profession",
         "industry": "secteur",
@@ -279,7 +287,28 @@ def _wage_time_frame(scope: dict[str, str], lo: date | None, hi: date | None) ->
 # --------------------------------------------------------------------------- #
 
 
+def _cap_bar(agg: pd.DataFrame, measure: str) -> pd.DataFrame:
+    """Hold an Explore bar chart to ``MAX_CATEGORIES`` categories.
+
+    Additive measures (postings, share) keep the largest nine and fold the rest
+    into one summed ``Other`` bar, so the total is preserved. Rate measures (yoy,
+    two-year, wage) cannot be averaged into an aggregate, so they keep the ten
+    largest by magnitude instead. Frames already within the cap pass through."""
+    if len(agg) <= MAX_CATEGORIES:
+        return agg
+    if measure in ("postings", "share"):
+        order = agg["value"].sort_values(ascending=False).index
+        kept = agg.loc[order[: MAX_CATEGORIES - 1]]
+        other_val = round(float(agg.loc[order[MAX_CATEGORIES - 1:], "value"].sum()), 2)
+        other = pd.DataFrame([{"category": _OTHER, "value": other_val}])
+        return pd.concat([kept, other], ignore_index=True).sort_values("value")
+    order = agg["value"].abs().sort_values(ascending=False).index
+    return agg.loc[order[:MAX_CATEGORIES]].sort_values("value")
+
+
 def _pretty(dim: str, category: str, locale: str = "en") -> str:
+    if category == _OTHER:
+        return _t(locale, "other")
     if dim == "province":
         return core.PROVINCE_NAMES.get(category, category)
     # occupation / industry: the shared short-name map (en + fr) so the Explore
@@ -443,6 +472,7 @@ def _build_bar(
         # Every category fell below the sample floor (or no rows survived).
         return _message_figure(_t(locale, "low_sample"), locale=locale)
 
+    agg = _cap_bar(agg, measure)
     labels = [_pretty(dim, c, locale) for c in agg["category"]]
     # The breakdown share is against the All-dimension total (Unknown included in
     # the denominator), so disclose that the bars exclude the uncategorized bucket.

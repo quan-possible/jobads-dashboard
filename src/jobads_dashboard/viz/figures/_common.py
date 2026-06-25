@@ -9,6 +9,45 @@ from ..theme import MUTED, SEQUENTIAL, register_templates
 
 register_templates()  # ensure templates exist when figures are built standalone
 
+#: Every visual asset shows at most this many distinct categories/items, so no
+#: chart, bar list, treemap, or heatmap axis overwhelms the reader.
+MAX_CATEGORIES = 10
+
+
+def cap_other(df: pd.DataFrame, value_col: str, label_col: str, *,
+              n: int = MAX_CATEGORIES, other_label: str = "Other",
+              rank_abs: bool = False) -> pd.DataFrame:
+    """Collapse a categorical frame to at most ``n`` rows.
+
+    Keeps the ``n-1`` largest categories (by ``value_col``, or by its absolute
+    value when ``rank_abs``) and folds the rest into a single residual row whose
+    ``value_col`` is the *sum* of the dropped categories — so the column total is
+    preserved. This groups the long tail rather than silently dropping it; frames
+    already within the cap are returned untouched. Callers re-sort as needed.
+    """
+    if len(df) <= n:
+        return df.copy()
+    key = df[value_col].abs() if rank_abs else df[value_col]
+    order = key.sort_values(ascending=False).index
+    kept = df.loc[order[: n - 1]].copy()
+    other_val = df.loc[order[n - 1:], value_col].sum()
+    other = pd.DataFrame([{label_col: other_label, value_col: other_val}])
+    return pd.concat([kept, other], ignore_index=True)
+
+
+def cap_columns(piv: pd.DataFrame, *, n: int = MAX_CATEGORIES,
+                other_label: str = "Other") -> pd.DataFrame:
+    """Cap a pivot table's columns to at most ``n`` by total, folding the rest
+    into one summed ``other_label`` column (used by the column-normalised
+    heatmaps). Totals per row are preserved; renormalise after."""
+    if piv.shape[1] <= n:
+        return piv
+    order = piv.sum(axis=0).sort_values(ascending=False).index
+    keep = list(order[: n - 1])
+    out = piv[keep].copy()
+    out[other_label] = piv.drop(columns=keep).sum(axis=1)
+    return out
+
 
 def annual_means(df: pd.DataFrame, value: str, *group_cols: str,
                  x: str = "month") -> pd.DataFrame:

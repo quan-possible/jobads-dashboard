@@ -13,7 +13,10 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from .. import compute as C
-from ..datasource import BASE_YEAR, PROVINCE_NAMES, DataSource
+from ..datasource import (
+    BASE_YEAR, REGION_NAMES, DataSource,
+    province_region_code, province_region_name,
+)
 from ..theme import BRAND, CONTEXT, DIVERGING, SEQUENTIAL
 from ._common import add_time_slider, annual_means, titled
 
@@ -75,17 +78,25 @@ def demand_map(ds: DataSource, measure: str = "share", animate: str | None = "by
     def _z(year: int) -> pd.DataFrame:
         g = (prov[prov["year"] == year].groupby("province_scope", as_index=False)["postings_total"].sum()
              .rename(columns={"province_scope": "code"}))
-        tot = g["postings_total"].sum()
+        # Fold to <=10 regions (the Atlantic provinces merge) so the choropleth
+        # never carries more than ten distinct values. Sum postings and labour
+        # force per region, compute the measure once, then broadcast the regional
+        # value back onto each province shape so every region colours as a block.
+        g["region"] = g["code"].map(province_region_code)
+        g["lf"] = g["code"].map(lf)
+        reg = g.groupby("region", as_index=False).agg(
+            postings_total=("postings_total", "sum"), lf=("lf", "sum"))
+        tot = reg["postings_total"].sum()
         if measure == "count":
-            g["z"] = g["postings_total"]
+            reg["z"] = reg["postings_total"]
         elif measure == "percap":
-            g["z"] = g["postings_total"] / g["code"].map(lf) * 10000
+            reg["z"] = reg["postings_total"] / reg["lf"] * 10000
         elif measure == "lq":
-            g["z"] = (g["postings_total"] / tot) / (g["code"].map(lf) / lf_total)
+            reg["z"] = (reg["postings_total"] / tot) / (reg["lf"] / lf_total)
         else:  # share
-            g["z"] = g["postings_total"] / tot * 100
-        g["name"] = g["code"].map(PROVINCE_NAMES)
-        return g.dropna(subset=["z"])
+            reg["z"] = reg["postings_total"] / tot * 100
+        reg["name"] = reg["region"].map(REGION_NAMES)
+        return g.merge(reg[["region", "z", "name"]], on="region").dropna(subset=["z"])
 
     def _trace(g: pd.DataFrame, *, with_geo: bool) -> go.Choropleth:
         kw = dict(locations=g["code"], z=g["z"], featureidkey="properties.code",
@@ -114,7 +125,11 @@ def demand_map(ds: DataSource, measure: str = "share", animate: str | None = "by
 
 
 def ranked_provinces(ds: DataSource) -> go.Figure:
-    prov = _last12(ds.province).groupby("province_name", as_index=False)["postings_total"].sum()
+    prov = _last12(ds.province).copy()
+    # Fold the Atlantic provinces into one region so the list stays at <=10 bars
+    # while the postings still sum to the national total.
+    prov["province_name"] = prov["province_name"].map(province_region_name)
+    prov = prov.groupby("province_name", as_index=False)["postings_total"].sum()
     prov = prov.sort_values("postings_total")
     colors = [BRAND if i == len(prov) - 1 else CONTEXT for i in range(len(prov))]
     fig = go.Figure(go.Bar(
@@ -127,7 +142,7 @@ def ranked_provinces(ds: DataSource) -> go.Figure:
                   "The list carries the precise ranking the map cannot")
 
 
-def cma_demand(ds: DataSource, top: int = 18) -> go.Figure:
+def cma_demand(ds: DataSource, top: int = 10) -> go.Figure:
     """City / CMA-level postings — finer than province. The largest metropolitan
     labour markets by posting volume over the last 12 months."""
     _non_metro = r"unknown market|rural area not in a cma"
@@ -165,8 +180,14 @@ def shift_share_bars(ds: DataSource, base_year: int = BASE_YEAR,
                      end_year: int | None = None) -> go.Figure:
     end_year = end_year if end_year is not None else ds.latest_complete_year
     base, end = _window(base_year, end_year)
-    pa = annual_means(ds.province_occupation, "postings_total",
-                      "province_name", "noc_label")
+    # Fold the Atlantic provinces into one region (<=10 bars). Sum the member
+    # provinces per occupation per month *before* averaging the year, so the
+    # regional series is a true total, not a mean across provinces.
+    src = ds.province_occupation.copy()
+    src["province_name"] = src["province_name"].map(province_region_name)
+    src = src.groupby(["province_name", "noc_label", "month"],
+                      as_index=False)["postings_total"].sum()
+    pa = annual_means(src, "postings_total", "province_name", "noc_label")
     ss = C.shift_share(pa, "province_name", "noc_label",
                        "postings_total", base, end)
     ss = ss.sort_values("actual_change")
@@ -189,12 +210,19 @@ def shift_share_bars(ds: DataSource, base_year: int = BASE_YEAR,
 
 
 def _yoy_by_month(prov: pd.DataFrame, month: pd.Timestamp) -> pd.DataFrame:
-    cur = prov[prov["month"] == month].set_index("province_scope")["postings_total"]
-    prev = prov[prov["month"] == month - pd.DateOffset(months=12)].set_index("province_scope")["postings_total"]
-    yoy = ((cur / prev - 1) * 100).dropna()
-    df = pd.DataFrame({"code": yoy.index, "yoy": yoy.values})
-    df["name"] = df["code"].map(PROVINCE_NAMES)
-    return df
+    # Fold to <=10 regions: sum the member provinces' postings, take the regional
+    # YoY, then broadcast it back onto each province shape (Atlantic reads as one).
+    cur = prov[prov["month"] == month].copy()
+    prev = prov[prov["month"] == month - pd.DateOffset(months=12)].copy()
+    cur["region"] = cur["province_scope"].map(province_region_code)
+    prev["region"] = prev["province_scope"].map(province_region_code)
+    rc = cur.groupby("region")["postings_total"].sum()
+    rp = prev.groupby("region")["postings_total"].sum()
+    yoy = ((rc / rp - 1) * 100).dropna()
+    codes = cur[["province_scope", "region"]].drop_duplicates().rename(columns={"province_scope": "code"})
+    codes["yoy"] = codes["region"].map(yoy)
+    codes["name"] = codes["region"].map(REGION_NAMES)
+    return codes.dropna(subset=["yoy"])[["code", "yoy", "name"]]
 
 
 def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en") -> go.Figure:
@@ -249,10 +277,15 @@ def ai_exposure_map(ds: DataSource) -> go.Figure:
     po = _last12(ds.province_occupation).copy()
     ex = ds.ai_exposure.set_index("noc_code")["exposure_beta"]
     po = po.assign(beta=po["noc_code"].map(ex)).dropna(subset=["beta"])
-    prov = po.groupby("province_scope").apply(
+    # Fold to <=10 regions: the posting-weighted exposure is computed over each
+    # region's pooled postings, then broadcast onto its member province shapes.
+    po["region"] = po["province_scope"].map(province_region_code)
+    reg = po.groupby("region").apply(
         lambda d: np.average(d["beta"], weights=d["postings_total"]), include_groups=False)
-    df = pd.DataFrame({"code": prov.index, "z": prov.values})
-    df["name"] = df["code"].map(PROVINCE_NAMES)
+    codes = po[["province_scope", "region"]].drop_duplicates().rename(columns={"province_scope": "code"})
+    codes["z"] = codes["region"].map(reg)
+    codes["name"] = codes["region"].map(REGION_NAMES)
+    df = codes.dropna(subset=["z"])
     fig = go.Figure(go.Choropleth(
         geojson=ds.geojson, locations=df["code"], z=df["z"], featureidkey="properties.code",
         colorscale=SEQUENTIAL, marker_line_color="white", marker_line_width=0.6,

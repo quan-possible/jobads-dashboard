@@ -42,6 +42,13 @@ def coverage_latest_bars(ds: DataSource) -> go.Figure:
     cov = ds.coverage_overall
     latest = cov[cov["month"] == cov["month"].max()].copy()
     latest["label"] = latest["field_name"].map(lambda f: _FIELD_LABELS.get(f, f))
+    # Cap at ten fields: always keep the six key fields, then fill with the
+    # sparsest of the rest so the "read sparse fields with their denominator"
+    # message stays intact (the well-covered extras are the ones dropped).
+    if len(latest) > 10:
+        key = latest[latest["field_name"].isin(_KEY_FIELDS)]
+        rest = latest[~latest["field_name"].isin(_KEY_FIELDS)].sort_values("coverage_pct")
+        latest = pd.concat([key, rest.head(10 - len(key))])
     latest = latest.sort_values("coverage_pct")
     colors = [BRAND if v >= 80 else (CONTEXT if v >= 40 else "#b5523a") for v in latest["coverage_pct"]]
     fig = go.Figure(go.Bar(

@@ -35,6 +35,28 @@ PROVINCE_NAMES = {
     "SK": "Saskatchewan", "YT": "Yukon",
 }
 
+# Every province asset is capped at ten categories. Canada has eleven provinces
+# in the data, so the four contiguous Atlantic provinces fold into one standard
+# region — a meaningful grouping that keeps the count at ten or fewer while
+# preserving the totals (we sum the parts, never drop them). Maps colour the four
+# Atlantic shapes with the shared regional value; bars draw a single Atlantic bar.
+ATLANTIC_CODES = ("NB", "NS", "PE", "NL")
+ATLANTIC_LABEL = "Atlantic Canada"
+_ATLANTIC_NAMES = frozenset(PROVINCE_NAMES[c] for c in ATLANTIC_CODES)
+#: Region code → display name (province names plus the Atlantic aggregate).
+REGION_NAMES = {**PROVINCE_NAMES, "ATL": ATLANTIC_LABEL}
+
+
+def province_region_code(code: str) -> str:
+    """Map a province code to its region code (Atlantic provinces collapse to ATL)."""
+    return "ATL" if code in ATLANTIC_CODES else code
+
+
+def province_region_name(name: str) -> str:
+    """Map a province display name to its region name (Atlantic provinces fold)."""
+    return ATLANTIC_LABEL if name in _ATLANTIC_NAMES else name
+
+
 # Approximate province population centroids for the bubble map (lon, lat).
 PROVINCE_CENTROID = {
     "AB": (-114.4, 53.0), "BC": (-122.9, 50.5), "MB": (-97.8, 52.0), "NB": (-66.2, 46.5),
@@ -208,7 +230,7 @@ class DataSource:
         return sub.sort_values("month").reset_index(drop=True)
 
     def skill_lift(self, occupation_scope: str, month: pd.Timestamp | None = None,
-                   top: int = 15, min_postings: int = 50) -> pd.DataFrame:
+                   top: int = 10, min_postings: int = 50) -> pd.DataFrame:
         """Top skills for an occupation by lift = (occupation share) / (national share).
 
         ``occupation_scope`` is the full 'code | label' scope string used in the skills

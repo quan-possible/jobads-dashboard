@@ -122,7 +122,7 @@ def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
     """What each occupation group requires: the most-requested skills (rows) by broad
     occupation group (columns), each column showing how that occupation's skill
     mentions split across the top skills (column-normalised)."""
-    df = ds.skill_by_occupation(top=16)
+    df = ds.skill_by_occupation(top=10)
     piv = df.pivot_table(index="skill_name", columns="noc_name", values="postings_total",
                          aggfunc="sum", fill_value=0.0)
     # order rows by total demand, columns by total demand — keeps the eye on the corner

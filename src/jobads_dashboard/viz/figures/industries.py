@@ -16,7 +16,9 @@ from ..theme import (
     BRAND, CONTEXT, MUTED, UP, DOWN,
     add_covid_band, add_provisional_band, add_reference_line,
 )
-from ._common import add_time_slider, annual_means, titled, treemap_trace
+from ._common import add_time_slider, annual_means, cap_other, titled, treemap_trace
+
+_OTHER_SECTORS = "Other sectors"
 
 
 def _real(df: pd.DataFrame) -> pd.DataFrame:
@@ -43,7 +45,10 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
         nb = nb.copy()
         nb["year"] = nb["month"].dt.year
         years = sorted(nb["year"].unique())
-        agg = {y: nb[nb["year"] == y].groupby("naics_name", as_index=False)["postings_total"].sum()
+        # Cap each year's tiles at ten: keep the nine biggest sectors, fold the
+        # rest into one "Other sectors" tile (the parts still sum to the whole).
+        agg = {y: cap_other(nb[nb["year"] == y].groupby("naics_name", as_index=False)["postings_total"].sum(),
+                            "postings_total", "naics_name", other_label=_OTHER_SECTORS)
                for y in years}
         frames = [go.Frame(name=str(y), data=[treemap_trace(agg[y], "naics_name", "All industries")]) for y in years]
         fig = go.Figure(data=frames[-1].data, frames=frames)
@@ -55,6 +60,7 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
                       "Area ∝ postings with a NAICS code in the selected year — drag or press play")
     cut = nb["month"].max() - pd.DateOffset(months=12)
     g = nb[nb["month"] > cut].groupby("naics_name", as_index=False)["postings_total"].sum()
+    g = cap_other(g, "postings_total", "naics_name", other_label=_OTHER_SECTORS)
     fig = go.Figure(treemap_trace(g, "naics_name", "All industries"))
     fig.update_layout(height=460, margin=dict(l=8, r=8, t=64, b=8))
     return titled(fig, "Demand by industry sector (where coded)",
@@ -93,6 +99,10 @@ def contribution_bars(ds: DataSource, base_year: int = BASE_YEAR,
     nb = annual_means(_real(ds.naics_broad), "postings_total", "naics_name")
     c = C.contribution_to_growth(nb, "naics_name", "postings_total", base, end)
     c["short"] = c["naics_name"].map(lambda s: s.split("|")[-1].strip()[:30])
+    # Keep the ten largest contributors (by magnitude); fold the rest into one
+    # "Other sectors" bar whose contribution sums the tail, so the bars still add
+    # to the headline change.
+    c = cap_other(c, "contribution_pp", "short", other_label=_OTHER_SECTORS, rank_abs=True)
     c = c.sort_values("contribution_pp")
     colors = np.where(c["contribution_pp"] >= 0, UP, DOWN)
     fig = go.Figure(go.Bar(x=c["contribution_pp"], y=c["short"], orientation="h",
