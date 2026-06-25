@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 import { authStatus, AuthError, login, logout } from "@/lib/explore";
 import { useI18n } from "@/lib/i18n/provider";
 import { PixelTiles } from "@/components/PixelTiles";
-import { ExploreView } from "./ExploreView";
+import { ExploreLockContext } from "./lockContext";
 
 type Phase = "checking" | "locked" | "unconfigured" | "open" | "error";
 
-export function AuthGate() {
+// Wraps the whole Explore surface (both the "Build a chart" and "Find postings"
+// tabs). Until a valid session exists, `children` are never rendered — the
+// password card stands in their place — so the entire tab is team-access, not
+// just the posting lookup. Descendants re-lock on a mid-session 401 through
+// ExploreLockContext.
+export function AuthGate({ children }: { children: React.ReactNode }) {
   const { t } = useI18n();
   const [phase, setPhase] = useState<Phase>("checking");
   const [password, setPassword] = useState("");
@@ -67,7 +72,9 @@ export function AuthGate() {
             {t.common.signOut}
           </button>
         </div>
-        <ExploreView onSessionExpired={() => setPhase("locked")} />
+        <ExploreLockContext.Provider value={() => setPhase("locked")}>
+          {children}
+        </ExploreLockContext.Provider>
       </div>
     );
   }

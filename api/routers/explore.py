@@ -6,21 +6,27 @@ registered charts. The body is the Plotly-encoded JSON string returned verbatim
 (FastAPI's default encoder would choke on the numpy/pandas internals), exactly
 as :mod:`api.routers.figures` does.
 
+The whole Explore surface is team-access: this route requires a valid session
+cookie (``require_session``), the same gate the posting-level lookup uses, so the
+chart data is protected and not merely hidden in the UI.
+
 The figure builder never raises on an awkward combination — its three gates
 (axis / data / sample) return a friendly message figure — so the only 422 here
-comes from query-param validation (a bad ``dim`` / ``measure`` / ``locale``).
+comes from query-param validation (a bad ``dim`` / ``measure`` / ``locale``); an
+unauthenticated request gets a 401 first.
 """
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Query, Response
+from fastapi import APIRouter, Depends, Query, Response
 
 from .. import explore
+from .private import require_session
 
 router = APIRouter(prefix="/api/explore", tags=["explore"])
 
 
-@router.get("/figure")
+@router.get("/figure", dependencies=[Depends(require_session)])
 def explore_figure(
     dim: str = Query(..., pattern="^(province|occupation|industry|time)$"),
     measure: str = Query(..., pattern="^(postings|share|yoy|two_year|wage)$"),

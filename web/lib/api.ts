@@ -44,12 +44,7 @@ export const api = {
   // degrades to a per-figure fallback instead of throwing the whole route (S23).
   figureSafe: (id: string, locale: string, extra: Record<string, string | number | undefined> = {}): Promise<FigJSON | null> =>
     get<FigJSON>(`/api/figure/${id}${qs({}, { locale, ...extra })}`).catch(() => null),
-  // Explore "Build a chart": a self-serve figure built from (dim, measure, scope,
-  // window). The endpoint never throws on an awkward combination — its three gates
-  // return a friendly message figure — so a failed fetch (API down) degrades to null.
-  exploreFigure: (
-    params: Record<string, string | number | undefined>,
-    locale: string,
-  ): Promise<FigJSON | null> =>
-    get<FigJSON>(`/api/explore/figure${qs({}, { ...params, locale })}`).catch(() => null),
+  // The Explore "Build a chart" figure is team-access, so it is fetched
+  // credentialed from the browser (see `fetchExploreFigure` in lib/explore.ts),
+  // not through this public typed client.
 };

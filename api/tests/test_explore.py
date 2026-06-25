@@ -21,10 +21,38 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from api import explore
+from api import auth, explore
 from api.main import app
+from api.routers import private as private_router
 
 client = TestClient(app)
+
+# --------------------------------------------------------------------------- #
+# Auth fixtures — the figure route is now team-access (require_session), so the
+# HTTP tests sign in first, mirroring api/tests/test_private.py.
+# --------------------------------------------------------------------------- #
+
+_PASSWORD = "test-explore-password"
+
+
+@pytest.fixture()
+def _configured(monkeypatch) -> None:
+    monkeypatch.delenv(auth.PASSWORD_HASH_ENV, raising=False)
+    monkeypatch.setenv(auth.PASSWORD_PLAIN_ENV, _PASSWORD)
+    monkeypatch.setenv("JOBADS_API_COOKIE_SECURE", "false")
+
+
+@pytest.fixture(autouse=True)
+def _clear_rate_limit() -> None:
+    private_router._AUTH_FAILURES.clear()
+
+
+@pytest.fixture()
+def signed_in(_configured) -> TestClient:
+    c = TestClient(app)
+    r = c.post("/api/auth", json={"password": _PASSWORD})
+    assert r.status_code == 200 and r.json()["authenticated"] is True
+    return c
 
 # A real, populated scope-label combination present in the cubes.
 ON = "ON"
@@ -268,28 +296,35 @@ def test_no_double_count_bar_total_matches_marginal() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_endpoint_ok_and_verbatim_json() -> None:
-    r = client.get("/api/explore/figure", params={"dim": "time", "measure": "postings"})
+def test_endpoint_requires_auth() -> None:
+    # The whole Explore surface is team-access: no session cookie → 401, before
+    # any figure is built.
+    r = TestClient(app).get("/api/explore/figure", params={"dim": "time", "measure": "postings"})
+    assert r.status_code == 401
+
+
+def test_endpoint_ok_and_verbatim_json(signed_in: TestClient) -> None:
+    r = signed_in.get("/api/explore/figure", params={"dim": "time", "measure": "postings"})
     assert r.status_code == 200
     assert r.headers["content-type"].startswith("application/json")
     body = r.json()
     assert "data" in body and "layout" in body
 
 
-def test_endpoint_validates_dim_and_measure() -> None:
-    assert client.get("/api/explore/figure", params={"dim": "bogus", "measure": "postings"}).status_code == 422
-    assert client.get("/api/explore/figure", params={"dim": "time", "measure": "bogus"}).status_code == 422
+def test_endpoint_validates_dim_and_measure(signed_in: TestClient) -> None:
+    assert signed_in.get("/api/explore/figure", params={"dim": "bogus", "measure": "postings"}).status_code == 422
+    assert signed_in.get("/api/explore/figure", params={"dim": "time", "measure": "bogus"}).status_code == 422
 
 
-def test_endpoint_validates_locale() -> None:
-    ok = client.get("/api/explore/figure", params={"dim": "time", "measure": "postings", "locale": "fr"})
+def test_endpoint_validates_locale(signed_in: TestClient) -> None:
+    ok = signed_in.get("/api/explore/figure", params={"dim": "time", "measure": "postings", "locale": "fr"})
     assert ok.status_code == 200
-    bad = client.get("/api/explore/figure", params={"dim": "time", "measure": "postings", "locale": "de"})
+    bad = signed_in.get("/api/explore/figure", params={"dim": "time", "measure": "postings", "locale": "de"})
     assert bad.status_code == 422
 
 
-def test_endpoint_fr_axis_gate_localized() -> None:
-    r = client.get(
+def test_endpoint_fr_axis_gate_localized(signed_in: TestClient) -> None:
+    r = signed_in.get(
         "/api/explore/figure",
         params={"dim": "province", "measure": "postings", "geo": ON, "locale": "fr"},
     )

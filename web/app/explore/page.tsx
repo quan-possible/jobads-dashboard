@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/explore/AuthGate";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { api } from "@/lib/api";
 import { getServerDict } from "@/lib/i18n/server";
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Explore",
   description:
-    "Build a chart from any breakdown and measure, or search the individual job postings behind the ACLMR aggregates (team access).",
+    "Build a chart from any breakdown and measure, or search the individual job postings behind the ACLMR aggregates. Team access required.",
 };
 
 export default async function ExplorePage() {
@@ -40,7 +41,11 @@ export default async function ExplorePage() {
         </div>
       </section>
       <div className="container-x py-8">
-        <ExploreTabs minYear={minYear} maxYear={maxYear} />
+        {/* The whole Explore surface is team-access: the gate replaces both tabs
+            with the password card until a valid session exists. */}
+        <AuthGate>
+          <ExploreTabs minYear={minYear} maxYear={maxYear} />
+        </AuthGate>
       </div>
     </div>
   );

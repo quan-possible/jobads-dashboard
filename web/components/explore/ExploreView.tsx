@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n/provider";
 import type { Locale } from "@/lib/i18n/locale";
 import type { PostingRow, PostingsResponse } from "@/lib/types";
 import { useFilters } from "@/lib/useFilters";
+import { useExploreLock } from "./lockContext";
 import { PostingDrawer } from "./PostingDrawer";
 
 const SLOW_THRESHOLD_MS = 20_000;
@@ -25,9 +26,10 @@ function rowWage(r: PostingRow, locale: Locale): string {
   return "—";
 }
 
-export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => void }) {
+export function ExploreView() {
   const { filters } = useFilters();
   const { t, locale } = useI18n();
+  const lock = useExploreLock();
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [offset, setOffset] = useState(0);
@@ -39,11 +41,11 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
   const [fetchKey, setFetchKey] = useState(0);
   const tableTop = useRef<HTMLDivElement>(null);
 
-  // S21: Keep the latest onSessionExpired in a ref so it never becomes a
-  // dependency of the fetch effect (same pattern as onCloseRef in PostingDrawer).
-  const onSessionExpiredRef = useRef(onSessionExpired);
+  // S21: Keep the latest lock() in a ref so it never becomes a dependency of the
+  // fetch effect (same pattern as onCloseRef in PostingDrawer).
+  const lockRef = useRef(lock);
   useEffect(() => {
-    onSessionExpiredRef.current = onSessionExpired;
+    lockRef.current = lock;
   });
 
   // Debounce the search box.
@@ -62,8 +64,8 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
     setOffset(0);
   }
 
-  // S09+S21: fetch effect. onSessionExpired is read from a ref so it is never
-  // a dep here — the effect only re-runs when the actual query inputs change.
+  // S09+S21: fetch effect. lock() is read from a ref so it is never a dep here —
+  // the effect only re-runs when the actual query inputs change.
   // Capture the localized fallback error message synchronously so the async
   // .catch branch never closes over a stale `t`.
   const loadingErrorMsg = t.explore.loadingError;
@@ -94,7 +96,7 @@ export function ExploreView({ onSessionExpired }: { onSessionExpired?: () => voi
         if (cancelled) return;
         // Session expired mid-use → hand back to the gate for re-login (S27).
         if (e instanceof AuthError) {
-          onSessionExpiredRef.current?.();
+          lockRef.current();
           return;
         }
         setError(e?.message ?? loadingErrorMsg);

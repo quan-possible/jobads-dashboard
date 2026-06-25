@@ -1,20 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { Select } from "@/components/Select";
-import { api } from "@/lib/api";
+import { AuthError, fetchExploreFigure } from "@/lib/explore";
 import { ALL_GEO, ALL_IND, ALL_OCC, type Option } from "@/lib/options";
 import { useFilters } from "@/lib/useFilters";
 import { useI18n } from "@/lib/i18n/provider";
 import type { FigJSON } from "@/lib/types";
+import { useExploreLock } from "./lockContext";
 
-// The public "Build a chart" tab. The reader picks one breakdown + one measure +
-// a year window; scope (region / occupation / industry) is reused from the shared
-// FilterSpine (the URL). Every change re-fetches /api/explore/figure and swaps the
+// The team-access "Build a chart" tab (rendered only inside an unlocked
+// AuthGate). The reader picks one breakdown + one measure + a year window; scope
+// (region / occupation / industry) is reused from the shared FilterSpine (the
+// URL). Every change re-fetches /api/explore/figure (credentialed) and swaps the
 // chart in place. The backend owns correctness — its three gates (axis / data /
 // sample) return a friendly message figure — so this component never has to
-// reason about empty or incoherent combinations.
+// reason about empty or incoherent combinations. A mid-session 401 re-locks the
+// gate via ExploreLockContext.
 
 type Dim = "province" | "occupation" | "industry" | "time";
 type Measure = "postings" | "share" | "yoy" | "two_year" | "wage";
@@ -49,6 +52,12 @@ export function ExploreBuilder({ minYear, maxYear }: { minYear: number; maxYear:
   const { locale, t } = useI18n();
   const b = t.explore.builder;
   const { filters } = useFilters();
+  const lock = useExploreLock();
+  // Kept in a ref so re-locking on a 401 never becomes a fetch-effect dependency.
+  const lockRef = useRef(lock);
+  useEffect(() => {
+    lockRef.current = lock;
+  });
 
   const [dim, setDim] = useState<Dim>("occupation");
   const [measure, setMeasure] = useState<Measure>("postings");
@@ -75,24 +84,33 @@ export function ExploreBuilder({ minYear, maxYear }: { minYear: number; maxYear:
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    void api
-      .exploreFigure(
-        {
-          dim: effectiveDim,
-          measure,
-          geo: filters.geo,
-          occ: filters.occ,
-          ind: filters.ind,
-          start_year: startYear,
-          end_year: endYear,
-        },
-        locale,
-      )
+    void fetchExploreFigure({
+      dim: effectiveDim,
+      measure,
+      geo: filters.geo,
+      occ: filters.occ,
+      ind: filters.ind,
+      start_year: startYear,
+      end_year: endYear,
+      locale,
+    })
       .then((f) => {
         if (!cancelled) {
           setFig(f);
           setLoading(false);
         }
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        // Session expired mid-use → hand back to the gate for re-login.
+        if (e instanceof AuthError) {
+          lockRef.current();
+          return;
+        }
+        // Any other failure (API down, etc.) degrades to the per-figure
+        // "unavailable" fallback rather than blanking the tab.
+        setFig(null);
+        setLoading(false);
       });
     return () => {
       cancelled = true;

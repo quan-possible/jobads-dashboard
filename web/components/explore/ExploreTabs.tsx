@@ -2,12 +2,14 @@
 
 import { useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n/provider";
-import { AuthGate } from "./AuthGate";
 import { ExploreBuilder } from "./ExploreBuilder";
+import { ExploreView } from "./ExploreView";
 
-// Two tiers of Explore under one page: the public "Build a chart" tool and the
-// team-gated "Find postings" raw lookup. Both sit below the shared FilterSpine,
-// so the region / occupation / industry scope carries across either tab.
+// Two views of Explore under one page: the "Build a chart" tool and the
+// "Find postings" raw lookup. Both sit below the shared FilterSpine, so the
+// region / occupation / industry scope carries across either tab. The whole
+// component renders inside an unlocked AuthGate (see app/explore/page.tsx), so
+// both tabs are team-access.
 
 type Tab = "build" | "find";
 const TABS: Tab[] = ["build", "find"];
@@ -68,7 +70,7 @@ export function ExploreTabs({ minYear, maxYear }: { minYear: number; maxYear: nu
         tabIndex={0}
         className="outline-none"
       >
-        {tab === "build" ? <ExploreBuilder minYear={minYear} maxYear={maxYear} /> : <AuthGate />}
+        {tab === "build" ? <ExploreBuilder minYear={minYear} maxYear={maxYear} /> : <ExploreView />}
       </div>
     </div>
   );

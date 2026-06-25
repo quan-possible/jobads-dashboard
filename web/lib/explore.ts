@@ -2,7 +2,7 @@
 // credentialed (session cookie) and go through the relative `/api` path so the
 // cookie is first-party (a Next rewrite proxies to the FastAPI backend).
 
-import type { AuthStatus, Filters, PostingDetail, PostingsResponse } from "./types";
+import type { AuthStatus, FigJSON, Filters, PostingDetail, PostingsResponse } from "./types";
 
 class AuthError extends Error {}
 
@@ -67,6 +67,26 @@ export async function fetchPostings(query: PostingQuery): Promise<PostingsRespon
     cache: "no-store",
   });
   return jsonOrThrow<PostingsResponse>(res);
+}
+
+// The "Build a chart" figure. Explore is team-access, so this goes through the
+// same credentialed relative path as the posting lookup: the session cookie
+// rides along (first-party, via the Next rewrite) and a 401 surfaces as an
+// AuthError so the gate can re-lock. Unlike the old public client this never
+// silently swallows the error to null.
+export async function fetchExploreFigure(
+  params: Record<string, string | number | undefined>,
+): Promise<FigJSON> {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null && v !== "") p.set(k, String(v));
+  }
+  const s = p.toString();
+  const res = await fetch(`/api/explore/figure${s ? `?${s}` : ""}`, {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  return jsonOrThrow<FigJSON>(res);
 }
 
 export async function fetchPosting(id: string): Promise<PostingDetail> {

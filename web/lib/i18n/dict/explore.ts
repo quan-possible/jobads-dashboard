@@ -7,7 +7,7 @@ export const explore = {
     eyebrow: "Explore",
     hero: "Explore the data your way",
     lede:
-      "Build your own chart from any breakdown and measure — or, with team access, search the individual job postings behind the aggregates. Both use the same region, occupation and industry filters above.",
+      "Build your own chart from any breakdown and measure, or search the individual job postings behind the aggregates. Explore is team-access — sign in with the dashboard password to continue. Both views use the same region, occupation and industry filters above.",
     tabs: {
       build: "Build a chart",
       find: "Find postings",
@@ -36,17 +36,17 @@ export const explore = {
       },
     },
     protected: "Protected",
-    lookupTitle: "Posting-level lookup",
+    lookupTitle: "Sign in to Explore",
     lockedBody:
-      "The individual job postings behind the aggregates are available to the team for verification. Enter the dashboard password to continue.",
+      "Explore — both the chart builder and the posting-level lookup — is reserved for the team. Enter the dashboard password to continue.",
     unconfigured:
-      "Access control isn’t configured on this server, so the private lookup is unavailable here. On the deployed dashboard this view is unlocked with the team password.",
+      "Access control isn’t configured on this server, so Explore is unavailable here. On the deployed dashboard this section is unlocked with the team password.",
     authError: "Couldn’t reach the access service. Confirm the API is running, then reload.",
     signinFailed: "Sign-in failed. Try again.",
     password: "Password",
     unlock: "Unlock",
     unlocking: "Unlocking…",
-    gateHint: "Aggregated views need no sign-in. Only the raw posting lookup is gated.",
+    gateHint: "Only Explore is gated. Every other view on the dashboard is open and needs no sign-in.",
     searchPlaceholder: "Search job title or employer…",
     postings: "postings",
     colPosted: "Posted",
@@ -85,7 +85,7 @@ export const explore = {
     eyebrow: "Explorer",
     hero: "Explorez les données à votre façon",
     lede:
-      "Construisez votre propre graphique à partir de n’importe quelle répartition et mesure — ou, avec un accès d’équipe, cherchez les offres d’emploi individuelles derrière les agrégats. Les deux utilisent les mêmes filtres de région, profession et industrie ci-dessus.",
+      "Construisez votre propre graphique à partir de n’importe quelle répartition et mesure, ou cherchez les offres d’emploi individuelles derrière les agrégats. Explorer est réservé à l’équipe — connectez-vous avec le mot de passe du tableau de bord pour continuer. Les deux vues utilisent les mêmes filtres de région, profession et industrie ci-dessus.",
     tabs: {
       build: "Construire un graphique",
       find: "Trouver des offres",
@@ -114,17 +114,17 @@ export const explore = {
       },
     },
     protected: "Protégé",
-    lookupTitle: "Consultation au niveau des offres",
+    lookupTitle: "Connexion à Explorer",
     lockedBody:
-      "Les offres d’emploi individuelles derrière les agrégats sont accessibles à l’équipe à des fins de vérification. Entrez le mot de passe du tableau de bord pour continuer.",
+      "Explorer — le générateur de graphiques comme la consultation au niveau des offres — est réservé à l’équipe. Entrez le mot de passe du tableau de bord pour continuer.",
     unconfigured:
-      "Le contrôle d’accès n’est pas configuré sur ce serveur; la consultation privée est donc indisponible ici. Sur le tableau de bord déployé, cette vue se déverrouille avec le mot de passe d’équipe.",
+      "Le contrôle d’accès n’est pas configuré sur ce serveur; Explorer est donc indisponible ici. Sur le tableau de bord déployé, cette section se déverrouille avec le mot de passe d’équipe.",
     authError: "Impossible de joindre le service d’accès. Vérifiez que l’API tourne, puis rechargez.",
     signinFailed: "Échec de la connexion. Réessayez.",
     password: "Mot de passe",
     unlock: "Déverrouiller",
     unlocking: "Déverrouillage…",
-    gateHint: "Les vues agrégées ne nécessitent aucune connexion. Seule la consultation brute est protégée.",
+    gateHint: "Seul Explorer est protégé. Toutes les autres vues du tableau de bord sont ouvertes et ne nécessitent aucune connexion.",
     searchPlaceholder: "Rechercher un titre ou un employeur…",
     postings: "offres",
     colPosted: "Affichée",
