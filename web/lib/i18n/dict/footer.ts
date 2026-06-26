@@ -6,6 +6,8 @@ export const footer = {
     dashboard: "Dashboard",
     aboutData: "About the data",
     sourceDefault: "Built from Vicinity online job-ads aggregates.",
+    categoryCap:
+      "Public charts show at most 10 categories, per the Vicinity Jobs API terms of service. Signed-in team members see full detail.",
     dataThrough: "Data through",
     readMethodPre: "Read the",
     readMethodLink: "method & caveats",
@@ -20,6 +22,8 @@ export const footer = {
     dashboard: "Tableau de bord",
     aboutData: "À propos des données",
     sourceDefault: "Établi à partir des agrégats d’offres d’emploi en ligne Vicinity.",
+    categoryCap:
+      "Les graphiques publics affichent au plus 10 catégories, conformément aux conditions d’utilisation de l’API Vicinity Jobs. Les membres de l’équipe connectés voient le détail complet.",
     dataThrough: "Données jusqu’à",
     readMethodPre: "Consultez la",
     readMethodLink: "méthode et les mises en garde",

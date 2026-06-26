@@ -11,6 +11,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 from .. import compute as C
+from .._capctx import category_cap
 from ..datasource import BASE_YEAR, DataSource
 from ..labels import localize_skill, noc_short
 from ..theme import BRAND, CONTEXT, MUTED, SEQUENTIAL, UP, DOWN, add_covid_band, add_provisional_band, add_reference_line
@@ -105,7 +106,7 @@ def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None,
         scopes = ds.noc_broad["occupation_scope"].unique()
         cands = [s for s in scopes if s.startswith("3 |")]
         occupation_scope = cands[0] if cands else scopes[0]
-    df = ds.skill_lift(occupation_scope).sort_values("lift")
+    df = ds.skill_lift(occupation_scope, top=category_cap(10, 25)).sort_values("lift")
     display_names = [localize_skill(n, locale) for n in df["skill_name"]]
     fig = go.Figure(go.Bar(
         x=df["lift"], y=display_names, orientation="h", marker_color=BRAND,
@@ -122,7 +123,7 @@ def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
     """What each occupation group requires: the most-requested skills (rows) by broad
     occupation group (columns), each column showing how that occupation's skill
     mentions split across the top skills (column-normalised)."""
-    df = ds.skill_by_occupation(top=10)
+    df = ds.skill_by_occupation(top=category_cap(10, 25))
     piv = df.pivot_table(index="skill_name", columns="noc_name", values="postings_total",
                          aggfunc="sum", fill_value=0.0)
     # order rows by total demand, columns by total demand — keeps the eye on the corner

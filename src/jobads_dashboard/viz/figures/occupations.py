@@ -12,6 +12,7 @@ from ..theme import (
     BRAND, CONTEXT, MUTED, SEQUENTIAL, UP, DOWN,
     add_covid_band, add_reference_line,
 )
+from .._capctx import category_cap
 from ._common import add_time_slider, annual_means, cap_columns, cap_other, titled, treemap_trace
 
 
@@ -221,7 +222,9 @@ def skill_churn(ds: DataSource, base_year: int = BASE_YEAR,
     skill surfaces without a small-base blow-up. Descriptive 'what's changing in the
     skill mix'; both years are selectable."""
     # Five risers + five fallers = ten bars total, the most-moved skills each way.
-    df = ds.skill_churn(base_year=base_year, end_year=end_year, top=5)
+    # Team view: 12 each side (a fuller churn read; the full skill universe is
+    # thousands of sparse codes, so it stays a top-k either way).
+    df = ds.skill_churn(base_year=base_year, end_year=end_year, top=category_cap(5, 12))
     end_year = int(end_year) if end_year is not None else ds.latest_complete_year
     colors = np.where(df["direction"].values == "rising", UP, DOWN)
     fig = go.Figure(go.Bar(

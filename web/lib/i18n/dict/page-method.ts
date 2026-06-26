@@ -48,6 +48,12 @@ export const methodDict = {
     caveatsEyebrow: "Caveats",
     caveatsTitle: "Things to keep in mind",
 
+    // Category cap figure
+    capEyebrow: "Category limit",
+    capTitle: "Why charts show up to 10 categories",
+    capBody:
+      "Public charts display at most 10 categories — the largest groups, with the remainder folded into a single “Other” bar (totals are preserved, never dropped). This limit is a condition of the Vicinity Jobs API terms of service. Signed-in team members see full, uncapped detail on every chart.",
+
     // Glossary figure
     glossaryEyebrow: "Glossary",
     glossaryTitle: "Key terms defined",
@@ -128,6 +134,12 @@ export const methodDict = {
     // Caveats figure
     caveatsEyebrow: "Mises en garde",
     caveatsTitle: "Points importants à retenir",
+
+    // Category cap figure
+    capEyebrow: "Limite de catégories",
+    capTitle: "Pourquoi les graphiques affichent jusqu’à 10 catégories",
+    capBody:
+      "Les graphiques publics affichent au plus 10 catégories — les plus grands groupes, le reste étant regroupé dans une seule barre « Autres » (les totaux sont préservés, jamais supprimés). Cette limite découle des conditions d’utilisation de l’API Vicinity Jobs. Les membres de l’équipe connectés voient le détail complet, sans plafond, sur chaque graphique.",
 
     // Glossary figure
     glossaryEyebrow: "Glossaire",

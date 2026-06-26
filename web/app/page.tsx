@@ -4,6 +4,7 @@ import { KpiTile } from "@/components/KpiTile";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
+import { figureServer } from "@/lib/api.server";
 import { fmtCompact, fmtInt, fmtMonth, fmtPct, fmtWage } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { pulseDict } from "@/lib/i18n/dict/page-pulse";
@@ -45,13 +46,13 @@ export default async function PulsePage() {
     const [overview, demand, yoy, seasonality, composition, occupationTrends, momentum, diffusion] =
       await Promise.all([
         api.overview(undefined, locale),
-        api.figureSafe("pulse.demand_ribbon", locale),
-        api.figureSafe("pulse.yoy_bars", locale),
-        api.figureSafe("pulse.seasonality", locale),
-        api.figureSafe("pulse.composition", locale),
-        api.figureSafe("pulse.occupation_trends", locale),
-        api.figureSafe("pulse.momentum", locale),
-        api.figureSafe("pulse.diffusion", locale),
+        figureServer("pulse.demand_ribbon", locale),
+        figureServer("pulse.yoy_bars", locale),
+        figureServer("pulse.seasonality", locale),
+        figureServer("pulse.composition", locale),
+        figureServer("pulse.occupation_trends", locale),
+        figureServer("pulse.momentum", locale),
+        figureServer("pulse.diffusion", locale),
       ]);
     data = overview;
     figs = { demand, yoy, seasonality, composition, occupationTrends, momentum, diffusion };

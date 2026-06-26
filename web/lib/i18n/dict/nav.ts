@@ -13,6 +13,15 @@ export const nav = {
     primary: "Primary",
     skipToContent: "Skip to main content",
     brandTagline: "Labour Market",
+    auth: {
+      logIn: "Team log in",
+      signIn: "Sign in",
+      title: "Team sign-in",
+      blurb:
+        "Sign in with the team password to open Explore and see full, uncapped detail on every chart.",
+      teamView: "Team view",
+      fullDetail: "Full detail",
+    },
   },
   fr: {
     pulse: "Tendance",
@@ -28,5 +37,14 @@ export const nav = {
     primary: "Principale",
     skipToContent: "Aller au contenu principal",
     brandTagline: "Marché du travail",
+    auth: {
+      logIn: "Connexion équipe",
+      signIn: "Se connecter",
+      title: "Connexion de l’équipe",
+      blurb:
+        "Connectez-vous avec le mot de passe d’équipe pour ouvrir Explorer et voir le détail complet, sans plafond, sur chaque graphique.",
+      teamView: "Vue équipe",
+      fullDetail: "Détail complet",
+    },
   },
 } as const;

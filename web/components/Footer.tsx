@@ -35,6 +35,7 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
         <div className="flex flex-col gap-3 t-meta text-ink-invert/65">
           <span className="eyebrow text-orange-soft!">{t.footer.aboutData}</span>
           <p>{source ?? t.footer.sourceDefault}</p>
+          <p>{t.footer.categoryCap}</p>
           {asOf && (
             <p className="num">
               {t.footer.dataThrough} {asOf}.

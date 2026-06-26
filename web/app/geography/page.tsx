@@ -4,6 +4,7 @@ import { RemoteFigure } from "@/components/RemoteFigure";
 import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
+import { figureServer } from "@/lib/api.server";
 import { fmtMonth } from "@/lib/format";
 import { geographyDict } from "@/lib/i18n/dict/page-geography";
 import { getLocale } from "@/lib/i18n/server";
@@ -52,15 +53,15 @@ export default async function GeographyPage() {
       aiExposure,
     ] = await Promise.all([
       api.meta(),
-      api.figureSafe("geography.demand_map_share", locale),
-      api.figureSafe("geography.demand_map_count", locale),
-      api.figureSafe("geography.demand_map_percap", locale),
-      api.figureSafe("geography.demand_map_lq", locale),
-      api.figureSafe("geography.ranked_provinces", locale),
-      api.figureSafe("geography.cma_demand", locale),
-      api.figureSafe("geography.yoy_choropleth", locale),
-      api.figureSafe("geography.shift_share", locale),
-      api.figureSafe("geography.ai_exposure", locale),
+      figureServer("geography.demand_map_share", locale),
+      figureServer("geography.demand_map_count", locale),
+      figureServer("geography.demand_map_percap", locale),
+      figureServer("geography.demand_map_lq", locale),
+      figureServer("geography.ranked_provinces", locale),
+      figureServer("geography.cma_demand", locale),
+      figureServer("geography.yoy_choropleth", locale),
+      figureServer("geography.shift_share", locale),
+      figureServer("geography.ai_exposure", locale),
     ]);
     asOf = meta.latest_month;
     figs = {

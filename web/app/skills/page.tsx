@@ -3,6 +3,7 @@ import { RemoteFigure } from "@/components/RemoteFigure";
 import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
+import { figureServer } from "@/lib/api.server";
 import { fmtMonth } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { skillsDict } from "@/lib/i18n/dict/page-skills";
@@ -43,12 +44,12 @@ export default async function SkillsPage() {
   try {
     const [meta, topSkillsTrend, aiSkillDiffusion, skillLift, skillOccupationHeatmap, education, experience] = await Promise.all([
       api.meta(),
-      api.figureSafe("skills.top_skills_trend", locale),
-      api.figureSafe("skills.ai_skill_diffusion", locale),
-      api.figureSafe("skills.skill_lift", locale),
-      api.figureSafe("skills.skill_occupation_heatmap", locale),
-      api.figureSafe("skills.education", locale),
-      api.figureSafe("skills.experience", locale),
+      figureServer("skills.top_skills_trend", locale),
+      figureServer("skills.ai_skill_diffusion", locale),
+      figureServer("skills.skill_lift", locale),
+      figureServer("skills.skill_occupation_heatmap", locale),
+      figureServer("skills.education", locale),
+      figureServer("skills.experience", locale),
     ]);
     asOf = meta.latest_month;
     figs = { topSkillsTrend, aiSkillDiffusion, skillLift, skillOccupationHeatmap, education, experience };

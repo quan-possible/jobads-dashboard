@@ -16,6 +16,7 @@ import pandas as pd
 
 from ..dashboard.constants import ALL_CANADA, ALL_INDUSTRIES, ALL_OCCUPATIONS
 from ..dashboard.data import load_tables
+from ._capctx import UNCAPPED
 from .labels import NAICS_SHORT, NOC_SHORT
 
 # Repo-relative default: <repo>/data/derived/labor_market_dashboard_v1
@@ -48,12 +49,21 @@ REGION_NAMES = {**PROVINCE_NAMES, "ATL": ATLANTIC_LABEL}
 
 
 def province_region_code(code: str) -> str:
-    """Map a province code to its region code (Atlantic provinces collapse to ATL)."""
+    """Map a province code to its region code (Atlantic provinces collapse to ATL).
+
+    Identity for the authenticated team view (``UNCAPPED``): every province keeps
+    its own code, so maps/bars show all provinces individually."""
+    if UNCAPPED.get():
+        return code
     return "ATL" if code in ATLANTIC_CODES else code
 
 
 def province_region_name(name: str) -> str:
-    """Map a province display name to its region name (Atlantic provinces fold)."""
+    """Map a province display name to its region name (Atlantic provinces fold).
+
+    Identity for the authenticated team view (``UNCAPPED``)."""
+    if UNCAPPED.get():
+        return name
     return ATLANTIC_LABEL if name in _ATLANTIC_NAMES else name
 
 

@@ -89,6 +89,37 @@ export async function fetchExploreFigure(
   return jsonOrThrow<FigJSON>(res);
 }
 
+// Client-side figure fetch for the year-anchored charts (TunableFigure). It must
+// use the relative `/api` proxied path with credentials so the httpOnly session
+// cookie rides along first-party (the absolute `NEXT_PUBLIC_API_BASE` carries no
+// cookie and isn't reachable behind the public proxy). Pass `full` from the auth
+// context: the server still gates on a valid session, so `full=1` from a logged-
+// out client is harmless. Resolves to null on failure so one chart degrades
+// gracefully (matches the old public `figureSafe`).
+export async function fetchFigure(
+  id: string,
+  locale: string,
+  extra: Record<string, string | number | undefined> = {},
+  full = false,
+): Promise<FigJSON | null> {
+  const p = new URLSearchParams();
+  const all: Record<string, string | number | undefined> = { locale, ...extra };
+  if (full) all.full = "1";
+  for (const [k, v] of Object.entries(all)) {
+    if (v !== undefined && v !== null && v !== "") p.set(k, String(v));
+  }
+  try {
+    const res = await fetch(`/api/figure/${id}?${p.toString()}`, {
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as FigJSON;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchPosting(id: string): Promise<PostingDetail> {
   const res = await fetch(`/api/postings/${encodeURIComponent(id)}`, {
     credentials: "same-origin",

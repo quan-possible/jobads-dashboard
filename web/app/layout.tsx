@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { fmtMonth } from "@/lib/format";
 import { getServerDict } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/provider";
+import { AuthProvider } from "@/lib/auth/provider";
 
 const ptSans = PT_Sans({
   weight: ["400", "700"],
@@ -62,18 +63,20 @@ export default async function RootLayout({
     <html lang={locale} className={`${ptSans.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-canvas">
         <I18nProvider locale={locale} dict={t}>
-          <a
-            href="#main"
-            className="sr-only z-[100] bg-navy px-4 py-2 text-sm font-bold text-canvas focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:outline focus:outline-2 focus:outline-orange"
-          >
-            {t.nav.skipToContent}
-          </a>
-          <TopNav />
-          <Suspense fallback={<div className="h-[68px] border-b border-card-border bg-surface-alt/70" />}>
-            <FilterSpine />
-          </Suspense>
-          <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
-          <Footer asOf={asOf} />
+          <AuthProvider>
+            <a
+              href="#main"
+              className="sr-only z-[100] bg-navy px-4 py-2 text-sm font-bold text-canvas focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:outline focus:outline-2 focus:outline-orange"
+            >
+              {t.nav.skipToContent}
+            </a>
+            <TopNav />
+            <Suspense fallback={<div className="h-[68px] border-b border-card-border bg-surface-alt/70" />}>
+              <FilterSpine />
+            </Suspense>
+            <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
+            <Footer asOf={asOf} />
+          </AuthProvider>
         </I18nProvider>
       </body>
     </html>

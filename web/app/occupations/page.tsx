@@ -3,6 +3,7 @@ import { RemoteFigure } from "@/components/RemoteFigure";
 import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
+import { figureServer } from "@/lib/api.server";
 import { fmtMonth } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { occupationsDict } from "@/lib/i18n/dict/page-occupations";
@@ -53,14 +54,14 @@ export default async function OccupationsPage() {
       nocNaicsHeatmap,
     ] = await Promise.all([
       api.meta(),
-      api.figureSafe("occupations.treemap", locale),
-      api.figureSafe("occupations.indexed_lines", locale),
-      api.figureSafe("occupations.contribution_bars", locale),
-      api.figureSafe("occupations.waterfall", locale),
-      api.figureSafe("occupations.dumbbell", locale),
-      api.figureSafe("occupations.skill_churn", locale),
-      api.figureSafe("occupations.ai_exposure", locale),
-      api.figureSafe("occupations.noc_naics_heatmap", locale),
+      figureServer("occupations.treemap", locale),
+      figureServer("occupations.indexed_lines", locale),
+      figureServer("occupations.contribution_bars", locale),
+      figureServer("occupations.waterfall", locale),
+      figureServer("occupations.dumbbell", locale),
+      figureServer("occupations.skill_churn", locale),
+      figureServer("occupations.ai_exposure", locale),
+      figureServer("occupations.noc_naics_heatmap", locale),
     ]);
     asOf = meta.latest_month;
     figs = {

@@ -3,6 +3,7 @@ import { RemoteFigure } from "@/components/RemoteFigure";
 import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
+import { figureServer } from "@/lib/api.server";
 import { fmtMonth } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { industriesDict } from "@/lib/i18n/dict/page-industries";
@@ -43,10 +44,10 @@ export default async function IndustriesPage() {
   try {
     const [meta, coverageLine, treemap, shareOverTime, contributionBars] = await Promise.all([
       api.meta(),
-      api.figureSafe("industries.coverage_line", locale),
-      api.figureSafe("industries.treemap", locale),
-      api.figureSafe("industries.share_over_time", locale),
-      api.figureSafe("industries.contribution_bars", locale),
+      figureServer("industries.coverage_line", locale),
+      figureServer("industries.treemap", locale),
+      figureServer("industries.share_over_time", locale),
+      figureServer("industries.contribution_bars", locale),
     ]);
     asOf = meta.latest_month;
     figs = { coverageLine, treemap, shareOverTime, contributionBars };

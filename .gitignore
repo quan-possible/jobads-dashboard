@@ -13,6 +13,7 @@ dist/
 logs/
 output/
 tmp/
+run/
 data/derived/labor_market_dashboard_v1/posting_lookup.parquet
 
 # AI-exposure builder download cache (regenerable from public sources)

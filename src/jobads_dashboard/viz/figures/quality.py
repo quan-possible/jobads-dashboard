@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import plotly.graph_objects as go
 
+from .._capctx import UNCAPPED
 from ..datasource import DataSource
 from ..theme import BRAND, CONTEXT, MUTED, add_provisional_band, add_unstable_band
 from ._common import titled
@@ -45,7 +46,8 @@ def coverage_latest_bars(ds: DataSource) -> go.Figure:
     # Cap at ten fields: always keep the six key fields, then fill with the
     # sparsest of the rest so the "read sparse fields with their denominator"
     # message stays intact (the well-covered extras are the ones dropped).
-    if len(latest) > 10:
+    # The team view (uncapped) shows every field.
+    if not UNCAPPED.get() and len(latest) > 10:
         key = latest[latest["field_name"].isin(_KEY_FIELDS)]
         rest = latest[~latest["field_name"].isin(_KEY_FIELDS)].sort_values("coverage_pct")
         latest = pd.concat([key, rest.head(10 - len(key))])

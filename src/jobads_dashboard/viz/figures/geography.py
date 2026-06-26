@@ -17,6 +17,7 @@ from ..datasource import (
     BASE_YEAR, REGION_NAMES, DataSource,
     province_region_code, province_region_name,
 )
+from .._capctx import category_cap
 from ..theme import BRAND, CONTEXT, DIVERGING, SEQUENTIAL
 from ._common import add_time_slider, annual_means, titled
 
@@ -149,7 +150,10 @@ def cma_demand(ds: DataSource, top: int = 10) -> go.Figure:
     mk = _last12(ds.market)
     mk = mk[~mk["market_label"].str.contains(_non_metro, case=False, regex=True)]
     mk = mk.groupby("market_label", as_index=False)["postings_total"].sum()
-    mk = mk.sort_values("postings_total", ascending=False).head(top).sort_values("postings_total")
+    # Public view: top ``top`` markets. Team view: the 30 largest metros (the
+    # full CMA/CA universe is ~160, mostly tiny agglomerations — a top-k either way).
+    eff_top = category_cap(top, 30)
+    mk = mk.sort_values("postings_total", ascending=False).head(eff_top).sort_values("postings_total")
     mk["prov"] = mk["market_label"].str.split("|").str[0].str.strip()
     mk["city"] = mk["market_label"].str.split("|").str[1].str.strip()
     # Disambiguate any city name shared by more than one province — the "Rural
@@ -169,7 +173,8 @@ def cma_demand(ds: DataSource, top: int = 10) -> go.Figure:
         hovertemplate="%{y} (%{customdata}): %{x:,.0f} postings (12 mo)<extra></extra>"))
     fig.update_xaxes(title_text="postings (last 12 months)")
     fig.update_layout(height=520, margin=dict(l=170))
-    return titled(fig, f"The biggest metropolitan labour markets (top {top} CMAs)",
+    shown = len(mk)
+    return titled(fig, f"The biggest metropolitan labour markets (top {shown} CMAs)",
                   "City-level postings from the census-metropolitan-area cut — finer than the province totals above")
 
 

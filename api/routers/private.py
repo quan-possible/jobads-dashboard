@@ -161,6 +161,14 @@ def require_session(request: Request) -> None:
         )
 
 
+def optional_session(request: Request) -> bool:
+    """FastAPI dependency: ``True`` when a valid session cookie is present, else
+    ``False`` — never raises. Used by public routes (e.g. the figure endpoint)
+    that stay open to everyone but serve fuller detail to the authenticated team
+    view. The caller decides what to unlock; the cookie is the single switch."""
+    return auth.verify_session(request.cookies.get(auth.COOKIE_NAME))
+
+
 def require_lookup() -> None:
     """FastAPI dependency: 503 (not a raw 500) when the posting lookup is absent.
 

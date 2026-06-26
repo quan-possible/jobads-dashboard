@@ -30,6 +30,7 @@ from typing import Callable
 import plotly.graph_objects as go
 import plotly.io as pio
 
+from jobads_dashboard.viz._capctx import UNCAPPED
 from jobads_dashboard.viz.datasource import DataSource
 from jobads_dashboard.viz.labels import (
     NAICS_SHORT,
@@ -305,10 +306,21 @@ def _year_kw(k: dict, *names: str) -> dict:
     return {n: max(lo, min(hi, int(k[n]))) for n in names if k.get(n) is not None}
 
 
-def build(chart_id: str, *, locale: str = "en", **params) -> str:
+def build(chart_id: str, *, locale: str = "en", uncapped: bool = False, **params) -> str:
     """Render a registered factory to a Plotly figure JSON string.
+
+    ``uncapped`` removes the public 10-category cap for the duration of this one
+    render (authenticated team view). It is applied via the request-local
+    :data:`jobads_dashboard.viz._capctx.UNCAPPED` switch — set here, reset in a
+    ``finally`` — so the cap helpers and province folds no-op without threading a
+    flag through every factory signature. ``build`` is synchronous and not cached,
+    so the switch never leaks across requests.
 
     Raises ``KeyError`` for an unknown ``chart_id`` (the router maps that to 404).
     """
-    fig = REGISTRY[chart_id](_ds(), locale=locale, **params)
+    tok = UNCAPPED.set(uncapped)
+    try:
+        fig = REGISTRY[chart_id](_ds(), locale=locale, **params)
+    finally:
+        UNCAPPED.reset(tok)
     return apply_house_style(fig, locale=locale)

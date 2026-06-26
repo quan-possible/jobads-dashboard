@@ -5,12 +5,16 @@ from __future__ import annotations
 import pandas as pd
 import plotly.graph_objects as go
 
+from .._capctx import UNCAPPED
 from ..theme import MUTED, SEQUENTIAL, register_templates
 
 register_templates()  # ensure templates exist when figures are built standalone
 
-#: Every visual asset shows at most this many distinct categories/items, so no
-#: chart, bar list, treemap, or heatmap axis overwhelms the reader.
+#: Every visual asset shows at most this many distinct categories/items in the
+#: public view, so no chart, bar list, treemap, or heatmap axis overwhelms the
+#: reader — and to honour the Vicinity Jobs API terms of service. An authenticated
+#: team viewer is served the full detail (the cap helpers no-op when
+#: :data:`jobads_dashboard.viz._capctx.UNCAPPED` is set).
 MAX_CATEGORIES = 10
 
 
@@ -24,8 +28,10 @@ def cap_other(df: pd.DataFrame, value_col: str, label_col: str, *,
     ``value_col`` is the *sum* of the dropped categories — so the column total is
     preserved. This groups the long tail rather than silently dropping it; frames
     already within the cap are returned untouched. Callers re-sort as needed.
+
+    No-ops (returns every row) for the authenticated team view (``UNCAPPED``).
     """
-    if len(df) <= n:
+    if UNCAPPED.get() or len(df) <= n:
         return df.copy()
     key = df[value_col].abs() if rank_abs else df[value_col]
     order = key.sort_values(ascending=False).index
@@ -39,8 +45,10 @@ def cap_columns(piv: pd.DataFrame, *, n: int = MAX_CATEGORIES,
                 other_label: str = "Other") -> pd.DataFrame:
     """Cap a pivot table's columns to at most ``n`` by total, folding the rest
     into one summed ``other_label`` column (used by the column-normalised
-    heatmaps). Totals per row are preserved; renormalise after."""
-    if piv.shape[1] <= n:
+    heatmaps). Totals per row are preserved; renormalise after.
+
+    No-ops (returns every column) for the authenticated team view (``UNCAPPED``)."""
+    if UNCAPPED.get() or piv.shape[1] <= n:
         return piv
     order = piv.sum(axis=0).sort_values(ascending=False).index
     keep = list(order[: n - 1])

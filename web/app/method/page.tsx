@@ -110,6 +110,13 @@ export default async function MethodPage() {
         </Figure>
       </section>
 
+      {/* Category cap — public charts limited to 10 categories (Vicinity TOS) */}
+      <section className="container-x py-4">
+        <Figure eyebrow={t.capEyebrow} title={t.capTitle}>
+          <p className="t-body leading-relaxed text-ink-soft">{t.capBody}</p>
+        </Figure>
+      </section>
+
       {/* Caveats — text comes from the API, no translation */}
       <section className="container-x py-4">
         <Figure eyebrow={t.caveatsEyebrow} title={t.caveatsTitle}>

@@ -2,6 +2,7 @@ import { Figure } from "@/components/Figure";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { DeepDivider } from "@/components/DeepDivider";
 import { api } from "@/lib/api";
+import { figureServer } from "@/lib/api.server";
 import { fmtMonth } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { wagesDict, type WagesDictEntry } from "@/lib/i18n/dict/page-wages";
@@ -46,13 +47,13 @@ export default async function WagesPage() {
     const [meta, wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, wageByEducation, conditionsMix, languageGap] =
       await Promise.all([
         api.meta(),
-        api.figureSafe("pay.wage_band", locale),
-        api.figureSafe("pay.wage_dumbbell", locale),
-        api.figureSafe("pay.wage_demand_quadrant", locale),
-        api.figureSafe("pay.education_wage_proxy", locale),
-        api.figureSafe("pay.wage_by_education", locale),
-        api.figureSafe("pay.conditions_mix", locale),
-        api.figureSafe("pay.language_gap", locale),
+        figureServer("pay.wage_band", locale),
+        figureServer("pay.wage_dumbbell", locale),
+        figureServer("pay.wage_demand_quadrant", locale),
+        figureServer("pay.education_wage_proxy", locale),
+        figureServer("pay.wage_by_education", locale),
+        figureServer("pay.conditions_mix", locale),
+        figureServer("pay.language_gap", locale),
       ]);
     asOf = meta.latest_month;
     figs = { wageBand, wageDumbbell, wageDemandQuadrant, educationWageProxy, wageByEducation, conditionsMix, languageGap };

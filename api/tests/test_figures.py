@@ -134,3 +134,72 @@ def test_no_causal_language_in_emitted_text():
         blob = figures.build(chart_id).lower()
         for verb in _CAUSAL:
             assert verb not in blob, f"{chart_id}: causal word {verb!r} in figure text"
+
+
+# --------------------------------------------------------------------------- #
+# Uncapped team view: full=1 is honoured only for a valid session.
+# --------------------------------------------------------------------------- #
+
+# A chart whose public cap (10) bites and whose uncapped set is clearly larger:
+# ranked provinces fold the Atlantic four into one bar publicly (≤10) but split
+# into 11 individual provinces for the team view.
+_CAPPED_CHART = "geography.ranked_provinces"
+
+_PASSWORD = "test-figure-password"
+
+
+def _bar_count(blob: str) -> int:
+    """Number of categories on the first bar trace of a figure JSON string."""
+    payload = json.loads(blob)
+    for trace in payload["data"]:
+        y = trace.get("y")
+        if isinstance(y, list):
+            return len(y)
+    raise AssertionError("no bar trace found")
+
+
+@pytest.fixture()
+def _configured(monkeypatch):
+    """A known plaintext password + non-secure cookies (the TestClient talks
+    plain http), mirroring api/tests/test_private.py."""
+    from api import auth
+    from api.routers import private as private_router
+
+    monkeypatch.delenv(auth.PASSWORD_HASH_ENV, raising=False)
+    monkeypatch.setenv(auth.PASSWORD_PLAIN_ENV, _PASSWORD)
+    monkeypatch.setenv("JOBADS_API_COOKIE_SECURE", "false")
+    private_router._AUTH_FAILURES.clear()
+
+
+def test_build_uncapped_has_more_categories():
+    """The figure factory itself returns more categories uncapped than capped."""
+    capped = _bar_count(figures.build(_CAPPED_CHART))
+    full = _bar_count(figures.build(_CAPPED_CHART, uncapped=True))
+    assert full > capped, f"uncapped should exceed capped: {full} vs {capped}"
+
+
+def test_full_without_session_stays_capped():
+    """full=1 from an anonymous client is ignored — the public cap holds and the
+    response stays cacheable (no private/no-store)."""
+    anon = TestClient(app)
+    plain = anon.get(f"/api/figure/{_CAPPED_CHART}")
+    full = anon.get(f"/api/figure/{_CAPPED_CHART}?full=1")
+    assert full.status_code == 200
+    assert _bar_count(full.text) == _bar_count(plain.text)
+    assert "no-store" not in full.headers.get("cache-control", "").lower()
+
+
+def test_full_with_session_is_uncapped_and_private(_configured):
+    """A valid session + full=1 returns the uncapped figure, marked private so it
+    never lands in a shared cache."""
+    c = TestClient(app)
+    assert c.post("/api/auth", json={"password": _PASSWORD}).status_code == 200
+
+    capped = c.get(f"/api/figure/{_CAPPED_CHART}")           # no full → public
+    full = c.get(f"/api/figure/{_CAPPED_CHART}?full=1")      # authed + full → uncapped
+    assert full.status_code == 200
+    assert _bar_count(full.text) > _bar_count(capped.text)
+    cc = full.headers.get("cache-control", "").lower()
+    assert "private" in cc and "no-store" in cc, cc
+    # Without full=1 the same authed client still gets the cacheable public view.
+    assert "no-store" not in capped.headers.get("cache-control", "").lower()

@@ -7,6 +7,7 @@ import { NAV } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n/provider";
 import { Brand } from "./Brand";
 import { LocaleToggle } from "./LocaleToggle";
+import { TopNavAuth } from "./TopNavAuth";
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
@@ -68,6 +69,8 @@ export function TopNav() {
             </nav>
 
             <LocaleToggle />
+
+            <TopNavAuth />
 
             {/* Hamburger — visible below md only */}
             <button

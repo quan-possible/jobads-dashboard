@@ -31,7 +31,7 @@ export const pulseDict = {
     demandEyebrow: "Postings over time",
     demandTitle: "Postings relative to the pre-pandemic norm",
     demandNote: "Index of monthly active postings, January 2019 = 100. Hover for monthly values.",
-    keyPointsTitle: "What stands out",
+    keyPointsTitle: "Automated summary",
     keyPointsNote: "Descriptive signals only — postings show posted demand, not causes.",
 
     // Movers section — one diverging chart, growth + decline on one scale
@@ -141,7 +141,7 @@ export const pulseDict = {
     demandEyebrow: "Offres au fil du temps",
     demandTitle: "Offres par rapport à la norme pré-pandémique",
     demandNote: "Indice des offres actives mensuelles, janvier 2019 = 100. Survolez pour les valeurs mensuelles.",
-    keyPointsTitle: "Ce qui ressort",
+    keyPointsTitle: "Résumé automatisé",
     keyPointsNote: "Signaux descriptifs seulement — les offres montrent la demande affichée, pas les causes.",
 
     // Movers section — un seul graphique divergent
