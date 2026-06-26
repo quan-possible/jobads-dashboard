@@ -14,6 +14,9 @@ export type NavKey =
 export interface NavItem {
   href: string;
   key: NavKey;
+  /** Team-only: hidden from the public nav, revealed only for an authenticated
+   *  session and shown with a distinct (outlined) treatment. */
+  teamOnly?: boolean;
 }
 
 export const NAV: NavItem[] = [
@@ -24,5 +27,5 @@ export const NAV: NavItem[] = [
   { href: "/wages", key: "wages" },
   { href: "/skills", key: "skills" },
   { href: "/method", key: "method" },
-  { href: "/explore", key: "explore" },
+  { href: "/explore", key: "explore", teamOnly: true },
 ];

@@ -21,6 +21,7 @@ export const nav = {
         "Sign in with the team password to open Explore and see full, uncapped detail on every chart.",
       teamView: "Team view",
       fullDetail: "Full detail",
+      teamBadge: "Team",
     },
   },
   fr: {
@@ -45,6 +46,7 @@ export const nav = {
         "Connectez-vous avec le mot de passe d’équipe pour ouvrir Explorer et voir le détail complet, sans plafond, sur chaque graphique.",
       teamView: "Vue équipe",
       fullDetail: "Détail complet",
+      teamBadge: "Équipe",
     },
   },
 } as const;

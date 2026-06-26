@@ -3,11 +3,15 @@
 import Link from "next/link";
 import { NAV } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n/provider";
+import { useAuth } from "@/lib/auth/provider";
 import { PixelTiles } from "./PixelTiles";
 
 export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
   const { t } = useI18n();
+  const { authenticated } = useAuth();
   const year = new Date().getFullYear();
+  // Team-only tabs (Explore) stay out of the public footer too.
+  const navItems = NAV.filter((item) => !item.teamOnly || authenticated);
   return (
     <footer className="mt-20 bg-surface-navy text-ink-invert">
       <div className="gradient-bar" />
@@ -22,7 +26,7 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
 
         <nav aria-label={t.footer.sections} className="flex flex-col gap-2">
           <span className="eyebrow text-orange-soft!">{t.footer.dashboard}</span>
-          {NAV.map((item) => (
+          {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="w-fit t-body text-ink-invert/80 transition-colors hover:text-orange-soft">
               {t.nav[item.key]}
             </Link>

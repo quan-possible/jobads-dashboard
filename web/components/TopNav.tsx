@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n/provider";
+import { useAuth } from "@/lib/auth/provider";
 import { Brand } from "./Brand";
 import { LocaleToggle } from "./LocaleToggle";
 import { TopNavAuth } from "./TopNavAuth";
@@ -17,7 +18,12 @@ function isActive(pathname: string, href: string): boolean {
 export function TopNav() {
   const pathname = usePathname();
   const { t } = useI18n();
+  const { authenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Team-only tabs (Explore) are hidden from the public nav and revealed only
+  // once a valid team session exists.
+  const navItems = NAV.filter((item) => !item.teamOnly || authenticated);
 
   // Close on route change
   useEffect(() => {
@@ -44,8 +50,28 @@ export function TopNav() {
           <div className="flex items-center gap-2 md:gap-3">
             {/* Desktop nav — hidden below md */}
             <nav aria-label={t.nav.primary} className="-mx-2 hidden items-center overflow-x-auto md:flex">
-              {NAV.map((item) => {
+              {navItems.map((item) => {
                 const active = isActive(pathname, item.href);
+                // The team-only tab reads as a distinct outlined pill (not an
+                // underline tab) so it is clearly the gated, full-detail view.
+                if (item.teamOnly) {
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      className={[
+                        "mx-2 flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 t-meta font-bold uppercase tracking-[0.01em] transition-colors",
+                        active
+                          ? "border-orange bg-orange/10 text-orange"
+                          : "border-orange/45 text-orange hover:border-orange hover:bg-orange/10",
+                      ].join(" ")}
+                    >
+                      <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-orange" />
+                      {t.nav[item.key]}
+                    </Link>
+                  );
+                }
                 return (
                   <Link
                     key={item.href}
@@ -125,7 +151,7 @@ export function TopNav() {
         style={{ transitionTimingFunction: "var(--ease)" }}
       >
         <div className="container-x py-2">
-          {NAV.map((item) => {
+          {navItems.map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <Link
@@ -134,19 +160,24 @@ export function TopNav() {
                 aria-current={active ? "page" : undefined}
                 onClick={() => setMenuOpen(false)}
                 className={[
-                  "relative flex min-h-[44px] items-center border-b border-card-border/50 t-body font-bold uppercase last:border-b-0",
+                  "relative flex min-h-[44px] items-center gap-2 border-b border-card-border/50 t-body font-bold uppercase last:border-b-0",
                   "pl-4 transition-colors duration-150",
-                  active ? "text-navy-deep" : "text-ink-soft hover:text-navy",
+                  item.teamOnly ? "text-orange" : active ? "text-navy-deep" : "text-ink-soft hover:text-navy",
                 ].join(" ")}
               >
-                {/* Left orange accent bar for active item */}
+                {/* Left accent bar: always on for the team tab, on-when-active otherwise */}
                 <span
                   className={[
                     "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-orange transition-opacity duration-200",
-                    active ? "opacity-100" : "opacity-0",
+                    item.teamOnly || active ? "opacity-100" : "opacity-0",
                   ].join(" ")}
                 />
                 {t.nav[item.key]}
+                {item.teamOnly && (
+                  <span className="rounded-full border border-orange/45 px-1.5 py-0.5 t-caption font-bold uppercase tracking-[0.04em] text-orange">
+                    {t.nav.auth.teamBadge}
+                  </span>
+                )}
               </Link>
             );
           })}
