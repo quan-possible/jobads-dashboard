@@ -2,7 +2,7 @@
 
 - **Created:** 2026-06-25
 - **Branch:** `feat/login-uncapped` (based on `redesign2`)
-- **Status:** IMPLEMENTED, VERIFIED, AND COMMITTED LOCALLY. Commits `4ac896f7` and `c15cc6e3` are not contained by a remote branch and have not been promoted to `main`. See "Implementation outcome" at the end.
+- **Status:** IMPLEMENTED, VERIFIED, COMMITTED, AND PUBLISHED on `origin/feat/login-uncapped`. Commits `4ac896f7` and `c15cc6e3` have not been promoted to `main`. See "Implementation outcome" at the end.
 - **Depends on:** [2026-06-25-ten-category-cap](../../done/2026-06-25-ten-category-cap/JOB.md) (this job makes that completed cap conditional on auth)
 
 ## Goal
@@ -300,8 +300,8 @@ isolated stack (API :8531 + `next dev`) — capped/uncapped counts, `private,no-
 uncapped, cookie through the Next proxy, disclosure + relabel render EN/FR. Public launchd 8530/8522/ngrok
 left untouched. Known: one pre-existing-class lint error in `provider.tsx` (`set-state-in-effect`).
 
-**Remaining:** decide whether and where to push or merge `feat/login-uncapped`; re-run
-current verification before promotion; set `JOBADS_DASHBOARD_PASSWORD(_HASH)` and
+**Remaining:** integrate the 10 `origin/main`-only commits and decide whether to merge
+`feat/login-uncapped`; re-run current verification before promotion; set `JOBADS_DASHBOARD_PASSWORD(_HASH)` and
 `JOBADS_API_SESSION_SECRET` through the deployment's secret owner; then rebuild/restart
 the deployed stack as required. Current service health alone does not prove that its
 compiled web bundle matches these commits.

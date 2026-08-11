@@ -39,6 +39,7 @@ Last condensed: 2026-08-11
 
 - The repository adopted the current project-memory split: `STATUS.md` for live orientation, this bounded file for progressively condensed history, dated memory for chronological reconstruction, and jobs for detailed task continuity.
 - `AGENTS.md` and `README.md` now route each kind of project truth to one owner. The pre-migration `MEMORY.md` was preserved under `archive/memory/versions/` before condensation.
+- The migration was committed as `f2a11741`, and `feat/login-uncapped` was published to `origin`; integration with `main` remains a separate decision.
 
 ## 2026-08-11 | Components published as a design system
 
