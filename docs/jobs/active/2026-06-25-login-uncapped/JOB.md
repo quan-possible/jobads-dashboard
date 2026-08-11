@@ -1,9 +1,9 @@
 # Job: Team login unlocks uncapped charts (+ Pulse text-block relabel)
 
 - **Created:** 2026-06-25
-- **Branch:** redesign2 (work to happen on a feature branch off it)
-- **Status:** IMPLEMENTED & verified 2026-06-25 on branch `feat/login-uncapped` (NOT committed). See "Implementation outcome" at the end.
-- **Depends on:** [2026-06-25-ten-category-cap](../2026-06-25-ten-category-cap/JOB.md) (this job makes that cap conditional on auth)
+- **Branch:** `feat/login-uncapped` (based on `redesign2`)
+- **Status:** IMPLEMENTED, VERIFIED, AND COMMITTED LOCALLY. Commits `4ac896f7` and `c15cc6e3` are not contained by a remote branch and have not been promoted to `main`. See "Implementation outcome" at the end.
+- **Depends on:** [2026-06-25-ten-category-cap](../../done/2026-06-25-ten-category-cap/JOB.md) (this job makes that completed cap conditional on auth)
 
 ## Goal
 
@@ -210,7 +210,7 @@ the `cap_other`/`cap_columns`/province-fold sites.
 
 Amend Scope Guardrail #5 in [AGENTS.md](../../../../AGENTS.md) so the cap is explicitly the
 **public** contract and the authenticated team view is exempt (shows full detail). This is a
-long-lived instruction edit ⇒ **must follow the `/writing` agent-instructions route** and
+long-lived instruction edit ⇒ **must use `$instructions`** and
 take a timestamped backup in `tmp/` first (per global contract).
 
 ## Workstream B — Pulse text-block relabel (small, but D4 is open)
@@ -235,10 +235,10 @@ Keep `test_no_causal_language` green.
   (c) uncapped response carries `Cache-Control: private, no-store`; (d) Explore returns
   uncapped (D2). Keep `test_no_causal_language` green for Workstream B.
 - `tsc` + `next build` for the web changes.
-- Live check on the canonical deploy (launchd :8530 API + :8522 web + ngrok, per
-  [deploy-topology memory]): public view capped; after team login, a known >10-category
+- Live check on the canonical deploy (launchd :8530 API + :8522 web; use the current
+  tunnel topology in `AGENTS.md`): public view capped; after team login, a known >10-category
   chart (e.g. industries treemap, ranked provinces showing all provinces incl. split
-  Atlantic, skill churn) renders uncapped; EN **and** FR. Confirm public ngrok still 403s
+  Atlantic, skill churn) renders uncapped; EN **and** FR. Confirm the public tunnel still 403s
   unauthenticated for Explore.
 - Invoke the `verification` skill; read `references/instruction-verification.md` before the
   AGENTS.md edit.
@@ -266,7 +266,7 @@ Keep `test_no_causal_language` green.
 
 ## Implementation outcome (2026-06-25, branch `feat/login-uncapped`)
 
-Built, verified, **not committed**. Plus one addition the user asked for during
+Built, verified, and committed locally as `4ac896f7` and `c15cc6e3`. Plus one addition the user asked for during
 implementation: a **Vicinity Jobs API terms-of-service disclosure** of the 10-category
 public cap (footer line, EN+FR; a method-page "Category limit" section, EN+FR).
 
@@ -300,7 +300,8 @@ isolated stack (API :8531 + `next dev`) — capped/uncapped counts, `private,no-
 uncapped, cookie through the Next proxy, disclosure + relabel render EN/FR. Public launchd 8530/8522/ngrok
 left untouched. Known: one pre-existing-class lint error in `provider.tsx` (`set-state-in-effect`).
 
-**Remaining:** commit `feat/login-uncapped`; set `JOBADS_DASHBOARD_PASSWORD(_HASH)` + `JOBADS_API_SESSION_SECRET`
-on the deploy; restart the API to ship the new code (the figure cube also needs the usual deploy-time refresh).
-</content>
-</invoke>
+**Remaining:** decide whether and where to push or merge `feat/login-uncapped`; re-run
+current verification before promotion; set `JOBADS_DASHBOARD_PASSWORD(_HASH)` and
+`JOBADS_API_SESSION_SECRET` through the deployment's secret owner; then rebuild/restart
+the deployed stack as required. Current service health alone does not prove that its
+compiled web bundle matches these commits.

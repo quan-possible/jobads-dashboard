@@ -6,9 +6,10 @@
 
 ## Getting Started
 1. Read `AGENTS.md` for execution rules.
-2. Read `MEMORY.md` for current priorities and risks.
-3. Read the latest files in `memory/` for recent history and evidence.
-4. Read `docs/analyses/labor_market_dashboard_spec/report.md` before planning or implementation.
+2. Read `STATUS.md` for current priorities, risks, and next actions.
+3. Read `MEMORY.md` for bounded historical orientation.
+4. Read the relevant active job and canonical document. Open dated files in `memory/` only when more historical detail is needed.
+5. Read `docs/analyses/labor_market_dashboard_spec/report.md` before dashboard planning or implementation.
 
 ## Environment
 
@@ -83,7 +84,7 @@ The private `Explore` posting lookup is gated by the API. Configure the password
 - `JOBADS_DASHBOARD_PASSWORD_HASH=<pbkdf2_sha256 hash>` (production), or
 - `JOBADS_DASHBOARD_PASSWORD=<plain>` (local dev only).
 
-Do not commit the password or the hash into the repository. On the Mac mini the public password is read from the macOS Keychain rather than an env var.
+Do not commit the password or the hash into the repository. macOS Keychain is the intended password source on the Mac Mini, but the entry must be verified before any password-bearing handoff. As of 2026-08-11 the documented lookup returns exit 44, so stop until the user restores or confirms the credential source.
 
 ## Render Hosting
 
@@ -177,19 +178,24 @@ Direct UI verification should inspect the actual Next.js UI in the browser, not 
   - `../jobads-data/main/docs/plans/README.md`
 
 ## Project Layout
-- `docs/analyses/labor_market_dashboard_spec/`: implementation contract for the dashboard.
-- `docs/jobs/`: ongoing and archived job continuity notes.
+- `docs/analyses/labor_market_dashboard_spec/`: product and metric contract plus the original version 1 implementation baseline.
+- `docs/jobs/active/`: unfinished job continuity.
+- `docs/jobs/done/`: completed job records and verification evidence.
+- `docs/jobs/archive/`: legacy job records kept for recovery.
 - `src/jobads_dashboard/`: reusable dashboard implementation code.
 - `data/derived/`: project-local aggregated dashboard data products.
-- `memory/`: dated project history and evidence-backed updates.
+- `memory/`: chronological project-history source records.
+- `tmp/`: disposable or reproducible scratch.
+- `archive/`: recovery material.
 
 ## Documentation Map
-- `AGENTS.md`: execution rules and collaboration contract.
-- `MEMORY.md`: current objective, active focus, next actions, and blockers.
-- `memory/YYYY-MM-DD.md`: dated project history and evidence-backed updates.
-- `docs/analyses/labor_market_dashboard_spec/report.md`: canonical implementation contract.
+- `AGENTS.md`: project-specific execution rules, boundaries, and routing.
+- `STATUS.md`: current position, priorities, next actions, risks, and owners.
+- `MEMORY.md`: bounded, progressively condensed historical index.
+- `memory/YYYY-MM-DD.md`: chronological source records for history and reconstruction.
+- `docs/analyses/labor_market_dashboard_spec/report.md`: canonical product and metric contract and original version 1 baseline.
 - `docs/analyses/labor_market_dashboard/README.md`: dashboard runbook, screenshots, and operator notes.
-- `docs/jobs/`: live continuity notes for longer-running work.
+- `docs/jobs/active/`, `docs/jobs/done/`, `docs/jobs/archive/`: unfinished, completed, and legacy job records. Loose `docs/jobs/*-ongoing.md` files are pre-migration records awaiting reconciliation.
 
 ## Current Runtime Surface
 

@@ -1,9 +1,9 @@
 # Cap every dashboard asset at 10 categories
 
-**Status:** IMPLEMENTED & VERIFIED (EN + FR), **not committed**. The user reviewed the
-plan and chose to keep the working-tree implementation and finish the live render pass.
-The 4 design questions below are recorded for confirmation but were resolved as the plan
-describes. Commit/deploy only on the user's go-ahead.
+**Status:** COMPLETED — IMPLEMENTED, VERIFIED (EN + FR), COMMITTED, AND PUSHED TO
+`origin/redesign2` through commits `a184c1b1`, `b97921e5`, and `2434787b`. The work is
+also part of the local `feat/login-uncapped` branch but has not been promoted to `main`.
+The four design questions below remain as the decision record.
 
 **Branch:** `redesign2`. **Date:** 2026-06-25.
 
@@ -136,27 +136,27 @@ viz + API layers.
    (e.g. demand_map 8 regions, cma_demand 10, skill_churn 10, heatmaps 10×10).
 3. **Golden + unit tests** — `pytest` incl. `tests/golden/`. The golden corpus is tiny
    (3 provinces, few skills) so most caps are no-ops there; review any diffs.
-4. **Live render pass** — per `AGENTS.md` rule 6/7, deploy on port 8520 / ngrok and
+4. **Live render pass** — at planning time this meant port 8520 / ngrok; current deployment
+   verification must follow the topology in `AGENTS.md`. In either case,
    eyeball the riskiest changes in **EN and FR**: the choropleths (Atlantic colours as
    one block, hover says "Atlantic Canada"), the two treemaps ("Other"/"Other sectors"
    tile), `skill_churn` (5+5), the NOC×NAICS heatmap ("Other" column), and an Explore
    industry breakdown ("Other"/"Autres" bar).
 
-## Risks & open questions
+## Resolved decisions and retained tradeoffs
 
 - **Atlantic fold on maps** loses province-level detail for NB/NS/PE/NL and is a
-  visible editorial change to a carefully-designed dashboard. Confirm this is wanted vs.
-  the lighter alternative of "top 9 provinces + Other (which would just be NT)".
+  visible editorial change, but it is the accepted public grouping; authenticated team
+  view restores province detail.
 - **`wage_dumbbell` inconsistency** (10 separate provinces while other province charts
-  show "Atlantic Canada") — accepted because wage quantiles can't be folded. Confirm.
+  show "Atlantic Canada") is accepted because wage quantiles cannot be folded honestly.
 - **`coverage_latest_bars`** drops 3 well-covered fields to fit 10; the trust page's
-  intent is "show every field's completeness". Confirm the key-fields-plus-sparsest
-  selection is acceptable, or exempt this chart as a methods-page special case.
-- **`Unknown` buckets** now fold into "Other" on the occupation treemap. Confirm that
-  reading (vs. keeping a labelled `Unknown` tile and dropping a real group instead).
-- **Golden review:** confirm no golden diff is a real regression, only the intended cap.
+  key-fields-plus-sparsest selection is the accepted public presentation.
+- **`Unknown` buckets** fold into "Other" on the public occupation treemap; this is the
+  accepted reading rather than displacing a real occupation group.
+- **Golden review:** completed without a material regression; diffs reflected the intended cap.
 
-## Reference implementation (already in the working tree, verified)
+## Reference implementation (verified and now on `origin/redesign2`)
 
 This plan was validated end-to-end before being written down. The 8 files above were
 edited and checked:
@@ -176,8 +176,10 @@ edited and checked:
   - `skill_churn_en` — 5 risers + 5 fallers = 10.
   - `skill_lift_en` — 10 bars.
   - `explore_industry_{en,fr}` — 10 bars; folded bar localized "Other" / "Autres".
-- **Not done:** no commit; no ngrok/8520 deploy (the detached prod services on
-  :8531/:3100 still run the pre-edit commit and were intentionally left untouched).
+- **Checkpoint limit:** the original 2026-06-25 evidence did not include a commit or
+  ngrok/8520 deployment; the detached services on :8531/:3100 were intentionally left
+  untouched. The changes were later committed and pushed to `origin/redesign2`, but that
+  historical render pass does not establish the current deployed version.
 
 Files edited (all clean before this session, so reverting is isolated): `datasource.py`,
 `figures/_common.py`, `figures/{geography,industries,occupations,skills,quality}.py`,

@@ -1,6 +1,6 @@
 """Build every dashboard asset and report its category count.
 
-Run from the repo root:  PYTHONPATH=src .venv/bin/python docs/jobs/active/2026-06-25-ten-category-cap/evidence/count_categories.py
+Run from the repo root:  PYTHONPATH=src .venv/bin/python docs/jobs/done/2026-06-25-ten-category-cap/evidence/count_categories.py
 
 Counts, per trace: horizontal-bar y / vertical-bar x (datetime axes = 0, i.e. time),
 treemap tiles (labels - root), heatmap max(rows, cols), choropleth distinct z,

@@ -1,23 +1,26 @@
 # Repository Guidelines
 
-## Required Pre-Read
-1. Read `AGENTS.md`.
-2. Read any skill, workflow, profile, or prompt restriction implicated by the prompt.
-3. Read `MEMORY.md` and `memory/YYYY-MM-DD.md` only if allowed.
-4. Read everything else only after that.
-5. Read the matching `docs/jobs/*-ongoing.md` file when the task matches an active dashboard job.
-6. Before planning or edits related to the dashboard product, read `docs/analyses/labor_market_dashboard_spec/report.md`.
+## Required Startup
+1. Read this file and any skill or workflow implicated by the request.
+2. Read `STATUS.md` for the live project position.
+3. Read `MEMORY.md` for bounded historical orientation.
+4. Read the relevant canonical owner and any overlapping job under `docs/jobs/active/`.
+5. Open `memory/YYYY-MM-DD.md` only when historical detail, verification, or reconstruction requires it.
+6. Before planning or editing the dashboard product, read `docs/analyses/labor_market_dashboard_spec/report.md`.
 
-## State Model
-1. `AGENTS.md` defines behavior and policy only.
-2. Matching `docs/jobs/*-ongoing.md` files are the canonical live continuity surface for in-progress work.
-3. `MEMORY.md` and `memory/YYYY-MM-DD.md` are the canonical durable and daily memory layers.
-4. `docs/analyses/<slug>/` is the canonical home for durable dashboard specs, screenshots, and writeups.
-5. Reusable implementation belongs in `src/jobads_dashboard/`.
-6. Temporary artifacts belong in `tmp/` once that directory exists.
+## Documentation And State Owners
+1. `AGENTS.md` owns durable project-specific behavior, boundaries, and document routing.
+2. `README.md` owns the human-facing purpose, setup, architecture, and documentation map.
+3. `STATUS.md` owns the compact live position, priorities, next actions, risks, and current owners.
+4. `MEMORY.md` is the bounded, progressively condensed historical index; `memory/YYYY-MM-DD.md` is its chronological source layer.
+5. `docs/analyses/labor_market_dashboard_spec/report.md` owns the product and metric contract and the original version 1 implementation baseline. `README.md` describes the current runtime architecture.
+6. `docs/analyses/<slug>/` owns durable specifications, investigations, screenshots, and operator writeups.
+7. `docs/jobs/active/` owns unfinished continuity, `docs/jobs/done/` owns completed work and its evidence, and `docs/jobs/archive/` preserves legacy records. Loose `docs/jobs/*-ongoing.md` files are pre-migration continuity to preserve until reconciled; do not create new loose jobs.
+8. Reusable implementation belongs in `src/jobads_dashboard/`; project-local derived data belongs in `data/derived/`.
+9. `tmp/` is disposable scratch and `archive/` is recovery material.
 
 ## Critical Must-Read
-- `docs/analyses/labor_market_dashboard_spec/report.md`: canonical implementation contract for the dashboard.
+- `docs/analyses/labor_market_dashboard_spec/report.md`: canonical product and metric contract and original version 1 implementation baseline.
 - `README.md`: project purpose, upstream dependencies, and doc map.
 
 ## Upstream Dependencies
@@ -31,11 +34,11 @@
 2. Keep changes targeted and readable; prefer existing modules over broad rewrites.
 3. Build the aggregate layer first, then the UI layer.
 4. Store project-local derived dashboard data in this repo rather than writing aggregates back into the upstream data repo.
-5. Update `MEMORY.md` and the relevant `memory/YYYY-MM-DD.md` file after material project changes.
-6. After any page/dashboard UI change or page bug fix, deploy the updated page through the project ngrok path before sign-off.
-7. Treat `http://127.0.0.1:8520` plus the current live ngrok URL as the canonical deployment target for this repo. Reuse that exact live URL whenever the existing tunnel is still active instead of creating a fresh tunnel.
-8. If the canonical ngrok tunnel is no longer active and the URL must rotate, bring the page back up on port `8520`, create or reconnect the tunnel, and explicitly report the new live URL in the handoff instead of implying the old URL still works.
-9. The public Mac Mini dashboard password is stored in macOS Keychain, not in repo files. When the password is needed, retrieve it with `security find-generic-password -a jobads-dashboard-public -s jobads-dashboard-public-password -w`. Do not commit the plaintext password or password hash.
+5. Use the project memory workflow after material changes: update the narrowest canonical owner, today's dated record, `STATUS.md` when live state changed, the overlapping job when continuity changed, and `MEMORY.md` only for lasting historical recall.
+6. After any page/dashboard UI change or page bug fix, rebuild and deploy the updated Next.js/FastAPI page through the project's public path before sign-off.
+7. Treat FastAPI on `http://127.0.0.1:8530`, Next.js on `http://127.0.0.1:8522`, and the current Cloudflare quick tunnel to port `8522` as the canonical public topology. Reuse healthy services and the active tunnel instead of creating a parallel deployment.
+8. Recover the current quick-tunnel hostname from `/Users/brucenguyen/jobads-dashboard-logs/cloudflared-launchd.err.log` and verify it live. If the services or tunnel must restart and the hostname rotates, report the verified replacement explicitly instead of implying that an older URL still works.
+9. macOS Keychain is the intended owner of the public dashboard password, never a repository file. When the password is needed, try `security find-generic-password -a jobads-dashboard-public -s jobads-dashboard-public-password -w`; if the entry is unavailable, stop the password-bearing handoff until the user restores or confirms the credential source. Do not copy a secret from process configuration into the repo, and do not commit the plaintext password or password hash.
 
 ## Scope Guardrails
 1. Do not implement dashboard logic inside `jobads-data/main` or `ai_labor`.
