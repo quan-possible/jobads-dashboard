@@ -1,0 +1,88 @@
+/* Design-sync stylesheet entry. NOT used by the Next app — `app/globals.css`
+   is still the app's only stylesheet.
+
+   Compiled Tailwind only contains the utilities the scanned source already
+   uses. The design agent on claude.ai/design writes NEW markup, so it needs a
+   wider vocabulary than the dashboard happens to use today. The `@source
+   inline(...)` lines below force the common layout / spacing / type / colour
+   utilities into the shipped CSS so an agent-authored layout is actually
+   styled. Keep this list to what a layout genuinely needs — every entry is
+   bytes in every rendered design.
+
+   Rebuild with:
+     npx @tailwindcss/cli -i .ds-tailwind-entry.css -o .ds-tailwind.css */
+
+@import "./app/globals.css";
+
+/* display + positioning */
+@source inline("{block,inline-block,inline,flex,inline-flex,grid,hidden,contents}");
+@source inline("{relative,absolute,fixed,sticky}");
+@source inline("{overflow,overflow-x,overflow-y}-{auto,hidden,visible,scroll}");
+@source inline("inset-0");
+@source inline("z-{0,10,20,30,40,50}");
+
+/* flex + grid */
+@source inline("flex-{row,col,wrap,nowrap,1,none,auto}");
+@source inline("items-{start,center,end,baseline,stretch}");
+@source inline("justify-{start,center,end,between,around,evenly}");
+@source inline("self-{start,center,end,stretch}");
+@source inline("grid-cols-{1,2,3,4,5,6,12}");
+@source inline("col-span-{1,2,3,4,5,6,full}");
+@source inline("shrink-0 grow basis-0");
+
+/* spacing */
+@source inline("{p,px,py,pt,pb,pl,pr,m,mx,my,mt,mb,ml,mr,gap,gap-x,gap-y}-{0,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,10,12,14,16,20,24}");
+@source inline("{mx,my}-auto");
+@source inline("space-{x,y}-{1,2,3,4,6,8}");
+
+/* sizing */
+@source inline("w-{full,auto,fit,px,1,2,3,4,5,6,8,10,12,16,20,24,32,40,48,64}");
+@source inline("h-{full,auto,fit,px,1,2,3,4,5,6,8,10,12,16,20,24,32,40,48,64}");
+@source inline("{min,max}-w-{0,full,fit,none}");
+@source inline("{min,max}-h-{0,full,fit,none}");
+@source inline("max-w-{xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl,prose}");
+@source inline("size-{4,5,6,8,10,12}");
+
+/* type */
+@source inline("text-{xs,sm,base,lg,xl,2xl,3xl,4xl,5xl}");
+@source inline("font-{normal,medium,semibold,bold}");
+@source inline("{italic,uppercase,lowercase,capitalize,normal-case,underline,no-underline,truncate}");
+@source inline("text-{left,center,right}");
+@source inline("leading-{none,tight,snug,normal,relaxed,loose}");
+@source inline("tracking-{tight,normal,wide,wider,widest}");
+@source inline("whitespace-{normal,nowrap,pre-line}");
+@source inline("tabular-nums");
+
+/* ACLMR palette — background, text, border, ring, fill for every brand token */
+@source inline("{bg,text,border,ring,fill,stroke,decoration}-{canvas,surface,surface-alt,surface-navy,ink,ink-soft,ink-faint,ink-invert,navy,navy-deep,teal,teal-soft,sand,sand-soft,orange,orange-deep,orange-soft,hairline,card-border,chart-grid,pos,neg}");
+@source inline("{bg,text,border}-{canvas,surface,surface-alt,ink,ink-soft,navy,teal,sand,orange,pos,neg}/{5,10,20,30,40,50,60,70,80,90}");
+@source inline("bg-{transparent,white,black,current}");
+@source inline("text-{transparent,white,black,current,inherit}");
+
+/* borders + surfaces */
+@source inline("border border-{0,2,4,t,b,l,r,y,x}");
+@source inline("border-{solid,dashed,dotted,none}");
+@source inline("rounded rounded-{none,sm,md,lg,xl,2xl,3xl,full}");
+/* The @theme radius/shadow tokens: real API, but nothing in the app uses the
+   utility form (components read var(--radius-card) directly), so they would not
+   compile in. The conventions header names them — keep them reachable. */
+@source inline("rounded-card shadow-card shadow-soft");
+@source inline("ring ring-{0,1,2,4} ring-inset");
+@source inline("shadow shadow-{none,sm,md,lg,xl,card,soft}");
+@source inline("opacity-{0,10,20,30,40,50,60,70,80,90,100}");
+
+/* interaction */
+@source inline("cursor-{pointer,default,not-allowed}");
+@source inline("transition transition-{colors,opacity,transform,all} duration-{150,200,300,500}");
+@source inline("select-none pointer-events-none");
+@source inline("hover:{underline,opacity-80,opacity-90}");
+@source inline("hover:{bg,text,border}-{surface-alt,orange,orange-deep,teal,navy,navy-deep,ink,sand-soft}");
+@source inline("focus-visible:outline-none");
+@source inline("disabled:{opacity-50,cursor-not-allowed}");
+
+/* responsive — the breakpoints the dashboard layouts actually use */
+@source inline("{sm,md,lg,xl}:{block,flex,hidden,grid}");
+@source inline("{sm,md,lg,xl}:flex-{row,col}");
+@source inline("{sm,md,lg}:grid-cols-{1,2,3,4,6,12}");
+@source inline("{sm,md,lg}:{p,px,py,gap}-{2,3,4,6,8,10,12}");
+@source inline("{sm,md,lg}:text-{sm,base,lg,xl,2xl,3xl,4xl}");

@@ -1,0 +1,39 @@
+{
+  "projectId": "c9764078-3970-42c2-be34-2e6acce106b9",
+  "shape": "package",
+  "pkg": "web",
+  "globalName": "ACLMR",
+  "entry": "./web/.ds-entry.tsx",
+  "buildCmd": "npx tsc -p tsconfig.ds.json && npx @tailwindcss/cli -i .ds-tailwind-entry.css -o .ds-tailwind.css",
+  "srcDir": "components",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": ".ds-tailwind.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "extraFonts": ["../.design-sync/fonts/pt-sans.css"],
+  "componentSrcMap": {
+    "DsPreviewProvider": null,
+    "I18nProvider": null,
+    "AuthProvider": null
+  },
+  "provider": {
+    "component": "DsPreviewProvider"
+  },
+  "overrides": {
+    "TopNav": {
+      "cardMode": "single",
+      "primaryStory": "Default",
+      "viewport": "1280x420"
+    },
+    "Footer": {
+      "cardMode": "column"
+    },
+    "MapToggle": {
+      "cardMode": "column"
+    }
+  },
+  "dtsPropsFor": {
+    "KpiTile": "label: string;\n  value: string;\n  unit?: string;\n  context?: string;\n  delta?: number | null;\n  deltaLabel?: string;\n  /** When set, the headline value itself is a trend metric: it gets the same ▲/▼ + pos/neg colour treatment as the delta chip, so all four tiles share one trend grammar. */\n  valueTrend?: number | null;\n  spark?: number[];\n  /** CSS colour for the sparkline. Defaults to --orange on accent tiles, --teal otherwise. */\n  sparkColor?: string;\n  accent?: boolean;\n  locale?: \"en\" | \"fr\";",
+    "CoverageBar": "label: string;\n  /** 0–1. Rendered as the filled proportion of the bar. */\n  share: number;\n  count: number;\n  /** Localised word for \"postings\" — defaults to English. */\n  postingsLabel?: string;\n  locale?: \"en\" | \"fr\";",
+    "Select": "label: string;\n  value: string | undefined;\n  /** First option is treated as the default; selecting any other one switches the control to its orange \"narrowed\" border. */\n  options: { value: string; label: string; labelFr?: string; code?: string }[];\n  onChange: (value: string) => void;\n  id: string;"
+  }
+}

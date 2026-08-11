@@ -2,6 +2,8 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "//types": "Declaration entry for design-sync only (npx tsc -p tsconfig.ds.json). Next does not read this.",
+  "types": ".ds-types/.ds-entry.d.ts",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

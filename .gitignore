@@ -18,3 +18,12 @@ data/derived/labor_market_dashboard_v1/posting_lookup.parquet
 
 # AI-exposure builder download cache (regenerable from public sources)
 data/ai/_sources/
+
+# design-sync (/design-sync skill) — generated; sync inputs under .design-sync/ are committed
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+web/.ds-types/
+web/.ds-tailwind.css

@@ -1,0 +1,16 @@
+{
+  "// note": "Declaration-only build for design-sync: gives the converter a .d.ts tree to extract component prop contracts from. Not used by Next.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": false,
+    "incremental": false,
+    "rootDir": ".",
+    "outDir": ".ds-types",
+    "plugins": []
+  },
+  "include": [".ds-entry.tsx"],
+  "exclude": ["node_modules", ".next", ".ds-types"]
+}
