@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useI18n } from "@/lib/i18n/provider";
+import { ACLMR_LOGO_DATA_URI } from "./aclmrLogo";
 
 export function Brand({ compact = false, inverted = true }: { compact?: boolean; inverted?: boolean }) {
   const { t } = useI18n();
@@ -13,7 +14,7 @@ export function Brand({ compact = false, inverted = true }: { compact?: boolean;
       aria-label={`ACLMR ${t.nav.brandTagline}`}
     >
       <Image
-        src="/aclmr-logo-white.svg"
+        src={ACLMR_LOGO_DATA_URI}
         alt=""
         width={138}
         height={31}

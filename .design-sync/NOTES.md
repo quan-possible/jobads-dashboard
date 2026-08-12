@@ -72,6 +72,15 @@ latin-ext only — EN/FR) and wired via `cfg.extraFonts`. That file also defines
 `--font-pt-sans`, which the app normally gets from `next/font`; without it every
 card falls back to a system sans.
 
+## Official logo asset
+
+`Brand` imports `ACLMR_LOGO_DATA_URI` from `web/components/aclmrLogo.ts`. That
+constant is the exact base64 encoding of `web/public/aclmr-logo-white.svg`
+(SHA-256 `bd308c4d221076e515bad78093e68b460967180b96c5765855d9ea3a691a8217`).
+Keep the self-contained source: a host-relative `/aclmr-logo-white.svg` works in
+Next but renders broken inside the portable design bundle, which has no public
+asset server.
+
 ## Render check without downloading Chromium
 
 No `~/.cache/ms-playwright` on this machine, but Google Chrome is installed.
