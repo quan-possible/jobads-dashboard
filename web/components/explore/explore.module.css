@@ -209,7 +209,8 @@
 .mobileRow:hover,
 .mobileRow:focus-visible { background: rgba(244, 238, 231, 0.045); }
 .mobileRowSelected { background: rgba(207, 119, 48, 0.14); box-shadow: inset 3px 0 0 var(--orange); }
-.mobileTitle { overflow: hidden; color: var(--x-text); font-size: 0.96rem; font-weight: 700; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.mobileRow > span:first-child { min-width: 0; }
+.mobileTitle { display: block; max-width: 100%; overflow: hidden; color: var(--x-text); font-size: 0.96rem; font-weight: 700; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .mobileMeta { display: block; margin-top: 3px; overflow: hidden; color: var(--x-soft); font-size: 0.82rem; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .mobileWage { color: var(--x-text); font-size: 0.88rem; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .mobileDate { display: block; margin-top: 3px; color: var(--x-faint); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
