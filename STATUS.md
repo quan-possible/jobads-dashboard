@@ -17,20 +17,19 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - The published Claude Design system still contains the original 14 presentational components. The redesign candidate expands the hand-maintained local package to 16 by adding `RouteMasthead` and `SectionLead`; validation and republishing remain a release follow-up. `.design-sync/NOTES.md` owns the operating detail.
 - The 2026-08-11 redesign exploration now has a durable, adversarially verified home at `docs/analyses/labor_market_dashboard/redesign-foundation/`, with separate desktop targets, design-system material, source-state UI kit, provenance, and ACLMR brand audit. The package uses the exact live ACLMR logo, PT Sans, target-aligned navy navigation and CTA families, accessible trend/contrast cues, and explicit mobile gates. This groundwork did not change the current application or deployment.
 - A complete redesign candidate now exists in `/Users/brucenguyen/.codex/worktrees/jobads-dashboard-redesign` on `codex/dashboard-redesign-production`. It migrates all nine routes, the shared shell, Plotly language, and authenticated Explore workspace; approved mobile targets and Mobbin evidence are preserved with the active job. The public site and canonical services remain unchanged.
-- Candidate verification on 2026-08-11 passed 349 Python tests, ESLint, TypeScript, a production Next build, design-package type/CSS generation, upstream-data reconciliation, 45 EN/FR route-and-viewport checks, authenticated Explore journeys, and public/team cap-response checks. Fresh adversarial review and production release authorization remain outstanding.
+- Candidate verification on 2026-08-11 passed 349 Python tests, ESLint, TypeScript, a production Next build, upstream-data reconciliation, 45 EN/FR route-and-viewport checks, authenticated Explore journeys, public/team cap-response checks, and a fresh adversarial `READY` verdict. The reviewer rebuilt and rendered the 16-component portable package and confirmed the official wordmark in Brand, Footer, and TopNav. Production release authorization remains outstanding.
 
 ## Active priorities
 
-1. Complete fresh-context adversarial review of the assembled redesign candidate and resolve any material finding.
-2. Decide when to integrate and release the candidate; do not deploy a partially redesigned route set.
-3. Confirm the deployed Next.js/FastAPI bundle and Render publication boundary before production cutover; current service health alone does not establish either.
-4. Refresh and validate the derived bundle when fresher canonical upstream processed data is available.
+1. Decide when to integrate and release the verified candidate; do not deploy a partially redesigned route set.
+2. Confirm the deployed Next.js/FastAPI bundle and Render publication boundary before production cutover; current service health alone does not establish either.
+3. Refresh and validate the derived bundle when fresher canonical upstream processed data is available.
 
 ## Next actions
 
-1. Finish the candidate's adversarial review, then freeze its accepted commit and evidence.
-2. Restore or confirm the Keychain credential source and Render ownership before any password-bearing or production handoff; never place the plaintext password or password hash in repository files.
-3. After explicit release approval, integrate the candidate and deploy through the existing launchd and Cloudflare topology with the plan's rollback procedure.
+1. Restore or confirm the Keychain credential source and Render ownership before any password-bearing or production handoff; never place the plaintext password or password hash in repository files.
+2. After explicit release approval, integrate the accepted candidate and deploy through the existing launchd and Cloudflare topology with the plan's rollback procedure.
+3. Republish the locally verified 16-component Claude Design package only as an explicitly authorized external follow-up.
 
 ## Risks and blockers
 

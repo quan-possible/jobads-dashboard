@@ -1,7 +1,7 @@
 # Dashboard redesign implementation
 
-Status: active in an isolated worktree; implementation and parent verification
-complete, fresh adversarial review pending, production publication blocked.
+Status: active in an isolated worktree; implementation and adversarial
+verification complete with `READY`, production publication blocked.
 
 ## Objective
 
@@ -49,13 +49,13 @@ category-cap, bilingual, accessibility, or deployment contracts.
 | Figure language | Worker | `src/jobads_dashboard/viz/`, figure goldens | Complete |
 | Public routes | Worker | seven remaining routes and shared route grammar | Complete |
 | Explore workspace | Worker | authenticated builder, posting lookup, responsive detail | Complete |
-| Integration and acceptance | Parent | combined worktree, job state, visual judgment | Parent checks complete; adversarial review pending |
+| Integration and acceptance | Parent | combined worktree, job state, visual judgment | Complete; fresh reviewer returned `READY` at `229c9ae2` |
 
 ## Next action
 
-Run the fresh-context adversarial review against the merged release candidate.
-If it returns READY, freeze the candidate and hand it back for an explicit
-integration/release decision. Do not restart the public services.
+Hand the accepted candidate back for an explicit integration/release decision.
+Restore the production credential and confirm the Render publication boundary
+before cutover. Do not restart the public services until release is authorized.
 
 ## Verification evidence
 
@@ -77,3 +77,9 @@ integration/release decision. Do not restart the public services.
   `Cache-Control: private, no-store`.
 - Complete Pulse, Geography, Method, locked Explore, authenticated Explore, and
   French mobile captures were inspected from the isolated 8521/8531 preview.
+- A fresh adversarial reviewer initially found that the portable package lost
+  the host-relative official logo. `Brand` now imports the exact vendored SVG as
+  a self-contained data URI; its bytes retain SHA-256
+  `bd308c4d221076e515bad78093e68b460967180b96c5765855d9ea3a691a8217`.
+  The same reviewer rebuilt and rendered all 16 components, confirmed Brand,
+  Footer, and TopNav, and returned `READY` at `229c9ae2`.

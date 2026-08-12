@@ -331,6 +331,7 @@ The release candidate is ready only when:
   govern visual direction; the earlier alternatives and source-tone UI kit do
   not.
 
-The complete implementation candidate is assembled and parent-verified.
-Production cutover remains blocked pending fresh adversarial acceptance,
-credential restoration, and publication-boundary confirmation.
+The complete implementation candidate is assembled, parent-verified, and has a
+fresh adversarial `READY` verdict. Production cutover remains blocked pending
+credential restoration, publication-boundary confirmation, and explicit release
+authorization.

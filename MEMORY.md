@@ -56,8 +56,8 @@ Last condensed: 2026-08-11
 ## 2026-08-11 | Complete redesign candidate assembled
 
 - The isolated `codex/dashboard-redesign-production` worktree now contains the complete nine-route ACLMR redesign: official brand shell, cream editorial public routes, responsive Plotly language, and a dark authenticated Explore workspace with mobile posting detail.
-- Parent verification passed Python, lint, type, production-build, data-reconciliation, EN/FR route matrix, public/team cap, and authenticated Explore journeys. The canonical public services and tunnel were not changed.
-- Production release remains a separate decision: fresh adversarial acceptance, the unavailable Keychain credential, and the ambiguous Render publication boundary must be resolved before integration or cutover.
+- Parent verification passed Python, lint, type, production-build, data-reconciliation, EN/FR route matrix, public/team cap, and authenticated Explore journeys. A fresh reviewer then rebuilt the 16-component portable package, verified the self-contained official logo, and returned `READY`. The canonical public services and tunnel were not changed.
+- Production release remains a separate decision: the unavailable Keychain credential and ambiguous Render publication boundary must be resolved before integration or cutover.
 
 ## Rebuild rule
 
