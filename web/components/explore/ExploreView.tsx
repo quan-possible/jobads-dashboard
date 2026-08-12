@@ -10,19 +10,19 @@ import type { PostingRow, PostingsResponse } from "@/lib/types";
 import { useFilters } from "@/lib/useFilters";
 import { useExploreLock } from "./lockContext";
 import { PostingDrawer } from "./PostingDrawer";
+import styles from "./explore.module.css";
 
 const SLOW_THRESHOLD_MS = 20_000;
-
 const PAGE = 25;
 
-function shortScope(occ: string): string {
-  return occ.includes(" | ") ? occ.split(" | ")[1] : occ;
+function shortScope(value: string): string {
+  return value.includes(" | ") ? value.split(" | ")[1] : value;
 }
 
-function rowWage(r: PostingRow, locale: Locale): string {
-  if (r.wage_hourly != null) return `${fmtWage(r.wage_hourly, locale)}`;
-  if (r.wage_min != null && r.wage_max != null) return `${fmtWage(r.wage_min, locale)}–${fmtWage(r.wage_max, locale)}`;
-  if (r.wage_min != null) return `${fmtWage(r.wage_min, locale)}+`;
+function rowWage(row: PostingRow, locale: Locale): string {
+  if (row.wage_hourly != null) return fmtWage(row.wage_hourly, locale);
+  if (row.wage_min != null && row.wage_max != null) return `${fmtWage(row.wage_min, locale)}–${fmtWage(row.wage_max, locale)}`;
+  if (row.wage_min != null) return `${fmtWage(row.wage_min, locale)}+`;
   return "—";
 }
 
@@ -34,50 +34,45 @@ export function ExploreView() {
   const [debouncedQ, setDebouncedQ] = useState("");
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState<PostingsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [slow, setSlow] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [resolvedKey, setResolvedKey] = useState<string | null>(null);
+  const [slowKey, setSlowKey] = useState<string | null>(null);
+  const [error, setError] = useState<{ key: string; message: string } | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [fetchKey, setFetchKey] = useState(0);
   const tableTop = useRef<HTMLDivElement>(null);
 
-  // S21: Keep the latest lock() in a ref so it never becomes a dependency of the
-  // fetch effect (same pattern as onCloseRef in PostingDrawer).
   const lockRef = useRef(lock);
   useEffect(() => {
     lockRef.current = lock;
   });
 
-  // Debounce the search box.
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedQ(q.trim()), 300);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setDebouncedQ(q.trim()), 300);
+    return () => clearTimeout(timer);
   }, [q]);
 
-  // Scope comes from the shared FilterSpine (URL). Reset paging to page 0 the
-  // moment the scope changes, during render — so the fetch effect runs exactly
-  // once at offset 0, never firing a stale-offset request first (S26).
   const scopeKey = `${filters.geo ?? ""}|${filters.occ ?? ""}|${filters.ind ?? ""}|${debouncedQ}`;
-  const [prevScope, setPrevScope] = useState(scopeKey);
-  if (scopeKey !== prevScope) {
-    setPrevScope(scopeKey);
+  const [previousScope, setPreviousScope] = useState(scopeKey);
+  if (scopeKey !== previousScope) {
+    setPreviousScope(scopeKey);
     setOffset(0);
   }
 
-  // S09+S21: fetch effect. lock() is read from a ref so it is never a dep here —
-  // the effect only re-runs when the actual query inputs change.
-  // Capture the localized fallback error message synchronously so the async
-  // .catch branch never closes over a stale `t`.
+  const requestKey = [filters.geo ?? "", filters.occ ?? "", filters.ind ?? "", debouncedQ, offset, fetchKey].join("|");
+  const loading = resolvedKey !== requestKey;
+  const errorForRequest = error?.key === requestKey ? error.message : null;
+  const slow = loading && slowKey === requestKey;
+  const displayData = resolvedKey === requestKey ? data : null;
+  const rows = displayData?.items ?? [];
+  const total = displayData?.total ?? 0;
+  const from = total === 0 ? 0 : offset + 1;
+  const to = Math.min(offset + PAGE, total);
   const loadingErrorMsg = t.explore.loadingError;
+
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setSlow(false);
-    setError(null);
-
-    // S09: bounded loading — after SLOW_THRESHOLD_MS show a "still loading" hint.
     const slowTimer = setTimeout(() => {
-      if (!cancelled) setSlow(true);
+      if (!cancelled) setSlowKey(requestKey);
     }, SLOW_THRESHOLD_MS);
 
     fetchPostings({
@@ -88,44 +83,36 @@ export function ExploreView() {
       limit: PAGE,
       offset,
     })
-      .then((d) => {
+      .then((next) => {
         if (cancelled) return;
-        setData(d);
+        setData(next);
+        setResolvedKey(requestKey);
       })
-      .catch((e) => {
+      .catch((reason) => {
         if (cancelled) return;
-        // Session expired mid-use → hand back to the gate for re-login (S27).
-        if (e instanceof AuthError) {
+        if (reason instanceof AuthError) {
           lockRef.current();
           return;
         }
-        setError(e?.message ?? loadingErrorMsg);
+        setData(null);
+        setError({ key: requestKey, message: reason?.message ?? loadingErrorMsg });
+        setResolvedKey(requestKey);
       })
       .finally(() => {
-        if (!cancelled) {
-          setLoading(false);
-          setSlow(false);
-          clearTimeout(slowTimer);
-        }
+        clearTimeout(slowTimer);
       });
+
     return () => {
       cancelled = true;
       clearTimeout(slowTimer);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.geo, filters.occ, filters.ind, debouncedQ, offset, fetchKey, loadingErrorMsg]);
-
-  const total = data?.total ?? 0;
-  const from = total === 0 ? 0 : offset + 1;
-  const to = Math.min(offset + PAGE, total);
-  const rows = data?.items ?? [];
+  }, [filters.geo, filters.occ, filters.ind, debouncedQ, offset, fetchKey, loadingErrorMsg, requestKey]);
 
   const scopeSummary = useMemo(() => {
     const parts: string[] = [];
     if (filters.geo) parts.push(labelFor(GEO_OPTIONS, filters.geo, locale));
     if (filters.occ) parts.push(labelFor(OCC_OPTIONS, filters.occ, locale));
     if (filters.ind) parts.push(labelFor(IND_OPTIONS, filters.ind, locale));
-    // Default (no scope) → the localized "All Canada" sentinel, not a hardcoded string.
     return parts.length ? parts.join(" · ") : labelFor(GEO_OPTIONS, ALL_GEO, locale);
   }, [filters.geo, filters.occ, filters.ind, locale]);
 
@@ -134,161 +121,121 @@ export function ExploreView() {
     tableTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const renderLoadingRows = () => Array.from({ length: 8 }, (_, i) => (
+    <tr key={i} aria-hidden="true"><td colSpan={7}><div className={styles.skeletonRow} /></td></tr>
+  ));
+
   return (
     <div className="flex flex-col gap-4">
-      {/* Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3" ref={tableTop}>
-        <label className="relative flex-1 sm:max-w-md">
-          <span className="sr-only">{t.explore.searchPlaceholder}</span>
-          <svg
-            aria-hidden
-            viewBox="0 0 16 16"
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-          >
-            <circle cx="7" cy="7" r="4.5" />
-            <path d="M11 11l3 3" strokeLinecap="square" />
-          </svg>
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={t.explore.searchPlaceholder}
-            className="control w-full border border-card-border bg-surface py-2 pl-9 pr-3 t-body focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
-          />
-        </label>
-        <div className="num t-meta text-ink-soft">
-          {loading && !data ? (
-            slow ? (
-              <span className="text-ink-faint">{t.explore.loadingSlowHint}</span>
-            ) : (
-              t.common.loading
-            )
+      <div className={styles.lookupControls} ref={tableTop}>
+        <form
+          className={styles.searchForm}
+          onSubmit={(event) => {
+            event.preventDefault();
+            setDebouncedQ(q.trim());
+          }}
+          role="search"
+        >
+          <label className={styles.searchField}>
+            <span className="sr-only">{t.explore.searchPlaceholder}</span>
+            <svg aria-hidden viewBox="0 0 16 16" className={styles.searchIcon} fill="none" stroke="currentColor" strokeWidth="1.6">
+              <circle cx="7" cy="7" r="4.5" />
+              <path d="M11 11l3 3" strokeLinecap="square" />
+            </svg>
+            <input
+              type="search"
+              value={q}
+              onChange={(event) => setQ(event.target.value)}
+              placeholder={t.explore.searchPlaceholder}
+              className={styles.searchInput}
+            />
+          </label>
+          <button type="submit" className={styles.searchButton} aria-label={t.common.search}>{t.common.search}</button>
+        </form>
+        <div className={styles.scopeSummary} aria-live="polite">
+          {loading && !displayData ? (
+            slow ? t.explore.loadingSlowHint : t.common.loading
           ) : (
-            <>
-              <span className="font-bold text-navy-deep">{fmtInt(total, locale)}</span> {t.explore.postings} · {scopeSummary}
-            </>
+            <><strong>{fmtInt(total, locale)}</strong> {t.explore.postings}<br />{scopeSummary}</>
           )}
         </div>
       </div>
 
-      {/* Table */}
-      <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left t-body-sm">
+      <section className={styles.resultsCard} aria-labelledby="explore-results-heading">
+        <div className={styles.resultsHeader}>
+          <h2 id="explore-results-heading" className={styles.resultsHeading}>{t.explore.colTitle}</h2>
+          <span className={styles.resultsCount}>{total > 0 ? `${fmtInt(from, locale)}–${fmtInt(to, locale)} ${t.common.of} ${fmtInt(total, locale)}` : "—"}</span>
+        </div>
+
+        <div className={styles.tableWrap}>
+          <table className={styles.resultsTable}>
             <thead>
-              <tr className="border-b border-card-border bg-surface-alt t-label uppercase tracking-[0.05em] text-ink-faint">
-                <th className="px-4 py-2.5 font-bold">{t.explore.colPosted}</th>
-                <th className="px-4 py-2.5 font-bold">{t.explore.colTitle}</th>
-                <th className="hidden px-4 py-2.5 font-bold md:table-cell">{t.explore.colEmployer}</th>
-                <th className="px-4 py-2.5 font-bold">{t.explore.colRegion}</th>
-                <th className="hidden px-4 py-2.5 font-bold lg:table-cell">{t.explore.colOccupation}</th>
-                <th className="px-4 py-2.5 text-right font-bold">{t.explore.colWage}</th>
-                <th className="hidden px-4 py-2.5 font-bold sm:table-cell">{t.explore.colType}</th>
+              <tr>
+                <th className={styles.idCell}>{t.explore.colPosted}</th>
+                <th>{t.explore.colTitle}</th>
+                <th>{t.explore.colEmployer}</th>
+                <th className={styles.regionCell}>{t.explore.colRegion}</th>
+                <th>{t.explore.colOccupation}</th>
+                <th className={styles.wageCell}>{t.explore.colWage}</th>
+                <th className={styles.dateCell}>{t.explore.colType}</th>
               </tr>
             </thead>
             <tbody>
-              {/* S09 error state with retry */}
-              {error && (
-                <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center t-body-sm">
-                    <p className="text-neg">{error}</p>
+              {errorForRequest && (
+                <tr><td colSpan={7} className={styles.errorState}>
+                  {errorForRequest}
+                  <br />
+                  <button type="button" className={styles.retryButton} onClick={() => setFetchKey((key) => key + 1)}>{t.explore.retryLoad}</button>
+                </td></tr>
+              )}
+              {!errorForRequest && loading && !displayData && renderLoadingRows()}
+              {!errorForRequest && !loading && rows.length === 0 && (
+                <tr><td colSpan={7} className={styles.emptyState}>{t.explore.emptyRows}</td></tr>
+              )}
+              {!errorForRequest && rows.map((row) => (
+                <tr key={row.posting_id} className={activeId === row.posting_id ? styles.selectedRow : undefined} onClick={() => setActiveId(row.posting_id)}>
+                  <td className={styles.idCell}>{row.date_found ? fmtMonth(row.date_found, locale) : fmtMonth(row.month, locale)}</td>
+                  <td className={styles.titleCell}>
                     <button
                       type="button"
-                      onClick={() => setFetchKey((k) => k + 1)}
-                      className="mt-3 control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors hover:border-orange hover:text-orange"
-                    >
-                      {t.explore.retryLoad}
-                    </button>
+                      className={styles.titleButton}
+                      onClick={(event) => { event.stopPropagation(); setActiveId(row.posting_id); }}
+                      aria-label={row.job_title ? `${t.explore.openPosting} — ${row.job_title}` : t.explore.openPosting}
+                    >{row.job_title ?? "—"}</button>
                   </td>
-                </tr>
-              )}
-              {/* S09 skeleton rows on cold start (no prior data) */}
-              {!error && loading && !data && (
-                Array.from({ length: PAGE }, (_, i) => (
-                  <tr key={i} aria-hidden="true" className="border-b border-hairline last:border-0">
-                    <td className="px-4 py-3"><div className="h-3 w-16 animate-pulse rounded bg-surface-alt" /></td>
-                    <td className="px-4 py-3"><div className="h-3 w-36 animate-pulse rounded bg-surface-alt" /></td>
-                    <td className="hidden px-4 py-3 md:table-cell"><div className="h-3 w-28 animate-pulse rounded bg-surface-alt" /></td>
-                    <td className="px-4 py-3"><div className="h-3 w-12 animate-pulse rounded bg-surface-alt" /></td>
-                    <td className="hidden px-4 py-3 lg:table-cell"><div className="h-3 w-24 animate-pulse rounded bg-surface-alt" /></td>
-                    <td className="px-4 py-3 text-right"><div className="ml-auto h-3 w-14 animate-pulse rounded bg-surface-alt" /></td>
-                    <td className="hidden px-4 py-3 sm:table-cell"><div className="h-3 w-16 animate-pulse rounded bg-surface-alt" /></td>
-                  </tr>
-                ))
-              )}
-              {!error && rows.length === 0 && !loading && (
-                <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center t-body-sm text-ink-faint">
-                    {t.explore.emptyRows}
-                  </td>
-                </tr>
-              )}
-              {rows.map((r) => (
-                // The row stays a real table row (semantics intact for AT). Mouse
-                // users can click anywhere; keyboard/AT users activate via the
-                // real <button> in the title cell (S31).
-                <tr
-                  key={r.posting_id}
-                  onClick={() => setActiveId(r.posting_id)}
-                  className="cursor-pointer border-b border-hairline transition-colors last:border-0 hover:bg-orange/[0.04] focus-within:bg-orange/[0.06]"
-                >
-                  <td className="num whitespace-nowrap px-4 py-3 text-ink-soft">{r.date_found ? fmtMonth(r.date_found, locale) : fmtMonth(r.month, locale)}</td>
-                  <td className="max-w-[22ch] px-4 py-3 font-bold text-navy-deep">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveId(r.posting_id);
-                      }}
-                      aria-label={r.job_title ? `${t.explore.openPosting} — ${r.job_title}` : t.explore.openPosting}
-                      className="line-clamp-2 text-left hover:underline focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
-                    >
-                      {r.job_title ?? "—"}
-                    </button>
-                  </td>
-                  <td className="hidden max-w-[18ch] truncate px-4 py-3 text-ink-soft md:table-cell">{r.employer ?? "—"}</td>
-                  <td className="num whitespace-nowrap px-4 py-3 text-ink-soft">{r.province ?? "—"}</td>
-                  <td className="hidden max-w-[18ch] truncate px-4 py-3 text-ink-soft lg:table-cell">{r.occupation ? shortScope(r.occupation) : "—"}</td>
-                  <td className="num whitespace-nowrap px-4 py-3 text-right text-navy">{rowWage(r, locale)}</td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-ink-soft sm:table-cell">{r.employment_type ?? "—"}</td>
+                  <td>{row.employer ?? "—"}</td>
+                  <td className={styles.regionCell}>{row.province ?? "—"}</td>
+                  <td>{row.occupation ? shortScope(row.occupation) : "—"}</td>
+                  <td className={styles.wageCell}>{rowWage(row, locale)}</td>
+                  <td className={styles.dateCell}>{row.employment_type ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="num t-caption text-ink-soft">
-          {total > 0 ? (
-            <>
-              {fmtInt(from, locale)}–{fmtInt(to, locale)} {t.common.of} {fmtInt(total, locale)}
-            </>
-          ) : (
-            "—"
-          )}
+        <div className={styles.mobileResults}>
+          {errorForRequest && <div className={styles.errorState}>{errorForRequest}<br /><button type="button" className={styles.retryButton} onClick={() => setFetchKey((key) => key + 1)}>{t.explore.retryLoad}</button></div>}
+          {!errorForRequest && loading && !displayData && Array.from({ length: 6 }, (_, i) => <div key={i} className={styles.skeletonRow} aria-hidden />)}
+          {!errorForRequest && !loading && rows.length === 0 && <div className={styles.emptyState}>{t.explore.emptyRows}</div>}
+          {!errorForRequest && rows.map((row) => (
+            <button key={row.posting_id} type="button" className={`${styles.mobileRow} ${activeId === row.posting_id ? styles.mobileRowSelected : ""}`} onClick={() => setActiveId(row.posting_id)}>
+              <span>
+                <span className={styles.mobileTitle}>{row.job_title ?? "—"}</span>
+                <span className={styles.mobileMeta}>{row.province ?? "—"}{row.employer ? ` · ${row.employer}` : ""}</span>
+              </span>
+              <span className={styles.mobileWage}>{rowWage(row, locale)}<span className={styles.mobileDate}>{row.date_found ? fmtMonth(row.date_found, locale) : fmtMonth(row.month, locale)}</span></span>
+              <span className={styles.mobileArrow} aria-hidden>›</span>
+            </button>
+          ))}
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => goPage(Math.max(0, offset - PAGE))}
-            disabled={offset === 0 || loading}
-            className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
-          >
-            ← {t.common.prev}
-          </button>
-          <button
-            type="button"
-            onClick={() => goPage(offset + PAGE)}
-            disabled={to >= total || loading}
-            className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
-          >
-            {t.common.next} →
-          </button>
+      </section>
+
+      <div className={styles.pager}>
+        <span className={styles.pagerSummary}>{total > 0 ? `${fmtInt(from, locale)}–${fmtInt(to, locale)} ${t.common.of} ${fmtInt(total, locale)}` : "—"}</span>
+        <div className={styles.pagerButtons}>
+          <button type="button" className={styles.pagerButton} onClick={() => goPage(Math.max(0, offset - PAGE))} disabled={offset === 0 || loading}>← {t.common.prev}</button>
+          <button type="button" className={styles.pagerButton} onClick={() => goPage(offset + PAGE)} disabled={to >= total || loading}>{t.common.next} →</button>
         </div>
       </div>
 

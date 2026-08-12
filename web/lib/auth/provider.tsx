@@ -51,7 +51,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    // Defer the first status read until after the initial client paint. This
+    // keeps the provider's loading transition explicit without a synchronous
+    // state update from the effect body.
+    const timer = window.setTimeout(() => {
+      void refresh();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [refresh]);
 
   const login = useCallback(

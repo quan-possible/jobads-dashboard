@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n/provider";
 import { ExploreBuilder } from "./ExploreBuilder";
 import { ExploreView } from "./ExploreView";
+import styles from "./explore.module.css";
 
 // Two views of Explore under one page: the "Build a chart" tool and the
 // "Find postings" raw lookup. Both sit below the shared FilterSpine, so the
@@ -16,7 +17,7 @@ const TABS: Tab[] = ["build", "find"];
 
 export function ExploreTabs({ minYear, maxYear }: { minYear: number; maxYear: number }) {
   const { t } = useI18n();
-  const [tab, setTab] = useState<Tab>("build");
+  const [tab, setTab] = useState<Tab>("find");
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   // APG tabs keyboard pattern: arrow keys move selection + focus, Home/End jump
@@ -34,8 +35,8 @@ export function ExploreTabs({ minYear, maxYear }: { minYear: number; maxYear: nu
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div role="tablist" aria-label={t.explore.eyebrow} className="flex gap-1 border-b border-card-border">
+    <div className={styles.panel}>
+      <div role="tablist" aria-label={t.explore.eyebrow} className={styles.tabs}>
         {TABS.map((k, i) => {
           const active = tab === k;
           return (
@@ -50,12 +51,7 @@ export function ExploreTabs({ minYear, maxYear }: { minYear: number; maxYear: nu
               tabIndex={active ? 0 : -1}
               onClick={() => setTab(k)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={[
-                "-mb-px border-b-2 px-4 py-2.5 t-meta font-bold uppercase tracking-[0.02em] transition-colors",
-                active
-                  ? "border-orange text-navy-deep"
-                  : "border-transparent text-ink-faint hover:text-ink-soft",
-              ].join(" ")}
+              className={`${styles.tab} ${active ? styles.tabActive : ""}`}
             >
               {t.explore.tabs[k]}
             </button>

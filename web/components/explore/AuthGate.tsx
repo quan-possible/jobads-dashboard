@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth/provider";
 import { useI18n } from "@/lib/i18n/provider";
 import { PixelTiles } from "@/components/PixelTiles";
 import { ExploreLockContext } from "./lockContext";
+import styles from "./explore.module.css";
 
 // Wraps the whole Explore surface (both the "Build a chart" and "Find postings"
 // tabs). Until a valid session exists, `children` are never rendered — the
@@ -46,47 +47,45 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   // Checking / locked / unconfigured / error all share one centered card shell
   // so the non-open phases read as designed, not as unfinished text (U09).
   return (
-    <div className="mx-auto max-w-md py-10">
-      <div className="card card-pad">
+    <div className={styles.gateWrap}>
+      <div className={styles.gateCard}>
         <div className="mb-5 flex items-center gap-3">
           <PixelTiles size={11} className="shrink-0" />
           <div>
-            <div className="eyebrow">{t.explore.protected}</div>
-            <h2 className="text-[1.1rem] font-bold leading-snug text-navy-deep">{t.explore.lookupTitle}</h2>
+            <div className={styles.eyebrow}>{t.explore.protected}</div>
+            <h2 className={styles.gateHeading}>{t.explore.lookupTitle}</h2>
           </div>
         </div>
 
         {loading && (
-          <p className="t-body-sm leading-relaxed text-ink-faint" aria-busy="true">{t.explore.checking}</p>
+          <p className={styles.gateMessage} aria-busy="true">{t.explore.checking}</p>
         )}
 
-        {!loading && error && <p className="t-body-sm leading-relaxed text-neg">{t.explore.authError}</p>}
+        {!loading && error && <p className={`${styles.gateMessage} ${styles.gateError}`}>{t.explore.authError}</p>}
 
         {!loading && !error && !configured && (
-          <p className="t-body-sm leading-relaxed text-ink-soft">{t.explore.unconfigured}</p>
+          <p className={styles.gateMessage}>{t.explore.unconfigured}</p>
         )}
 
         {!loading && !error && configured && (
           <>
-            <p className="mb-5 t-body-sm leading-relaxed text-ink-soft">{t.explore.lockedBody}</p>
-            <form onSubmit={onSubmit} className="flex flex-col gap-3">
-              <label className="flex flex-col gap-1">
-                <span className="t-label font-bold uppercase tracking-[0.05em] text-ink-faint">
-                  {t.explore.password}
-                </span>
+            <p className={styles.gateBody}>{t.explore.lockedBody}</p>
+            <form onSubmit={onSubmit} className={styles.gateForm}>
+              <label className={styles.gateLabel}>
+                <span>{t.explore.password}</span>
                 <input
                   type="password"
                   autoFocus
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="control border border-card-border bg-surface px-3 py-2 t-body focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
+                  className={styles.gateInput}
                 />
               </label>
-              {authError && <p className="t-meta text-neg">{authError}</p>}
+              {authError && <p className={`${styles.gateMessage} ${styles.gateError}`}>{authError}</p>}
               <button
                 type="submit"
                 disabled={submitting || !password}
-                className="control bg-navy px-4 py-2.5 t-meta font-bold uppercase tracking-[0.03em] text-canvas transition-colors enabled:hover:bg-orange disabled:opacity-50"
+                className={styles.gateButton}
               >
                 {submitting ? t.explore.unlocking : t.explore.unlock}
               </button>
@@ -94,7 +93,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           </>
         )}
       </div>
-      <p className="mt-4 text-center t-caption leading-relaxed text-ink-faint">{t.explore.gateHint}</p>
+      <p className={styles.gateHint}>{t.explore.gateHint}</p>
     </div>
   );
 }
