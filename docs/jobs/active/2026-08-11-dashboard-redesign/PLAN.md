@@ -302,9 +302,13 @@ The release candidate is ready only when:
 2. Confirm whether pushing `main` will also publish to Render. Coordinate that
    endpoint or disable unintended auto-deploy before the push; do not allow two
    different “production” builds to emerge silently.
-3. Build the accepted commit for the canonical local service, then restart only
-   `com.aclmr.jobads-dashboard-public`. Leave the Cloudflare LaunchAgent in place
-   unless it is unhealthy.
+3. Back up `com.aclmr.jobads-dashboard-public.plist`, add
+   `--no-proxy-headers` to its Uvicorn command so the local Next hop cannot pass
+   client-forged `X-Forwarded-For` into the API rate-limit key, validate the
+   plist, then build the accepted commit for the canonical local service and
+   restart only `com.aclmr.jobads-dashboard-public`. Leave the Cloudflare
+   LaunchAgent in place unless it is unhealthy. Do not treat the repository's
+   Docker entrypoint as proof that this external LaunchAgent has the flag.
 4. Verify `127.0.0.1:8530/health`, `127.0.0.1:8522/healthz`, the current quick
    tunnel hostname recovered from the cloudflared log, every route, EN/FR, and
    public/authenticated cap behaviour against the deployed build.
@@ -322,6 +326,9 @@ The release candidate is ready only when:
 - **Blocker:** the deployed bundle has not been proven to match current `main`.
 - **Blocker for production auth verification:** the intended Keychain password
   lookup currently fails.
+- **Blocker for production restart:** the installed public LaunchAgent currently
+  omits `--no-proxy-headers`; update it with backup and rollback only during the
+  authorized cutover, then repeat the forged-header throttle probe.
 - **Settled:** migrate the existing app; do not build a parallel replacement.
 - **Settled:** redesign all routes for one release; do not expose a mixed public
   experience.

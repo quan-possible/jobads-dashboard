@@ -12,11 +12,10 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Canadian Labour Market Pulse",
-  description:
-    "A monthly read on posted hiring demand across Canada's regions, occupations, industries, wages and skills — from online job ads.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = pulseDict[await getLocale()];
+  return { title: t.heroFallback, description: t.lede };
+}
 
 function ApiDown({ t }: { t: (typeof pulseDict)[keyof typeof pulseDict] }) {
   return (

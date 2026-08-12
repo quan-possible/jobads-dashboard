@@ -5,6 +5,19 @@ import { baseConfig } from "@/lib/plotly/theme";
 import { useI18n } from "@/lib/i18n/provider";
 import type { FigJSON } from "@/lib/types";
 
+function wrapCompactAnnotation(text: unknown): unknown {
+  if (typeof text !== "string" || text.includes("<br>")) return text;
+  const words = text.split(" ");
+  if (words.length < 2 || text.length <= 12) return text;
+  const lines: string[] = [];
+  for (const word of words) {
+    const current = lines.at(-1);
+    if (!current || current.length + word.length + 1 > 13) lines.push(word);
+    else lines[lines.length - 1] = `${current} ${word}`;
+  }
+  return lines.join("<br>");
+}
+
 // Client host for a figure authored in Python (the redesign2 Plotly factories,
 // served as figure JSON by /api/figure and fetched server-side by the page).
 // Unlike PlotlyFigure it does NOT inject the web template — the figure already
@@ -81,10 +94,72 @@ export function RemoteFigure({
             })
           : fig.data;
         const authoredMargin = (fig.layout.margin ?? {}) as Record<string, unknown>;
+        const authoredAnnotations = Array.isArray(fig.layout.annotations) ? fig.layout.annotations : [];
+        const compactSmallMultiples = el.clientWidth < 520 && authoredAnnotations.length >= 8;
+        const compactHeatmapLabels = el.clientWidth < 520
+          ? fig.data.find((trace) => {
+              if (typeof trace !== "object" || trace === null || (trace as { type?: string }).type !== "heatmap") return false;
+              const x = (trace as { x?: unknown[] }).x;
+              return Array.isArray(x) && x.length >= 8 && x.some((value) => typeof value === "string" && value.length > 8);
+            }) as { x?: unknown[] } | undefined
+          : undefined;
+        const compactAnnotations = compactSmallMultiples
+          ? authoredAnnotations.map((annotation) => {
+              if (typeof annotation !== "object" || annotation === null) return annotation;
+              const item = annotation as Record<string, unknown>;
+              const font = (item.font ?? {}) as Record<string, unknown>;
+              return { ...item, text: wrapCompactAnnotation(item.text), font: { ...font, size: 9 } };
+            })
+          : authoredAnnotations;
+        const compactAxis = (axis: unknown, key: string) => {
+          if (typeof axis !== "object" || axis === null) return axis;
+          const item = axis as Record<string, unknown>;
+          const tickfont = (item.tickfont ?? {}) as Record<string, unknown>;
+          const title = (item.title ?? {}) as Record<string, unknown>;
+          const titleFont = (title.font ?? {}) as Record<string, unknown>;
+          const denseHeatmapX = key === "xaxis" && compactHeatmapLabels;
+          return {
+            ...item,
+            automargin: true,
+            ...(denseHeatmapX ? {
+              tickangle: -90,
+              tickmode: "array",
+              tickvals: compactHeatmapLabels.x,
+              ticktext: compactHeatmapLabels.x,
+            } : {}),
+            tickfont: { ...tickfont, size: Math.min(Number(tickfont.size ?? 10), denseHeatmapX ? 8 : 9) },
+            title: { ...title, font: { ...titleFont, size: Math.min(Number(titleFont.size ?? 11), 10) } },
+          };
+        };
+        const compactAxes = el.clientWidth < 520
+          ? Object.fromEntries(Object.entries(fig.layout)
+              .filter(([key]) => /^xaxis\d*$|^yaxis\d*$/.test(key))
+              .map(([key, value]) => [key, compactAxis(value, key)]))
+          : {};
+        const compactCategoryCount = el.clientWidth < 520
+          ? Math.max(0, ...fig.data.map((trace) => {
+              if (typeof trace !== "object" || trace === null || (trace as { type?: string }).type !== "bar") return 0;
+              const y = (trace as { y?: unknown[] }).y;
+              return Array.isArray(y) && y.every((value) => typeof value === "string") ? y.length : 0;
+            }))
+          : 0;
+        const renderHeight = compactSmallMultiples
+          ? Math.max(figHeight, 340)
+          : compactCategoryCount > 7
+            ? Math.max(figHeight, compactCategoryCount * 34 + 80)
+            : figHeight;
+        // The authored heights target desktop. Give dense mobile labels actual
+        // vertical room instead of shrinking or deleting categorical truth.
+        el.style.height = `${renderHeight}px`;
         const layout = {
           ...fig.layout,
-          height: figHeight,
+          ...compactAxes,
+          height: renderHeight,
           ...(compactMap ? { margin: { ...authoredMargin, t: Math.max(Number(authoredMargin.t ?? 0), 54) } } : {}),
+          ...(compactSmallMultiples ? {
+            annotations: compactAnnotations,
+            margin: { ...authoredMargin, t: Math.max(Number(authoredMargin.t ?? 0), 62) },
+          } : {}),
         };
         void newPlot(el, data, layout, { ...baseConfig })
           .then(() => {
@@ -112,7 +187,8 @@ export function RemoteFigure({
     return (
       <div
         style={{ height: figHeight, width: "100%" }}
-        role="img"
+        role="status"
+        aria-live="polite"
         aria-busy="true"
         aria-label={t.common.loading}
         className={`flex min-w-0 max-w-full animate-pulse items-center justify-center overflow-hidden rounded-md border border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
@@ -129,8 +205,9 @@ export function RemoteFigure({
     return (
       <div
         style={{ height: figHeight, width: "100%" }}
-        role="img"
-        aria-label={ariaLabel}
+        role="status"
+        aria-live="polite"
+        aria-label={`${ariaLabel}: ${t.common.chartUnavailable}`}
         className={`flex min-w-0 max-w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
       >
         {t.common.chartUnavailable}
@@ -144,7 +221,7 @@ export function RemoteFigure({
       style={{ height: figHeight, width: "100%" }}
       role="img"
       aria-label={ariaLabel}
-      className={`min-w-0 max-w-full overflow-hidden ${className}`}
+      className={`remote-figure min-w-0 max-w-full overflow-hidden ${className}`}
     />
   );
 }

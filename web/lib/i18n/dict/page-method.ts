@@ -1,14 +1,15 @@
 // Self-contained EN/FR dictionary for app/method/page.tsx.
 // Keep in sync with that page only — do NOT wire this into the central dict.
-// API-returned strings (coverage field labels, caveat text, version dates) are
-// NOT translated here; they come from the API as-is.
+// API-returned coverage and caveat identifiers are localized here at the
+// presentation boundary; unknown future values deliberately fall back to the
+// server text instead of disappearing.
 
 export const methodDict = {
   en: {
     // ApiDown fallback
     apiDownTitle: "Data service unavailable",
     apiDownBody: "The API isn't responding. Start it with",
-    apiDownCmd: "uvicorn api.main:app --port 8530",
+    apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Hero
     heroEyebrow: "Method & data",
@@ -43,10 +44,12 @@ export const methodDict = {
     coverageBuiltFrom: "Built from",
     coveragePostingsSpanning: "postings spanning",
     coveragePostingsLabel: "postings",
+    coverageLabels: {} as Record<string, string>,
 
     // Caveats figure
     caveatsEyebrow: "Caveats",
     caveatsTitle: "Things to keep in mind",
+    caveatTranslations: {} as Record<string, string>,
 
     // Category cap figure
     capEyebrow: "Category limit",
@@ -95,7 +98,7 @@ export const methodDict = {
     // ApiDown fallback
     apiDownTitle: "Service de données indisponible",
     apiDownBody: "L'API ne répond pas. Démarrez-la avec",
-    apiDownCmd: "uvicorn api.main:app --port 8530",
+    apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Hero
     heroEyebrow: "Méthode et données",
@@ -117,7 +120,7 @@ export const methodDict = {
     notMeasuresItems: [
       "Pas l'emploi — le nombre de personnes en poste",
       "Pas le taux de chômage",
-      "Pas les postes vacants au sens de Statistique Canada (EERH)",
+      "Pas les postes vacants au sens de Statistique Canada (EPVS)",
       "Pas les embauches réelles — une offre peut ne mener à aucune embauche",
       "Une seule annonce ne correspond pas nécessairement à un seul poste",
     ],
@@ -130,10 +133,26 @@ export const methodDict = {
     coverageBuiltFrom: "Calculé à partir de",
     coveragePostingsSpanning: "offres couvrant",
     coveragePostingsLabel: "offres",
+    coverageLabels: {
+      noc_postings: "Profession (CNP)",
+      naics_postings: "Industrie (SCIAN)",
+      wage_postings: "Salaire",
+      remote_field_postings: "Champ sur le télétravail",
+    } as Record<string, string>,
 
     // Caveats figure
     caveatsEyebrow: "Mises en garde",
     caveatsTitle: "Points importants à retenir",
+    caveatTranslations: {
+      "Job ads measure posted labor demand, not employment or unemployment.":
+        "Les offres d’emploi mesurent la demande de main-d’œuvre affichée, non l’emploi ni le chômage.",
+      "The 2025 upstream raw fetch provenance remains under audit; freshness should be read with caution.":
+        "La provenance de la collecte brute en amont pour 2025 fait toujours l’objet d’un audit; la fraîcheur des données doit être interprétée avec prudence.",
+      "Wages, remote work, language, and detailed experience fields are sparse or historically unstable.":
+        "Les champs sur les salaires, le télétravail, la langue et l’expérience détaillée sont peu renseignés ou historiquement instables.",
+      "Posting-level lookup is private and may be bounded by the configured lookup window and row limit.":
+        "La consultation au niveau des offres est privée et peut être limitée par la période et le nombre maximal de lignes configurés.",
+    } as Record<string, string>,
 
     // Category cap figure
     capEyebrow: "Limite de catégories",

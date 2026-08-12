@@ -59,6 +59,23 @@ Last condensed: 2026-08-11
 - Parent verification passed Python, lint, type, production-build, data-reconciliation, EN/FR route matrix, public/team cap, and authenticated Explore journeys. A fresh reviewer then rebuilt the 16-component portable package, verified the self-contained official logo, and returned `READY`. The canonical public services and tunnel were not changed.
 - Production release remains a separate decision: the unavailable Keychain credential and ambiguous Render publication boundary must be resolved before integration or cutover.
 
+## 2026-08-11 to 2026-08-12 | Redesign deep-audit convergence
+
+- A whole-system convergence audit repaired mobile figure legibility, summary
+  contrast, French metadata/provenance, authenticated Explore framing and
+  failure states, private response caching, concurrent/forged-header login
+  limits, atomic derived-bundle and lookup publication, stale lookup windows,
+  private-text encoding, and vulnerable web dependencies.
+- The final isolated candidate passed 362 Python tests, Next 16.3 lint/type/build,
+  clean dependency audits, 27/27 live route-and-viewport checks, real Explore
+  failure journeys, data reconciliation, security response probes, and 16/16
+  rendered design-package previews. Fresh adversarial review found no remaining
+  candidate-code or product blocker.
+- Production is still intentionally unchanged and not ready for cutover. The
+  installed Mac LaunchAgent omits Uvicorn `--no-proxy-headers`; update it only
+  during authorized cutover with backup, validation, rollback, and a repeated
+  forged-header probe. Keychain and Render ownership remain separate blockers.
+
 ## Rebuild rule
 
 - Rebuild from dated records and owning evidence. When over budget, condense the oldest adjacent spans first and preserve exact claims with direct links where they materially aid verification.

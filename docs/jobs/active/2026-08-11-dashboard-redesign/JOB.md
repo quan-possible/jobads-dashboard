@@ -1,7 +1,7 @@
 # Dashboard redesign implementation
 
-Status: active in an isolated worktree; implementation and adversarial
-verification complete with `READY`, production publication blocked.
+Status: complete in an isolated worktree; deep-audit convergence and fresh
+adversarial verification passed, production publication blocked.
 
 ## Objective
 
@@ -54,8 +54,9 @@ category-cap, bilingual, accessibility, or deployment contracts.
 ## Next action
 
 Hand the accepted candidate back for an explicit integration/release decision.
-Restore the production credential and confirm the Render publication boundary
-before cutover. Do not restart the public services until release is authorized.
+Restore the production credential, confirm the Render publication boundary,
+and harden the installed public LaunchAgent with `--no-proxy-headers` before
+cutover. Do not restart the public services until release is authorized.
 
 ## Verification evidence
 
@@ -83,3 +84,14 @@ before cutover. Do not restart the public services until release is authorized.
   `bd308c4d221076e515bad78093e68b460967180b96c5765855d9ea3a691a8217`.
   The same reviewer rebuilt and rendered all 16 components, confirmed Brand,
   Footer, and TopNav, and returned `READY` at `229c9ae2`.
+- Deep-audit convergence then admitted and repaired 19 candidate defects across
+  mobile product quality, bilingual/auth states, security/privacy, data
+  publication, lookup text integrity, dependencies, and package permanence.
+  The complete suite passed 362 Python tests, lint, type, Next 16.3 build, two
+  zero-vulnerability npm audits, 27/27 live route/viewport checks, real Explore
+  failure paths, and 16/16 portable-package renders. A fresh adversarial review
+  returned `READY` for the candidate and `NOT READY` for production cutover.
+- The remaining publication prerequisite is external to the worktree:
+  `/Users/brucenguyen/Library/LaunchAgents/com.aclmr.jobads-dashboard-public.plist`
+  still omits `--no-proxy-headers`. Back it up, add and validate the flag during
+  authorized cutover, then repeat the forged-header throttle probe.

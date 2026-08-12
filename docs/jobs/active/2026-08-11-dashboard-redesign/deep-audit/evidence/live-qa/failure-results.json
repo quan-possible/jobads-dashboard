@@ -1,0 +1,45 @@
+[
+  {
+    "route": "/",
+    "status": 200,
+    "visibleError": false,
+    "buttons": [
+      "",
+      "EN",
+      "FR",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "signals": [
+      "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    ],
+    "excerpt": "Skip to main content\nLABOUR MARKET\nPULSE\nOCCUPATIONS\nINDUSTRIES\nGEOGRAPHY\nWAGES\nSKILLS\nMETHOD\nEN\nFR\nLABOUR MARKET PULSE · MAR 2026\nCANADA’S HIRING IS 8% BELOW ITS 2019 BASELINE.\n\nA monthly read on posted hiring across Canada’s regions, occupations and industries. Job ads measure posted demand — not employment or vacancies.\n\nPOSTINGS INDEX\n2019 = 100\n92\ndown\n▼\n8.3%\nvs baseline\nACTIVE POSTINGS\nthis month\n217.4k\nup\n▲\n11.7%\nMoM\nVS LAST YEAR\nyear over year\n▼\n7.6%\nMEDIAN WAGE\nn = 43.3k\n$29.28\n/hr\n01\nPOSTINGS OVER TIME\nMAR 2026\nPOSTINGS OVER TIME\nPosted hiring: monthly job-ad postings\nMAR 2026\n2020\n2"
+  },
+  {
+    "route": "/explore",
+    "status": 200,
+    "visibleError": false,
+    "buttons": [
+      "",
+      "EN",
+      "FR",
+      "Reset"
+    ],
+    "signals": [
+      "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    ],
+    "excerpt": "Skip to main content\nLABOUR MARKET\nPULSE\nOCCUPATIONS\nINDUSTRIES\nGEOGRAPHY\nWAGES\nSKILLS\nMETHOD\nEN\nFR\nEXPLORE\nEXPLORE THE DATA YOUR WAY\n\nBuild your own chart from any breakdown and measure, or search the individual job postings behind the aggregates. Explore is team-access — sign in with the dashboard password to continue. Both views use the same region, occupation and industry filters above.\n\nFILTER\nTHE EXPLORE VIEWS\nREGION\nAll Canada\nAlberta\nBritish Columbia\nManitoba\nNew Brunswick\nNewfoundland & Labrador\nNova Scotia\nNorthwest Territories\nOntario\nPrince Edward Island\nQuebec\nSaskatchewan\nOCCUPAT"
+  }
+]

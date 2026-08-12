@@ -8,6 +8,7 @@ see ``api/auth.py``.
 from __future__ import annotations
 
 import os
+import threading
 import time
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
@@ -49,17 +50,16 @@ _AUTH_WINDOW = 900.0            # 15 minutes
 _GLOBAL_FAILURES: list[float] = []
 _GLOBAL_MAX_FAILURES = 50       # global cap within _AUTH_WINDOW
 
-# Loopback peers are the single-container default: the Next proxy connects to
-# FastAPI over localhost, so its X-Forwarded-For carries the real client IP.
-# Override with a comma-separated allowlist of proxy socket addresses if the
-# proxy hop is elsewhere.
-_DEFAULT_TRUSTED_PROXIES = {"127.0.0.1", "::1", "localhost"}
-
-
 def _trusted_proxies() -> set[str]:
+    """Return explicitly configured proxy peers.
+
+    Trust is opt-in. A generic reverse proxy/rewrite may preserve a client-
+    supplied X-Forwarded-For header instead of replacing it, so trusting
+    loopback by default would let a caller choose their own rate-limit key.
+    Deployments may enable this only after the public proxy is known to
+    sanitize the header at the trust boundary.
+    """
     raw = os.environ.get("JOBADS_API_TRUSTED_PROXY", "").strip()
-    if not raw:
-        return _DEFAULT_TRUSTED_PROXIES
     return {p.strip() for p in raw.split(",") if p.strip()}
 
 
@@ -71,14 +71,9 @@ def _client_ip(request: Request) -> str:
     reset their own backoff and brute-forces the shared password (S06). When the
     peer is untrusted we key on the real socket address.
 
-    Single-trusted-hop assumption: the Next.js proxy is the only hop between
-    the internet and FastAPI, running on loopback. In a standard
-    ``client → Next (public) → FastAPI (localhost)`` chain, ``X-Forwarded-For``
-    contains exactly one entry: the IP that *Next observed* (the real client).
-    We take the RIGHTMOST entry so an attacker who adds extra leftmost entries
-    cannot rotate their own bucket. If a multi-proxy topology is ever added,
-    extend ``_JOBADS_API_TRUSTED_PROXY`` with each additional proxy and adjust
-    this logic to remove as many rightmost entries as there are trusted hops."""
+    For an explicitly trusted, sanitizing single-hop proxy, use the rightmost
+    entry. If a multi-proxy topology is added, configure and parse its trusted
+    chain deliberately rather than broadening this default."""
     peer = request.client.host if request.client else "unknown"
     if peer in _trusted_proxies():
         xff = request.headers.get("x-forwarded-for")
@@ -88,6 +83,7 @@ def _client_ip(request: Request) -> str:
 
 
 _AUTH_FAILURES_MAX_KEYS = 1024   # S10: cap dict size to resist memory exhaustion
+_AUTH_RATE_LOCK = threading.Lock()
 
 
 def _auth_rate_check(ip: str) -> None:
@@ -137,6 +133,26 @@ def _auth_record_failure(ip: str) -> None:
 
 def _auth_record_success(ip: str) -> None:
     _AUTH_FAILURES.pop(ip, None)
+
+
+def _verify_login_attempt(ip: str, password: str) -> bool:
+    """Atomically check, verify, and record one login attempt.
+
+    FastAPI runs this sync route in a thread pool. Keeping the failure-window
+    check and its state update under one lock prevents a burst of concurrent
+    requests from all passing the check before any failure is recorded.
+    Password verification is intentionally inside the critical section: this
+    endpoint uses one shared credential and serializing attempts is both small
+    in scope and part of the brute-force defence.
+    """
+    with _AUTH_RATE_LOCK:
+        _auth_rate_check(ip)
+        verified = auth.verify_password(password)
+        if verified:
+            _auth_record_success(ip)
+        else:
+            _auth_record_failure(ip)
+        return verified
 
 
 def _set_session_cookie(response: Response, token: str) -> None:
@@ -194,19 +210,16 @@ def auth_status(request: Request) -> AuthStatus:
 @router.post("/auth", response_model=AuthStatus)
 def login(body: LoginBody, request: Request, response: Response) -> AuthStatus:
     ip = _client_ip(request)
-    _auth_rate_check(ip)
     if not auth.auth_configured():
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Access control is not configured on this server.",
         )
-    if not auth.verify_password(body.password):
-        _auth_record_failure(ip)
+    if not _verify_login_attempt(ip, body.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password.",
         )
-    _auth_record_success(ip)
     _set_session_cookie(response, auth.mint_session())
     return AuthStatus(authenticated=True, configured=True)
 
@@ -231,11 +244,13 @@ def logout(response: Response) -> AuthStatus:
     dependencies=[Depends(require_session), Depends(require_lookup)],
 )
 def list_postings(
+    response: Response,
     scope: Scope = Depends(scope_dependency),
     q: str | None = Query(None, description="Search job title / employer."),
     limit: int = Query(25, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ) -> PostingsResponse:
+    response.headers["Cache-Control"] = "private, no-store"
     return private.postings(scope, q, limit, offset)
 
 
@@ -244,8 +259,13 @@ def list_postings(
     response_model=PostingDetail,
     dependencies=[Depends(require_session), Depends(require_lookup)],
 )
-def posting_detail(posting_id: str) -> PostingDetail:
+def posting_detail(posting_id: str, response: Response) -> PostingDetail:
+    response.headers["Cache-Control"] = "private, no-store"
     detail = private.posting_detail(posting_id)
     if detail is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Posting not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Posting not found.",
+            headers={"Cache-Control": "private, no-store"},
+        )
     return detail

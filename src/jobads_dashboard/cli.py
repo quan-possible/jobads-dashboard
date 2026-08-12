@@ -21,6 +21,13 @@ def discover_source_root(repo_root: Path) -> Path:
 DEFAULT_SOURCE_ROOT = discover_source_root(REPO_ROOT)
 
 
+def non_negative_int(value: str) -> int:
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be zero or greater")
+    return parsed
+
+
 def refresh_dashboard_data(*args, **kwargs):
     from jobads_dashboard.dashboard.prepare import refresh_dashboard_data as _refresh_dashboard_data
 
@@ -52,8 +59,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     refresh.add_argument("--source-root", type=Path, default=DEFAULT_SOURCE_ROOT)
     refresh.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     refresh.add_argument("--skills-top-k", type=int, default=10)
-    refresh.add_argument("--posting-lookup-limit", type=int, default=100_000)
-    refresh.add_argument("--posting-lookup-recent-months", type=int, default=24)
+    refresh.add_argument("--posting-lookup-limit", type=non_negative_int, default=100_000)
+    refresh.add_argument("--posting-lookup-recent-months", type=non_negative_int, default=24)
 
     posting_lookup = subparsers.add_parser(
         "posting-lookup",
@@ -61,8 +68,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     posting_lookup.add_argument("--source-root", type=Path, default=DEFAULT_SOURCE_ROOT)
     posting_lookup.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
-    posting_lookup.add_argument("--posting-lookup-limit", type=int, default=100_000)
-    posting_lookup.add_argument("--posting-lookup-recent-months", type=int, default=24)
+    posting_lookup.add_argument("--posting-lookup-limit", type=non_negative_int, default=100_000)
+    posting_lookup.add_argument("--posting-lookup-recent-months", type=non_negative_int, default=24)
 
     validate = subparsers.add_parser("validate", help="Check the derived dashboard package.")
     validate.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)

@@ -1,0 +1,4924 @@
+{
+  "target": "http://127.0.0.1:8521",
+  "revision": "77926310+deep-audit-repairs",
+  "matrix": [
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/",
+      "status": 200,
+      "lang": "en",
+      "title": "Canada’s hiring",
+      "h1Count": 1,
+      "h1": "Canada’s hiring is 8% below its 2019 baseline.",
+      "overflowX": 0,
+      "plotCount": 7,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/occupations",
+      "status": 200,
+      "lang": "en",
+      "title": "Occupations · ACLMR",
+      "h1Count": 1,
+      "h1": "What work Canada is hiring for, and how the mix is shifting.",
+      "overflowX": 0,
+      "plotCount": 8,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/industries",
+      "status": 200,
+      "lang": "en",
+      "title": "Industries · ACLMR",
+      "h1Count": 1,
+      "h1": "Posted hiring by industry sector.",
+      "overflowX": 0,
+      "plotCount": 4,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/geography",
+      "status": 200,
+      "lang": "en",
+      "title": "Geography · ACLMR",
+      "h1Count": 1,
+      "h1": "Where in Canada are postings concentrated?",
+      "overflowX": 0,
+      "plotCount": 6,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/wages",
+      "status": 200,
+      "lang": "en",
+      "title": "Wages · ACLMR",
+      "h1Count": 1,
+      "h1": "What job ads say about pay.",
+      "overflowX": 0,
+      "plotCount": 7,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/skills",
+      "status": 200,
+      "lang": "en",
+      "title": "Skills & requirements · ACLMR",
+      "h1Count": 1,
+      "h1": "What employers are asking for.",
+      "overflowX": 0,
+      "plotCount": 6,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/method",
+      "status": 200,
+      "lang": "en",
+      "title": "Method · ACLMR",
+      "h1Count": 1,
+      "h1": "How to read this dashboard.",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/developers",
+      "status": 200,
+      "lang": "en",
+      "title": "Developers · ACLMR",
+      "h1Count": 1,
+      "h1": "Public data API",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "/api/docs",
+          "width": 68,
+          "height": 22
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "route": "/explore",
+      "status": 200,
+      "lang": "en",
+      "title": "Explore · ACLMR",
+      "h1Count": 1,
+      "h1": "Explore the data your way",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/",
+      "status": 200,
+      "lang": "en",
+      "title": "Canada’s hiring",
+      "h1Count": 1,
+      "h1": "Canada’s hiring is 8% below its 2019 baseline.",
+      "overflowX": 0,
+      "plotCount": 7,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/occupations",
+      "status": 200,
+      "lang": "en",
+      "title": "Occupations · ACLMR",
+      "h1Count": 1,
+      "h1": "What work Canada is hiring for, and how the mix is shifting.",
+      "overflowX": 0,
+      "plotCount": 8,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/industries",
+      "status": 200,
+      "lang": "en",
+      "title": "Industries · ACLMR",
+      "h1Count": 1,
+      "h1": "Posted hiring by industry sector.",
+      "overflowX": 0,
+      "plotCount": 4,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/geography",
+      "status": 200,
+      "lang": "en",
+      "title": "Geography · ACLMR",
+      "h1Count": 1,
+      "h1": "Where in Canada are postings concentrated?",
+      "overflowX": 0,
+      "plotCount": 6,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": []
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/wages",
+      "status": 200,
+      "lang": "en",
+      "title": "Wages · ACLMR",
+      "h1Count": 1,
+      "h1": "What job ads say about pay.",
+      "overflowX": 0,
+      "plotCount": 7,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/skills",
+      "status": 200,
+      "lang": "en",
+      "title": "Skills & requirements · ACLMR",
+      "h1Count": 1,
+      "h1": "What employers are asking for.",
+      "overflowX": 0,
+      "plotCount": 6,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/method",
+      "status": 200,
+      "lang": "en",
+      "title": "Method · ACLMR",
+      "h1Count": 1,
+      "h1": "How to read this dashboard.",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/developers",
+      "status": 200,
+      "lang": "en",
+      "title": "Developers · ACLMR",
+      "h1Count": 1,
+      "h1": "Public data API",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "/api/docs",
+          "width": 68,
+          "height": 22
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "tablet",
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "route": "/explore",
+      "status": 200,
+      "lang": "en",
+      "title": "Explore · ACLMR",
+      "h1Count": 1,
+      "h1": "Explore the data your way",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/",
+      "status": 200,
+      "lang": "en",
+      "title": "Canada’s hiring",
+      "h1Count": 1,
+      "h1": "Canada’s hiring is 8% below its 2019 baseline.",
+      "overflowX": 0,
+      "plotCount": 7,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=5CB68i4pnAekjehf",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=5CB68i4pnAekjehf",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=5CB68i4pnAekjehf",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=5CB68i4pnAekjehf",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=5CB68i4pnAekjehf",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=5CB68i4pnAekjehf",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/occupations",
+      "status": 200,
+      "lang": "en",
+      "title": "Occupations · ACLMR",
+      "h1Count": 1,
+      "h1": "What work Canada is hiring for, and how the mix is shifting.",
+      "overflowX": 0,
+      "plotCount": 8,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=575v3wc1VnpCAaDy",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=575v3wc1VnpCAaDy",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=575v3wc1VnpCAaDy",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=575v3wc1VnpCAaDy",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=575v3wc1VnpCAaDy",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=575v3wc1VnpCAaDy",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=o5-X_TAO1126Vq5H",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/industries",
+      "status": 200,
+      "lang": "en",
+      "title": "Industries · ACLMR",
+      "h1Count": 1,
+      "h1": "Posted hiring by industry sector.",
+      "overflowX": 0,
+      "plotCount": 4,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=EIsiHLY1EA81RtEP",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=EIsiHLY1EA81RtEP",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=EIsiHLY1EA81RtEP",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=EIsiHLY1EA81RtEP",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=EIsiHLY1EA81RtEP",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=EIsiHLY1EA81RtEP",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=KSLQadErVmHTPpoG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/geography",
+      "status": 200,
+      "lang": "en",
+      "title": "Geography · ACLMR",
+      "h1Count": 1,
+      "h1": "Where in Canada are postings concentrated?",
+      "overflowX": 0,
+      "plotCount": 6,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom in"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom out"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=FA78ZWcp64Moesq2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=FA78ZWcp64Moesq2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=FA78ZWcp64Moesq2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=FA78ZWcp64Moesq2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=FA78ZWcp64Moesq2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=FA78ZWcp64Moesq2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=HG08cUMwjdDp_lYr",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/wages",
+      "status": 200,
+      "lang": "en",
+      "title": "Wages · ACLMR",
+      "h1Count": 1,
+      "h1": "What job ads say about pay.",
+      "overflowX": 0,
+      "plotCount": 7,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=8Vs9bAz7Vh4Z1UJV",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=8Vs9bAz7Vh4Z1UJV",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=8Vs9bAz7Vh4Z1UJV",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=8Vs9bAz7Vh4Z1UJV",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=8Vs9bAz7Vh4Z1UJV",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=8Vs9bAz7Vh4Z1UJV",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=7geXVjBBbYTIgV0r",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/skills",
+      "status": 200,
+      "lang": "en",
+      "title": "Skills & requirements · ACLMR",
+      "h1Count": 1,
+      "h1": "What employers are asking for.",
+      "overflowX": 0,
+      "plotCount": 6,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=ZAweaE_PVlyC5PxI",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=ZAweaE_PVlyC5PxI",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=ZAweaE_PVlyC5PxI",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=ZAweaE_PVlyC5PxI",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=ZAweaE_PVlyC5PxI",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=ZAweaE_PVlyC5PxI",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=7hx0JnEbAedMlUiG",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/method",
+      "status": 200,
+      "lang": "en",
+      "title": "Method · ACLMR",
+      "h1Count": 1,
+      "h1": "How to read this dashboard.",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=A1XpA_BbsEen8Bfc",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=A1XpA_BbsEen8Bfc",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=A1XpA_BbsEen8Bfc",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=A1XpA_BbsEen8Bfc",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=A1XpA_BbsEen8Bfc",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=A1XpA_BbsEen8Bfc",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=zAkKyMp5qVka_jt6",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/developers",
+      "status": 200,
+      "lang": "en",
+      "title": "Developers · ACLMR",
+      "h1Count": 1,
+      "h1": "Public data API",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=dnwEALE2rpknmHGC",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=dnwEALE2rpknmHGC",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=dnwEALE2rpknmHGC",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=dnwEALE2rpknmHGC",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=dnwEALE2rpknmHGC",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=dnwEALE2rpknmHGC",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=dnwEALE2rpknmHGC",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=pYLnW-6C9bSfwPfN",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "label": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "route": "/explore",
+      "status": 200,
+      "lang": "en",
+      "title": "Explore · ACLMR",
+      "h1Count": 1,
+      "h1": "Explore the data your way",
+      "overflowX": 0,
+      "plotCount": 0,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [],
+      "imgsMissingAlt": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    }
+  ],
+  "publicFlows": {
+    "skip": {
+      "href": "#main",
+      "text": "Skip to main content",
+      "visible": true
+    },
+    "skipTarget": {
+      "id": "main",
+      "tag": "MAIN"
+    },
+    "menuExpanded": "true",
+    "mobileNavLinks": [
+      "Pulse",
+      "Occupations",
+      "Industries",
+      "Geography",
+      "Wages",
+      "Skills",
+      "Method"
+    ],
+    "menuClosed": "false",
+    "french": {
+      "lang": "fr",
+      "title": "L’embauche au Canada",
+      "h1Count": 1,
+      "h1": "L’embauche au Canada est 8 % en dessous de son niveau de référence de 2019.",
+      "overflowX": 0,
+      "plotCount": 7,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Aller au contenu principal",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Tendance",
+          "width": 59,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Professions",
+          "width": 71,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Géographie",
+          "width": 72,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Salaires",
+          "width": 49,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Compétences",
+          "width": 84,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Méthode",
+          "width": 55,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Développeurs",
+          "width": 86,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "méthode et les mises en garde",
+          "width": 167,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": []
+    },
+    "signals": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=tXyZJ52UQVBCVsD3",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    }
+  },
+  "exploreFlows": {
+    "publicExploreNavCount": 0,
+    "invalidMessage": "Incorrect password.",
+    "authenticatedExploreNavCount": 1,
+    "authenticatedHero": "Explore the full dataset",
+    "authenticatedLede": "Your verified team session is active. Build uncapped charts or inspect the postings behind the aggregates using the shared filters below.",
+    "initialRows": 25,
+    "clickedText": "Senior ArchaeologistQC · WSP Canada Inc$57.60Mar 2026›",
+    "dialogState": {
+      "modal": "true",
+      "activeInside": true,
+      "bodyLocked": "hidden"
+    },
+    "drawerHasMojibake": false,
+    "focusReturned": {
+      "tag": "BUTTON",
+      "text": "Senior ArchaeologistQC · WSP Canada Inc$57.60Mar 2026›"
+    },
+    "pageTwoVisible": true,
+    "filteredScopeVisible": true,
+    "noResultsVisible": true,
+    "builderState": {
+      "lang": "en",
+      "title": "Explore · ACLMR",
+      "h1Count": 1,
+      "h1": "Explore the full dataset",
+      "overflowX": 0,
+      "plotCount": 1,
+      "chartUnavailable": false,
+      "unnamed": [],
+      "unlabeledInputs": [],
+      "duplicateIds": [],
+      "smallTargets": [
+        {
+          "tag": "A",
+          "text": "Skip to main content",
+          "width": 32,
+          "height": 16
+        },
+        {
+          "tag": "A",
+          "text": "Pulse",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Occupations",
+          "width": 77,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Industries",
+          "width": 62,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Geography",
+          "width": 67,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Wages",
+          "width": 40,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Skills",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Method",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Explore",
+          "width": 48,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "Developers",
+          "width": 70,
+          "height": 24
+        },
+        {
+          "tag": "A",
+          "text": "method & caveats",
+          "width": 100,
+          "height": 17
+        },
+        {
+          "tag": "A",
+          "text": "aclmr.ca →",
+          "width": 61,
+          "height": 20
+        }
+      ],
+      "modebarTargets": [
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Zoom"
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "title": "Reset axes"
+        }
+      ],
+      "imgsMissingAlt": []
+    },
+    "afterLogoutExploreNavCount": 0,
+    "expiredRelocked": true,
+    "signals": {
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/developers?_rsc=TLJ23gVnbrIc7BPU",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/developers?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/developers?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/explore?_rsc=-xeKiNFDOuuBtMH2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/explore?geo=AB&_rsc=-xeKiNFDOuuBtMH2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/developers?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/explore?geo=AB&_rsc=-xeKiNFDOuuBtMH2",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/occupations?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/geography?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/industries?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/wages?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/developers?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/skills?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:8521/method?_rsc=-ZlQGheqjI7_E2Fu",
+          "method": "GET",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    }
+  },
+  "frenchMethod": {
+    "lang": "fr",
+    "title": "Méthode · ACLMR",
+    "knownEnglishLeaks": []
+  },
+  "logoutFailure": {
+    "alert": "Couldn’t sign out. Try again.",
+    "exploreStillVisible": true,
+    "stillAuthenticatedAfterReload": true
+  }
+}

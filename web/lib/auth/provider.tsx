@@ -74,12 +74,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
-    try {
-      await apiLogout();
-    } finally {
-      setAuthenticated(false);
-      router.refresh();
-    }
+    const status = await apiLogout();
+    // Preserve the verified local session if the server could not complete the
+    // logout. Callers surface that failure and let the person retry rather than
+    // presenting a misleading locked state while the cookie remains valid.
+    setAuthenticated(status.authenticated);
+    setConfigured(status.configured);
+    setError(false);
+    router.refresh();
   }, [router]);
 
   const lock = useCallback(() => {

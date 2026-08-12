@@ -55,7 +55,7 @@ Run the app locally (two processes):
 ```bash
 # Terminal 1 — the API (reads only derived parquet)
 python -m pip install -e '.[api]'
-uvicorn api.main:app --port 8530
+uvicorn api.main:app --port 8530 --no-proxy-headers
 
 # Terminal 2 — the web UI (proxies /api/* to the API above)
 npm --prefix web install

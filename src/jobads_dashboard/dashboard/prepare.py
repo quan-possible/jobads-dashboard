@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import html
 import json
+import shutil
+import tempfile
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,6 +26,74 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "data" / "derived" / "labor_market_dashboard_v1"
 SOURCE_GLOB = "20[0-9][0-9]/processed_*.parquet"
 
+# Known UTF-8 punctuation and French characters occasionally arrive after their
+# bytes were decoded as Windows-1252. Keep this mapping deliberately specific:
+# valid Unicode is left alone, while recognized mojibake is repaired when the
+# private posting lookup is materialized.
+MOJIBAKE_REPLACEMENTS = (
+    ("â€¯", " "),
+    ("â€Ž", "‎"),
+    ("â€\u009d", "”"),
+    ("â€‹", "​"),
+    ("â€‰", " "),
+    ("â€‚", " "),
+    ("â€\u0090", "‐"),
+    ("â€£", "‣"),
+    ("â€ƒ", " "),
+    ("â€¨", " "),
+    ("â€‘", "‑"),
+    ("â€“", "–"),
+    ("â€”", "—"),
+    ("â€˜", "‘"),
+    ("â€™", "’"),
+    ("â€œ", "“"),
+    ("â€�", "”"),
+    ("â€¢", "•"),
+    ("â€¦", "…"),
+    ("Â ", " "),
+    ("Ã€", "À"),
+    ("Ã‚", "Â"),
+    ("Ã‡", "Ç"),
+    ("Ãˆ", "È"),
+    ("Ã‰", "É"),
+    ("ÃŠ", "Ê"),
+    ("Ã‹", "Ë"),
+    ("ÃŽ", "Î"),
+    ("Ã”", "Ô"),
+    ("Ã™", "Ù"),
+    ("Ã›", "Û"),
+    ("Ãœ", "Ü"),
+    ("Ã ", "à"),
+    ("Ã¢", "â"),
+    ("Ã§", "ç"),
+    ("Ã¨", "è"),
+    ("Ã©", "é"),
+    ("Ãª", "ê"),
+    ("Ã«", "ë"),
+    ("Ã®", "î"),
+    ("Ã´", "ô"),
+    ("Ã¹", "ù"),
+    ("Ã»", "û"),
+    ("Ã¼", "ü"),
+    ("ã…¤", "ㅤ"),
+    ("ã€€", "　"),
+    # A second observed source-codepage failure writes the UTF-8 lead byte C3
+    # as `í` while leaving the continuation byte decoded as Windows-1252.
+    # Generate that finite family so French accents are repaired without
+    # touching already-valid Unicode or ordinary uses of the letter í.
+    *tuple(
+        (
+            "í" + (
+                bytes([continuation]).decode("cp1252")
+                if continuation not in (0x81, 0x8D, 0x8F, 0x90, 0x9D)
+                else chr(continuation)
+            ),
+            bytes([0xC3, continuation]).decode("utf-8"),
+        )
+        for continuation in range(0x80, 0xC0)
+    ),
+)
+
 
 def discover_source_root(repo_root: Path) -> Path:
     for anchor in (repo_root, *repo_root.parents):
@@ -34,8 +106,55 @@ def discover_source_root(repo_root: Path) -> Path:
 DEFAULT_SOURCE_ROOT = discover_source_root(REPO_ROOT)
 
 
+def non_negative_int(value: str) -> int:
+    """Parse a CLI integer whose zero value means "no bound"."""
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be zero or greater")
+    return parsed
+
+
+def validate_posting_lookup_options(
+    posting_lookup_limit: int,
+    posting_lookup_recent_months: int,
+) -> None:
+    if posting_lookup_limit < 0:
+        raise ValueError("posting_lookup_limit must be zero or greater")
+    if posting_lookup_recent_months < 0:
+        raise ValueError("posting_lookup_recent_months must be zero or greater")
+
+
+def remove_package_path(path: Path) -> None:
+    if path.is_symlink() or path.is_file():
+        path.unlink()
+    elif path.exists():
+        shutil.rmtree(path)
+
+
 def sql_literal(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
+
+
+def repair_mojibake_sql(expression: str) -> str:
+    repaired = expression
+    for corrupted, intended in MOJIBAKE_REPLACEMENTS:
+        repaired = f"replace({repaired}, {sql_literal(corrupted)}, {sql_literal(intended)})"
+    return repaired
+
+
+def normalize_posting_text(value: str | None) -> str | None:
+    """Decode literal HTML character entities after SQL repairs encoding damage."""
+    if value is None:
+        return None
+    return html.unescape(value)
+
+
+def register_posting_text_normalizer(con: duckdb.DuckDBPyConnection) -> None:
+    con.create_function("normalize_posting_text", normalize_posting_text, [str], str)
+
+
+def normalize_posting_text_sql(expression: str) -> str:
+    return f"normalize_posting_text({repair_mojibake_sql(expression)})"
 
 
 def build_noc_case() -> str:
@@ -488,6 +607,12 @@ def build_posting_lookup_table(
     posting_lookup_limit: int,
     posting_lookup_recent_months: int,
 ) -> None:
+    validate_posting_lookup_options(posting_lookup_limit, posting_lookup_recent_months)
+    register_posting_text_normalizer(con)
+    job_title_sql = normalize_posting_text_sql("COALESCE(job_title, job_title_text, 'Untitled posting')")
+    employer_sql = normalize_posting_text_sql("COALESCE(employer, 'Unknown employer')")
+    experience_details_sql = normalize_posting_text_sql("experience_details")
+    description_sql = normalize_posting_text_sql("COALESCE(description, '')")
     cutoff_cte = ""
     where_sql = ""
     if posting_lookup_recent_months > 0:
@@ -503,8 +628,8 @@ def build_posting_lookup_table(
     posting_id,
     month,
     date_found,
-    COALESCE(job_title, job_title_text, 'Untitled posting') AS job_title,
-    COALESCE(employer, 'Unknown employer') AS employer,
+    {job_title_sql} AS job_title,
+    {employer_sql} AS employer,
     province AS province_scope,
     market,
     noc_broad_label AS occupation_scope,
@@ -520,14 +645,14 @@ def build_posting_lookup_table(
     employment_type,
     duration,
     experience,
-    experience_details,
+    {experience_details_sql} AS experience_details,
     education,
     remote_class,
     primary_posting_language,
     data_source,
-    NULLIF(TRIM(description), '') IS NOT NULL AS has_description,
-    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt,
-    COALESCE(description, '') AS description_full
+    NULLIF(TRIM({description_sql}), '') IS NOT NULL AS has_description,
+    regexp_replace(substr({description_sql}, 1, 900), '\\s+', ' ', 'g') AS description_excerpt,
+    {description_sql} AS description_full
 FROM normalized_postings
 {where_sql}
 ORDER BY date_found DESC, posting_id DESC
@@ -541,37 +666,44 @@ def posting_lookup_source_plan(
     output_root: Path,
     posting_lookup_recent_months: int,
 ) -> tuple[str, str]:
+    del output_root  # Kept in the public signature for compatibility; source data is authoritative.
     if posting_lookup_recent_months <= 0:
         return sql_literal((source_root / SOURCE_GLOB).as_posix()), ""
 
-    metadata_path = output_root / "metadata.json"
-    if not metadata_path.exists():
-        source_sql = sql_literal((source_root / SOURCE_GLOB).as_posix())
-        recent_filter = f"""
-AND CAST(dateFound AS DATE) >= (
-    SELECT date_trunc('month', max(CAST(dateFound AS DATE))) - INTERVAL {int(posting_lookup_recent_months - 1)} MONTH
-    FROM read_parquet({source_sql}, union_by_name=True)
-    WHERE dateFound IS NOT NULL
-)
+    source_files = sorted(source_root.glob(SOURCE_GLOB))
+    if not source_files:
+        raise FileNotFoundError(f"No processed parquet files found under {source_root}")
+    all_source_sql = "[" + ", ".join(sql_literal(path.as_posix()) for path in source_files) + "]"
+    con = duckdb.connect()
+    try:
+        max_date = con.execute(
+            f"""
+SELECT max(CAST(dateFound AS DATE))
+FROM read_parquet({all_source_sql}, union_by_name=True)
+WHERE dateFound IS NOT NULL
 """
-        return source_sql, recent_filter
+        ).fetchone()[0]
+    finally:
+        con.close()
+    if max_date is None:
+        raise ValueError(
+            "Source data has no valid dateFound values — cannot determine the posting lookup window."
+        )
 
-    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    max_date = datetime.fromisoformat(metadata["source_window"]["max_date"]).date()
     month_index = max_date.year * 12 + max_date.month - int(posting_lookup_recent_months - 1)
     cutoff_year = (month_index - 1) // 12
     cutoff_month = (month_index - 1) % 12 + 1
     cutoff_date = f"{cutoff_year:04d}-{cutoff_month:02d}-01"
 
-    source_files = sorted(
+    window_source_files = sorted(
         path
-        for path in source_root.glob(SOURCE_GLOB)
+        for path in source_files
         if path.parent.name.isdigit() and cutoff_year <= int(path.parent.name) <= max_date.year
     )
-    if not source_files:
-        source_sql = sql_literal((source_root / SOURCE_GLOB).as_posix())
+    if not window_source_files:
+        source_sql = all_source_sql
     else:
-        source_sql = "[" + ", ".join(sql_literal(path.as_posix()) for path in source_files) + "]"
+        source_sql = "[" + ", ".join(sql_literal(path.as_posix()) for path in window_source_files) + "]"
     max_date_sql = sql_literal(max_date.isoformat())
     return source_sql, f"AND CAST(dateFound AS DATE) >= DATE {sql_literal(cutoff_date)} AND CAST(dateFound AS DATE) <= DATE {max_date_sql}"
 
@@ -583,8 +715,12 @@ def build_posting_lookup_from_source(
     posting_lookup_limit: int,
     posting_lookup_recent_months: int,
 ) -> Path:
+    validate_posting_lookup_options(posting_lookup_limit, posting_lookup_recent_months)
     output_path = output_root / "posting_lookup.parquet"
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    staging_path = output_path.with_name(
+        f".{output_path.stem}.staging-{uuid.uuid4().hex}{output_path.suffix}"
+    )
     noc_case = build_noc_case()
     naics_case = build_naics_case()
     source_sql, recent_filter = posting_lookup_source_plan(
@@ -592,6 +728,10 @@ def build_posting_lookup_from_source(
         output_root,
         posting_lookup_recent_months,
     )
+    job_title_sql = normalize_posting_text_sql("job_title")
+    employer_sql = normalize_posting_text_sql("employer")
+    experience_details_sql = normalize_posting_text_sql("experience_details")
+    description_sql = normalize_posting_text_sql("COALESCE(description, '')")
     limit_sql = f"LIMIT {int(posting_lookup_limit)}" if posting_lookup_limit > 0 else ""
     query = f"""
 WITH base AS (
@@ -642,8 +782,8 @@ SELECT
     posting_id,
     month,
     date_found,
-    job_title,
-    employer,
+    {job_title_sql} AS job_title,
+    {employer_sql} AS employer,
     province_scope,
     market,
     {noc_case} AS occupation_scope,
@@ -659,21 +799,35 @@ SELECT
     employment_type,
     duration,
     experience,
-    experience_details,
+    {experience_details_sql} AS experience_details,
     education,
     remote_class,
     primary_posting_language,
     data_source,
-    NULLIF(TRIM(description), '') IS NOT NULL AS has_description,
-    regexp_replace(substr(COALESCE(description, ''), 1, 900), '\\s+', ' ', 'g') AS description_excerpt,
-    COALESCE(description, '') AS description_full
+    NULLIF(TRIM({description_sql}), '') IS NOT NULL AS has_description,
+    regexp_replace(substr({description_sql}, 1, 900), '\\s+', ' ', 'g') AS description_excerpt,
+    {description_sql} AS description_full
 FROM base
 ORDER BY date_found DESC, posting_id DESC
 {limit_sql}
 """
-    con = duckdb.connect()
-    con.execute("PRAGMA threads=4")
-    write_query_to_parquet(con, query, output_path)
+    try:
+        con = duckdb.connect()
+        try:
+            con.execute("PRAGMA threads=4")
+            register_posting_text_normalizer(con)
+            write_query_to_parquet(con, query, staging_path)
+            # Force a read before publication so an interrupted/corrupt COPY
+            # never replaces the last known-good private lookup.
+            con.execute(
+                f"SELECT count(*) FROM read_parquet({sql_literal(staging_path.as_posix())})"
+            ).fetchone()
+        finally:
+            con.close()
+        staging_path.replace(output_path)
+    finally:
+        if staging_path.exists():
+            staging_path.unlink()
     return output_path
 
 
@@ -873,50 +1027,92 @@ def refresh_dashboard_data(
     def log(message: str) -> None:
         print(message, flush=True)
 
-    output_root.mkdir(parents=True, exist_ok=True)
-    con = duckdb.connect()
-    con.execute("PRAGMA threads=4")
-    log("Preparing normalized upstream view...")
-    con.execute(normalized_view_sql((source_root / SOURCE_GLOB).as_posix()))
-
-    log("Building monthly_filter_cube.parquet ...")
-    build_monthly_filter_cube(con, output_root)
-    log("Building monthly_overall.parquet ...")
-    build_monthly_overall(con, output_root)
-    log("Building monthly_by_province.parquet ...")
-    build_monthly_by_province(con, output_root)
-    log("Building monthly_by_noc_broad.parquet ...")
-    build_monthly_by_noc_broad(con, output_root)
-    log("Building monthly_by_naics_broad.parquet ...")
-    build_monthly_by_naics_broad(con, output_root)
-    log("Building wage tables ...")
-    build_monthly_wage_cubes(con, output_root)
-    log("Building market tables ...")
-    build_monthly_by_market(con, output_root)
-    log("Building monthly_conditions.parquet ...")
-    build_monthly_conditions(con, output_root)
-    log("Building monthly_language.parquet ...")
-    build_monthly_language(con, output_root)
-    log("Building monthly_requirements.parquet ...")
-    build_monthly_requirements(con, output_root)
-    log("Building coverage_by_field_monthly.parquet ...")
-    build_coverage_table(con, output_root)
-    log("Building monthly_skills_topk.parquet ...")
-    build_skills_table(con, output_root, skills_top_k=skills_top_k)
-    log("Building posting_lookup.parquet ...")
-    build_posting_lookup_table(
-        con,
-        output_root,
-        posting_lookup_limit=posting_lookup_limit,
-        posting_lookup_recent_months=posting_lookup_recent_months,
+    validate_posting_lookup_options(posting_lookup_limit, posting_lookup_recent_months)
+    output_root = output_root.absolute()
+    if (output_root.exists() or output_root.is_symlink()) and not output_root.is_dir():
+        raise NotADirectoryError(f"Derived package path is not a directory: {output_root}")
+    output_root.parent.mkdir(parents=True, exist_ok=True)
+    staging_root = Path(
+        tempfile.mkdtemp(prefix=f".{output_root.name}.staging-", dir=output_root.parent)
     )
+    try:
+        con = duckdb.connect()
+        try:
+            con.execute("PRAGMA threads=4")
+            log("Preparing normalized upstream view...")
+            con.execute(normalized_view_sql((source_root / SOURCE_GLOB).as_posix()))
 
-    log("Writing metadata.json ...")
-    metadata = collect_metadata(con, source_root=source_root, output_root=output_root)
-    with (output_root / "metadata.json").open("w", encoding="utf-8") as handle:
-        json.dump(metadata, handle, indent=2)
-    log("Refresh complete.")
+            log("Building monthly_filter_cube.parquet ...")
+            build_monthly_filter_cube(con, staging_root)
+            log("Building monthly_overall.parquet ...")
+            build_monthly_overall(con, staging_root)
+            log("Building monthly_by_province.parquet ...")
+            build_monthly_by_province(con, staging_root)
+            log("Building monthly_by_noc_broad.parquet ...")
+            build_monthly_by_noc_broad(con, staging_root)
+            log("Building monthly_by_naics_broad.parquet ...")
+            build_monthly_by_naics_broad(con, staging_root)
+            log("Building wage tables ...")
+            build_monthly_wage_cubes(con, staging_root)
+            log("Building market tables ...")
+            build_monthly_by_market(con, staging_root)
+            log("Building monthly_conditions.parquet ...")
+            build_monthly_conditions(con, staging_root)
+            log("Building monthly_language.parquet ...")
+            build_monthly_language(con, staging_root)
+            log("Building monthly_requirements.parquet ...")
+            build_monthly_requirements(con, staging_root)
+            log("Building coverage_by_field_monthly.parquet ...")
+            build_coverage_table(con, staging_root)
+            log("Building monthly_skills_topk.parquet ...")
+            build_skills_table(con, staging_root, skills_top_k=skills_top_k)
+            log("Building posting_lookup.parquet ...")
+            build_posting_lookup_table(
+                con,
+                staging_root,
+                posting_lookup_limit=posting_lookup_limit,
+                posting_lookup_recent_months=posting_lookup_recent_months,
+            )
+
+            log("Writing metadata.json ...")
+            metadata = collect_metadata(con, source_root=source_root, output_root=output_root)
+            with (staging_root / "metadata.json").open("w", encoding="utf-8") as handle:
+                json.dump(metadata, handle, indent=2)
+        finally:
+            con.close()
+
+        validation = validate_derived_package(staging_root, source_root=source_root)
+        if not validation.get("validated", False) or not (staging_root / "posting_lookup.parquet").exists():
+            raise RuntimeError(
+                "Refusing to publish an invalid derived package: "
+                + json.dumps(validation, sort_keys=True, default=str)
+            )
+        publish_staged_package(staging_root, output_root)
+        log("Refresh complete.")
+    finally:
+        remove_package_path(staging_root)
     return output_root
+
+
+def publish_staged_package(staging_root: Path, output_root: Path) -> None:
+    """Publish one validated directory release and restore the old one on failure."""
+    backup_root = output_root.parent / f".{output_root.name}.backup-{uuid.uuid4().hex}"
+    had_existing = output_root.exists() or output_root.is_symlink()
+    if had_existing:
+        output_root.rename(backup_root)
+    try:
+        staging_root.rename(output_root)
+    except BaseException:
+        if had_existing and backup_root.exists():
+            try:
+                backup_root.rename(output_root)
+            except OSError as restore_error:
+                raise RuntimeError(
+                    f"Publishing failed and the prior package could not be restored from {backup_root}"
+                ) from restore_error
+        raise
+    if backup_root.exists():
+        remove_package_path(backup_root)
 
 
 def parse_args() -> argparse.Namespace:
@@ -924,8 +1120,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-root", type=Path, default=DEFAULT_SOURCE_ROOT)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--skills-top-k", type=int, default=10)
-    parser.add_argument("--posting-lookup-limit", type=int, default=100_000)
-    parser.add_argument("--posting-lookup-recent-months", type=int, default=24)
+    parser.add_argument("--posting-lookup-limit", type=non_negative_int, default=100_000)
+    parser.add_argument("--posting-lookup-recent-months", type=non_negative_int, default=24)
     return parser.parse_args()
 
 

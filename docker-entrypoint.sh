@@ -9,7 +9,7 @@ API_PORT="${API_PORT:-8530}"
 PORT="${PORT:-10000}"
 
 echo "[entrypoint] starting FastAPI on 127.0.0.1:${API_PORT}"
-python -m uvicorn api.main:app --host 127.0.0.1 --port "${API_PORT}" &
+python -m uvicorn api.main:app --host 127.0.0.1 --port "${API_PORT}" --no-proxy-headers &
 api_pid=$!
 
 echo "[entrypoint] starting Next.js on 0.0.0.0:${PORT}"

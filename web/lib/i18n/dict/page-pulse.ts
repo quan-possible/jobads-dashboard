@@ -63,7 +63,7 @@ export const pulseDict = {
     // ApiDown error card
     apiDownTitle: "Data service unavailable",
     apiDownBody: "The API isn’t responding. Start it with",
-    apiDownCmd: "uvicorn api.main:app --port 8530",
+    apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Section dividers (Core → Deep)
     deepEyebrow: "Going deeper",
@@ -173,7 +173,7 @@ export const pulseDict = {
     // ApiDown error card
     apiDownTitle: "Service de données indisponible",
     apiDownBody: "L’API ne répond pas. Démarrez-la avec",
-    apiDownCmd: "uvicorn api.main:app --port 8530",
+    apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Section dividers (Core → Deep)
     deepEyebrow: "Pour aller plus loin",

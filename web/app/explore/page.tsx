@@ -1,22 +1,22 @@
 import { AuthGate } from "@/components/explore/AuthGate";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
+import { ExploreHero } from "@/components/explore/ExploreHero";
 import { FilterSpine } from "@/components/FilterSpine";
 import { api } from "@/lib/api";
-import { getServerDict } from "@/lib/i18n/server";
+import { getLocale } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 import styles from "@/components/explore/explore.module.css";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Explore",
-  description:
-    "Build a chart from any breakdown and measure, or search the individual job postings behind the ACLMR aggregates. Team access required.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return locale === "fr"
+    ? { title: "Explorer", description: "Construisez un graphique ou consultez les offres derrière les agrégats de l’ACLMR. Accès équipe requis." }
+    : { title: "Explore", description: "Build a chart or inspect the postings behind the ACLMR aggregates. Team access required." };
+}
 
 export default async function ExplorePage() {
-  const { t } = await getServerDict();
-
   // Year-picker bounds for the builder. Data starts 2016; the upper bound is the
   // latest complete year (the partial current year is excluded). Fall back to a
   // fixed span if meta is unavailable — the builder still renders.
@@ -33,13 +33,7 @@ export default async function ExplorePage() {
 
   return (
     <div className={styles.explorePage}>
-      <section className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div className={styles.eyebrow}>{t.explore.eyebrow}</div>
-          <h1 className={styles.heroTitle}>{t.explore.hero}</h1>
-          <p className={styles.heroLede}>{t.explore.lede}</p>
-        </div>
-      </section>
+      <ExploreHero />
       <FilterSpine />
       <div className={styles.workspace}>
         {/* The whole Explore surface is team-access: the gate replaces both tabs

@@ -279,7 +279,7 @@ textarea {
   text-transform: uppercase;
 }
 
-.dark-panel {
+.card.dark-panel {
   border-color: var(--navy-deep);
   background: var(--surface-navy);
   color: var(--ink-invert);
@@ -306,6 +306,13 @@ textarea {
 .figure-shell {
   min-width: 0;
   box-shadow: var(--shadow-soft);
+}
+
+/* Plotly's default icons are 24px wide but slightly shorter. Keep every visible
+   modebar action at least 24x24 without enlarging the toolbar on desktop. */
+.remote-figure .modebar-btn {
+  min-width: 24px;
+  min-height: 24px;
 }
 
 .site-header {
@@ -472,6 +479,19 @@ textarea {
 
   .pulse-section-asof {
     margin-left: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .figure-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .figure-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
 }
 

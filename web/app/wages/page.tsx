@@ -11,11 +11,10 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Wages",
-  description:
-    "Posted hourly wage ranges by occupation and province, from Canadian online job ads.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = wagesDict[await getLocale()];
+  return { title: t.eyebrowPrefix, description: t.heroLede };
+}
 
 function ApiDown({ t }: { t: WagesDictEntry }) {
   return (
@@ -25,7 +24,7 @@ function ApiDown({ t }: { t: WagesDictEntry }) {
         <p className="text-ink-soft">
           {t.apiDownBody}{" "}
           <code className="bg-surface-alt px-1">
-            uvicorn api.main:app --port 8530
+            uvicorn api.main:app --port 8530 --no-proxy-headers
           </code>
           .
         </p>

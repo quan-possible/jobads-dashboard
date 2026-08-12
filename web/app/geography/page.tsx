@@ -13,18 +13,17 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Geography",
-  description:
-    "Posted hiring demand by Canadian province — per-capita, concentration, and raw count views.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = geographyDict[await getLocale()];
+  return { title: t.eyebrow, description: t.lede };
+}
 
 function ApiDown({ t }: { t: (typeof geographyDict)[keyof typeof geographyDict] }) {
   return (
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
         <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
-        <p className="text-ink-soft">{t.apiDownBody} <code className="bg-surface-alt px-1">uvicorn api.main:app --port 8530</code>.</p>
+        <p className="text-ink-soft">{t.apiDownBody} <code className="bg-surface-alt px-1">uvicorn api.main:app --port 8530 --no-proxy-headers</code>.</p>
       </div>
     </div>
   );

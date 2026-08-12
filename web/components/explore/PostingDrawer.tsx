@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { fetchPosting } from "@/lib/explore";
+import { AuthError, fetchPosting } from "@/lib/explore";
 import { fmtMonth, fmtWage } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/provider";
 import type { Locale } from "@/lib/i18n/locale";
 import type { PostingDetail } from "@/lib/types";
 import styles from "./explore.module.css";
+import { useExploreLock } from "./lockContext";
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   if (value === null || value === undefined || value === "" || value === "—") return null;
@@ -25,6 +26,8 @@ function wageLine(detail: PostingDetail, locale: Locale, perHour: string): strin
 
 export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () => void }) {
   const { t, locale } = useI18n();
+  const lock = useExploreLock();
+  const lockRef = useRef(lock);
   const [detail, setDetail] = useState<PostingDetail | null>(null);
   const [shownId, setShownId] = useState(id);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +42,7 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
 
   useEffect(() => {
     onCloseRef.current = onClose;
+    lockRef.current = lock;
   });
 
   useEffect(() => {
@@ -46,9 +50,17 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
     let cancelled = false;
     fetchPosting(id)
       .then((next) => { if (!cancelled) setDetail(next); })
-      .catch((reason) => { if (!cancelled) setError(reason?.message ?? "Could not load this posting."); });
+      .catch((reason) => {
+        if (cancelled) return;
+        if (reason instanceof AuthError) {
+          onCloseRef.current();
+          lockRef.current();
+          return;
+        }
+        setError(reason?.message ?? t.explore.loadingPostingError);
+      });
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, t.explore.loadingPostingError]);
 
   useEffect(() => {
     if (!id) return;

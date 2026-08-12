@@ -8,6 +8,10 @@ export const explore = {
     hero: "Explore the data your way",
     lede:
       "Build your own chart from any breakdown and measure, or search the individual job postings behind the aggregates. Explore is team-access — sign in with the dashboard password to continue. Both views use the same region, occupation and industry filters above.",
+    teamEyebrow: "Team workspace · Full detail",
+    teamHero: "Explore the full dataset",
+    teamLede:
+      "Your verified team session is active. Build uncapped charts or inspect the postings behind the aggregates using the shared filters below.",
     tabs: {
       build: "Build a chart",
       find: "Find postings",
@@ -79,6 +83,7 @@ export const explore = {
     retryLoad: "Retry",
     checking: "Checking access…",
     loadingPosting: "Loading posting…",
+    loadingPostingError: "Could not load this posting.",
     csvFilename: "postings",
   },
   fr: {
@@ -86,6 +91,10 @@ export const explore = {
     hero: "Explorez les données à votre façon",
     lede:
       "Construisez votre propre graphique à partir de n’importe quelle répartition et mesure, ou cherchez les offres d’emploi individuelles derrière les agrégats. Explorer est réservé à l’équipe — connectez-vous avec le mot de passe du tableau de bord pour continuer. Les deux vues utilisent les mêmes filtres de région, profession et industrie ci-dessus.",
+    teamEyebrow: "Espace équipe · Détail complet",
+    teamHero: "Explorez l’ensemble des données",
+    teamLede:
+      "Votre session d’équipe vérifiée est active. Construisez des graphiques sans plafond ou consultez les offres derrière les agrégats à l’aide des filtres ci-dessous.",
     tabs: {
       build: "Construire un graphique",
       find: "Trouver des offres",
@@ -157,6 +166,7 @@ export const explore = {
     retryLoad: "Réessayer",
     checking: "Vérification de l’accès…",
     loadingPosting: "Chargement de l’offre…",
+    loadingPostingError: "Impossible de charger cette offre.",
     csvFilename: "offres",
   },
 } as const;

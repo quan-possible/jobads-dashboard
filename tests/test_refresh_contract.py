@@ -9,8 +9,11 @@ import pytest
 from jobads_dashboard.dashboard.prepare import (
     EXPERIENCE_BAND_SQL,
     SOURCE_GLOB,
+    build_posting_lookup_from_source,
     discover_source_root,
     normalized_view_sql,
+    publish_staged_package,
+    refresh_dashboard_data,
     validate_derived_package,
 )
 
@@ -186,6 +189,126 @@ def test_discover_source_root_walks_up_to_find_sibling_repo(tmp_path: Path) -> N
     repo_root.mkdir(parents=True)
 
     assert discover_source_root(repo_root) == source_root
+
+
+def test_posting_lookup_uses_current_source_window_when_metadata_is_stale(tmp_path: Path) -> None:
+    fixture_path = next((Path(__file__).parent / "fixtures" / "golden_corpus" / "2024").glob("processed_*.parquet"))
+    template = pd.read_parquet(fixture_path).iloc[[0]].copy()
+    source_root = tmp_path / "processed"
+    for year, posting_id, date_found in [(2025, 1, "2025-01-15"), (2026, 2, "2026-06-15")]:
+        frame = template.copy()
+        frame["id"] = posting_id
+        frame["dateFound"] = date_found
+        if year == 2026:
+            frame["jobTitle"] = "Analyste â€” &#201;nergie"
+            frame["employer"] = "CafÃ© Québec"
+            frame["experienceDetails"] = "multiâ€‘phase"
+            frame["description"] = "ambition â€” cafÃ© &amp; déjà Franí§ais.â€¯ ã…¤"
+        year_root = source_root / str(year)
+        year_root.mkdir(parents=True)
+        frame.to_parquet(year_root / f"processed_{year}.parquet", index=False)
+
+    output_root = tmp_path / "derived"
+    output_root.mkdir()
+    (output_root / "metadata.json").write_text(
+        json.dumps({"source_window": {"min_date": "2025-01-15", "max_date": "2025-01-15"}}),
+        encoding="utf-8",
+    )
+
+    path = build_posting_lookup_from_source(
+        source_root,
+        output_root,
+        posting_lookup_limit=100,
+        posting_lookup_recent_months=1,
+    )
+
+    lookup = pd.read_parquet(path)
+    assert lookup["posting_id"].tolist() == ["2"]
+    assert lookup["date_found"].astype(str).tolist() == ["2026-06-15"]
+    assert lookup["job_title"].tolist() == ["Analyste — Énergie"]
+    assert lookup["employer"].tolist() == ["Café Québec"]
+    assert lookup["experience_details"].tolist() == ["multi‑phase"]
+    assert lookup["description_full"].tolist() == ["ambition — café & déjà Français.  ㅤ"]
+
+
+def test_standalone_lookup_failure_preserves_existing_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import jobads_dashboard.dashboard.prepare as prepare
+
+    source_root = Path(__file__).parent / "fixtures" / "golden_corpus"
+    output_root = tmp_path / "derived"
+    output_root.mkdir()
+    output_path = output_root / "posting_lookup.parquet"
+    output_path.write_bytes(b"last-known-good")
+
+    def fail_write(*_args, **_kwargs) -> None:
+        raise RuntimeError("injected standalone build failure")
+
+    monkeypatch.setattr(prepare, "write_query_to_parquet", fail_write)
+    with pytest.raises(RuntimeError, match="injected standalone build failure"):
+        build_posting_lookup_from_source(
+            source_root,
+            output_root,
+            posting_lookup_limit=100,
+            posting_lookup_recent_months=1,
+        )
+
+    assert output_path.read_bytes() == b"last-known-good"
+    assert not list(output_root.glob(".posting_lookup.staging-*.parquet"))
+
+
+def test_refresh_failure_leaves_existing_bundle_unchanged(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import jobads_dashboard.dashboard.prepare as prepare
+
+    output_root = tmp_path / "derived"
+    output_root.mkdir()
+    (output_root / "current-release.txt").write_text("keep me", encoding="utf-8")
+    source_root = Path(__file__).parent / "fixtures" / "golden_corpus"
+
+    def fail_after_first_output(*_args, **_kwargs) -> None:
+        raise RuntimeError("injected build failure")
+
+    monkeypatch.setattr(prepare, "build_monthly_overall", fail_after_first_output)
+
+    with pytest.raises(RuntimeError, match="injected build failure"):
+        refresh_dashboard_data(
+            source_root=source_root,
+            output_root=output_root,
+            skills_top_k=10,
+            posting_lookup_limit=100,
+            posting_lookup_recent_months=1,
+        )
+
+    assert sorted(path.name for path in output_root.iterdir()) == ["current-release.txt"]
+    assert (output_root / "current-release.txt").read_text(encoding="utf-8") == "keep me"
+    assert not list(tmp_path.glob(".derived.staging-*"))
+    assert not list(tmp_path.glob(".derived.backup-*"))
+
+
+def test_publish_failure_restores_prior_bundle(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    output_root = tmp_path / "derived"
+    output_root.mkdir()
+    (output_root / "release.txt").write_text("old", encoding="utf-8")
+    staging_root = tmp_path / ".derived.staging-test"
+    staging_root.mkdir()
+    (staging_root / "release.txt").write_text("new", encoding="utf-8")
+    real_rename = Path.rename
+
+    def fail_staging_publish(path: Path, target: Path) -> Path:
+        if path == staging_root:
+            raise OSError("injected publish failure")
+        return real_rename(path, target)
+
+    monkeypatch.setattr(Path, "rename", fail_staging_publish)
+
+    with pytest.raises(OSError, match="injected publish failure"):
+        publish_staged_package(staging_root, output_root)
+
+    assert (output_root / "release.txt").read_text(encoding="utf-8") == "old"
+    assert (staging_root / "release.txt").read_text(encoding="utf-8") == "new"
+    assert not list(tmp_path.glob(".derived.backup-*"))
 
 
 def test_normalized_view_sql_maps_two_digit_noc_rows_to_broad_group(tmp_path: Path) -> None:

@@ -20,6 +20,13 @@ def test_parse_args_rejects_the_removed_streamlit_app_command() -> None:
         parse_args(["app"])
 
 
+@pytest.mark.parametrize("command", ["refresh", "posting-lookup"])
+@pytest.mark.parametrize("option", ["--posting-lookup-limit", "--posting-lookup-recent-months"])
+def test_parse_args_rejects_negative_posting_lookup_options(command: str, option: str) -> None:
+    with pytest.raises(SystemExit):
+        parse_args([command, option, "-1"])
+
+
 def test_validate_exits_nonzero_when_bundle_is_invalid(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     monkeypatch.setattr(
         cli,

@@ -185,6 +185,9 @@ _FR_CHROME: dict[str, str] = {
     "Not seasonally adjusted": "non désaisonnalisé",
     "Seasonally adjusted (approx.)": "désaisonnalisé (approx.)",
     "Wage coverage": "couverture salariale",
+    "Other": "Autres",
+    "Other groups": "Autres groupes",
+    "Other sectors": "Autres secteurs",
     # subplot titles
     "Observed": "Observé",
     "Trend": "Tendance",

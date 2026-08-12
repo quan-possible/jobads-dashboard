@@ -12,11 +12,10 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Industries",
-  description:
-    "Posted hiring demand across Canadian industry sectors (NAICS), with trends, wages and in-demand skills.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = industriesDict[await getLocale()];
+  return { title: t.eyebrow, description: t.lede };
+}
 
 function ApiDown({ t }: { t: (typeof industriesDict)[keyof typeof industriesDict] }) {
   return (

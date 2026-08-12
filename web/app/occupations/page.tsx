@@ -12,11 +12,10 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Occupations",
-  description:
-    "Posted hiring demand across Canada's broad occupational groups (NOC), with trends, wages and in-demand skills.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = occupationsDict[await getLocale()];
+  return { title: t.eyebrow, description: t.lede };
+}
 
 function ApiDown({ t }: { t: (typeof occupationsDict)[keyof typeof occupationsDict] }) {
   return (

@@ -11,6 +11,8 @@ not present (it is gitignored and read from the main checkout).
 
 from __future__ import annotations
 
+import time
+from concurrent.futures import ThreadPoolExecutor
 import warnings
 
 import pytest
@@ -48,6 +50,7 @@ def _clear_rate_limit() -> None:
     test so one test's failed logins can't bleed into another's (the rate-limit
     key is now the socket peer unless a trusted proxy is configured — S06)."""
     private_router._AUTH_FAILURES.clear()
+    private_router._GLOBAL_FAILURES.clear()
 
 
 @pytest.fixture()
@@ -172,6 +175,46 @@ def test_xff_spoof_does_not_bypass_throttle(configured, anon):
     assert 429 in statuses, "rotating XFF must not defeat the per-peer throttle"
 
 
+def test_loopback_proxy_xff_is_untrusted_by_default(configured, monkeypatch):
+    """The current Next rewrite does not establish that XFF was sanitized.
+
+    Even when the socket peer is loopback, a forged single-value header must
+    not choose a fresh bucket unless proxy trust was explicitly configured.
+    """
+    monkeypatch.delenv("JOBADS_API_TRUSTED_PROXY", raising=False)
+    proxy_client = TestClient(app, client=("127.0.0.1", 50000))
+    statuses = [
+        proxy_client.post(
+            "/api/auth",
+            json={"password": "wrong"},
+            headers={"x-forwarded-for": f"198.51.100.{i}"},
+        ).status_code
+        for i in range(private_router._AUTH_MAX_FAILURES + 2)
+    ]
+    assert 429 in statuses, "forged single-value XFF through loopback must not reset the bucket"
+    assert set(private_router._AUTH_FAILURES) == {"127.0.0.1"}
+
+
+def test_concurrent_failed_logins_cannot_overshoot_per_ip_limit(configured, anon, monkeypatch):
+    """The check and failure record form one atomic operation across workers."""
+
+    def slow_reject(_password: str) -> bool:
+        time.sleep(0.03)
+        return False
+
+    monkeypatch.setattr(private_router.auth, "verify_password", slow_reject)
+    attempts = private_router._AUTH_MAX_FAILURES + 8
+
+    def attempt(_index: int) -> int:
+        return anon.post("/api/auth", json={"password": "wrong"}).status_code
+
+    with ThreadPoolExecutor(max_workers=attempts) as pool:
+        statuses = list(pool.map(attempt, range(attempts)))
+
+    assert statuses.count(401) == private_router._AUTH_MAX_FAILURES
+    assert statuses.count(429) == attempts - private_router._AUTH_MAX_FAILURES
+
+
 def test_weak_pbkdf2_hash_rejected():
     """A hash below the iteration floor is refused even with the right password (S13)."""
     salt = b"sixteen_byte_salt"
@@ -221,6 +264,22 @@ def test_postings_list_shape(signed_in):
     row = body["items"][0]
     for key in ("posting_id", "month", "job_title", "province"):
         assert key in row
+
+
+@needs_lookup
+def test_private_posting_responses_are_not_cacheable(signed_in):
+    listing = signed_in.get("/api/postings", params={"limit": 1})
+    assert listing.status_code == 200
+    assert listing.headers["cache-control"] == "private, no-store"
+
+    posting_id = listing.json()["items"][0]["posting_id"]
+    detail = signed_in.get(f"/api/postings/{posting_id}")
+    assert detail.status_code == 200
+    assert detail.headers["cache-control"] == "private, no-store"
+
+    missing = signed_in.get("/api/postings/__no_such_id__")
+    assert missing.status_code == 404
+    assert missing.headers["cache-control"] == "private, no-store"
 
 
 @needs_lookup

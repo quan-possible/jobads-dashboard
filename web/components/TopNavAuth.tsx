@@ -19,16 +19,22 @@ export function TopNavAuth() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const closePopover = (restoreFocus = false) => {
+    setOpen(false);
+    if (restoreFocus) window.requestAnimationFrame(() => triggerRef.current?.focus());
+  };
 
   // Close the popover on outside click or Escape.
   useEffect(() => {
     if (!open) return;
     function onDown(e: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) closePopover();
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") closePopover(true);
     }
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -48,7 +54,7 @@ export function TopNavAuth() {
 
   if (authenticated) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="relative flex items-center gap-2">
         <span
           className="hidden items-center gap-1.5 rounded-full border border-teal/60 bg-teal/15 px-2.5 py-1 t-caption font-bold uppercase tracking-[0.02em] text-teal-soft sm:inline-flex"
           title={a.fullDetail}
@@ -58,11 +64,22 @@ export function TopNavAuth() {
         </span>
         <button
           type="button"
-          onClick={() => void logout()}
+          onClick={() => {
+            setError(null);
+            void logout().catch(() => setError(a.signOutFailed));
+          }}
           className="cta-pill border border-white/30 px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-invert/75 transition-colors hover:border-orange hover:text-orange-soft"
         >
           {t.common.signOut}
         </button>
+        {error && (
+          <span
+            role="alert"
+            className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-56 border border-neg/50 bg-navy-deep p-2.5 t-caption leading-snug text-neg shadow-pop"
+          >
+            {error}
+          </span>
+        )}
       </div>
     );
   }
@@ -86,10 +103,14 @@ export function TopNavAuth() {
   return (
     <div ref={wrapRef} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (open) closePopover(true);
+          else setOpen(true);
+        }}
         className={[
           "auth-pill px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] transition-colors",
           open

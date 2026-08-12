@@ -1,6 +1,6 @@
 """FastAPI application entrypoint.
 
-Run locally:  uvicorn api.main:app --reload --port 8530
+Run locally:  uvicorn api.main:app --reload --port 8530 --no-proxy-headers
 """
 
 from __future__ import annotations

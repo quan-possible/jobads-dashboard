@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NAV } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n/provider";
 import { useAuth } from "@/lib/auth/provider";
@@ -20,12 +20,16 @@ export function TopNav() {
   const { t } = useI18n();
   const { authenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const navItems = NAV.filter((item) => !item.teamOnly || authenticated);
 
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        window.requestAnimationFrame(() => menuTriggerRef.current?.focus());
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -73,6 +77,7 @@ export function TopNav() {
           </div>
 
           <button
+            ref={menuTriggerRef}
             type="button"
             aria-label={t.nav.menu}
             aria-expanded={menuOpen}

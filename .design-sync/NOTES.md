@@ -159,7 +159,7 @@ meaning in a design tool. `RemoteFigure` is still reachable *inside* the bundle
 
 ## Card layout overrides
 
-Three components need `cfg.overrides` to present correctly in the product's grid:
+Four components need `cfg.overrides` to present correctly in the product's grid:
 
 - **`TopNav`** — `cardMode: "single"`, `viewport: "1280x420"`. At the default
   900x700 the navigation and auth controls run out of horizontal room. That is a
@@ -168,6 +168,9 @@ Three components need `cfg.overrides` to present correctly in the product's grid
   come from the pinned provider, so a second export would be byte-identical.
 - **`Footer`** — `cardMode: "column"`. Renders whole at 900px; column is purely
   for the product grid card.
+- **`Figure`** — `cardMode: "column"`. Figure actions are responsive to the
+  viewport, not a narrow preview cell; a multi-column sheet can manufacture the
+  squeezed title/action layout that the product avoids at mobile viewports.
 - **`MapToggle`** — `cardMode: "column"`. This one only appeared AFTER the
   `global` shim landed: while Plotly was silently failing, the cells were narrow
   failure notices and fit fine. A real chart is wider than a grid cell.

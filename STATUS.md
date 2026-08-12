@@ -17,7 +17,7 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - The published Claude Design system still contains the original 14 presentational components. The redesign candidate expands the hand-maintained local package to 16 by adding `RouteMasthead` and `SectionLead`; validation and republishing remain a release follow-up. `.design-sync/NOTES.md` owns the operating detail.
 - The 2026-08-11 redesign exploration now has a durable, adversarially verified home at `docs/analyses/labor_market_dashboard/redesign-foundation/`, with separate desktop targets, design-system material, source-state UI kit, provenance, and ACLMR brand audit. The package uses the exact live ACLMR logo, PT Sans, target-aligned navy navigation and CTA families, accessible trend/contrast cues, and explicit mobile gates. This groundwork did not change the current application or deployment.
 - A complete redesign candidate now exists in `/Users/brucenguyen/.codex/worktrees/jobads-dashboard-redesign` on `codex/dashboard-redesign-production`. It migrates all nine routes, the shared shell, Plotly language, and authenticated Explore workspace; approved mobile targets and Mobbin evidence are preserved with the active job. The public site and canonical services remain unchanged.
-- Candidate verification on 2026-08-11 passed 349 Python tests, ESLint, TypeScript, a production Next build, upstream-data reconciliation, 45 EN/FR route-and-viewport checks, authenticated Explore journeys, public/team cap-response checks, and a fresh adversarial `READY` verdict. The reviewer rebuilt and rendered the 16-component portable package and confirmed the official wordmark in Brand, Footer, and TopNav. Production release authorization remains outstanding.
+- Deep-audit convergence on 2026-08-11/12 repaired 19 candidate defects and passed 362 Python tests, ESLint, TypeScript, a Next 16.3 production build, clean complete/production dependency audits, upstream-data reconciliation, 27 final live route-and-viewport checks, authenticated and failure-path Explore journeys, public/team cap and proxy-throttle probes, and 16/16 portable-package renders. A fresh adversarial reviewer returned `READY` for the isolated candidate and `NOT READY` for production cutover. Production remained unchanged.
 
 ## Active priorities
 
@@ -28,7 +28,7 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 ## Next actions
 
 1. Restore or confirm the Keychain credential source and Render ownership before any password-bearing or production handoff; never place the plaintext password or password hash in repository files.
-2. After explicit release approval, integrate the accepted candidate and deploy through the existing launchd and Cloudflare topology with the plan's rollback procedure.
+2. After explicit release approval, back up and harden the installed public LaunchAgent with Uvicorn `--no-proxy-headers`, integrate the accepted candidate, and deploy through the existing launchd and Cloudflare topology with the plan's rollback procedure.
 3. Republish the locally verified 16-component Claude Design package only as an explicitly authorized external follow-up.
 
 ## Risks and blockers
@@ -40,6 +40,7 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - Historical jobs include stale status wording. Preserve ambiguous jobs until their commits, branches, deployment state, and inbound links are reconciled.
 - The design-system export enumerates components by hand in `web/.ds-entry.tsx`, so a component added to `web/components/` will not reach the design system until it is added there.
 - The production Keychain credential is unavailable and the Render CLI session is expired; the reachable Render hostname appears to serve an older Streamlit surface. These unresolved ownership boundaries block production release, not local candidate verification.
+- The installed public LaunchAgent still omits Uvicorn `--no-proxy-headers`; restarting it unchanged would recreate the forged-forwarding-header throttle bypass. Treat its backed-up, validated update and a repeated runtime probe as mandatory cutover work.
 
 ## Current owners
 

@@ -22,6 +22,7 @@ export const nav = {
       teamView: "Team view",
       fullDetail: "Full detail",
       teamBadge: "Team",
+      signOutFailed: "Couldn’t sign out. Try again.",
     },
   },
   fr: {
@@ -47,6 +48,7 @@ export const nav = {
       teamView: "Vue équipe",
       fullDetail: "Détail complet",
       teamBadge: "Équipe",
+      signOutFailed: "Impossible de vous déconnecter. Réessayez.",
     },
   },
 } as const;

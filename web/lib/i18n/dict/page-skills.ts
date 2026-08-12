@@ -43,7 +43,7 @@ export const skillsDict = {
     apiDownTitle: "Data service unavailable",
     apiDownBody:
       "The API isn’t responding. Start it with ",
-    apiDownCode: "uvicorn api.main:app --port 8530",
+    apiDownCode: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // SkillBars aria-labels
     skillBarsShareLabel: "Most-requested skills by share of postings",
@@ -140,7 +140,7 @@ export const skillsDict = {
     apiDownTitle: "Service de données indisponible",
     apiDownBody:
       "L’API ne répond pas. Démarrez-la avec ",
-    apiDownCode: "uvicorn api.main:app --port 8530",
+    apiDownCode: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // SkillBars aria-labels
     skillBarsShareLabel: "Compétences les plus requises par part des offres",

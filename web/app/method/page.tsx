@@ -10,11 +10,11 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Method",
-  description:
-    "How the ACLMR dashboard works — data sources, field coverage, caveats and key term definitions.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return (await getLocale()) === "fr"
+    ? { title: "Méthode", description: "Sources, couverture des champs, mises en garde et définitions du tableau de bord de l’ACLMR." }
+    : { title: "Method", description: "Data sources, field coverage, caveats and definitions for the ACLMR dashboard." };
+}
 
 function ApiDown({ t }: { t: (typeof methodDict)[keyof typeof methodDict] }) {
   return (
@@ -96,7 +96,7 @@ export default async function MethodPage() {
             {meta.coverage.map((item) => (
               <CoverageBar
                 key={item.field}
-                label={item.label}
+                label={t.coverageLabels[item.field] ?? item.label}
                 share={item.share}
                 count={item.postings}
                 postingsLabel={t.coveragePostingsLabel}
@@ -123,7 +123,7 @@ export default async function MethodPage() {
             {meta.caveats.map((caveat, i) => (
               <li key={i} className="flex gap-3 t-body leading-snug text-ink">
                 <span aria-hidden className="mt-[0.45rem] h-1.5 w-1.5 shrink-0 bg-orange" />
-                <span>{caveat}</span>
+                <span>{t.caveatTranslations[caveat] ?? caveat}</span>
               </li>
             ))}
           </ul>

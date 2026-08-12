@@ -76,6 +76,13 @@ def test_fr_localizes_in_figure_chrome():
     assert "moyenne sur 3 mois" in [t.get("name") for t in fr["data"]]
 
 
+def test_fr_localizes_pulse_residual_legend():
+    fr = json.loads(figures.build("pulse.composition", locale="fr"))
+    names = [trace.get("name") for trace in fr["data"]]
+    assert "Autres groupes" in names
+    assert "Other groups" not in names
+
+
 @pytest.mark.parametrize("chart_id", [
     "geography.yoy_choropleth", "geography.demand_map_share",
     "geography.demand_map_count", "geography.demand_map_percap", "geography.demand_map_lq",
