@@ -18,7 +18,6 @@ the runtime source of truth. Production tokens and components remain in
   they encode data.
 - Use bold uppercase headings with no tracking, readable body text, and tabular
   numerals for data.
-- Use the pixel mosaic sparingly as the identifying decorative motif.
 - Keep figure cards softly rounded and lightly bordered. Avoid glass effects,
   heavy shadows, and generic SaaS card walls.
 - Keep analytical controls square. Use the live gradient-ring or solid-orange
@@ -27,7 +26,8 @@ the runtime source of truth. Production tokens and components remain in
 
 ## Package map
 
-- `styles.css`, `tokens/`, `assets/fonts/` — portable foundations
+- `styles.css`, `tokens/`, `assets/` — portable foundations, fonts, and the
+  official wordmark
 - `components/` — redesign-aligned presentational components and usage prompts;
   `TopNav` defaults to the selected navy treatment
 - `guidelines/` — visual specimens
