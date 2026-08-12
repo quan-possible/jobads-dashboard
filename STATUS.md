@@ -14,23 +14,23 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - The current product is a Next.js web app backed by FastAPI and the Python Plotly figure layer. Runtime reads `data/derived/labor_market_dashboard_v1/`; refresh reads only canonical upstream parquet files under `../jobads-data/main/data/processed/<year>/`.
 - The derived bundle was generated on 2026-06-03 from 164 files, covers `2016-01-01` through `2026-03-31`, and records 25,356,735 postings. This is current local metadata, not proof that upstream has not advanced.
 - Verified on 2026-08-11: the LaunchAgents, local web health (`127.0.0.1:8522/healthz`), API health (`127.0.0.1:8530/health`), authentication status route, and current Cloudflare quick tunnel were healthy. Recover the live hostname from `/Users/brucenguyen/jobads-dashboard-logs/cloudflared-launchd.err.log`; do not rely on an older recorded URL.
-- The 14 presentational `web/components/` are published as a Claude Design system (`https://claude.ai/design/p/c9764078-3970-42c2-be34-2e6acce106b9`), driven by inputs committed locally as `a741d8c1` under `.design-sync/` and four dot-prefixed files in `web/`. `.design-sync/NOTES.md` owns the operating detail.
+- The published Claude Design system still contains the original 14 presentational components. The redesign candidate expands the hand-maintained local package to 16 by adding `RouteMasthead` and `SectionLead`; validation and republishing remain a release follow-up. `.design-sync/NOTES.md` owns the operating detail.
 - The 2026-08-11 redesign exploration now has a durable, adversarially verified home at `docs/analyses/labor_market_dashboard/redesign-foundation/`, with separate desktop targets, design-system material, source-state UI kit, provenance, and ACLMR brand audit. The package uses the exact live ACLMR logo, PT Sans, target-aligned navy navigation and CTA families, accessible trend/contrast cues, and explicit mobile gates. This groundwork did not change the current application or deployment.
-- The production migration is now planned at `docs/jobs/active/2026-08-11-dashboard-redesign/PLAN.md`. The chosen route is an in-place, component-first migration of the existing Next.js/FastAPI app on an isolated branch and preview stack. Implementation can begin with baseline and responsive-design gates; production cutover is not ready.
+- A complete redesign candidate now exists in `/Users/brucenguyen/.codex/worktrees/jobads-dashboard-redesign` on `codex/dashboard-redesign-production`. It migrates all nine routes, the shared shell, Plotly language, and authenticated Explore workspace; approved mobile targets and Mobbin evidence are preserved with the active job. The public site and canonical services remain unchanged.
+- Candidate verification on 2026-08-11 passed 349 Python tests, ESLint, TypeScript, a production Next build, design-package type/CSS generation, upstream-data reconciliation, 45 EN/FR route-and-viewport checks, authenticated Explore journeys, and public/team cap-response checks. Fresh adversarial review and production release authorization remain outstanding.
 
 ## Active priorities
 
-1. Rebuild the public deployment from `main`, then verify the auth/cap behavior and complete live UI against that exact bundle.
-2. Confirm the deployed Next.js/FastAPI bundle matches `main`; current service health alone does not establish that.
-3. Refresh and validate the derived bundle when fresher canonical upstream processed data is available.
-4. Before implementing the new dashboard direction, create and inspect mobile targets for Pulse and Explore; the preserved high-fidelity prototypes settle desktop composition only.
-5. Follow the redesign plan's single-release migration and verification gates; do not deploy a partially redesigned route set.
+1. Complete fresh-context adversarial review of the assembled redesign candidate and resolve any material finding.
+2. Decide when to integrate and release the candidate; do not deploy a partially redesigned route set.
+3. Confirm the deployed Next.js/FastAPI bundle and Render publication boundary before production cutover; current service health alone does not establish either.
+4. Refresh and validate the derived bundle when fresher canonical upstream processed data is available.
 
 ## Next actions
 
-1. Deploy the verified canonical `main` line through the existing launchd and Cloudflare topology without creating a parallel stack.
-2. Reconcile stale entries under `docs/jobs/active/` and loose `docs/jobs/*-ongoing.md` records only after confirming whether each is complete, superseded, or still needed; several predate the current branch topology.
-3. Restore or confirm the Keychain credential source before any password-bearing handoff; the documented lookup returned exit 44 on 2026-08-11. Never place the plaintext password or password hash in repository files.
+1. Finish the candidate's adversarial review, then freeze its accepted commit and evidence.
+2. Restore or confirm the Keychain credential source and Render ownership before any password-bearing or production handoff; never place the plaintext password or password hash in repository files.
+3. After explicit release approval, integrate the candidate and deploy through the existing launchd and Cloudflare topology with the plan's rollback procedure.
 
 ## Risks and blockers
 
@@ -39,9 +39,8 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - The dashboard measures job-ad activity, not employment, unemployment, economy-wide vacancies, or wages paid; sparse-field and provenance caveats remain required.
 - Public charts must stay at 10 categories through shared cap helpers. Only a verified team session may receive uncapped figures; a `full=1` flag alone must never bypass the cap.
 - Historical jobs include stale status wording. Preserve ambiguous jobs until their commits, branches, deployment state, and inbound links are reconciled.
-- `web/components/PixelTiles.tsx` renders the brand mark as solid navy: `pick()` clamps at `Math.min(0.999, …)` so only `STOPS[0]` is ever selected, and the navy→teal→sand→orange mosaic has never appeared. On the navy footer the mark is invisible. Affects `Brand`, `TopNav`, `Footer`, `KeyPoints`, `AuthGate`. Unfixed — the fix changes the live brand mark and may move golden-file output.
 - The design-system export enumerates components by hand in `web/.ds-entry.tsx`, so a component added to `web/components/` will not reach the design system until it is added there.
-- The redesign high-fidelity prototypes have a fixed 1100 px minimum and are not production-ready mobile specifications. Do not ship horizontal scrolling as their responsive adaptation.
+- The production Keychain credential is unavailable and the Render CLI session is expired; the reachable Render hostname appears to serve an older Streamlit surface. These unresolved ownership boundaries block production release, not local candidate verification.
 
 ## Current owners
 
@@ -51,5 +50,6 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - `docs/analyses/labor_market_dashboard/redesign-foundation/`: redesign visual targets, portable design reference, provenance, and brand audit.
 - `docs/jobs/active/2026-06-25-login-uncapped/JOB.md`: current feature continuity and promotion work.
 - `docs/jobs/active/2026-08-11-dashboard-redesign/PLAN.md`: current production-redesign implementation and release plan.
+- `docs/jobs/active/2026-08-11-dashboard-redesign/JOB.md`: candidate implementation, verification evidence, and release blockers.
 - `src/jobads_dashboard/`: aggregate, metric, and visualization implementation.
 - `api/` and `web/`: FastAPI service and Next.js product UI.

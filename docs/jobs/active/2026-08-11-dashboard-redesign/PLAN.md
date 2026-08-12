@@ -317,7 +317,8 @@ The release candidate is ready only when:
 
 ## Known blockers and decisions already settled
 
-- **Blocker:** mobile Pulse and Explore targets do not yet exist.
+- **Resolved:** mobile Pulse and Explore targets plus Mobbin interaction evidence
+  now govern the responsive composition.
 - **Blocker:** the deployed bundle has not been proven to match current `main`.
 - **Blocker for production auth verification:** the intended Keychain password
   lookup currently fails.
@@ -330,4 +331,6 @@ The release candidate is ready only when:
   govern visual direction; the earlier alternatives and source-tone UI kit do
   not.
 
-Implementation can begin with Gates 0 and 1 now. Production cutover cannot.
+The complete implementation candidate is assembled and parent-verified.
+Production cutover remains blocked pending fresh adversarial acceptance,
+credential restoration, and publication-boundary confirmation.

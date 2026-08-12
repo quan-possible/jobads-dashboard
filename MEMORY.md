@@ -53,6 +53,12 @@ Last condensed: 2026-08-11
 - Fresh-context adversarial verification passed the combined desktop package. The current application and deployment remained unchanged; separate mobile Pulse and Explore targets are still required before implementation.
 - The production implementation plan chose an in-place, component-first migration of the current nine-route Next.js/FastAPI app rather than a parallel replacement. Work remains gated on a trustworthy deployment baseline, approved mobile Pulse and Explore targets, and restored production-auth verification; the public site stays unchanged until one complete release candidate passes full visual, behavioural, and adversarial review.
 
+## 2026-08-11 | Complete redesign candidate assembled
+
+- The isolated `codex/dashboard-redesign-production` worktree now contains the complete nine-route ACLMR redesign: official brand shell, cream editorial public routes, responsive Plotly language, and a dark authenticated Explore workspace with mobile posting detail.
+- Parent verification passed Python, lint, type, production-build, data-reconciliation, EN/FR route matrix, public/team cap, and authenticated Explore journeys. The canonical public services and tunnel were not changed.
+- Production release remains a separate decision: fresh adversarial acceptance, the unavailable Keychain credential, and the ambiguous Render publication boundary must be resolved before integration or cutover.
+
 ## Rebuild rule
 
 - Rebuild from dated records and owning evidence. When over budget, condense the oldest adjacent spans first and preserve exact claims with direct links where they materially aid verification.
