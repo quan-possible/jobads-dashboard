@@ -42,7 +42,11 @@ export function MapToggle({
 
   return (
     <div>
-      <div role="tablist" aria-label={ariaLabel} className="mb-3 inline-flex flex-wrap gap-1 rounded-md bg-surface-alt p-1">
+      <div
+        role="tablist"
+        aria-label={ariaLabel}
+        className="mb-3 inline-flex max-w-full flex-wrap gap-1 border border-card-border bg-surface-alt p-1"
+      >
         {options.map((o) => {
           const on = active === o.value;
           return (
@@ -57,9 +61,11 @@ export function MapToggle({
               onClick={() => setActive(o.value)}
               onKeyDown={onKeyDown}
               className={[
-                "rounded px-3 py-1 t-meta font-bold transition-colors",
+                "control min-h-9 px-3 py-1 t-meta font-bold transition-colors",
                 "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange",
-                on ? "bg-orange text-white shadow-sm" : "text-ink-soft hover:text-navy-deep",
+                // Keep the selected label dark-on-light. Orange text on the
+                // selected warm control is too easy to lose at compact sizes.
+                on ? "bg-navy text-ink-invert shadow-sm" : "text-navy hover:bg-surface hover:text-navy-deep",
               ].join(" ")}
             >
               {o.label}

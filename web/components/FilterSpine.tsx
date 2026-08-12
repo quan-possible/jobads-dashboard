@@ -24,13 +24,13 @@ export function FilterSpine() {
     <div
       role="toolbar"
       aria-label={t.filter.scope}
-      className="sticky top-16 z-30 border-y border-card-border bg-surface-alt backdrop-blur-md"
+      className="sticky top-16 z-30 border-y border-white/15 bg-surface-navy text-ink-invert backdrop-blur-md"
       style={{ borderTopColor: "var(--orange)", borderTopWidth: "2px" }}
     >
       <div className="container-x flex flex-wrap items-end gap-x-4 gap-y-3 py-3">
         <div className="mr-1 flex flex-col">
-          <span className="t-label font-bold uppercase tracking-[0.05em] text-orange-deep">{t.filter.eyebrow}</span>
-          <span className="t-caption font-bold uppercase tracking-[0.02em] text-ink-soft">
+          <span className="t-label font-bold uppercase tracking-[0.05em] text-orange-soft">{t.filter.eyebrow}</span>
+          <span className="t-caption font-bold uppercase tracking-[0.02em] text-ink-invert/70">
             {t.filter.scope}
           </span>
         </div>
@@ -41,6 +41,7 @@ export function FilterSpine() {
             value={filters.geo}
             options={optionsFor(GEO_OPTIONS, locale)}
             onChange={(v) => setFilter("geo", v)}
+            tone="dark"
           />
           <Select
             id="filter-occ"
@@ -48,6 +49,7 @@ export function FilterSpine() {
             value={filters.occ}
             options={optionsFor(OCC_OPTIONS, locale)}
             onChange={(v) => setFilter("occ", v)}
+            tone="dark"
           />
           <Select
             id="filter-ind"
@@ -55,13 +57,14 @@ export function FilterSpine() {
             value={filters.ind}
             options={optionsFor(IND_OPTIONS, locale)}
             onChange={(v) => setFilter("ind", v)}
+            tone="dark"
           />
         </div>
         <button
           type="button"
           onClick={reset}
           disabled={activeCount === 0}
-          className="control h-[38px] shrink-0 self-end border border-card-border px-3 t-caption font-bold uppercase tracking-[0.02em] text-ink-soft transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
+          className="control h-[38px] shrink-0 self-end border border-white/25 px-3 t-caption font-bold uppercase tracking-[0.02em] text-ink-invert transition-colors enabled:hover:border-orange enabled:hover:text-orange disabled:opacity-40"
         >
           {t.filter.reset}{activeCount > 0 ? ` · ${activeCount}` : ""}
         </button>

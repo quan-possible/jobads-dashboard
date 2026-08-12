@@ -86,7 +86,7 @@ export function TunableFigure({
   }, [chartId, locale, mode, baseYear, endYear, authenticated]);
 
   const selectCls =
-    "num rounded border border-card-border bg-surface-alt px-1.5 py-0.5 t-caption font-bold text-ink-soft focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange";
+    "control num min-h-8 border border-card-border bg-surface-alt px-1.5 py-0.5 t-caption font-bold text-navy focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange";
   const labelCls = "t-caption uppercase tracking-[0.03em] text-ink-faint";
 
   // Each <select> carries its own accessible name (the visible label spans are
@@ -94,7 +94,7 @@ export function TunableFigure({
   // comboboxes are for (S13).
   const picker =
     mode === "base" ? (
-      <div className="flex items-center gap-1.5" role="group" aria-label={yc.aria}>
+      <div className="flex flex-wrap items-center justify-end gap-1.5" role="group" aria-label={yc.aria}>
         <span className={labelCls} aria-hidden>{yc.base}</span>
         <select
           className={selectCls}
@@ -108,7 +108,7 @@ export function TunableFigure({
         </select>
       </div>
     ) : (
-      <div className="flex items-center gap-1.5" role="group" aria-label={yc.aria}>
+      <div className="flex flex-wrap items-center justify-end gap-1.5" role="group" aria-label={yc.aria}>
         <span className={labelCls} aria-hidden>{yc.from}</span>
         <select
           className={selectCls}

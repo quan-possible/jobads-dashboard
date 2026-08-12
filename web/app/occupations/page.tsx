@@ -2,9 +2,10 @@ import { Figure } from "@/components/Figure";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
+import { RouteMasthead } from "@/components/RouteMasthead";
+import { SectionLead } from "@/components/SectionLead";
 import { api } from "@/lib/api";
 import { figureServer } from "@/lib/api.server";
-import { fmtMonth } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { occupationsDict } from "@/lib/i18n/dict/page-occupations";
 import type { Metadata } from "next";
@@ -88,25 +89,17 @@ export default async function OccupationsPage() {
 
   return (
     <div className="pb-4">
-      {/* Hero */}
-      <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
-        <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">
-            {t.eyebrow} · {fmtMonth(asOf, locale)}
-          </div>
-          <h1 className="h-display max-w-4xl text-balance">{t.hero}.</h1>
-          <p className="lede mt-4 max-w-2xl">{t.lede}</p>
-        </div>
-      </section>
+      <RouteMasthead eyebrow={t.eyebrow} title={`${t.hero}.`} lede={t.lede} asOf={asOf} locale={locale} />
 
       {/* Core: what's in demand, and who grew */}
-      <section className="container-x py-4">
+      <section className="container-x py-8 md:py-10">
+        <SectionLead number="01" label={locale === "fr" ? "Demande par profession" : "Occupation demand"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.treemap.eyebrow} title={c.treemap.title} asOf={asOf} note={c.treemap.note}>
           <RemoteFigure fig={figs.treemap} height={460} ariaLabel={c.treemap.aria} />
         </Figure>
       </section>
 
-      <section className="container-x py-4">
+      <section className="container-x pb-8 md:pb-10">
         <TunableFigure
           chartId="occupations.indexed_lines" initialFig={figs.indexedLines} mode="base"
           minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR}
@@ -117,7 +110,8 @@ export default async function OccupationsPage() {
       <DeepDivider eyebrow={t.deepEyebrow} lede={t.deepLede} />
 
       {/* Deep: contribution + reconciliation */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="02" label={locale === "fr" ? "Composition et variation" : "Composition and change"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <TunableFigure
             chartId="occupations.contribution_bars" initialFig={figs.contributionBars} mode="baseEnd"
@@ -133,7 +127,8 @@ export default async function OccupationsPage() {
       </section>
 
       {/* Deep: then-vs-now + skill churn */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="03" label={locale === "fr" ? "Trajectoires et renouvellement" : "Trajectories and skill churn"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <TunableFigure
             chartId="occupations.dumbbell" initialFig={figs.dumbbell} mode="baseEnd"
@@ -149,7 +144,8 @@ export default async function OccupationsPage() {
       </section>
 
       {/* Deep: occupation-by-sector + AI exposure (the ceiling) */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="04" label={locale === "fr" ? "Professions par secteur" : "Occupation by sector"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.nocNaicsHeatmap.eyebrow} title={c.nocNaicsHeatmap.title} asOf={asOf} note={c.nocNaicsHeatmap.note}>
             <RemoteFigure fig={figs.nocNaicsHeatmap} height={460} ariaLabel={c.nocNaicsHeatmap.aria} />

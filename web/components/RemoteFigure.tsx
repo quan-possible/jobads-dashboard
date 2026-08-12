@@ -31,7 +31,7 @@ export function RemoteFigure({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { t } = useI18n();
-  const [failed, setFailed] = useState(false);
+  const [failedFor, setFailedFor] = useState<FigJSON | null>(null);
 
   // The factory's own height is the authored intent; fall back to the prop.
   const figHeight = (fig?.layout?.height as number | undefined) ?? height ?? 360;
@@ -60,13 +60,13 @@ export function RemoteFigure({
           .then(() => {
             if (!disposed && fig.frames?.length) void addFrames(el, fig.frames);
           })
-          .catch(() => !disposed && setFailed(true));
+          .catch(() => !disposed && setFailedFor(fig));
         ro = new ResizeObserver(() => {
           if (plotly && ref.current) plotly.Plots.resize(ref.current);
         });
         ro.observe(el);
       })
-      .catch(() => !disposed && setFailed(true));
+      .catch(() => !disposed && setFailedFor(fig));
 
     return () => {
       disposed = true;
@@ -78,14 +78,14 @@ export function RemoteFigure({
   // While a fetch is in flight and nothing has rendered yet, show a neutral
   // loading skeleton — not the error notice — so a normal load never reads as
   // broken (S15).
-  if (!fig && loading && !failed) {
+  if (!fig && loading && !failedFor) {
     return (
       <div
         style={{ height: figHeight, width: "100%" }}
         role="img"
         aria-busy="true"
         aria-label={t.common.loading}
-        className={`flex animate-pulse items-center justify-center rounded-md border border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
+        className={`flex min-w-0 max-w-full animate-pulse items-center justify-center overflow-hidden rounded-md border border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
       >
         {t.common.loading}
       </div>
@@ -94,13 +94,14 @@ export function RemoteFigure({
 
   // Per-figure fallback: a missing figure (server fetch failed) or a render
   // error degrades to a small notice — it never blanks the rest of the page (S23).
-  if (!fig || failed) {
+  const renderFailed = failedFor === fig;
+  if (!fig || renderFailed) {
     return (
       <div
         style={{ height: figHeight, width: "100%" }}
         role="img"
         aria-label={ariaLabel}
-        className={`flex items-center justify-center rounded-md border border-dashed border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
+        className={`flex min-w-0 max-w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-card-border bg-surface-alt/40 px-4 text-center t-meta text-ink-faint ${className}`}
       >
         {t.common.chartUnavailable}
       </div>
@@ -113,7 +114,7 @@ export function RemoteFigure({
       style={{ height: figHeight, width: "100%" }}
       role="img"
       aria-label={ariaLabel}
-      className={className}
+      className={`min-w-0 max-w-full overflow-hidden ${className}`}
     />
   );
 }

@@ -1,7 +1,9 @@
 import { CoverageBar } from "@/components/CoverageBar";
 import { Figure } from "@/components/Figure";
+import { RouteMasthead } from "@/components/RouteMasthead";
+import { SectionLead } from "@/components/SectionLead";
 import { api } from "@/lib/api";
-import { fmtCompact, fmtInt, fmtMonth } from "@/lib/format";
+import { fmtInt, fmtMonth } from "@/lib/format";
 import { methodDict } from "@/lib/i18n/dict/page-method";
 import { getLocale } from "@/lib/i18n/server";
 import type { Metadata } from "next";
@@ -41,19 +43,13 @@ export default async function MethodPage() {
 
   return (
     <div className="pb-4">
-      {/* Hero */}
-      <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
-        <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">{t.heroEyebrow}</div>
-          <h1 className="h-display max-w-4xl text-balance">{t.heroTitle}</h1>
-          <p className="lede mt-4 max-w-2xl">{t.heroIntro}</p>
-        </div>
-      </section>
+      <RouteMasthead eyebrow={t.heroEyebrow} title={t.heroTitle} lede={t.heroIntro} />
 
       {/* What it measures / what it doesn't */}
-      <section className="container-x py-4">
+      <section className="container-x py-8 md:py-10">
+        <SectionLead number="01" label={locale === "fr" ? "Portée et limites" : "Scope and limits"} />
         <div className="grid gap-5 md:grid-cols-2">
-          <div className="card card-pad">
+          <div className="border-l-4 border-teal bg-surface p-5 md:p-7">
             <h2 className="h-card mb-3">{t.measuresTitle}</h2>
             <ul className="flex flex-col gap-2 t-body leading-snug text-ink">
               {t.measuresItems.map((item, i) => (
@@ -65,7 +61,7 @@ export default async function MethodPage() {
             </ul>
           </div>
 
-          <div className="card card-pad">
+          <div className="border-l-4 border-orange bg-surface-alt p-5 md:p-7">
             <h2 className="h-card mb-3">{t.notMeasuresTitle}</h2>
             <ul className="flex flex-col gap-2 t-body leading-snug text-ink">
               {t.notMeasuresItems.map((item, i) => (
@@ -80,7 +76,8 @@ export default async function MethodPage() {
       </section>
 
       {/* Field coverage */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="02" label={locale === "fr" ? "Couverture des champs" : "Field coverage"} />
         <Figure
           eyebrow={t.coverageEyebrow}
           title={t.coverageTitle}
@@ -111,14 +108,16 @@ export default async function MethodPage() {
       </section>
 
       {/* Category cap — public charts limited to 10 categories (Vicinity TOS) */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="03" label={locale === "fr" ? "Règles de présentation" : "Presentation rules"} />
         <Figure eyebrow={t.capEyebrow} title={t.capTitle}>
           <p className="t-body leading-relaxed text-ink-soft">{t.capBody}</p>
         </Figure>
       </section>
 
       {/* Caveats — text comes from the API, no translation */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="04" label={locale === "fr" ? "Mises en garde" : "Caveats"} />
         <Figure eyebrow={t.caveatsEyebrow} title={t.caveatsTitle}>
           <ul className="flex flex-col gap-3.5">
             {meta.caveats.map((caveat, i) => (
@@ -132,7 +131,8 @@ export default async function MethodPage() {
       </section>
 
       {/* Glossary */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="05" label={locale === "fr" ? "Glossaire" : "Glossary"} />
         <Figure eyebrow={t.glossaryEyebrow} title={t.glossaryTitle}>
           <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
             {t.glossaryTerms.map(({ term, def }) => (
@@ -146,7 +146,8 @@ export default async function MethodPage() {
       </section>
 
       {/* Version */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="06" label={locale === "fr" ? "Version" : "Version"} />
         <Figure eyebrow={t.versionEyebrow} title={t.versionTitle}>
           <p className="t-body text-ink-soft">
             <span className="num font-bold text-navy">v1</span> ·{" "}

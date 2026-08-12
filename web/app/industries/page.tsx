@@ -2,9 +2,10 @@ import { Figure } from "@/components/Figure";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
+import { RouteMasthead } from "@/components/RouteMasthead";
+import { SectionLead } from "@/components/SectionLead";
 import { api } from "@/lib/api";
 import { figureServer } from "@/lib/api.server";
-import { fmtMonth } from "@/lib/format";
 import { getLocale } from "@/lib/i18n/server";
 import { industriesDict } from "@/lib/i18n/dict/page-industries";
 import type { Metadata } from "next";
@@ -63,19 +64,11 @@ export default async function IndustriesPage() {
 
   return (
     <div className="pb-4">
-      {/* Hero */}
-      <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
-        <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">
-            {t.eyebrow} · {fmtMonth(asOf, locale)}
-          </div>
-          <h1 className="h-display max-w-4xl text-balance">{t.hero}.</h1>
-          <p className="lede mt-4 max-w-2xl">{t.lede}</p>
-        </div>
-      </section>
+      <RouteMasthead eyebrow={t.eyebrow} title={`${t.hero}.`} lede={t.lede} asOf={asOf} locale={locale} />
 
       {/* Core: coverage + industry mix over time */}
-      <section className="container-x py-4">
+      <section className="container-x py-8 md:py-10">
+        <SectionLead number="01" label={locale === "fr" ? "Couverture et composition" : "Coverage and composition"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.coverageLine.eyebrow} title={c.coverageLine.title} asOf={asOf} note={c.coverageLine.note}>
             <RemoteFigure fig={figs.coverageLine} height={360} ariaLabel={c.coverageLine.aria} />
@@ -87,7 +80,8 @@ export default async function IndustriesPage() {
       </section>
 
       {/* Core: sector treemap */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="02" label={locale === "fr" ? "Structure sectorielle" : "Sector structure"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.treemap.eyebrow} title={c.treemap.title} asOf={asOf} note={c.treemap.note}>
           <RemoteFigure fig={figs.treemap} height={460} ariaLabel={c.treemap.aria} />
         </Figure>
@@ -96,7 +90,8 @@ export default async function IndustriesPage() {
       <DeepDivider eyebrow={t.deepEyebrow} lede={t.deepLede} />
 
       {/* Deep: contribution to growth (general window) */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="03" label={locale === "fr" ? "Contribution à la variation" : "Contribution to change"} asOf={asOf} locale={locale} />
         <TunableFigure
           chartId="industries.contribution_bars" initialFig={figs.contributionBars} mode="baseEnd"
           minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR} defaultEndYear={latestComplete}

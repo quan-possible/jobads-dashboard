@@ -3,9 +3,10 @@ import { MapToggle } from "@/components/MapToggle";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { TunableFigure } from "@/components/TunableFigure";
 import { DeepDivider } from "@/components/DeepDivider";
+import { RouteMasthead } from "@/components/RouteMasthead";
+import { SectionLead } from "@/components/SectionLead";
 import { api } from "@/lib/api";
 import { figureServer } from "@/lib/api.server";
-import { fmtMonth } from "@/lib/format";
 import { geographyDict } from "@/lib/i18n/dict/page-geography";
 import { getLocale } from "@/lib/i18n/server";
 import type { Metadata } from "next";
@@ -94,18 +95,12 @@ export default async function GeographyPage() {
 
   return (
     <div className="pb-4">
-      {/* Hero */}
-      <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
-        <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">{t.eyebrow} · {fmtMonth(asOf, locale)}</div>
-          <h1 className="h-display max-w-3xl text-balance">{t.hero}</h1>
-          <p className="lede mt-4 max-w-2xl">{t.lede}</p>
-        </div>
-      </section>
+      <RouteMasthead eyebrow={t.eyebrow} title={t.hero} lede={t.lede} asOf={asOf} locale={locale} />
 
       {/* Core: authoritative map (measure toggle) + ranked list */}
-      <section className="container-x py-8">
-        <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+      <section className="container-x py-8 md:py-10">
+        <SectionLead number="01" label={locale === "fr" ? "Carte et classement" : "Map and ranking"} asOf={asOf} locale={locale} />
+        <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(260px,1fr)]">
           <Figure eyebrow={c.demandMap.eyebrow} title={c.demandMap.title} asOf={asOf} note={c.demandMap.note}>
             <MapToggle
               options={measureOptions}
@@ -126,7 +121,8 @@ export default async function GeographyPage() {
       </section>
 
       {/* Core: city / CMA demand full width */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="02" label={locale === "fr" ? "Marchés métropolitains" : "Metropolitan markets"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.cmaDemand.eyebrow} title={c.cmaDemand.title} asOf={asOf} note={c.cmaDemand.note}>
           <RemoteFigure fig={figs.cmaDemand} height={520} ariaLabel={c.cmaDemand.aria} />
         </Figure>
@@ -135,7 +131,8 @@ export default async function GeographyPage() {
       <DeepDivider eyebrow={t.deepEyebrow} lede={t.deepLede} />
 
       {/* Deep: momentum + AI exposure */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="03" label={locale === "fr" ? "Dynamique régionale" : "Regional momentum"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.yoyChoropleth.eyebrow} title={c.yoyChoropleth.title} asOf={asOf} note={c.yoyChoropleth.note}>
             <RemoteFigure fig={figs.yoyChoropleth} height={460} ariaLabel={c.yoyChoropleth.aria} />
@@ -147,7 +144,8 @@ export default async function GeographyPage() {
       </section>
 
       {/* Deep: shift-share decomposition (secondary, general window) */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="04" label={locale === "fr" ? "Décomposition" : "Decomposition"} asOf={asOf} locale={locale} />
         <TunableFigure
           chartId="geography.shift_share" initialFig={figs.shiftShare} mode="baseEnd"
           minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR} defaultEndYear={latestComplete}

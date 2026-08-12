@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { RouteMasthead } from "@/components/RouteMasthead";
+import { SectionLead } from "@/components/SectionLead";
 import { getLocale } from "@/lib/i18n/server";
 import { developersDict } from "@/lib/i18n/dict/page-developers";
 
@@ -28,21 +30,21 @@ function ParamRow({ p }: { p: Param }) {
 
 function EndpointCard({ ep, headers }: { ep: Endpoint; headers: { param: string; type: string; description: string } }) {
   return (
-    <div className="card card-pad flex flex-col gap-4">
+    <article className="border-t border-card-border py-6 first:border-t-2 first:border-navy">
       {/* Method + path */}
       <div className="flex flex-wrap items-baseline gap-3">
-        <span className="shrink-0 rounded-none border border-teal px-2 py-0.5 font-mono t-caption font-bold uppercase tracking-wider text-teal">
+        <span className="control shrink-0 border border-teal bg-surface px-2 py-1 font-mono t-caption font-bold uppercase tracking-wider text-teal">
           {ep.method}
         </span>
         <code className="font-mono text-[1rem] font-bold text-navy-deep">{ep.path}</code>
       </div>
 
       {/* Purpose */}
-      <p className="t-body text-ink-soft">{ep.purpose}</p>
+      <p className="mt-3 max-w-3xl t-body text-ink-soft">{ep.purpose}</p>
 
       {/* Params table */}
       {ep.params.length > 0 && (
-        <div className="overflow-x-auto">
+        <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr>
@@ -59,7 +61,7 @@ function EndpointCard({ ep, headers }: { ep: Endpoint; headers: { param: string;
           </table>
         </div>
       )}
-    </div>
+    </article>
   );
 }
 
@@ -71,36 +73,31 @@ export default async function DevelopersPage() {
 
   return (
     <div className="pb-16">
-      {/* Hero */}
-      <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
-        <div className="container-x py-10 md:py-14">
-          <div className="eyebrow mb-3">{t.eyebrow}</div>
-          <h1 className="h-display max-w-3xl text-balance">{t.title}</h1>
-          <p className="lede mt-4 max-w-2xl">
-            {t.ledeIntro} <code className="font-mono text-[0.9em] text-navy">/api</code>.{" "}
+      <RouteMasthead eyebrow={t.eyebrow} title={t.title} lede={
+        <>
+            {t.ledeIntro} <code className="font-mono text-[0.9em] !text-orange-soft">/api</code>.{" "}
             {t.ledeDocsBefore}{" "}
             <a
               href="/api/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-bold text-orange underline underline-offset-2 hover:text-orange-deep"
+              className="font-bold !text-orange-soft underline underline-offset-2 hover:!text-ink-invert"
             >
               {t.docsLabel}
             </a>
             .
-          </p>
-        </div>
-      </section>
+        </>
+      } />
 
       {/* Scope parameters */}
-      <section className="container-x py-8">
+      <section className="container-x py-8 md:py-10">
+        <SectionLead number="01" label={t.scopeEyebrow} />
         <div className="mb-5">
-          <div className="eyebrow mb-1.5">{t.scopeEyebrow}</div>
           <h2 className="h-section">{t.scopeTitle}</h2>
           <p className="mt-2 max-w-2xl t-body text-ink-soft">{t.scopeDesc}</p>
         </div>
 
-        <div className="card card-pad overflow-x-auto">
+        <div className="overflow-x-auto border border-card-border bg-surface p-4 md:p-6">
           <table className="w-full text-left">
             <thead>
               <tr>
@@ -119,13 +116,13 @@ export default async function DevelopersPage() {
       </section>
 
       {/* Endpoints */}
-      <section className="container-x py-4">
+      <section className="container-x py-4 md:py-6">
+        <SectionLead number="02" label={t.endpointsEyebrow} />
         <div className="mb-5">
-          <div className="eyebrow mb-1.5">{t.endpointsEyebrow}</div>
           <h2 className="h-section">{t.endpointsTitle}</h2>
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="bg-surface px-4 md:px-6">
           {t.endpoints.map((ep) => (
             <EndpointCard key={ep.path} ep={ep} headers={headers} />
           ))}
@@ -133,9 +130,9 @@ export default async function DevelopersPage() {
       </section>
 
       {/* Privacy note */}
-      <section className="container-x py-8">
-        <div className="card card-pad max-w-2xl border-l-2 border-l-sand bg-surface-alt/50">
-          <div className="eyebrow mb-1.5">{t.accessEyebrow}</div>
+      <section className="container-x py-8 md:py-10">
+        <SectionLead number="03" label={t.accessEyebrow} />
+        <div className="max-w-2xl border-l-4 border-l-sand bg-surface-alt p-5 md:p-7">
           <h2 className="h-card mb-2">{t.accessTitle}</h2>
           <p className="t-body text-ink-soft">{t.accessBody}</p>
         </div>

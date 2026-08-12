@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, normalizeLocale, type Locale } from "@/lib/i18n/locale";
 
 // Route error boundaries render outside the i18n provider tree, so they can't use
@@ -42,20 +42,24 @@ export function ErrorCard({
   title: "view" | "explore" | "page";
   body?: "service" | "generic";
 }) {
-  // Read after mount to avoid a hydration mismatch; the error view is client-only.
-  const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
-  useEffect(() => setLocale(readLocale()), []);
+  // The server snapshot remains English for hydration; the client snapshot
+  // reads the preference without a setState-in-effect update.
+  const locale = useSyncExternalStore(
+    () => () => undefined,
+    readLocale,
+    () => DEFAULT_LOCALE,
+  );
   const c = COPY[locale];
   return (
     <div className="container-x py-24">
-      <div className="card card-pad mx-auto max-w-xl text-center">
-        <div className="eyebrow mb-2">{c.eyebrow}</div>
-        <h1 className="h-section mb-3">{c.titles[title]}</h1>
-        <p className="mb-5 text-ink-soft">{c.bodies[body]}</p>
+      <div className="mx-auto max-w-xl border-l-4 border-orange bg-surface-navy p-6 text-center text-ink-invert md:p-8">
+        <div className="eyebrow mb-2 !text-orange-soft">{c.eyebrow}</div>
+        <h1 className="h-section mb-3 !text-ink-invert">{c.titles[title]}</h1>
+        <p className="mb-5 !text-ink-invert/75">{c.bodies[body]}</p>
         <button
           type="button"
           onClick={reset}
-          className="control border border-card-border px-4 py-2 t-meta font-bold uppercase tracking-[0.02em] text-navy transition-colors hover:border-orange hover:text-orange"
+          className="control border border-orange/70 px-4 py-2 t-meta font-bold uppercase tracking-[0.02em] text-orange-soft transition-colors hover:border-orange hover:bg-orange hover:text-navy-deep"
         >
           {c.retry}
         </button>
