@@ -38,7 +38,7 @@ Last condensed: 2026-08-11
 ## 2026-08-11 | Harness migration
 
 - The repository adopted the current project-memory split: `STATUS.md` for live orientation, this bounded file for progressively condensed history, dated memory for chronological reconstruction, and jobs for detailed task continuity.
-- The root `AGENTS.md` now keeps only project-specific hard boundaries and required product routing. The global memory contract and `README.md` retain generic startup, history, commands, and documentation ownership. The pre-migration `MEMORY.md` was preserved under `archive/memory/versions/` before condensation.
+- `AGENTS.md` and `README.md` now route each kind of project truth to one owner. The pre-migration `MEMORY.md` was preserved under `archive/memory/versions/` before condensation.
 - The migration was committed as `f2a11741` and published with the new design line. On 2026-08-11, `main` was moved directly to that line at `65661304`; the obsolete 10-commit Streamlit/worktree-only line was deliberately not merged.
 
 ## 2026-08-11 | Components published as a design system

@@ -19,7 +19,7 @@ the live ACLMR gradient-ring or solid-orange pill families.
 
 Do not copy the static prototypes or exported components mechanically into
 production. Reconcile them with current behavior, accessibility, data,
-authentication, and i18n. Copy must describe posted demand rather than
-employment or causes; public charts retain the shared category-cap behavior;
-production remains EN/FR bilingual. The preserved targets settle desktop only:
-create and inspect separate mobile targets before responsive implementation.
+authentication, and i18n. Public charts retain the shared category-cap
+behavior; production remains EN/FR bilingual. The preserved targets settle
+desktop only: create and inspect separate mobile targets before responsive
+implementation.
