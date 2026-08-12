@@ -47,8 +47,10 @@ raw `text-*` sizes**:
 - Utilities: `num` (tabular figures — use on every number), `control` (square
   form controls), `gradient-bar` (the navy→teal→sand→orange signature ribbon)
 
-For categorical chart series use `--cat-1` … `--cat-8`, which are CVD-safe and
-luminance-separated.
+For categorical chart series use the shared `--cat-1` … `--cat-8` sequence so
+figures remain visually consistent. Do not claim colour-vision safety without a
+separate current audit; keep labels and direct values available independently of
+colour.
 
 ### House rules that are not visual defaults
 
@@ -57,8 +59,9 @@ luminance-separated.
   the tail into an "Other" residual (or a meaningful grouping like "Atlantic
   Canada") so the parts still sum to the whole — never drop categories silently.
   Time axes are exempt.
-- **Job postings are not employment.** Copy must describe *posted demand*, never
-  vacancies, hiring, or unemployment, and must stay descriptive rather than
+- **Job postings are not employment.** Copy must keep the underlying measure
+  explicit as online posting activity or posted demand, distinguish it from
+  employment and economy-wide vacancies, and stay descriptive rather than
   causal. `KeyPoints` carries this guard in its default footnote.
 - **Keep sparse-data caveats visible.** `CoverageBar` deliberately turns orange
   below 40% coverage; `KpiTile` renders an em-dash rather than a thin estimate.

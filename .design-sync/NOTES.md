@@ -100,14 +100,14 @@ export DS_CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google C
 - **The sizing wrapper is not neutral.** Too tight a `maxWidth` manufactures
   defects that do not exist in the product (mid-phrase wraps that read as layout
   faults), and a grader reading only the sheet cannot tell the difference.
-- **Decorative components need their lockup ported.** `Sparkline` and `PixelTiles`
+- **Decorative components need their context ported.** `Sparkline` and `PixelTiles`
   are `aria-hidden` and carry no text, so a bare cell has nothing for the "fonts
-  and tokens applied" criterion to bind to. Reproduce the surrounding composition
-  (the `KpiTile` eyebrow+value pairing, the `Brand` wordmark) or the cell reads as
-  an unstyled fragment.
+  and tokens applied" criterion to bind to. Reproduce a real surrounding
+  composition (the `KpiTile` eyebrow+value pairing or `KeyPoints` heading) or the
+  cell reads as an unstyled fragment.
 - **A downscaled sheet is weak evidence for small or dense components.** 7–9px
-  pixel tiles resolve to ~4px on the sheet; the PixelTiles colour bug (below) was
-  invisible there. For dense output, read the sheet and then verify out of band —
+  pixel tiles resolve to ~4px on the sheet; the historical PixelTiles colour bug
+  was invisible there. For dense output, read the sheet and then verify out of band —
   crop to full resolution, or evaluate the component's own helper in node.
 
 ## Component behaviours worth knowing (found while authoring)
@@ -129,20 +129,14 @@ export DS_CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google C
   Avoid `yaxis.automargin` on horizontal bars in a narrow card; it shrinks the
   left margin until category labels sit on top of the bars.
 
-## A product bug this sync surfaced (NOT a design-sync issue)
+## Historical PixelTiles defect — resolved in the redesign candidate
 
-`web/components/PixelTiles.tsx` clamps its gradient index at `Math.min(0.999, …)`
-before `STOPS[Math.floor(t)]`, so the index is **always 0** and every tile renders
-`#041c2c` navy. The intended navy→teal→sand→orange mosaic has never appeared.
-Confirmed by evaluating `pick()` over a 3×8 grid (one distinct colour; with the
-ceiling at `STOPS.length - 0.001`, all four) and by cropping a capture to full
-resolution. Affects `Brand`, `TopNav`, `Footer`, `KeyPoints`, `AuthGate` — and on
-the navy footer surface the mark is effectively invisible.
-
-The `PixelTiles` preview cells are graded `good` deliberately: they faithfully
-render what ships and exercise the full prop surface. Do NOT "fix" this in a
-preview by faking a gradient the component does not produce. Fix it in the
-component or leave it.
+The original component clamped its gradient index at `Math.min(0.999, …)`, so
+every tile resolved to the first navy stop. `web/components/PixelTiles.tsx` now
+clamps at `STOPS.length - 0.001`; the decorative mosaic uses all four live ACLMR
+stops. The component remains decoration, never the ACLMR identity mark. `Brand`
+uses the official vendored wordmark, while `KeyPoints` and the Explore auth gate
+are the real product contexts for `PixelTiles`.
 
 ## Scope
 
@@ -159,8 +153,8 @@ meaning in a design tool. `RemoteFigure` is still reachable *inside* the bundle
 Three components need `cfg.overrides` to present correctly in the product's grid:
 
 - **`TopNav`** — `cardMode: "single"`, `viewport: "1280x420"`. At the default
-  900x700 the wordmark wraps to three lines and the auth control falls off the
-  right edge. That is a real responsive squeeze, not a preview artifact, but it
+  900x700 the navigation and auth controls run out of horizontal room. That is a
+  real responsive squeeze, not a preview artifact, but it
   is not the state worth showing. One export only: pathname, locale and auth all
   come from the pinned provider, so a second export would be byte-identical.
 - **`Footer`** — `cardMode: "column"`. Renders whole at 900px; column is purely
