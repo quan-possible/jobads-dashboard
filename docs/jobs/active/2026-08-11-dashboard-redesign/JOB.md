@@ -1,7 +1,7 @@
 # Dashboard redesign implementation
 
-Status: complete in an isolated worktree; deep-audit convergence and fresh
-adversarial verification passed, production publication blocked.
+Status: deployed through the existing local public stack; remote publication
+remains blocked pending Render authority.
 
 ## Objective
 
@@ -21,18 +21,22 @@ category-cap, bilingual, accessibility, or deployment contracts.
 
 - The preserved Pulse and Explore desktop targets are verified redesign
   groundwork.
-- The running app is healthy at `127.0.0.1:8522` and the API is healthy at
-  `127.0.0.1:8530`, but the deployed bundle is not proven to match current
-  `main`.
+- The deployed app is healthy at `127.0.0.1:8522`, the API is healthy at
+  `127.0.0.1:8530`, and the public tunnel serves the exact canonical build from
+  release commit `b7bebe5b` (Next build ID `R1XRrat8L-kJFQH4OLwqr`).
 - Mobile Pulse and Explore targets plus four Mobbin interaction references are
   preserved under this job's `evidence/` directory.
-- The intended Keychain password lookup exits 44, so production authenticated
-  verification remains blocked pending credential-source restoration or
-  confirmation.
+- The intended Keychain password lookup still exits 44. The existing mode-600
+  local credential matched the installed production hash and enabled live team
+  verification without exposing or copying the secret.
 - Implementation worktree: `/Users/brucenguyen/.codex/worktrees/jobads-dashboard-redesign`.
-- Branch: `codex/dashboard-redesign-production`; current canonical `main` at
-  `463d919a` has been merged into the candidate.
-- The canonical `8522`/`8530` services and Cloudflare tunnel remain untouched.
+- Branch `codex/dashboard-redesign-production` remains at release `b7bebe5b`;
+  canonical local `main` contains that release plus this cutover record. Rollback is preserved at
+  `backup/main-pre-dashboard-redesign-20260812-463d919a`.
+- The existing `8522`/`8530` LaunchAgent was rebuilt and restarted; its plist
+  was backed up and hardened with `--no-proxy-headers`. The Cloudflare agent
+  was left running and retained
+  `https://topics-marion-although-restore.trycloudflare.com`.
 - All nine routes, the shell, shared charts, and Explore workspace have been
   migrated to the ACLMR design language. The design-system inputs now enumerate
   16 reusable components locally; the remote Claude Design package is not yet
@@ -42,7 +46,7 @@ category-cap, bilingual, accessibility, or deployment contracts.
 
 | Scope | Owner | Paths | State |
 | --- | --- | --- | --- |
-| Baseline evidence | Worker | `agents/baseline.md`, read-only project/runtime inspection | Complete; publication blocked |
+| Baseline evidence | Worker | `agents/baseline.md`, read-only project/runtime inspection | Complete |
 | Responsive reference evidence | Worker | `evidence/mobile-references/`, `agents/mobile-references.md` | Complete |
 | Responsive composition targets | Parent | `evidence/mobile-targets/` | Complete |
 | Shared UI implementation | Worker | shell, shared presentational components, Pulse | Complete |
@@ -53,10 +57,10 @@ category-cap, bilingual, accessibility, or deployment contracts.
 
 ## Next action
 
-Hand the accepted candidate back for an explicit integration/release decision.
-Restore the production credential, confirm the Render publication boundary,
-and harden the installed public LaunchAgent with `--no-proxy-headers` before
-cutover. Do not restart the public services until release is authorized.
+Keep the local public release in service. Resolve Render ownership and its
+auto-deploy behavior before pushing local `main` to `origin/main`; restore the
+Keychain credential owner and republish the 16-component Claude Design package
+as separately authorized follow-ups.
 
 ## Verification evidence
 
@@ -91,7 +95,31 @@ cutover. Do not restart the public services until release is authorized.
   zero-vulnerability npm audits, 27/27 live route/viewport checks, real Explore
   failure paths, and 16/16 portable-package renders. A fresh adversarial review
   returned `READY` for the candidate and `NOT READY` for production cutover.
-- The remaining publication prerequisite is external to the worktree:
-  `/Users/brucenguyen/Library/LaunchAgents/com.aclmr.jobads-dashboard-public.plist`
-  still omits `--no-proxy-headers`. Back it up, add and validate the flag during
-  authorized cutover, then repeat the forged-header throttle probe.
+- The earlier external LaunchAgent prerequisite is resolved: the installed
+  plist now includes `--no-proxy-headers`, and the forged-header throttle probe
+  passed after the authorized cutover.
+- Authorized cutover completed on 2026-08-12. The plist backup is
+  `tmp/deployment/2026-08-12-dashboard-redesign/com.aclmr.jobads-dashboard-public.plist.before`;
+  its SHA-256 is
+  `05de524d64fdf5030dc0471b2be4885d4761fed6d3d15388ac6a21877afb2795`.
+- Canonical verification repeated after integration: 362 Python tests passed;
+  ESLint, TypeScript, Next 16.3 build, both npm audits, and derived-data
+  reconciliation passed. The live forged-header sequence was
+  `401` × 8 then `429` × 2; anonymous and anonymous `full=1` returned 10
+  categories, verified team returned 11, and team figure/posting responses
+  were `private, no-store`.
+- Live Browser QA inspected English desktop Pulse, French mobile Geography,
+  locked and authenticated mobile Explore, menu focus return, French switching,
+  team login, 25 posting rows, a posting drawer with no known mojibake/entities,
+  and logout relock. Current deployed captures are under
+  `deep-audit/evidence/live-qa/deployed-*.png`.
+- After this cutover record, local `main` is 18 commits ahead of `origin/main`.
+  It was not pushed because
+  Render CLI authority is expired and the reachable Render hostname appears to
+  serve an older Streamlit application; avoiding an uncoordinated second
+  deployment is intentional.
+- A fresh read-only post-deployment reviewer returned `READY`: canonical and
+  runtime identity matched `b7bebe5b` / `R1XRrat8L-kJFQH4OLwqr`, local and
+  public health passed, all nine EN/FR routes returned 200, anonymous `full=1`
+  stayed capped, protected endpoints stayed protected, the running LaunchAgent
+  included `--no-proxy-headers`, and all four deployed captures were coherent.

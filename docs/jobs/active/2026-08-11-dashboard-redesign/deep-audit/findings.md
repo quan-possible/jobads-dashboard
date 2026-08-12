@@ -9,13 +9,13 @@ evidence. Candidate observations remain outside this ledger until confirmed.
 
 ## Verification note
 
-Convergence complete. The final complete pass and fresh-context adversarial
-review found no remaining candidate-code or product blocker. Verdict: **READY
-as an isolated release candidate; NOT READY for production cutover.** The
-external installed LaunchAgent must be hardened during an authorized cutover,
-and production authentication, Render ownership, provider/container behavior,
-and deployed visual verification still require their missing authority and
-credentials. Canonical production was not modified.
+Convergence and the authorized local public cutover are complete. The final
+candidate pass found no code or product blocker; the deployed release then
+passed production authentication, cap/cache/security probes, all-route EN/FR
+checks, and direct desktop/mobile Browser inspection. The installed LaunchAgent
+is hardened and S20 is closed. Render ownership and the missing Keychain owner
+remain remote-publication and credential-hardening follow-ups; they did not
+block the verified existing Cloudflare-backed release.
 
 ## Severity tally
 
@@ -272,11 +272,12 @@ Mac service definition. The user explicitly forbids modifying production during
 this groundwork audit. Admitted as a cutover configuration blocker rather than
 a candidate-code defect.
 
-**Remediation status.** Repository run commands and the deployment plan are
-fixed. At authorized cutover, back up and validate the external plist, add the
-flag, restart only the public service, and repeat the forged-header probe before
-sign-off. Until then the candidate is not authorized for direct production
-restart.
+**Remediation status.** Fixed during the authorized 2026-08-12 cutover. The
+external plist was backed up, updated with `--no-proxy-headers`, validated, and
+used to restart only the public dashboard service. The public-tunnel regression
+probe sent ten wrong passwords with ten rotating forged forwarding headers and
+received eight `401` responses followed by two `429` responses. Current
+deployment evidence is in `evidence/deployment-2026-08-12.md`.
 
 ## Final verification
 

@@ -1,81 +1,81 @@
 # MEMORY
 
-Last condensed: 2026-08-11
+Last condensed: 2026-08-12
 
 <!-- Bounded historical index. Read STATUS.md for live state. -->
 <!-- Oldest to newest; inspect dated files within a section's range for detail. -->
 <!-- Target: 80 lines / 6 KiB. Maximum: 100 lines / 8 KiB. -->
 
-## 2026-03-24 to 2026-03-29 | Standalone dashboard foundation
+## 2026-03-24 to 2026-03-29 | Standalone foundation
 
-- `jobads-dashboard` became the independent implementation home, with `../jobads-data/main/data/processed/<year>/processed_*.parquet` retained as the upstream source and `data/derived/labor_market_dashboard_v1/` as the local runtime-data boundary.
-- The first Streamlit implementation established the aggregate refresh and validation contracts, fixed denominator and filtering errors, added operator-friendly failure states, and completed several responsive UI polish loops.
-- Render deployment support was added, but the early service and health-route details belong to this historical Streamlit era rather than the current runtime.
+- `jobads-dashboard` became the independent implementation home. Canonical
+  inputs remain `../jobads-data/main/data/processed/<year>/processed_*.parquet`;
+  runtime data stays under `data/derived/labor_market_dashboard_v1/`.
+- The first Streamlit version established aggregate refresh, validation,
+  denominator, filtering, failure-state, and Render deployment contracts.
 
-## 2026-06-02 to 2026-06-11 | Explore, refreshed data, and Mac Mini hosting
+## 2026-06-02 to 2026-06-11 | Explore, data, and hosting
 
-- Explore added curated aggregate questions and a bounded posting lookup without arbitrary SQL, bulk raw-text export, or a runtime dependency on `ai_labor`.
-- The local aggregate package was rebuilt from 164 canonical parquet files covering `2016-01-01` through `2026-03-31`, reconciling 25,356,735 postings. [See the refresh record.](memory/2026-06-02.md)
-- Mac Mini hosting, password gating, a selected-posting full-description view, and persistent tunnel services were established. Secrets remain outside the repository; rotating tunnel URLs must be verified live rather than copied from history.
+- Explore added curated aggregate questions and bounded posting lookup without
+  arbitrary SQL, bulk raw-text export, or a dependency on `ai_labor`.
+- The aggregate package reconciled 25,356,735 postings from 164 files covering
+  `2016-01-01` through `2026-03-31`. [Refresh record.](memory/2026-06-02.md)
+- Mac Mini hosting, password gating, posting detail, and persistent tunnelling
+  were established. Secrets stay outside Git; tunnel URLs require live checks.
 
-## 2026-06-20 to 2026-06-23 | Audit, redesign, and current runtime architecture
+## 2026-06-20 to 2026-06-25 | Current architecture and access contracts
 
-- Deep-audit remediation hardened query escaping, Markdown handling, schema validation, partial-bundle behavior, denominators, and visual craft; the detailed evidence remains in `docs/jobs/done/` and the dated records.
-- The product moved from Streamlit to the current Next.js web app plus FastAPI service, while keeping the precomputed local aggregate boundary and Python Plotly figure layer.
-- The persistent public topology became FastAPI on `127.0.0.1:8530`, Next.js on `127.0.0.1:8522`, and a Cloudflare quick tunnel to the web service. The former `/_stcore/health` route is obsolete; the web health route is `/healthz`.
+- The product moved to Next.js plus FastAPI while preserving precomputed
+  aggregates and the Python Plotly layer. The public topology became FastAPI
+  `8530`, Next `8522`, and a Cloudflare quick tunnel; `/healthz` is web health.
+- Public charts adopted the Vicinity Jobs 10-category limit through shared cap
+  helpers. Only a verified session can request uncapped, private, no-store
+  figures; Explore remains absent from public navigation. [Cap job.](docs/jobs/done/2026-06-25-ten-category-cap/JOB.md)
+- Audit remediation hardened escaping, Markdown, schema validation,
+  partial-bundle behavior, denominators, and visual craft.
 
-## 2026-06-25 | Public category cap and authenticated team detail
+## 2026-06-29 to 2026-07-06 | Tunnel recovery
 
-- The public dashboard adopted the Vicinity Jobs 10-category presentation limit, using shared capping helpers and honest residual or regional grouping rather than per-chart hard-coding. The authenticated team view can request uncapped detail only through a verified session. [See the completed cap job.](docs/jobs/done/2026-06-25-ten-category-cap/JOB.md)
-- Team login, uncapped server/client figure fetching, private no-store responses, Explore gating, bilingual disclosure, and the public-nav restriction were implemented and verified on `feat/login-uncapped`. [See the login job.](docs/jobs/active/2026-06-25-login-uncapped/JOB.md)
+- The Cloudflare LaunchAgent now uses `--config /dev/null` so unrelated named
+  tunnel configuration cannot hijack this service. Quick-tunnel hostnames rotate;
+  recover them from the live log rather than memory.
+- Keychain lookup failures blocked password-bearing outreach; plaintext
+  passwords and password hashes remain forbidden from project records.
 
-## 2026-06-29 to 2026-07-06 | Quick-tunnel recovery
+## 2026-08-11 | Canonical design line and operating system
 
-- The Cloudflare LaunchAgent was changed to pass `--config /dev/null` so an unrelated named-tunnel configuration could not hijack this project's quick tunnel.
-- Repeated checks confirmed that quick-tunnel hostnames rotate. The durable recovery path is the cloudflared LaunchAgent log plus live health checks, not any hostname preserved in memory.
-- Password-bearing outreach remained blocked when the documented Keychain lookup failed; no plaintext password or hash belongs in project records.
+- The project adopted the current STATUS/MEMORY/dated-record/job split. The
+  migration was committed as `f2a11741`; `main` then moved to the Next/FastAPI
+  design line with the retired Streamlit history preserved by a backup ref.
+- Fourteen real presentational components were published to Claude Design using
+  the hand-maintained `.design-sync/` boundary. The later local package expanded
+  to 16; the remote package still awaits separately authorized republication.
+- The downloaded exploration gained a durable, ACLMR-aligned home under
+  `docs/analyses/labor_market_dashboard/redesign-foundation/`: official logo,
+  PT Sans, verified desktop targets, brand audit, and explicit mobile gates.
 
-## 2026-08-11 | Harness migration
+## 2026-08-11 to 2026-08-12 | Redesign, audit, and production release
 
-- The repository adopted the current project-memory split: `STATUS.md` for live orientation, this bounded file for progressively condensed history, dated memory for chronological reconstruction, and jobs for detailed task continuity.
-- The root `AGENTS.md` now keeps only project-specific hard boundaries and required product routing. The global memory contract and `README.md` retain generic startup, history, commands, and documentation ownership. The pre-migration `MEMORY.md` was preserved under `archive/memory/versions/` before condensation.
-- The migration was committed as `f2a11741` and published with the new design line. On 2026-08-11, `main` was moved directly to that line at `65661304`; the obsolete 10-commit Streamlit/worktree-only line was deliberately not merged.
-
-## 2026-08-11 | Components published as a design system
-
-- The 14 presentational `web/components/` were imported into Claude Design so design work starts from the real shipped components. Because `web/` is an application rather than a package, the import needs hand-maintained inputs (`.design-sync/`, four dot-prefixed files in `web/`); `.design-sync/NOTES.md` owns that detail.
-- The import surfaced a long-standing product bug: `PixelTiles` renders the brand mark solid navy, so the signature mosaic has never appeared anywhere in the product.
-
-## 2026-08-11 | Dashboard redesign groundwork preserved
-
-- The downloaded design exploration became the durable `docs/analyses/labor_market_dashboard/redesign-foundation/` package, separating the Pulse and Explore desktop targets, earlier directions, portable design system, source-state UI kit, provenance, and ACLMR brand audit.
-- A repair pass made the package safe as redesign guidance: it vendors the exact live ACLMR logo with checksum provenance, keeps pixel tiles decorative, uses PT Sans throughout the selected targets, aligns the reusable navy navigation and both live CTA families, restores accessible trend and contrast cues, and removes unsupported colour-vision-safety claims.
-- Fresh-context adversarial verification passed the combined desktop package. The current application and deployment remained unchanged; separate mobile Pulse and Explore targets are still required before implementation.
-- The production implementation plan chose an in-place, component-first migration of the current nine-route Next.js/FastAPI app rather than a parallel replacement. Work remains gated on a trustworthy deployment baseline, approved mobile Pulse and Explore targets, and restored production-auth verification; the public site stays unchanged until one complete release candidate passes full visual, behavioural, and adversarial review.
-
-## 2026-08-11 | Complete redesign candidate assembled
-
-- The isolated `codex/dashboard-redesign-production` worktree now contains the complete nine-route ACLMR redesign: official brand shell, cream editorial public routes, responsive Plotly language, and a dark authenticated Explore workspace with mobile posting detail.
-- Parent verification passed Python, lint, type, production-build, data-reconciliation, EN/FR route matrix, public/team cap, and authenticated Explore journeys. A fresh reviewer then rebuilt the 16-component portable package, verified the self-contained official logo, and returned `READY`. The canonical public services and tunnel were not changed.
-- Production release remains a separate decision: the unavailable Keychain credential and ambiguous Render publication boundary must be resolved before integration or cutover.
-
-## 2026-08-11 to 2026-08-12 | Redesign deep-audit convergence
-
-- A whole-system convergence audit repaired mobile figure legibility, summary
-  contrast, French metadata/provenance, authenticated Explore framing and
-  failure states, private response caching, concurrent/forged-header login
-  limits, atomic derived-bundle and lookup publication, stale lookup windows,
-  private-text encoding, and vulnerable web dependencies.
-- The final isolated candidate passed 362 Python tests, Next 16.3 lint/type/build,
-  clean dependency audits, 27/27 live route-and-viewport checks, real Explore
-  failure journeys, data reconciliation, security response probes, and 16/16
-  rendered design-package previews. Fresh adversarial review found no remaining
-  candidate-code or product blocker.
-- Production is still intentionally unchanged and not ready for cutover. The
-  installed Mac LaunchAgent omits Uvicorn `--no-proxy-headers`; update it only
-  during authorized cutover with backup, validation, rollback, and a repeated
-  forged-header probe. Keychain and Render ownership remain separate blockers.
+- The isolated `codex/dashboard-redesign-production` branch migrated all nine
+  routes to the official navy/cream ACLMR system, responsive Plotly language,
+  and dark authenticated Explore workspace. Mobile targets and downloaded
+  Mobbin references are preserved with the job.
+- Whole-system convergence repaired 19 product/code defects across mobile
+  figures, localization/auth states, accessibility, privacy/cache/rate limits,
+  atomic data publication, lookup freshness/text integrity, dependencies, and
+  portable-package fidelity. The candidate passed 362 Python tests, Next 16.3
+  lint/type/build, zero-vulnerability audits, 27/27 live checks, data/security
+  probes, and 16/16 package renders; fresh adversarial review found no blocker.
+- Authorized cutover fast-forwarded local `main` to `b7bebe5b`, preserved
+  `backup/main-pre-dashboard-redesign-20260812-463d919a`, backed up and hardened
+  the LaunchAgent with `--no-proxy-headers`, rebuilt Next, and restarted only the
+  dashboard service. The existing tunnel remained live and the deployed release
+  passed EN/FR, auth, cap, cache, throttle, responsive, and visual checks.
+- `origin/main` was not pushed because Render authority is expired and its
+  reachable hostname appears to serve an older Streamlit build. The missing
+  Keychain entry remains a credential-ownership hardening follow-up.
 
 ## Rebuild rule
 
-- Rebuild from dated records and owning evidence. When over budget, condense the oldest adjacent spans first and preserve exact claims with direct links where they materially aid verification.
+- Rebuild from dated records and owning evidence. Condense oldest adjacent spans
+  first and retain exact claims with direct links when they aid verification.

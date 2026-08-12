@@ -79,9 +79,9 @@ and downloaded Mobbin interaction references.
 
 ## Current next step
 
-Hand the committed worktree candidate back for an explicit integration decision.
-Production cutover remains a separate, credential-, provider-authority-, and
-LaunchAgent-hardening-gated operation.
+The local Cloudflare-backed production cutover is complete. Preserve the
+current release while Render ownership/auto-deploy and the missing Keychain
+owner are resolved; neither uncertainty justifies pushing `origin/main`.
 
 ### Round 1 — complete black-box and source audit
 
@@ -128,3 +128,26 @@ LaunchAgent-hardening-gated operation.
   NOT READY for production cutover.** All original 19 remediations survived. The
   reviewer confirmed the external installed LaunchAgent as the remaining
   publication prerequisite captured in S20.
+
+### Round 4 — authorized production cutover
+
+- Fast-forwarded canonical local `main` to `b7bebe5b` after fetching origin and
+  confirming `463d919a` was the candidate's merge base. Preserved the prior
+  production source at `backup/main-pre-dashboard-redesign-20260812-463d919a`.
+- Backed up and validated the installed public LaunchAgent, added
+  `--no-proxy-headers`, installed locked web dependencies, built Next 16.3, and
+  restarted only `com.aclmr.jobads-dashboard-public`. The unchanged Cloudflare
+  agent retained the current quick-tunnel hostname.
+- The deployed stack passed local/public health, all nine EN/FR routes, public
+  cap and forged-`full=1`, verified-team uncapping, private no-store headers,
+  eight-failure throttle enforcement under rotating forged XFF, posting lookup,
+  logout relock, and direct desktop/mobile Browser inspection against the
+  approved ACLMR targets.
+- Remote publication remains intentionally incomplete: after this cutover
+  record, local `main` is 18
+  commits ahead of `origin/main`, Render CLI authority is expired, and the
+  reachable Render surface appears to be the older Streamlit application.
+- Fresh read-only adversarial review of the deployed canonical/runtime state
+  returned `READY` with no material finding. It independently confirmed
+  build/service identity, health, every EN/FR route, anonymous cap enforcement,
+  protected endpoints, LaunchAgent hardening, and all four deployed captures.

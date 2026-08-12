@@ -84,7 +84,11 @@ The private `Explore` posting lookup is gated by the API. Configure the password
 - `JOBADS_DASHBOARD_PASSWORD_HASH=<pbkdf2_sha256 hash>` (production), or
 - `JOBADS_DASHBOARD_PASSWORD=<plain>` (local dev only).
 
-Do not commit the password or the hash into the repository. macOS Keychain is the intended password source on the Mac Mini, but the entry must be verified before any password-bearing handoff. As of 2026-08-11 the documented lookup returns exit 44, so stop until the user restores or confirms the credential source.
+Do not commit the password or the hash into the repository. macOS Keychain is
+the intended password source on the Mac Mini. The documented lookup still
+returns exit 44; a pre-existing mode-600 local source matched the installed
+production hash for the 2026-08-12 deployment verification, but the Keychain
+owner should be restored before any password-bearing handoff.
 
 ## Render Hosting
 

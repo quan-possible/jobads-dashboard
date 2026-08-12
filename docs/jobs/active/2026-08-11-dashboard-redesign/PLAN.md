@@ -1,7 +1,7 @@
 # Production dashboard redesign plan
 
-Status: ready to begin design completion and implementation; not ready for a
-production cutover.
+Status: implementation and local public cutover complete; remote Render
+publication remains intentionally unresolved.
 
 ## Decision
 
@@ -86,8 +86,8 @@ Before redesign edits:
    into the redesign.
 2. Record the local commit, `origin/main`, current `.next/BUILD_ID`, API/web
    health, auth configuration status, and every reachable public endpoint.
-   The local branch is currently two commits ahead of `origin/main`, so resolve
-   that publication boundary before treating a remote build as authoritative.
+   At baseline the local branch was two commits ahead of `origin/main`; this
+   established that remote publication needed separate authority.
 3. Determine whether the Render service is still reachable and auto-deploying.
    The project-owned public topology remains FastAPI on `127.0.0.1:8530`, Next
    on `127.0.0.1:8522`, and the active Cloudflare quick tunnel to `8522` unless
@@ -323,12 +323,19 @@ The release candidate is ready only when:
 
 - **Resolved:** mobile Pulse and Explore targets plus Mobbin interaction evidence
   now govern the responsive composition.
-- **Blocker:** the deployed bundle has not been proven to match current `main`.
-- **Blocker for production auth verification:** the intended Keychain password
-  lookup currently fails.
-- **Blocker for production restart:** the installed public LaunchAgent currently
-  omits `--no-proxy-headers`; update it with backup and rollback only during the
-  authorized cutover, then repeat the forged-header throttle probe.
+- **Resolved:** the deployed local bundle is built from release commit
+  `b7bebe5b`; local and public health, all routes, auth, caps, and Browser QA
+  passed against that release.
+- **Resolved for cutover; hardening follow-up remains:** the intended Keychain
+  lookup still fails, but the existing mode-600 local credential matched the
+  production hash and enabled live authenticated verification without exposing
+  the secret.
+- **Resolved:** the installed public LaunchAgent was backed up, validated, and
+  updated with `--no-proxy-headers`; the deployed forged-header probe enforced
+  the eight-failure limit.
+- **Open remote publication boundary:** Render CLI authority is expired and its
+  reachable hostname appears to serve an older Streamlit build. Do not push
+  local `main` to `origin/main` until the auto-deploy consequence is explicit.
 - **Settled:** migrate the existing app; do not build a parallel replacement.
 - **Settled:** redesign all routes for one release; do not expose a mixed public
   experience.
@@ -338,7 +345,6 @@ The release candidate is ready only when:
   govern visual direction; the earlier alternatives and source-tone UI kit do
   not.
 
-The complete implementation candidate is assembled, parent-verified, and has a
-fresh adversarial `READY` verdict. Production cutover remains blocked pending
-credential restoration, publication-boundary confirmation, and explicit release
-authorization.
+The complete implementation was adversarially accepted and released through
+the existing local Next.js/FastAPI/Cloudflare topology on 2026-08-12. Remote
+Render publication and Keychain restoration remain separate follow-ups.
