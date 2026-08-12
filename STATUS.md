@@ -16,6 +16,7 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - Verified on 2026-08-11: the LaunchAgents, local web health (`127.0.0.1:8522/healthz`), API health (`127.0.0.1:8530/health`), authentication status route, and current Cloudflare quick tunnel were healthy. Recover the live hostname from `/Users/brucenguyen/jobads-dashboard-logs/cloudflared-launchd.err.log`; do not rely on an older recorded URL.
 - The 14 presentational `web/components/` are published as a Claude Design system (`https://claude.ai/design/p/c9764078-3970-42c2-be34-2e6acce106b9`), driven by inputs committed locally as `a741d8c1` under `.design-sync/` and four dot-prefixed files in `web/`. `.design-sync/NOTES.md` owns the operating detail.
 - The 2026-08-11 redesign exploration now has a durable, adversarially verified home at `docs/analyses/labor_market_dashboard/redesign-foundation/`, with separate desktop targets, design-system material, source-state UI kit, provenance, and ACLMR brand audit. The package uses the exact live ACLMR logo, PT Sans, target-aligned navy navigation and CTA families, accessible trend/contrast cues, and explicit mobile gates. This groundwork did not change the current application or deployment.
+- The production migration is now planned at `docs/jobs/active/2026-08-11-dashboard-redesign/PLAN.md`. The chosen route is an in-place, component-first migration of the existing Next.js/FastAPI app on an isolated branch and preview stack. Implementation can begin with baseline and responsive-design gates; production cutover is not ready.
 
 ## Active priorities
 
@@ -23,6 +24,7 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 2. Confirm the deployed Next.js/FastAPI bundle matches `main`; current service health alone does not establish that.
 3. Refresh and validate the derived bundle when fresher canonical upstream processed data is available.
 4. Before implementing the new dashboard direction, create and inspect mobile targets for Pulse and Explore; the preserved high-fidelity prototypes settle desktop composition only.
+5. Follow the redesign plan's single-release migration and verification gates; do not deploy a partially redesigned route set.
 
 ## Next actions
 
@@ -48,5 +50,6 @@ Maintain a standalone, descriptive Canadian labour-demand dashboard built from V
 - `docs/analyses/labor_market_dashboard_spec/report.md`: product and metric contract plus the original version 1 baseline.
 - `docs/analyses/labor_market_dashboard/redesign-foundation/`: redesign visual targets, portable design reference, provenance, and brand audit.
 - `docs/jobs/active/2026-06-25-login-uncapped/JOB.md`: current feature continuity and promotion work.
+- `docs/jobs/active/2026-08-11-dashboard-redesign/PLAN.md`: current production-redesign implementation and release plan.
 - `src/jobads_dashboard/`: aggregate, metric, and visualization implementation.
 - `api/` and `web/`: FastAPI service and Next.js product UI.

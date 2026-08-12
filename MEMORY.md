@@ -51,6 +51,7 @@ Last condensed: 2026-08-11
 - The downloaded design exploration became the durable `docs/analyses/labor_market_dashboard/redesign-foundation/` package, separating the Pulse and Explore desktop targets, earlier directions, portable design system, source-state UI kit, provenance, and ACLMR brand audit.
 - A repair pass made the package safe as redesign guidance: it vendors the exact live ACLMR logo with checksum provenance, keeps pixel tiles decorative, uses PT Sans throughout the selected targets, aligns the reusable navy navigation and both live CTA families, restores accessible trend and contrast cues, and removes unsupported colour-vision-safety claims.
 - Fresh-context adversarial verification passed the combined desktop package. The current application and deployment remained unchanged; separate mobile Pulse and Explore targets are still required before implementation.
+- The production implementation plan chose an in-place, component-first migration of the current nine-route Next.js/FastAPI app rather than a parallel replacement. Work remains gated on a trustworthy deployment baseline, approved mobile Pulse and Explore targets, and restored production-auth verification; the public site stays unchanged until one complete release candidate passes full visual, behavioural, and adversarial review.
 
 ## Rebuild rule
 
