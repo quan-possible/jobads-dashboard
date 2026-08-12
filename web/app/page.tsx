@@ -80,10 +80,11 @@ export default async function PulsePage() {
           .replace("{dir}", baselineGap >= 0 ? t.heroAbove : t.heroBelow);
 
   return (
-    <div className="pb-4">
-      {/* Hero */}
-      <section className="border-b border-card-border bg-gradient-to-b from-surface-alt/60 to-canvas">
-        <div className="container-x py-10 md:py-14">
+    <div className="pb-8">
+      {/* Dark institutional hero. The headline and lede remain composed from
+          the real overview response and bilingual dictionary. */}
+      <section className="pulse-hero">
+        <div className="container-x py-12 md:py-16">
           <div className="eyebrow mb-3">
             {t.eyebrowPrefix} · {fmtMonth(as_of, locale)}
           </div>
@@ -92,8 +93,9 @@ export default async function PulsePage() {
         </div>
       </section>
 
-      {/* KPI strip */}
-      <section className="container-x -mt-px py-8">
+      {/* KPI strip — overlaps the dark-to-cream transition on desktop and
+          remains a readable 2 × 2 scan on the approved 390 px composition. */}
+      <section className="container-x pulse-kpis py-0">
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiTile
             label={t.kpiDemandLabel}
@@ -134,18 +136,28 @@ export default async function PulsePage() {
         </div>
       </section>
 
-      {/* Demand ribbon + key points */}
-      <section className="container-x py-4">
+      {/* Core analytical read */}
+      <section className="container-x pulse-section pt-12 md:pt-14">
+        <div className="pulse-section-header">
+          <span className="pulse-section-number">01</span>
+          <span className="pulse-section-title">{c.demandRibbon.eyebrow}</span>
+          <span className="pulse-section-asof">{fmtMonth(as_of, locale)}</span>
+        </div>
         <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
           <Figure eyebrow={c.demandRibbon.eyebrow} title={c.demandRibbon.title} asOf={as_of} note={c.demandRibbon.note}>
             <RemoteFigure fig={figs.demand} height={420} ariaLabel={c.demandRibbon.aria} />
           </Figure>
-          <KeyPoints points={key_points} title={t.keyPointsTitle} note={t.keyPointsNote} />
+          <KeyPoints points={key_points} title={t.keyPointsTitle} note={t.keyPointsNote} tone="navy" />
         </div>
       </section>
 
-      {/* Core: year-over-year, seasonality, occupational mix */}
-      <section className="container-x py-4">
+      {/* Composition and seasonality */}
+      <section className="container-x pulse-section pt-4">
+        <div className="pulse-section-header">
+          <span className="pulse-section-number">02</span>
+          <span className="pulse-section-title">{c.composition.eyebrow} &amp; {c.seasonality.eyebrow}</span>
+          <span className="pulse-section-asof">{fmtMonth(as_of, locale)}</span>
+        </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.yoyBars.eyebrow} title={c.yoyBars.title} asOf={as_of} note={c.yoyBars.note}>
             <RemoteFigure fig={figs.yoy} height={360} ariaLabel={c.yoyBars.aria} />
@@ -156,7 +168,7 @@ export default async function PulsePage() {
         </div>
       </section>
 
-      <section className="container-x py-4">
+      <section className="container-x pulse-section pt-0">
         <Figure eyebrow={c.seasonality.eyebrow} title={c.seasonality.title} asOf={as_of} note={c.seasonality.note}>
           <RemoteFigure fig={figs.seasonality} height={360} ariaLabel={c.seasonality.aria} />
         </Figure>

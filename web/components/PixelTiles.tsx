@@ -9,7 +9,10 @@ function pick(r: number, c: number, cols: number): string {
   // deterministic pseudo-random texture
   const h = ((r * 73856093) ^ (c * 19349663)) >>> 0;
   const jitter = (h % 1000) / 1000 - 0.5;
-  const t = Math.min(0.999, Math.max(0, bias * (STOPS.length - 0.001) + jitter * 1.1));
+  // Clamp to the full stop range. The old 0.999 upper bound meant every
+  // generated tile resolved to STOPS[0], making the decorative mosaic appear
+  // as a solid navy block.
+  const t = Math.min(STOPS.length - 0.001, Math.max(0, bias * (STOPS.length - 0.001) + jitter * 1.1));
   return STOPS[Math.floor(t)];
 }
 

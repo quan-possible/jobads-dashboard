@@ -50,7 +50,7 @@ export function TopNavAuth() {
     return (
       <div className="flex items-center gap-2">
         <span
-          className="hidden items-center gap-1.5 rounded-full border border-teal/40 bg-teal/10 px-2.5 py-1 t-caption font-bold uppercase tracking-[0.02em] text-teal sm:inline-flex"
+          className="hidden items-center gap-1.5 rounded-full border border-teal/60 bg-teal/15 px-2.5 py-1 t-caption font-bold uppercase tracking-[0.02em] text-teal-soft sm:inline-flex"
           title={a.fullDetail}
         >
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-teal" />
@@ -59,7 +59,7 @@ export function TopNavAuth() {
         <button
           type="button"
           onClick={() => void logout()}
-          className="control border border-card-border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-faint transition-colors hover:border-orange hover:text-orange"
+          className="cta-pill border border-white/30 px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] text-ink-invert/75 transition-colors hover:border-orange hover:text-orange-soft"
         >
           {t.common.signOut}
         </button>
@@ -91,10 +91,10 @@ export function TopNavAuth() {
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className={[
-          "control border px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] transition-colors",
+          "auth-pill px-3 py-1.5 t-caption font-bold uppercase tracking-[0.02em] transition-colors",
           open
-            ? "border-orange text-orange"
-            : "border-card-border text-ink-soft hover:border-orange hover:text-orange",
+            ? "text-orange-soft"
+            : "text-orange-soft hover:text-ink-invert",
         ].join(" ")}
       >
         {a.logIn}
@@ -104,13 +104,13 @@ export function TopNavAuth() {
         <div
           role="dialog"
           aria-label={a.title}
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-72 rounded-md border border-card-border bg-canvas p-4 shadow-lg"
+          className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-72 rounded-md border border-white/20 bg-navy-deep p-4 text-ink-invert shadow-pop"
         >
           <div className="eyebrow mb-1">{a.title}</div>
-          <p className="mb-3 t-caption leading-relaxed text-ink-soft">{a.blurb}</p>
+          <p className="mb-3 t-caption leading-relaxed text-ink-invert/70">{a.blurb}</p>
           <form onSubmit={onSubmit} className="flex flex-col gap-2">
             <label className="flex flex-col gap-1">
-              <span className="t-label font-bold uppercase tracking-[0.05em] text-ink-faint">
+              <span className="t-label font-bold uppercase tracking-[0.05em] text-ink-invert/60">
                 {t.explore.password}
               </span>
               <input
@@ -118,14 +118,14 @@ export function TopNavAuth() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="control border border-card-border bg-surface px-3 py-2 t-body focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
+                className="control border border-white/30 bg-white/10 px-3 py-2 t-body text-ink-invert focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange"
               />
             </label>
             {error && <p className="t-meta text-neg">{error}</p>}
             <button
               type="submit"
               disabled={submitting || !password}
-              className="control bg-navy px-4 py-2.5 t-meta font-bold uppercase tracking-[0.03em] text-canvas transition-colors enabled:hover:bg-orange disabled:opacity-50"
+              className="cta-pill bg-orange px-4 py-2.5 t-meta font-bold uppercase tracking-[0.03em] text-white transition-colors enabled:hover:bg-sand enabled:hover:text-navy-deep disabled:opacity-50"
             >
               {submitting ? t.explore.unlocking : a.signIn}
             </button>

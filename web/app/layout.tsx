@@ -61,7 +61,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={`${ptSans.variable} h-full`}>
-      <body className="flex min-h-full flex-col bg-canvas">
+      <body className="flex min-h-full flex-col bg-canvas overflow-x-clip">
         <I18nProvider locale={locale} dict={t}>
           <AuthProvider>
             <a

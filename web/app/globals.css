@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   ACLMR Labour Market Dashboard — design tokens (warm signature variant)
+   ACLMR Labour Market Dashboard — shared production design tokens
    Brand bones from aclmr.ca: PT Sans, the navy→teal→sand→orange gradient,
    navy/teal/orange, uppercase headings with NO tracking, square controls.
    Warm signature kept from the dashboard: cream canvas, sand accents, pixel tiles.
@@ -134,6 +134,14 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 ::selection {
@@ -189,6 +197,169 @@ body {
   font-size: clamp(1.05rem, 1.6vw, 1.2rem);
   color: var(--ink-soft);
   line-height: 1.55;
+}
+
+/* Shared ACLMR shell and Pulse composition. The gradient is a transition rail,
+   never a full-page wallpaper. */
+.masthead,
+.pulse-hero {
+  background: var(--navy-deep);
+  color: var(--ink-invert);
+}
+
+.masthead .eyebrow,
+.pulse-hero .eyebrow {
+  color: var(--orange-soft);
+}
+
+.pulse-hero {
+  border: 0;
+}
+
+.pulse-hero .h-display {
+  max-width: 760px;
+  color: var(--ink-invert);
+}
+
+.pulse-hero .lede {
+  max-width: 700px;
+  color: rgba(244, 238, 231, 0.72);
+}
+
+.pulse-kpis {
+  position: relative;
+  z-index: 2;
+  margin-top: -38px;
+}
+
+.kpi-tile {
+  min-height: 146px;
+  box-shadow: var(--shadow-card);
+}
+
+.kpi-tile .num {
+  letter-spacing: -0.015em;
+}
+
+.pulse-section {
+  padding-block: clamp(24px, 3vw, 42px);
+}
+
+.pulse-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  border-top: 2px solid var(--navy-deep);
+  padding-top: 12px;
+}
+
+.pulse-section-number {
+  color: var(--sand);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pulse-section-title {
+  margin-right: auto;
+  color: var(--navy-deep);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pulse-section-asof {
+  color: var(--ink-faint);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dark-panel {
+  border-color: var(--navy-deep);
+  background: var(--surface-navy);
+  color: var(--ink-invert);
+}
+
+.dark-panel .h-card,
+.dark-panel .t-figure-title {
+  color: var(--ink-invert);
+}
+
+.dark-panel .eyebrow {
+  color: var(--orange-soft);
+}
+
+.dark-panel .t-meta,
+.dark-panel .t-caption {
+  color: rgba(244, 238, 231, 0.64);
+}
+
+.dark-panel .border-hairline {
+  border-color: rgba(244, 238, 231, 0.16);
+}
+
+.figure-shell {
+  min-width: 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.site-header {
+  position: relative;
+  min-height: 64px;
+  background: var(--navy-deep);
+  color: var(--ink-invert);
+}
+
+.site-header > .gradient-bar {
+  position: absolute;
+  inset-inline: 0;
+  top: 60px;
+  z-index: 1;
+}
+
+.site-header .container-x {
+  min-height: 64px;
+}
+
+.nav-link-dark {
+  color: rgba(244, 238, 231, 0.64);
+}
+
+.nav-link-dark:hover,
+.nav-link-dark[aria-current="page"] {
+  color: var(--ink-invert);
+}
+
+.nav-link-dark[aria-current="page"]::after {
+  background: var(--orange);
+}
+
+.auth-pill {
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background: linear-gradient(var(--navy-deep), var(--navy-deep)) padding-box, var(--gradient) border-box;
+  color: var(--orange-soft);
+}
+
+.auth-pill:hover,
+.auth-pill[aria-expanded="true"] {
+  color: var(--ink-invert);
+}
+
+.brand-logo,
+.footer-brand-logo {
+  display: block;
+  width: 138px;
+  height: auto;
+}
+
+.footer-brand-logo {
+  width: 142px;
 }
 
 /* Small-text scale — one source of truth for label / caption / body sizes,
@@ -248,6 +419,10 @@ body {
   border-radius: var(--radius-control);
 }
 
+.cta-pill {
+  border-radius: var(--radius-pill);
+}
+
 /* Explore detail drawer slide-in */
 @keyframes drawerIn {
   from {
@@ -267,5 +442,45 @@ body {
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --gutter: 18px;
+  }
+
+  .pulse-hero .container-x {
+    padding-top: 44px;
+    padding-bottom: 72px;
+  }
+
+  .pulse-hero .h-display {
+    font-size: clamp(2.15rem, 9vw, 3rem);
+    line-height: 1.02;
+  }
+
+  .pulse-hero .lede {
+    font-size: 1.05rem;
+  }
+
+  .pulse-section-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .pulse-section-asof {
+    margin-left: auto;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  :root {
+    --gutter: 28px;
+  }
+
+  .pulse-hero .h-display {
+    max-width: 690px;
   }
 }

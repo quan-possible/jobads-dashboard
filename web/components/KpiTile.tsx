@@ -41,7 +41,7 @@ export function KpiTile({
   return (
     <div
       className={[
-        "card relative flex flex-col gap-3 overflow-hidden p-5",
+        "card kpi-tile relative flex flex-col gap-3 overflow-hidden p-5",
         accent ? "ring-1 ring-orange/30" : "",
       ].join(" ")}
     >

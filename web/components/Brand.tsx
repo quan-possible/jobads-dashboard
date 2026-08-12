@@ -1,20 +1,29 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useI18n } from "@/lib/i18n/provider";
-import { PixelTiles } from "./PixelTiles";
 
-export function Brand({ compact = false }: { compact?: boolean }) {
+export function Brand({ compact = false, inverted = true }: { compact?: boolean; inverted?: boolean }) {
   const { t } = useI18n();
   return (
-    <Link href="/" className="group flex items-center gap-3" aria-label={`ACLMR ${t.nav.brandTagline}`}>
-      <PixelTiles rows={3} cols={3} size={7} gap={2} className="shrink-0 transition-transform duration-300 group-hover:scale-105" />
-      <span className="flex flex-col leading-none">
-        <span className="text-[1.05rem] font-bold uppercase tracking-[0.01em] text-navy-deep">ACLMR</span>
-        {!compact && (
-          <span className="t-caption font-bold uppercase tracking-[0.08em] text-ink-soft">{t.nav.brandTagline}</span>
-        )}
-      </span>
+    <Link
+      href="/"
+      className="group flex min-w-0 flex-col items-start gap-1.5 no-underline"
+      aria-label={`ACLMR ${t.nav.brandTagline}`}
+    >
+      <Image
+        src="/aclmr-logo-white.svg"
+        alt=""
+        width={138}
+        height={31}
+        className={`${inverted ? "brand-logo" : "brand-logo brightness-0"} transition-opacity duration-200 group-hover:opacity-80`}
+      />
+      {!compact && (
+        <span className={`t-caption pl-px font-bold uppercase tracking-[0.08em] ${inverted ? "text-ink-invert/60" : "text-ink-soft"}`}>
+          {t.nav.brandTagline}
+        </span>
+      )}
     </Link>
   );
 }

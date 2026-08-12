@@ -26,7 +26,7 @@ export function Figure({
 }) {
   const { locale } = useI18n();
   return (
-    <figure className={`card card-pad flex flex-col ${className}`}>
+    <figure className={`card figure-shell card-pad flex flex-col ${className}`}>
       <div className="mb-4 flex items-start justify-between gap-4">
         <div className="min-w-0">
           {eyebrow && <div className="eyebrow mb-1.5">{eyebrow}</div>}

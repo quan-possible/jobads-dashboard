@@ -4,7 +4,7 @@ import Link from "next/link";
 import { NAV } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n/provider";
 import { useAuth } from "@/lib/auth/provider";
-import { PixelTiles } from "./PixelTiles";
+import { Brand } from "./Brand";
 
 export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
   const { t } = useI18n();
@@ -17,10 +17,7 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
       <div className="gradient-bar" />
       <div className="container-x grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1.2fr]">
         <div>
-          <div className="flex items-center gap-3">
-            <PixelTiles rows={3} cols={3} size={8} gap={2} />
-            <span className="text-lg font-bold uppercase tracking-[0.01em]">ACLMR</span>
-          </div>
+          <Brand compact inverted />
           <p className="mt-4 max-w-sm t-body leading-relaxed text-ink-invert/70">{t.footer.tagline}</p>
         </div>
 

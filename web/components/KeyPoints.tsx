@@ -7,14 +7,16 @@ export function KeyPoints({
   points,
   title = "What stands out",
   note = "Descriptive signals only — postings show posted demand, not causes.",
+  tone = "navy",
 }: {
   points: string[];
   title?: string;
   note?: string;
+  tone?: "navy" | "tinted";
 }) {
   if (!points || points.length === 0) return null;
   return (
-    <div className="card card-pad flex h-full flex-col bg-surface-alt">
+    <div className={`card card-pad flex h-full flex-col ${tone === "navy" ? "dark-panel" : "bg-surface-alt"}`}>
       <div className="mb-4 flex items-center gap-3">
         <PixelTiles rows={2} cols={4} size={7} gap={2} />
         <h2 className="h-card">{title}</h2>
