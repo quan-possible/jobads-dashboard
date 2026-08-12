@@ -178,6 +178,14 @@
 .scopeSummary { flex: 0 0 auto; color: var(--x-faint); font-size: 0.8rem; line-height: 1.35; text-align: right; }
 .scopeSummary strong { color: var(--x-text); }
 
+.mobileKpis { display: none; }
+.mobileKpi { min-width: 0; border: 1px solid var(--x-line); padding: 13px 14px; }
+.mobileKpi span { display: block; color: var(--x-faint); font-size: 0.64rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.mobileKpi strong { display: block; margin-top: 6px; color: var(--x-text); font-size: 1.45rem; font-variant-numeric: tabular-nums; line-height: 1; }
+.mobileKpi .mobileKpiNegative { color: var(--orange-soft); }
+.mobileKpi .mobileKpiPositive,
+.mobileKpi .mobileKpiTeal { color: var(--teal-soft); }
+
 .resultsCard { border: 1px solid var(--x-line); background: rgba(2, 21, 33, 0.35); }
 .resultsHeader { min-height: 45px; border-bottom: 1px solid var(--x-line); padding: 9px 14px; }
 .resultsHeading { color: var(--x-text); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.035em; text-transform: uppercase; }
@@ -264,6 +272,7 @@
   .lookupControls { align-items: stretch; flex-direction: column; gap: 10px; }
   .searchForm { width: 100%; }
   .scopeSummary { text-align: left; }
+  .mobileKpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .tableWrap { display: none; }
   .mobileResults { display: block; }
   .mobileRow { grid-template-columns: minmax(0, 1fr) auto 17px; padding: 13px 12px; }

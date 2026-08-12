@@ -2,7 +2,7 @@
 // credentialed (session cookie) and go through the relative `/api` path so the
 // cookie is first-party (a Next rewrite proxies to the FastAPI backend).
 
-import type { AuthStatus, FigJSON, Filters, PostingDetail, PostingsResponse } from "./types";
+import type { AuthStatus, FigJSON, Filters, OverviewResponse, PostingDetail, PostingsResponse } from "./types";
 
 class AuthError extends Error {}
 
@@ -67,6 +67,18 @@ export async function fetchPostings(query: PostingQuery): Promise<PostingsRespon
     cache: "no-store",
   });
   return jsonOrThrow<PostingsResponse>(res);
+}
+
+export async function fetchExploreOverview(filters: Filters, locale: string): Promise<OverviewResponse> {
+  const p = new URLSearchParams({ locale });
+  for (const [key, value] of Object.entries(filters)) {
+    if (value) p.set(key, value);
+  }
+  const res = await fetch(`/api/overview?${p.toString()}`, {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  return jsonOrThrow<OverviewResponse>(res);
 }
 
 // The "Build a chart" figure. Explore is team-access, so this goes through the

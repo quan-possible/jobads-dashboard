@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AuthError, fetchPostings } from "@/lib/explore";
-import { fmtInt, fmtMonth, fmtWage } from "@/lib/format";
+import { AuthError, fetchExploreOverview, fetchPostings } from "@/lib/explore";
+import { fmtCompact, fmtInt, fmtMonth, fmtPct, fmtWage } from "@/lib/format";
 import { ALL_GEO, GEO_OPTIONS, IND_OPTIONS, OCC_OPTIONS, labelFor } from "@/lib/options";
 import { useI18n } from "@/lib/i18n/provider";
 import type { Locale } from "@/lib/i18n/locale";
-import type { PostingRow, PostingsResponse } from "@/lib/types";
+import type { OverviewResponse, PostingRow, PostingsResponse } from "@/lib/types";
 import { useFilters } from "@/lib/useFilters";
 import { useExploreLock } from "./lockContext";
 import { PostingDrawer } from "./PostingDrawer";
@@ -39,6 +39,7 @@ export function ExploreView() {
   const [error, setError] = useState<{ key: string; message: string } | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [fetchKey, setFetchKey] = useState(0);
+  const [overview, setOverview] = useState<OverviewResponse | null>(null);
   const tableTop = useRef<HTMLDivElement>(null);
 
   const lockRef = useRef(lock);
@@ -108,6 +109,14 @@ export function ExploreView() {
     };
   }, [filters.geo, filters.occ, filters.ind, debouncedQ, offset, fetchKey, loadingErrorMsg, requestKey]);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetchExploreOverview(filters, locale)
+      .then((next) => { if (!cancelled) setOverview(next); })
+      .catch(() => { if (!cancelled) setOverview(null); });
+    return () => { cancelled = true; };
+  }, [filters, locale]);
+
   const scopeSummary = useMemo(() => {
     const parts: string[] = [];
     if (filters.geo) parts.push(labelFor(GEO_OPTIONS, filters.geo, locale));
@@ -158,6 +167,31 @@ export function ExploreView() {
           ) : (
             <><strong>{fmtInt(total, locale)}</strong> {t.explore.postings}<br />{scopeSummary}</>
           )}
+        </div>
+      </div>
+
+      <div className={styles.mobileKpis} aria-label={t.explore.mobileKpis.matches}>
+        <div className={styles.mobileKpi}>
+          <span>{t.explore.mobileKpis.matches}</span>
+          <strong>{loading && !displayData ? "—" : fmtCompact(total, locale)}</strong>
+        </div>
+        <div className={styles.mobileKpi}>
+          <span>{t.explore.mobileKpis.medianWage}</span>
+          <strong>{fmtWage(overview?.kpis.median_wage, locale)}</strong>
+        </div>
+        <div className={styles.mobileKpi}>
+          <span>{t.explore.mobileKpis.yoyChange}</span>
+          <strong className={(overview?.kpis.active_yoy_pct ?? 0) < 0 ? styles.mobileKpiNegative : styles.mobileKpiPositive}>
+            {fmtPct(overview?.kpis.active_yoy_pct, { sign: true, locale })}
+          </strong>
+        </div>
+        <div className={styles.mobileKpi}>
+          <span>{t.explore.mobileKpis.wageCoverage}</span>
+          <strong className={styles.mobileKpiTeal}>
+            {overview?.kpis.wage_n != null && overview.kpis.active_postings
+              ? fmtPct((overview.kpis.wage_n / overview.kpis.active_postings) * 100, { locale })
+              : "—"}
+          </strong>
         </div>
       </div>
 

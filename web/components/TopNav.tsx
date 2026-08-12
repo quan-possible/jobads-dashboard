@@ -76,6 +76,17 @@ export function TopNav() {
             <TopNavAuth />
           </div>
 
+          {authenticated && (
+            <Link
+              href="/explore"
+              aria-label={`${t.nav.auth.teamView}: ${t.nav.explore}`}
+              className="auth-pill inline-flex min-h-10 items-center gap-1.5 px-3 t-caption font-bold uppercase tracking-[0.03em] text-orange-soft sm:hidden"
+            >
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-orange" />
+              {t.nav.auth.teamBadge}
+            </Link>
+          )}
+
           <button
             ref={menuTriggerRef}
             type="button"

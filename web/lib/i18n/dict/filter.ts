@@ -5,6 +5,7 @@ export const filter = {
     region: "Region",
     occupation: "Occupation",
     industry: "Industry",
+    filters: "Filters",
     reset: "Reset",
   },
   fr: {
@@ -13,6 +14,7 @@ export const filter = {
     region: "Région",
     occupation: "Profession",
     industry: "Industrie",
+    filters: "Filtres",
     reset: "Réinitialiser",
   },
 } as const;
