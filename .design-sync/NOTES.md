@@ -13,7 +13,7 @@ extract prop contracts from.
 Three files under `web/` are design-sync inputs. They are committed, dot-prefixed,
 and nothing in the app imports them:
 
-- **`web/.ds-entry.tsx`** — the bundle entry. Re-exports the 14 synced components
+- **`web/.ds-entry.tsx`** — the bundle entry. Re-exports the 16 synced components
   plus `I18nProvider` / `AuthProvider`, and defines `DsPreviewProvider`, the
   app-root stand-in that previews render inside (`cfg.provider`).
 - **`web/.ds-process-shim.ts`** — imported FIRST by the entry. `web/lib/api.ts`
@@ -146,7 +146,8 @@ component or leave it.
 
 ## Scope
 
-14 presentational components are synced. Deliberately excluded (see
+16 presentational components are synced, including the shared redesign grammar
+in `RouteMasthead` and `SectionLead`. Deliberately excluded (see
 `cfg.componentSrcMap` and `web/.ds-entry.tsx`): `RemoteFigure`, `TunableFigure`,
 `FilterSpine`, `TopNavAuth`, `PostingDrawer`, and the whole `components/explore/`
 suite. They fetch live API data or depend on auth/router state that has no
@@ -173,7 +174,8 @@ Three components need `cfg.overrides` to present correctly in the product's grid
 <!-- Warn lines triaged as legitimate. A warn NOT listed here on a re-sync is new
      — look at it, then fix it or add it. -->
 
-- None outstanding. The final validate run is clean at 14/14.
+- None outstanding in the last published package. A redesign re-sync must reach
+  a clean 16/16 after the two shared route components are added.
 - Historical, resolved — do not re-chase: `[RENDER_THIN]` / `[RENDER_BLANK]` on
   unauthored components before previews existed, and `[GRID_OVERFLOW]` on
   MapToggle before its `column` override.

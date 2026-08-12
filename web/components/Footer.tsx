@@ -4,16 +4,18 @@ import Link from "next/link";
 import { NAV } from "@/lib/nav";
 import { useI18n } from "@/lib/i18n/provider";
 import { useAuth } from "@/lib/auth/provider";
+import { usePathname } from "next/navigation";
 import { Brand } from "./Brand";
 
 export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
   const { t } = useI18n();
   const { authenticated } = useAuth();
+  const pathname = usePathname();
   const year = new Date().getFullYear();
   // Team-only tabs (Explore) stay out of the public footer too.
   const navItems = NAV.filter((item) => !item.teamOnly || authenticated);
   return (
-    <footer className="mt-20 bg-surface-navy text-ink-invert">
+    <footer className={`${pathname.startsWith("/explore") ? "mt-0" : "mt-20"} bg-surface-navy text-ink-invert`}>
       <div className="gradient-bar" />
       <div className="container-x grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1.2fr]">
         <div>

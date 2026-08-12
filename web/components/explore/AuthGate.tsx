@@ -75,7 +75,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 <span>{t.explore.password}</span>
                 <input
                   type="password"
-                  autoFocus
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={styles.gateInput}

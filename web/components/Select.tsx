@@ -45,13 +45,13 @@ export function Select({
           value={current}
           onChange={(e) => onChange(e.target.value)}
           className={[
-            "control w-full cursor-pointer appearance-none border bg-surface py-2 pl-3 pr-9 t-body font-bold transition-colors",
+            "control w-full cursor-pointer appearance-none border py-2 pl-3 pr-9 t-body font-bold transition-colors",
             "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange",
             tone === "dark"
               ? "border-white/25 bg-navy-deep text-ink-invert hover:border-orange"
               : isDefault
-                ? "border-card-border text-navy"
-                : "border-orange/60 text-navy-deep",
+                ? "border-card-border bg-surface text-navy"
+                : "border-orange/60 bg-surface text-navy-deep",
           ].join(" ")}
         >
           {options.map((o) => (

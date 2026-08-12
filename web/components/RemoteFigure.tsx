@@ -55,8 +55,38 @@ export function RemoteFigure({
           el: HTMLElement, frames: unknown,
         ) => Promise<unknown>;
 
-        const layout = { ...fig.layout, height: figHeight };
-        void newPlot(el, fig.data, layout, { ...baseConfig })
+        const compactMap = el.clientWidth < 520 && fig.data.some((trace) => (
+          typeof trace === "object" && trace !== null && (trace as { type?: string }).type === "choropleth"
+        ));
+        const data = compactMap
+          ? fig.data.map((trace) => {
+              if (typeof trace !== "object" || trace === null || (trace as { type?: string }).type !== "choropleth") return trace;
+              const item = trace as Record<string, unknown>;
+              const colorbar = (item.colorbar ?? {}) as Record<string, unknown>;
+              const title = (colorbar.title ?? {}) as Record<string, unknown>;
+              return {
+                ...item,
+                colorbar: {
+                  ...colorbar,
+                  orientation: "h",
+                  x: 0.5,
+                  xanchor: "center",
+                  y: 1.04,
+                  yanchor: "bottom",
+                  len: 0.72,
+                  thickness: 10,
+                  title: { ...title, side: "top" },
+                },
+              };
+            })
+          : fig.data;
+        const authoredMargin = (fig.layout.margin ?? {}) as Record<string, unknown>;
+        const layout = {
+          ...fig.layout,
+          height: figHeight,
+          ...(compactMap ? { margin: { ...authoredMargin, t: Math.max(Number(authoredMargin.t ?? 0), 54) } } : {}),
+        };
+        void newPlot(el, data, layout, { ...baseConfig })
           .then(() => {
             if (!disposed && fig.frames?.length) void addFrames(el, fig.frames);
           })

@@ -16,11 +16,9 @@ export function FilterSpine() {
   if (!pathname.startsWith("/explore")) return null;
 
   return (
-    /* U06: FilterSpine renders in the root layout (above <main>) so it
-       structurally precedes the page hero. We compensate with a distinct
-       "toolbar" treatment — full-bleed opaque chrome + orange accent bar —
-       so the strip reads as persistent navigation chrome, not page content,
-       and the hero below still opens the page visually. */
+    /* Explore owns this toolbar directly after its hero. It remains sticky
+       while the results scroll, without displacing or preceding the page's
+       primary heading. */
     <div
       role="toolbar"
       aria-label={t.filter.scope}

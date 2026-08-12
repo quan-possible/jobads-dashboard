@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { PT_Sans } from "next/font/google";
 import "./globals.css";
-import { Suspense } from "react";
 import { TopNav } from "@/components/TopNav";
-import { FilterSpine } from "@/components/FilterSpine";
 import { Footer } from "@/components/Footer";
 import { api } from "@/lib/api";
 import { fmtMonth } from "@/lib/format";
@@ -71,9 +69,6 @@ export default async function RootLayout({
               {t.nav.skipToContent}
             </a>
             <TopNav />
-            <Suspense fallback={<div className="h-[68px] border-b border-card-border bg-surface-alt/70" />}>
-              <FilterSpine />
-            </Suspense>
             <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
             <Footer asOf={asOf} />
           </AuthProvider>

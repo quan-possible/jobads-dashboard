@@ -33,6 +33,8 @@ export { KpiTile } from "./components/KpiTile";
 export { LocaleToggle } from "./components/LocaleToggle";
 export { MapToggle } from "./components/MapToggle";
 export { PixelTiles } from "./components/PixelTiles";
+export { RouteMasthead } from "./components/RouteMasthead";
+export { SectionLead } from "./components/SectionLead";
 export { Select } from "./components/Select";
 export { Sparkline } from "./components/Sparkline";
 export { TopNav } from "./components/TopNav";

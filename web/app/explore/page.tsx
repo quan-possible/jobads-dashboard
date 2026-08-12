@@ -1,5 +1,6 @@
 import { AuthGate } from "@/components/explore/AuthGate";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
+import { FilterSpine } from "@/components/FilterSpine";
 import { api } from "@/lib/api";
 import { getServerDict } from "@/lib/i18n/server";
 import type { Metadata } from "next";
@@ -39,6 +40,7 @@ export default async function ExplorePage() {
           <p className={styles.heroLede}>{t.explore.lede}</p>
         </div>
       </section>
+      <FilterSpine />
       <div className={styles.workspace}>
         {/* The whole Explore surface is team-access: the gate replaces both tabs
             with the password card until a valid session exists. */}
