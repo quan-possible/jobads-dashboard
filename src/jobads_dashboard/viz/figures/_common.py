@@ -17,6 +17,12 @@ register_templates()  # ensure templates exist when figures are built standalone
 #: :data:`jobads_dashboard.viz._capctx.UNCAPPED` is set).
 MAX_CATEGORIES = 10
 
+# The Plotly template supplies the same defaults for standalone figures.  Keep
+# the small explicit values here too because factories often override one
+# margin edge for long labels; filling only missing edges preserves those
+# deliberate label allowances while keeping ordinary charts compact.
+_COMPACT_MARGINS = {"l": 48, "r": 20, "b": 40}
+
 
 def cap_other(df: pd.DataFrame, value_col: str, label_col: str, *,
               n: int = MAX_CATEGORIES, other_label: str = "Other",
@@ -106,6 +112,13 @@ def treemap_trace(g: pd.DataFrame, name_col: str, root: str) -> go.Treemap:
 def titled(fig: go.Figure, headline: str, subtitle: str | None = None,
            height: int | None = None) -> go.Figure:
     """Apply the standard finding-as-headline + units-as-subtitle title block."""
+    margin = fig.layout.margin
+    missing = {
+        edge: value for edge, value in _COMPACT_MARGINS.items()
+        if getattr(margin, edge) is None
+    }
+    if missing:
+        fig.update_layout(margin=missing)
     title = dict(text=headline)
     if subtitle:
         title["subtitle"] = dict(text=subtitle, font=dict(size=12, color=MUTED))

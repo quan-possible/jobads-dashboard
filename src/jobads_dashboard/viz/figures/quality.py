@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 
 from .._capctx import UNCAPPED
 from ..datasource import DataSource
-from ..theme import BRAND, CONTEXT, MUTED, add_provisional_band, add_unstable_band
+from ..theme import BRAND, CONTEXT, DOWN, MUTED, add_provisional_band, add_unstable_band
 from ._common import titled
 
 from ..theme import COLORWAY
@@ -52,7 +52,7 @@ def coverage_latest_bars(ds: DataSource) -> go.Figure:
         rest = latest[~latest["field_name"].isin(_KEY_FIELDS)].sort_values("coverage_pct")
         latest = pd.concat([key, rest.head(10 - len(key))])
     latest = latest.sort_values("coverage_pct")
-    colors = [BRAND if v >= 80 else (CONTEXT if v >= 40 else "#b5523a") for v in latest["coverage_pct"]]
+    colors = [BRAND if v >= 80 else (CONTEXT if v >= 40 else DOWN) for v in latest["coverage_pct"]]
     fig = go.Figure(go.Bar(
         x=latest["coverage_pct"], y=latest["label"], orientation="h", marker_color=colors,
         text=latest["coverage_pct"].map(lambda v: f"{v:.0f}%"), textposition="auto",

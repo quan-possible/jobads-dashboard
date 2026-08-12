@@ -132,6 +132,22 @@ def test_no_causal_language(chart_id):
         assert verb not in blob, f"{chart_id}: causal word {verb!r}"
 
 
+def test_house_style_uses_aclmr_chart_chrome(_fig_ds):
+    """The figure bridge carries the shared ACLMR language to the browser."""
+    layout = payload("pulse.yoy_bars")["layout"]
+    template = layout["template"]["layout"]
+    assert layout["paper_bgcolor"] == "rgba(0,0,0,0)"
+    assert layout["plot_bgcolor"] == "rgba(0,0,0,0)"
+    assert template["font"]["family"].startswith("'PT Sans'")
+    assert template["paper_bgcolor"] == "rgba(0,0,0,0)"
+    assert template["plot_bgcolor"] == "rgba(0,0,0,0)"
+    assert template["yaxis"]["gridcolor"] == "#e6e0da"
+    assert template["xaxis"]["showline"] is False
+    assert template["yaxis"]["showline"] is False
+    assert template["legend"]["y"] == -0.12
+    assert layout["margin"]["l"] == 48 and layout["margin"]["r"] == 20
+
+
 # --------------------------------------------------------------------------- #
 # Helpers for value goldens
 # --------------------------------------------------------------------------- #
@@ -578,7 +594,7 @@ def test_quality_coverage_latest_bars_and_thresholds(_fig_ds):
     colors = dict(zip(list(tr.y), list(tr.marker.color)))
     assert np.isclose(cov["Industry (NAICS)"], 80.0) and colors["Industry (NAICS)"] == "#cf7730"  # ≥80 brand
     assert np.isclose(cov["Education"], 70.0) and colors["Education"] == "#9aa7b0"                 # 40–80 grey
-    assert np.isclose(cov["Hourly wage"], 15.0) and colors["Hourly wage"] == "#b5523a"            # <40 red
+    assert np.isclose(cov["Hourly wage"], 15.0) and colors["Hourly wage"] == "#b54e33"            # <40 decline/status red
 
 
 # --------------------------------------------------------------------------- #

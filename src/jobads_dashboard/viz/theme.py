@@ -26,28 +26,39 @@ import plotly.io as pio
 # Palette
 # --------------------------------------------------------------------------- #
 
-#: Warm ACLMR brand accent - reserved for the single focal series and brand marks.
+#: ACLMR brand accents. Keep chart colour roles aligned with the web design
+#: tokens (navy → teal → sand → orange), rather than introducing chart-only
+#: hues that compete with the surrounding cards.
+NAVY_DEEP = "#041c2c"
+NAVY = "#061f2f"
+TEAL = "#345961"
+TEAL_SOFT = "#5b7e85"
+SAND = "#c39e80"
+SAND_SOFT = "#e3d2c1"
 BRAND = "#cf7730"
-BRAND_DEEP = "#a85c1f"
+BRAND_DEEP = "#a25518"
 
 #: Neutral "context" ink used for de-emphasised series and gridlines.
 CONTEXT = "#9aa7b0"
 MUTED = "#5d6b74"
 
-#: Semantic up/down accents for risers vs fallers (deltas, dumbbells, waterfalls).
-UP = "#2f6f77"
-DOWN = "#b5523a"
+#: Semantic up/down accents for risers vs fallers (deltas, dumbbells,
+#: waterfalls). These are deliberately distinct from the brand orange and
+#: paired with arrows/labels by the consuming UI, so colour is not the only
+#: signal.
+UP = "#2c765c"
+DOWN = "#b54e33"
 
 #: Categorical colorway for multi-series charts (brand-harmonised, distinguishable).
 COLORWAY = [
-    "#345961",  # teal
-    "#cf7730",  # brand orange
-    "#6e8790",  # slate
-    "#7b6b8d",  # plum
-    "#55754e",  # olive
-    "#a64d3f",  # clay
-    "#c39e80",  # sand
-    "#041c2c",  # navy
+    TEAL,        # cat-1: teal
+    BRAND,       # cat-2: brand orange
+    "#6f93a0",   # cat-3: soft slate
+    "#9a6a3c",   # cat-4: warm brown
+    "#3f7a5c",   # cat-5: growth green
+    "#8a5f86",   # cat-6: plum
+    "#c2a23f",   # cat-7: ochre
+    "#485b66",   # cat-8: blue-grey
 ]
 
 #: Sequential scale for magnitude (light sand -> deep navy). Perceptually ordered.
@@ -105,16 +116,16 @@ LIGHT = ThemePalette(
     name="aclmr_light",
     canvas="#fbf8f5",
     surface="#ffffff",
-    text="#132330",
+    text="#16242f",
     muted="#5d6b74",
-    grid="#ece3da",
-    axis="#c8b3a2",
+    grid="#e6e0da",
+    axis="#b9ab9d",
 )
 
-# Match the web app's font (web/app/globals.css --font-sans). The PT Sans face
-# is self-hosted by next/font under the --font-pt-sans CSS variable, so charts
-# render in the same type as their cards instead of Plotly's Inter/system fallback.
-_FONT = "var(--font-pt-sans), ui-sans-serif, system-ui, sans-serif"
+# Match the web app's self-hosted face. Plotly writes this family directly into
+# SVG presentation attributes, where CSS custom properties are not resolved;
+# using the literal family prevents a silent fallback to system-ui.
+_FONT = "'PT Sans', ui-sans-serif, system-ui, sans-serif"
 
 #: Standing provenance caption for the standalone static review page (``review.py``).
 DEMAND_SIGNAL_NOTE = "Vicinity Jobs online job ads · a labour-demand signal, not employment"
@@ -131,18 +142,22 @@ def _template(p: ThemePalette) -> go.layout.Template:
                 xref="paper",
                 pad=dict(l=4, b=8),
             ),
-            paper_bgcolor=p.surface,
-            plot_bgcolor=p.surface,
+            # Figures sit inside the app's cream canvas / white cards. Keep the
+            # graph surfaces transparent so either host surface remains visible
+            # (the API bridge also enforces this when serialising figures).
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             colorway=COLORWAY,
             hovermode="x unified",
             hoverlabel=dict(font=dict(family=_FONT, size=12), namelength=-1),
-            margin=dict(l=64, r=28, t=92, b=48),
+            margin=dict(l=48, r=20, t=72, b=40),
             xaxis=dict(
                 showgrid=False,
                 zeroline=False,
+                showline=False,
                 linecolor=p.axis,
-                ticks="outside",
-                tickcolor=p.axis,
+                ticks="",
+                tickcolor="rgba(0,0,0,0)",
                 tickfont=dict(size=11.5, color=p.muted),
                 automargin=True,
             ),
@@ -151,6 +166,7 @@ def _template(p: ThemePalette) -> go.layout.Template:
                 gridcolor=p.grid,
                 gridwidth=1,
                 zeroline=False,
+                showline=False,
                 linecolor="rgba(0,0,0,0)",
                 ticks="",
                 tickfont=dict(size=11.5, color=p.muted),
@@ -159,11 +175,13 @@ def _template(p: ThemePalette) -> go.layout.Template:
             legend=dict(
                 orientation="h",
                 yanchor="top",
-                y=-0.16,
+                y=-0.12,
                 xanchor="left",
                 x=0,
                 font=dict(size=11.5, color=p.muted),
                 title=dict(font=dict(size=11.5, color=p.muted)),
+                bgcolor="rgba(0,0,0,0)",
+                borderwidth=0,
             ),
             colorscale=dict(sequential=SEQUENTIAL, diverging=DIVERGING),
         )
@@ -240,10 +258,14 @@ def add_reference_line(fig: go.Figure, y: float, *, text: str | None = None,
     if text:
         fig.add_annotation(
             text=text,
-            xref="paper", x=0.99, xanchor="right",
+            # Keep labels inside the plotting area; right-edge anchors clip on
+            # narrow cards and are especially brittle for translated text.
+            xref="paper", x=0.02, xanchor="left",
             yref="y", y=y, yanchor="bottom",
             showarrow=False,
-            font=dict(size=10, color=color),
+            font=dict(family=_FONT, size=10, color=color),
+            xshift=2,
+            yshift=2,
         )
     return fig
 
