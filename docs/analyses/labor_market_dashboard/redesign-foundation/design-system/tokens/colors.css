@@ -1,0 +1,53 @@
+/* ACLMR Labour Market Dashboard — color tokens.
+   Source: web/app/globals.css @ quan-possible/jobads-dashboard (brand bones from aclmr.ca:
+   navy→teal→sand→orange gradient; warm cream canvas is the dashboard's signature variant). */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --canvas: #fbf8f5;
+  --surface: #ffffff;
+  --surface-alt: #f7efe9;
+  --surface-navy: #041c2c;
+
+  /* Ink */
+  --ink: #16242f;
+  --ink-soft: #5d6b74;
+  --ink-faint: #616a71;
+  --ink-invert: #f4eee7;
+
+  /* Brand */
+  --navy: #061f2f;
+  --navy-deep: #041c2c;
+  --teal: #345961;
+  --teal-soft: #5b7e85;
+  --sand: #c39e80;
+  --sand-soft: #e3d2c1;
+  --orange: #cf7730;
+  --orange-deep: #a25518;
+  --orange-soft: #f0c79f;
+
+  /* Lines */
+  --hairline: #ece3da;
+  --card-border: #e3d6c8;
+  --chart-grid: #e6e0da;
+  --chart-axis: #b9ab9d;
+
+  /* Status (CVD-distinct, AA) */
+  --pos: #2c765c;
+  --neg: #b54e33;
+
+  /* CVD-safe categorical sequence */
+  --cat-1: #345961;
+  --cat-2: #cf7730;
+  --cat-3: #6f93a0;
+  --cat-4: #9a6a3c;
+  --cat-5: #3f7a5c;
+  --cat-6: #8a5f86;
+  --cat-7: #c2a23f;
+  --cat-8: #485b66;
+
+  /* Signature gradient */
+  --gradient: linear-gradient(270deg, #041c2c 0%, #345961 37.49%, #c39e80 76.96%, #cf7730 100%);
+  --gradient-h: linear-gradient(90deg, #041c2c 0%, #345961 37.49%, #c39e80 76.96%, #cf7730 100%);
+}

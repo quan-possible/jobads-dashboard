@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACLMR Labour Market Pulse redesign</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="stylesheet" href="../design-system/assets/fonts/pt-sans.css"><style>body{margin:0;background:#fbf8f5;font-family:'PT Sans',ui-sans-serif,system-ui,sans-serif;color:#16242f;-webkit-font-smoothing:antialiased}a{color:#a25518;text-decoration:none}a:hover{color:#cf7730}</style></helmet>
+<div data-screen-label="Pulse home — hifi" style="min-width:1100px">
+<!-- Navy masthead -->
+<div style="background:#041c2c">
+<div style="max-width:1140px;margin:0 auto;padding:0 32px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;height:64px;border-bottom:1px solid rgba(244,238,231,.12)">
+<a href="#" style="display:flex;align-items:center;gap:11px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="7" fill="#f4eee7"></rect><rect x="8.5" width="7" height="7" fill="#5b7e85"></rect><rect x="17" width="7" height="7" fill="#cf7730"></rect><rect y="8.5" width="7" height="7" fill="#5b7e85"></rect><rect x="8.5" y="8.5" width="7" height="7" fill="#c39e80"></rect><rect x="17" y="8.5" width="7" height="7" fill="#c39e80"></rect><rect y="17" width="7" height="7" fill="#f4eee7"></rect><rect x="8.5" y="17" width="7" height="7" fill="#345961"></rect><rect x="17" y="17" width="7" height="7" fill="#cf7730"></rect></svg><span style="display:flex;flex-direction:column;line-height:1"><span style="font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:#f4eee7">ACLMR</span><span style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(244,238,231,.55);margin-top:3px">Labour Market Pulse</span></span></a>
+<div style="display:flex;align-items:center;gap:6px">
+<nav style="display:flex;align-items:center">
+<a href="#" style="position:relative;padding:22px 12px;font-size:12.8px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:#f4eee7">Pulse<span style="position:absolute;left:12px;right:12px;bottom:-1px;height:3px;background:#cf7730"></span></a>
+<a href="#" style="padding:22px 12px;font-size:12.8px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:rgba(244,238,231,.6)" style-hover="color:#f4eee7">Occupations</a>
+<a href="#" style="padding:22px 12px;font-size:12.8px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:rgba(244,238,231,.6)" style-hover="color:#f4eee7">Industries</a>
+<a href="#" style="padding:22px 12px;font-size:12.8px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:rgba(244,238,231,.6)" style-hover="color:#f4eee7">Geography</a>
+<a href="#" style="padding:22px 12px;font-size:12.8px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:rgba(244,238,231,.6)" style-hover="color:#f4eee7">Wages</a>
+<a href="#" style="padding:22px 12px;font-size:12.8px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:rgba(244,238,231,.6)" style-hover="color:#f4eee7">Skills</a>
+<a href="#" style="padding:22px 12px;font-size:12.8px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:rgba(244,238,231,.6)" style-hover="color:#f4eee7">Method</a>
+</nav>
+<span style="display:flex;border:1px solid rgba(244,238,231,.25);font-size:11.5px;font-weight:700"><span style="padding:4px 8px;background:#f4eee7;color:#041c2c">EN</span><span style="padding:4px 8px;color:rgba(244,238,231,.6)">FR</span></span>
+<a href="Explore Hifi.dc.html" style="display:flex;align-items:center;gap:6px;margin-left:8px;border:1px solid rgba(207,119,48,.55);border-radius:999px;padding:6px 13px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;color:#f0c79f" style-hover="background:rgba(207,119,48,.12);color:#f0c79f"><span style="width:6px;height:6px;border-radius:999px;background:#cf7730"></span>Explore</a>
+</div>
+</div>
+<div style="padding:52px 0 66px">
+<div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#f0c79f;margin-bottom:14px">Labour Market Pulse · July 2026</div>
+<div style="font-size:46px;line-height:1.04;font-weight:700;text-transform:uppercase;color:#f4eee7;max-width:820px;text-wrap:balance">Canada’s hiring is 12% below its 2019 baseline.</div>
+<p style="margin:18px 0 0;font-size:18px;line-height:1.55;color:rgba(244,238,231,.72);max-width:600px">A monthly read on posted hiring across Canada’s regions, occupations and industries. Job ads measure posted demand — not employment or vacancies.</p>
+</div>
+</div>
+<div style="height:4px;background:linear-gradient(90deg,#041c2c 0%,#345961 37.49%,#c39e80 76.96%,#cf7730 100%)"></div>
+</div>
+<!-- KPI strip overlapping the band -->
+<div style="max-width:1140px;margin:-36px auto 0;padding:0 32px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative">
+<div style="background:#fff;border:1px solid #e3d6c8;border-radius:14px;padding:20px;box-shadow:0 18px 40px rgba(6,31,47,.10);display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden"><span style="position:absolute;inset:0 0 auto 0;height:4px;background:#cf7730"></span>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#5d6b74">Postings index</span><span style="font-size:11.5px;color:#616a71">2019 = 100</span></div>
+<div style="font-size:33px;font-weight:700;line-height:1;color:#041c2c;font-variant-numeric:tabular-nums">88</div>
+<div style="margin-top:auto;display:flex;align-items:flex-end;gap:8px"><span style="font-size:12.8px;font-weight:700;color:#b54e33;white-space:nowrap;font-variant-numeric:tabular-nums">▼ 12% <span style="font-weight:400;color:#616a71">vs baseline</span></span><div style="flex:1;display:flex;justify-content:flex-end"><svg viewBox="0 0 132 34" preserveAspectRatio="none" style="width:100%;max-width:132px;height:34px;display:block;overflow:visible" aria-hidden="true"><path d="{{sp1.area}}" fill="#cf7730" opacity="0.1"></path><path d="{{sp1.line}}" fill="none" stroke="#cf7730" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path><circle cx="{{sp1.cx}}" cy="{{sp1.cy}}" r="2.4" fill="#cf7730"></circle></svg></div></div>
+</div>
+<div style="background:#fff;border:1px solid #e3d6c8;border-radius:14px;padding:20px;box-shadow:0 18px 40px rgba(6,31,47,.10);display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#5d6b74">Active postings</span><span style="font-size:11.5px;color:#616a71">this month</span></div>
+<div style="font-size:33px;font-weight:700;line-height:1;color:#041c2c;font-variant-numeric:tabular-nums">412K</div>
+<div style="margin-top:auto;display:flex;align-items:flex-end;gap:8px"><span style="font-size:12.8px;font-weight:700;color:#2c765c;white-space:nowrap;font-variant-numeric:tabular-nums">▲ 3.1% <span style="font-weight:400;color:#616a71">MoM</span></span><div style="flex:1;display:flex;justify-content:flex-end"><svg viewBox="0 0 132 34" preserveAspectRatio="none" style="width:100%;max-width:132px;height:34px;display:block;overflow:visible" aria-hidden="true"><path d="{{sp2.area}}" fill="#345961" opacity="0.1"></path><path d="{{sp2.line}}" fill="none" stroke="#345961" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path><circle cx="{{sp2.cx}}" cy="{{sp2.cy}}" r="2.4" fill="#345961"></circle></svg></div></div>
+</div>
+<div style="background:#fff;border:1px solid #e3d6c8;border-radius:14px;padding:20px;box-shadow:0 18px 40px rgba(6,31,47,.10);display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#5d6b74">Vs last year</span><span style="font-size:11.5px;color:#616a71">year over year</span></div>
+<div style="display:flex;align-items:flex-end;gap:6px"><span style="font-size:24px;line-height:1;color:#b54e33" aria-hidden="true">▼</span><span style="font-size:33px;font-weight:700;line-height:1;color:#b54e33;font-variant-numeric:tabular-nums">8.4%</span></div>
+<div style="margin-top:auto;display:flex;justify-content:flex-end"><svg viewBox="0 0 132 34" preserveAspectRatio="none" style="width:100%;max-width:132px;height:34px;display:block;overflow:visible" aria-hidden="true"><path d="{{sp3.area}}" fill="#345961" opacity="0.1"></path><path d="{{sp3.line}}" fill="none" stroke="#345961" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path><circle cx="{{sp3.cx}}" cy="{{sp3.cy}}" r="2.4" fill="#345961"></circle></svg></div>
+</div>
+<div style="background:#fff;border:1px solid #e3d6c8;border-radius:14px;padding:20px;box-shadow:0 18px 40px rgba(6,31,47,.10);display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#5d6b74">Median wage</span><span style="font-size:11.5px;color:#616a71">n = 212K</span></div>
+<div style="display:flex;align-items:flex-end;gap:5px"><span style="font-size:33px;font-weight:700;line-height:1;color:#041c2c;font-variant-numeric:tabular-nums">$28.50</span><span style="font-size:13.8px;font-weight:700;color:#5d6b74;margin-bottom:2px">/hr</span></div>
+<div style="margin-top:auto;display:flex;justify-content:flex-end"><svg viewBox="0 0 132 34" preserveAspectRatio="none" style="width:100%;max-width:132px;height:34px;display:block;overflow:visible" aria-hidden="true"><path d="{{sp4.area}}" fill="#345961" opacity="0.1"></path><path d="{{sp4.line}}" fill="none" stroke="#345961" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path><circle cx="{{sp4.cx}}" cy="{{sp4.cy}}" r="2.4" fill="#345961"></circle></svg></div>
+</div>
+</div>
+<!-- 01 Postings over time -->
+<div style="max-width:1140px;margin:44px auto 0;padding:0 32px">
+<div style="display:flex;align-items:baseline;gap:12px;border-top:2px solid #041c2c;padding-top:12px;margin-bottom:16px"><span style="font-size:24px;font-weight:700;line-height:1;color:#c39e80;font-variant-numeric:tabular-nums">01</span><span style="font-size:13px;font-weight:700;text-transform:uppercase;color:#041c2c">Postings over time</span><span style="margin-left:auto;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#616a71;font-variant-numeric:tabular-nums">Jul 2026</span></div>
+<div style="display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:stretch">
+<figure style="margin:0;background:#fff;border:1px solid #e3d6c8;border-radius:14px;box-shadow:0 2px 10px rgba(6,31,47,.06);padding:24px;display:flex;flex-direction:column">
+<div style="margin-bottom:16px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:6px">Postings over time</div><figcaption style="font-size:16.8px;font-weight:700;line-height:1.35;color:#041c2c">Posted hiring: monthly job-ad postings</figcaption></div>
+<svg viewBox="0 0 720 230" style="width:100%;height:auto;display:block" aria-label="Monthly job-ad postings with a 3-month average and a provisional tail">
+<line x1="0" y1="58" x2="720" y2="58" stroke="#e6e0da" stroke-width="1"></line>
+<line x1="0" y1="170" x2="720" y2="170" stroke="#e6e0da" stroke-width="1"></line>
+<line x1="0" y1="{{baseY}}" x2="720" y2="{{baseY}}" stroke="#b9ab9d" stroke-width="1" stroke-dasharray="4 4"></line>
+<text x="6" y="{{baseLabelY}}" font-size="11" fill="#616a71" font-family="PT Sans">2019 = 100</text>
+<polyline points="{{rawPts}}" fill="none" stroke="#dcc9b4" stroke-width="1.2"></polyline>
+<path d="{{avgPath}}" fill="none" stroke="#345961" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
+<polyline points="{{tailPts}}" fill="none" stroke="#345961" stroke-width="2.5" stroke-dasharray="2 6" stroke-linecap="round"></polyline>
+<text x="0" y="226" font-size="11" fill="#616a71" font-family="PT Sans">2016</text><text x="132" y="226" font-size="11" fill="#616a71" font-family="PT Sans">2018</text><text x="272" y="226" font-size="11" fill="#616a71" font-family="PT Sans">2020</text><text x="412" y="226" font-size="11" fill="#616a71" font-family="PT Sans">2022</text><text x="552" y="226" font-size="11" fill="#616a71" font-family="PT Sans">2024</text><text x="694" y="226" font-size="11" fill="#616a71" font-family="PT Sans">2026</text>
+</svg>
+<div style="margin-top:14px;border-top:1px solid #ece3da;padding-top:12px;font-size:12.8px;line-height:1.6;color:#5d6b74">Faint line = raw monthly count · bold = 3-month average · dotted tail = provisional. Counts partly reflect scraping coverage over time, not hiring alone.</div>
+</figure>
+<sc-if value="{{darkSummary}}" hint-placeholder-val="{{true}}">
+<div style="background:#041c2c;border-radius:14px;padding:24px;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(6,31,47,.06)">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect width="4.5" height="4.5" fill="#cf7730"></rect><rect x="5.75" width="4.5" height="4.5" fill="#c39e80"></rect><rect y="5.75" width="4.5" height="4.5" fill="#5b7e85"></rect><rect x="5.75" y="5.75" width="4.5" height="4.5" fill="#f4eee7"></rect><rect x="11.5" y="11.5" width="4.5" height="4.5" fill="#cf7730"></rect></svg><span style="font-size:13px;font-weight:700;text-transform:uppercase;color:#f0c79f">Automated summary</span></div>
+<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px">
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#f4eee7"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>Postings are 12% below the 2019 baseline — the widest gap since early 2021.</span></li>
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#f4eee7"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>Health is the only broad occupation group with year-over-year growth (▲ 8.4%).</span></li>
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#f4eee7"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>Alberta and Saskatchewan are holding up better than the national trend.</span></li>
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#f4eee7"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>The 3-month average has cooled for five consecutive months.</span></li>
+</ul>
+<p style="margin:auto 0 0;padding-top:16px;font-size:11.5px;line-height:1.6;color:rgba(244,238,231,.55);border-top:1px solid rgba(244,238,231,.14)">Descriptive signals only — postings show posted demand, not causes.</p>
+</div>
+</sc-if>
+<sc-if value="{{lightSummary}}" hint-placeholder-val="{{false}}">
+<div style="background:#f7efe9;border:1px solid #e3d6c8;border-radius:14px;padding:24px;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(6,31,47,.06)">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect width="4.5" height="4.5" fill="#cf7730"></rect><rect x="5.75" width="4.5" height="4.5" fill="#c39e80"></rect><rect y="5.75" width="4.5" height="4.5" fill="#345961"></rect><rect x="5.75" y="5.75" width="4.5" height="4.5" fill="#041c2c"></rect><rect x="11.5" y="11.5" width="4.5" height="4.5" fill="#cf7730"></rect></svg><span style="font-size:13px;font-weight:700;text-transform:uppercase;color:#041c2c">Automated summary</span></div>
+<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px">
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#16242f"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>Postings are 12% below the 2019 baseline — the widest gap since early 2021.</span></li>
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#16242f"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>Health is the only broad occupation group with year-over-year growth (▲ 8.4%).</span></li>
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#16242f"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>Alberta and Saskatchewan are holding up better than the national trend.</span></li>
+<li style="display:flex;gap:12px;font-size:14.7px;line-height:1.45;color:#16242f"><span style="width:6px;height:6px;background:#cf7730;margin-top:7px;flex:none" aria-hidden="true"></span><span>The 3-month average has cooled for five consecutive months.</span></li>
+</ul>
+<p style="margin:auto 0 0;padding-top:16px;font-size:11.5px;line-height:1.6;color:#616a71;border-top:1px solid #ece3da">Descriptive signals only — postings show posted demand, not causes.</p>
+</div>
+</sc-if>
+</div>
+</div>
+<!-- 02 Composition & seasonality -->
+<div style="max-width:1140px;margin:44px auto 0;padding:0 32px">
+<div style="display:flex;align-items:baseline;gap:12px;border-top:2px solid #041c2c;padding-top:12px;margin-bottom:16px"><span style="font-size:24px;font-weight:700;line-height:1;color:#c39e80;font-variant-numeric:tabular-nums">02</span><span style="font-size:13px;font-weight:700;text-transform:uppercase;color:#041c2c">Composition &amp; seasonality</span><span style="margin-left:auto;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#616a71;font-variant-numeric:tabular-nums">Jul 2026</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<figure style="margin:0;background:#fff;border:1px solid #e3d6c8;border-radius:14px;box-shadow:0 2px 10px rgba(6,31,47,.06);padding:24px;display:flex;flex-direction:column">
+<div style="margin-bottom:16px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:6px">Year over year</div><figcaption style="font-size:16.8px;font-weight:700;line-height:1.35;color:#041c2c">Growth and decline in postings, year over year</figcaption></div>
+<svg viewBox="0 0 720 200" style="width:100%;height:auto;display:block" aria-label="Year-over-year percentage change in postings, by month">
+<line x1="0" y1="100" x2="720" y2="100" stroke="#b9ab9d" stroke-width="1"></line>
+<sc-for list="{{yoyBars}}" as="b" hint-placeholder-count="0"><rect x="{{b.x}}" y="{{b.y}}" width="20" height="{{b.h}}" fill="{{b.f}}" rx="1"></rect></sc-for>
+<text x="6" y="16" font-size="11" fill="#2c765c" font-family="PT Sans" font-weight="700">▲ growth</text>
+<text x="6" y="194" font-size="11" fill="#b54e33" font-family="PT Sans" font-weight="700">▼ decline</text>
+</svg>
+<div style="margin-top:14px;border-top:1px solid #ece3da;padding-top:12px;font-size:12.8px;line-height:1.6;color:#5d6b74">Each bar compares a month with the same month a year earlier.</div>
+</figure>
+<figure style="margin:0;background:#fff;border:1px solid #e3d6c8;border-radius:14px;box-shadow:0 2px 10px rgba(6,31,47,.06);padding:24px;display:flex;flex-direction:column">
+<div style="margin-bottom:16px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:6px">Occupational mix</div><figcaption style="font-size:16.8px;font-weight:700;line-height:1.35;color:#041c2c">How the occupational mix shifts over time</figcaption></div>
+<svg viewBox="0 0 720 200" style="width:100%;height:auto;display:block" aria-label="Stacked area of posting share by broad occupation group over time">
+<path d="M0 0 L720 0 L720 200 L0 200 Z" fill="#345961"></path>
+<path d="{{comp.p2}}" fill="#6f93a0"></path>
+<path d="{{comp.p3}}" fill="#c39e80"></path>
+<path d="{{comp.p4}}" fill="#9a6a3c"></path>
+<path d="{{comp.p5}}" fill="#cf7730"></path>
+</svg>
+<div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px">
+<span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5d6b74"><span style="width:10px;height:10px;background:#345961;border-radius:2px"></span>Sales &amp; service</span>
+<span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5d6b74"><span style="width:10px;height:10px;background:#6f93a0;border-radius:2px"></span>Trades &amp; transport</span>
+<span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5d6b74"><span style="width:10px;height:10px;background:#c39e80;border-radius:2px"></span>Business &amp; finance</span>
+<span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5d6b74"><span style="width:10px;height:10px;background:#9a6a3c;border-radius:2px"></span>Health</span>
+<span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#5d6b74"><span style="width:10px;height:10px;background:#cf7730;border-radius:2px"></span>Other</span>
+</div>
+<div style="margin-top:14px;border-top:1px solid #ece3da;padding-top:12px;font-size:12.8px;line-height:1.6;color:#5d6b74">Share of monthly postings by broad occupation group (top groups + Other).</div>
+</figure>
+</div>
+<figure style="margin:20px 0 0;background:#fff;border:1px solid #e3d6c8;border-radius:14px;box-shadow:0 2px 10px rgba(6,31,47,.06);padding:24px">
+<div style="margin-bottom:16px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:6px">Seasonality · month by year</div><figcaption style="font-size:16.8px;font-weight:700;line-height:1.35;color:#041c2c">When in the year are postings strongest?</figcaption></div>
+<div style="display:flex;gap:4px;align-items:center;margin-bottom:2px"><span style="width:44px;flex:none"></span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Jan</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Feb</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Mar</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Apr</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">May</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Jun</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Jul</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Aug</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Sep</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Oct</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Nov</span><span style="flex:1;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:#616a71">Dec</span></div>
+<sc-for list="{{heatRows}}" as="row" hint-placeholder-count="6">
+<div style="display:flex;gap:4px;align-items:center;margin-top:4px"><span style="width:44px;flex:none;font-size:11.5px;color:#616a71;font-variant-numeric:tabular-nums">{{row.year}}</span><sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="12"><div style="flex:1;height:26px;border-radius:3px;background:{{cell}}"></div></sc-for></div>
+</sc-for>
+<div style="display:flex;align-items:center;gap:8px;margin-top:14px"><span style="font-size:11.5px;color:#616a71">Below year average</span><span style="width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,#f7efe9,#cf7730)"></span><span style="font-size:11.5px;color:#616a71">Above</span></div>
+<div style="margin-top:14px;border-top:1px solid #ece3da;padding-top:12px;font-size:12.8px;line-height:1.6;color:#5d6b74">Each cell is that month relative to its own year’s average, so the seasonal shape shows through the trend.</div>
+</figure>
+</div>
+<sc-if value="{{showDeep}}" hint-placeholder-val="{{true}}">
+<!-- Going deeper -->
+<div style="max-width:1140px;margin:52px auto 0;padding:0 32px">
+<div style="border-top:1px solid #e3d6c8;padding-top:24px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:8px">Going deeper</div><p style="margin:0;font-size:18px;line-height:1.55;color:#5d6b74;max-width:600px">Decomposition and diagnostics for readers who want the mechanics behind the headline.</p></div>
+</div>
+<!-- 03 Occupation trajectories -->
+<div style="max-width:1140px;margin:32px auto 0;padding:0 32px">
+<div style="display:flex;align-items:baseline;gap:12px;border-top:2px solid #041c2c;padding-top:12px;margin-bottom:16px"><span style="font-size:24px;font-weight:700;line-height:1;color:#c39e80;font-variant-numeric:tabular-nums">03</span><span style="font-size:13px;font-weight:700;text-transform:uppercase;color:#041c2c">Occupation trajectories</span><span style="margin-left:auto;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#616a71;font-variant-numeric:tabular-nums">Jul 2026</span></div>
+<figure style="margin:0;background:#fff;border:1px solid #e3d6c8;border-radius:14px;box-shadow:0 2px 10px rgba(6,31,47,.06);padding:24px">
+<div style="margin-bottom:16px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:6px">Occupation small-multiples</div><figcaption style="font-size:16.8px;font-weight:700;line-height:1.35;color:#041c2c">Every occupation group’s posting trajectory at a glance</figcaption></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
+<sc-for list="{{occPanels}}" as="p" hint-placeholder-count="10">
+<div style="border:1px solid #ece3da;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px">
+<span style="font-size:11.5px;font-weight:700;color:#16242f;line-height:1.3;min-height:30px">{{p.name}}</span>
+<svg viewBox="0 0 120 40" preserveAspectRatio="none" style="width:100%;height:40px;display:block" aria-hidden="true"><polyline points="{{p.pts}}" fill="none" stroke="{{p.color}}" stroke-width="1.75" vector-effect="non-scaling-stroke" stroke-linejoin="round"></polyline></svg>
+<span style="font-size:11.5px;font-weight:700;color:{{p.dcolor}};font-variant-numeric:tabular-nums">{{p.delta}} <span style="font-weight:400;color:#616a71">YoY</span></span>
+</div>
+</sc-for>
+</div>
+<div style="margin-top:16px;border-top:1px solid #ece3da;padding-top:12px;font-size:12.8px;line-height:1.6;color:#5d6b74">Monthly postings 2016–2026, one panel per broad NOC group (each panel scaled to its own peak).</div>
+</figure>
+</div>
+<!-- 04 Momentum & breadth -->
+<div style="max-width:1140px;margin:44px auto 0;padding:0 32px">
+<div style="display:flex;align-items:baseline;gap:12px;border-top:2px solid #041c2c;padding-top:12px;margin-bottom:16px"><span style="font-size:24px;font-weight:700;line-height:1;color:#c39e80;font-variant-numeric:tabular-nums">04</span><span style="font-size:13px;font-weight:700;text-transform:uppercase;color:#041c2c">Momentum &amp; breadth</span><span style="margin-left:auto;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#616a71;font-variant-numeric:tabular-nums">Jul 2026</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<figure style="margin:0;background:#fff;border:1px solid #e3d6c8;border-radius:14px;box-shadow:0 2px 10px rgba(6,31,47,.06);padding:24px;display:flex;flex-direction:column">
+<div style="margin-bottom:16px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:6px">Momentum</div><figcaption style="font-size:16.8px;font-weight:700;line-height:1.35;color:#041c2c">Is hiring speeding up or cooling?</figcaption></div>
+<svg viewBox="0 0 720 160" style="width:100%;height:auto;display:block" aria-label="Bar chart of the gap between the 3-month and 12-month moving averages">
+<line x1="0" y1="80" x2="720" y2="80" stroke="#b9ab9d" stroke-width="1"></line>
+<sc-for list="{{momBars}}" as="b" hint-placeholder-count="0"><rect x="{{b.x}}" y="{{b.y}}" width="20" height="{{b.h}}" fill="{{b.f}}" rx="1"></rect></sc-for>
+</svg>
+<div style="margin-top:auto;border-top:1px solid #ece3da;padding-top:12px;font-size:12.8px;line-height:1.6;color:#5d6b74;margin-top:14px">Gap between the 3-month and 12-month averages · teal = accelerating, orange = cooling.</div>
+</figure>
+<figure style="margin:0;background:#fff;border:1px solid #e3d6c8;border-radius:14px;box-shadow:0 2px 10px rgba(6,31,47,.06);padding:24px;display:flex;flex-direction:column">
+<div style="margin-bottom:16px"><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#a25518;margin-bottom:6px">Breadth of growth</div><figcaption style="font-size:16.8px;font-weight:700;line-height:1.35;color:#041c2c">Is growth broad or narrow?</figcaption></div>
+<svg viewBox="0 0 720 160" style="width:100%;height:auto;display:block" aria-label="Diffusion index of occupation groups with positive year-over-year postings">
+<line x1="0" y1="85" x2="720" y2="85" stroke="#b9ab9d" stroke-width="1" stroke-dasharray="4 4"></line>
+<text x="6" y="80" font-size="11" fill="#616a71" font-family="PT Sans">50 = evenly split</text>
+<polyline points="{{difPts}}" fill="none" stroke="#345961" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+</svg>
+<div style="margin-top:auto;border-top:1px solid #ece3da;padding-top:12px;font-size:12.8px;line-height:1.6;color:#5d6b74;margin-top:14px">Share of broad occupation groups with positive year-over-year postings; 50 = evenly split (3-month smoothed).</div>
+</figure>
+</div>
+</div>
+</sc-if>
+<!-- Footer -->
+<footer style="margin-top:80px;background:#041c2c;color:#f4eee7">
+<div style="height:4px;background:linear-gradient(90deg,#041c2c 0%,#345961 37.49%,#c39e80 76.96%,#cf7730 100%)"></div>
+<div style="max-width:1140px;margin:0 auto;padding:56px 32px;display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:40px">
+<div>
+<div style="display:flex;align-items:center;gap:12px"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="8" height="8" fill="#f4eee7"></rect><rect x="10" width="8" height="8" fill="#5b7e85"></rect><rect x="20" width="8" height="8" fill="#cf7730"></rect><rect y="10" width="8" height="8" fill="#5b7e85"></rect><rect x="10" y="10" width="8" height="8" fill="#c39e80"></rect><rect x="20" y="10" width="8" height="8" fill="#c39e80"></rect><rect y="20" width="8" height="8" fill="#f4eee7"></rect><rect x="10" y="20" width="8" height="8" fill="#345961"></rect><rect x="20" y="20" width="8" height="8" fill="#cf7730"></rect></svg><span style="font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.01em">ACLMR</span></div>
+<p style="margin:16px 0 0;max-width:24rem;font-size:14.7px;line-height:1.65;color:rgba(244,238,231,.7)">The Alberta Centre for Labour Market Research studies how Canada’s labour market is changing, using timely data from online job postings.</p>
+</div>
+<nav style="display:flex;flex-direction:column;gap:8px">
+<span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#f0c79f;margin-bottom:4px">Dashboard</span>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Pulse</a>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Occupations</a>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Industries</a>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Geography</a>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Wages</a>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Skills</a>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Method</a>
+<a href="#" style="width:fit-content;font-size:14.7px;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">Developers</a>
+</nav>
+<div style="display:flex;flex-direction:column;gap:12px;font-size:12.8px;line-height:1.6;color:rgba(244,238,231,.65)">
+<span style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#f0c79f">About the data</span>
+<p style="margin:0">Source: online job postings collected and de-duplicated by ACLMR.</p>
+<p style="margin:0">Categories follow the National Occupational Classification (NOC 2021).</p>
+<p style="margin:0;font-variant-numeric:tabular-nums">Data through July 2026.</p>
+<p style="margin:0">Read the <a href="#" style="font-weight:700;color:#f0c79f">method notes</a> for coverage and caveats.</p>
+<a href="https://www.aclmr.ca/" style="margin-top:8px;width:fit-content;color:rgba(244,238,231,.8)" style-hover="color:#f0c79f">aclmr.ca →</a>
+</div>
+</div>
+<div style="border-top:1px solid rgba(255,255,255,.1)">
+<div style="max-width:1140px;margin:0 auto;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:rgba(244,238,231,.5)">
+<span>© 2026 Alberta Centre for Labour Market Research</span>
+<span style="text-transform:uppercase;letter-spacing:.04em">Job ads measure posted demand — not employment</span>
+</div>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showDeep&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Content&quot;},&quot;darkSummary&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Style&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const seq = (n, f) => Array.from({ length: n }, (_, i) => f(i));
+    const spark = (vals, W = 132, H = 34) => {
+      const mn = Math.min(...vals), mx = Math.max(...vals), span = mx - mn || 1, pad = 2;
+      const sx = (W - pad * 2) / (vals.length - 1);
+      const pts = vals.map((v, i) => [pad + i * sx, pad + (H - pad * 2) * (1 - (v - mn) / span)]);
+      const line = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+      const last = pts[pts.length - 1];
+      return { line, area: `${line} L${last[0].toFixed(1)} ${H} L${pts[0][0].toFixed(1)} ${H} Z`, cx: last[0].toFixed(1), cy: last[1].toFixed(1) };
+    };
+    const sp1 = spark(seq(24, i => 30 - i * 0.8 + 2.5 * Math.sin(i * 0.9)));
+    const sp2 = spark(seq(24, i => 10 + i * 0.5 + 3 * Math.sin(i * 0.7)));
+    const sp3 = spark(seq(24, i => 20 - i * 0.7 + 3 * Math.sin(i * 1.1)));
+    const sp4 = spark(seq(24, i => 8 + i * 0.55 + 2 * Math.sin(i * 0.8)));
+    // Demand ribbon: index series 2016-2026 (covid dip, 2022 peak, decline to 88)
+    const N = 120, W = 720, H = 230;
+    const y = v => H - 14 - (v - 55) * (H - 40) / 90;
+    const base = i => {
+      const t = i / (N - 1);
+      return 97 - 38 * Math.exp(-Math.pow((t - 0.40) / 0.045, 2)) + 38 * Math.exp(-Math.pow((t - 0.63) / 0.11, 2)) + (t > 0.74 ? -(t - 0.74) * 90 : 0) + 4 * Math.sin(t * 9);
+    };
+    const rawPts = seq(N, i => `${(i * (W / (N - 1))).toFixed(1)},${y(base(i) + 3.5 * Math.sin(i * 2.7) + 2 * Math.sin(i * 0.9)).toFixed(1)}`).join(' ');
+    const arr = seq(N, i => base(i));
+    const sm = arr.map((_, i) => { let s = 0, c = 0; for (let k = -3; k <= 3; k++) { const j = i + k; if (j >= 0 && j < N) { s += arr[j]; c++; } } return s / c; });
+    const cut = Math.floor(N * 0.94);
+    const avgPath = sm.slice(0, cut + 1).map((v, i) => `${i ? 'L' : 'M'}${(i * (W / (N - 1))).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+    const tailPts = sm.slice(cut).map((v, k) => `${((cut + k) * (W / (N - 1))).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const baseY = y(100).toFixed(1);
+    const baseLabelY = (y(100) - 6).toFixed(1);
+    // YoY bars
+    const yoyBars = seq(24, i => {
+      const v = 13 - 1.5 * i + 5 * Math.sin(i * 1.3);
+      const h = Math.max(Math.abs(v) * 2.6, 1.5);
+      return { x: (8 + i * 30).toFixed(1), y: (v > 0 ? 100 - h : 100).toFixed(1), h: h.toFixed(1), f: v > 0 ? '#2c765c' : '#b54e33' };
+    });
+    // Composition stacked area boundaries
+    const bnd = (frac, ph, amp) => seq(41, i => `${i ? 'L' : 'M'}${(i * 18).toFixed(1)} ${(200 * frac + amp * Math.sin(i * 0.45 + ph)).toFixed(1)}`).join(' ');
+    const toBottom = p => `${p} L720 200 L0 200 Z`;
+    const comp = { p2: toBottom(bnd(0.24, 0, 7)), p3: toBottom(bnd(0.47, 1.4, 8)), p4: toBottom(bnd(0.68, 2.6, 6)), p5: toBottom(bnd(0.85, 3.7, 5)) };
+    // Seasonality heatmap
+    const pal = ['#f7efe9', '#efdec8', '#e5c49b', '#d9a468', '#cf7730', '#a95818'];
+    const seas = [1, 1, 2, 3, 3, 2, 2, 3, 4, 5, 3, 0];
+    const heatRows = [2021, 2022, 2023, 2024, 2025, 2026].map(yr => ({
+      year: yr,
+      cells: seq(12, m => yr === 2026 && m > 6 ? '#f3ede4' : pal[clamp(seas[m] + ((yr * 7 + m * 13) % 3) - 1, 0, 5)])
+    }));
+    // Occupation small multiples
+    const occ = [['Management', -6.2], ['Business & finance', -4.8], ['Sciences', 2.1], ['Health', 8.4], ['Education & law', -1.9], ['Art & culture', -9.6], ['Sales & service', -12.3], ['Trades & transport', -7.4], ['Natural resources', 0.8], ['Manufacturing', -10.1]];
+    const occPanels = occ.map(([name, d], k) => {
+      const vals = seq(24, i => 50 - d * 0.5 + (d / 10) * i * 1.2 + 4 * Math.sin(i * 0.8 + k));
+      const mn = Math.min(...vals), mx = Math.max(...vals), sp = mx - mn || 1;
+      const pts = vals.map((v, i) => `${(i * (120 / 23)).toFixed(1)},${(36 - 30 * ((v - mn) / sp)).toFixed(1)}`).join(' ');
+      return { name, pts, delta: `${d > 0 ? '▲' : '▼'} ${Math.abs(d).toFixed(1)}%`, dcolor: d > 0 ? '#2c765c' : '#b54e33', color: d > 0 ? '#2c765c' : '#345961' };
+    });
+    // Momentum bars
+    const momBars = seq(24, i => {
+      const v = 9 * Math.sin(i * 0.42) + 7 - i * 0.75;
+      const h = Math.max(Math.abs(v) * 3.2, 1.5);
+      return { x: (8 + i * 30).toFixed(1), y: (v > 0 ? 80 - h : 80).toFixed(1), h: h.toFixed(1), f: v > 0 ? '#345961' : '#cf7730' };
+    });
+    // Diffusion line
+    const difPts = seq(36, i => {
+      const v = 63 - 0.75 * i + 5 * Math.sin(i * 0.7);
+      return `${(i * (720 / 35)).toFixed(1)},${(160 - 1.5 * v).toFixed(1)}`;
+    }).join(' ');
+    const darkSummary = this.props.darkSummary ?? true;
+    return {
+      sp1, sp2, sp3, sp4, rawPts, avgPath, tailPts, baseY, baseLabelY, yoyBars, comp, heatRows, occPanels, momBars, difPts,
+      showDeep: this.props.showDeep ?? true, darkSummary, lightSummary: !darkSummary
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!-- @dsCard group="Components" viewport="700x150" name="Select" subtitle="Default, active (orange border), empty-disabled" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../../styles.css"><style>body{padding:16px 20px;background:var(--canvas)}</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../../ds-dev.js?v=7"></script>
+</head><body><div id="root"></div>
+<script type="text/plain" data-card>
+const { Select } = NS;
+const opts = [{value:"ca",label:"Canada"},{value:"ab",label:"Alberta"},{value:"on",label:"Ontario"}];
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16,maxWidth:640}}>
+    <Select id="a" label="Region" options={opts} />
+    <Select id="b" label="Region" value="ab" options={opts} />
+    <Select id="c" label="Industry" options={[]} />
+  </div>
+);
+</script></body></html>

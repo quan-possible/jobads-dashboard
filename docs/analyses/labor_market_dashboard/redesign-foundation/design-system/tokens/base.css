@@ -1,0 +1,63 @@
+/* ACLMR — base element styles + structural classes (mirrors web/app/globals.css). */
+* { border-color: var(--hairline); box-sizing: border-box; }
+
+html { background: var(--canvas); -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-pt-sans, "PT Sans"), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--orange-soft); color: var(--navy-deep); }
+
+a { color: var(--orange-deep); text-decoration: none; }
+a:hover { color: var(--orange); }
+
+/* Layout */
+.container-x {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Surfaces */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+}
+.card-pad { padding: clamp(18px, 2.4vw, 26px); }
+
+/* Signature gradient ribbon */
+.gradient-bar { background: var(--gradient-h); height: 4px; width: 100%; }
+
+/* Square focus rings honoring the accent */
+:where(a, button, [tabindex], input, select, textarea):focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+/* Dense analytical controls are square; meaningful primary CTAs use the live
+   ACLMR pill geometry. */
+.control { border-radius: var(--radius-control); }
+.cta-pill { border-radius: var(--radius-pill); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Nav tab row scrolls within the header at narrow widths (matches the app's
+   overflow-x-auto) without showing a scrollbar track over the chrome. */
+.nav-scroll { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.nav-scroll::-webkit-scrollbar { display: none; }

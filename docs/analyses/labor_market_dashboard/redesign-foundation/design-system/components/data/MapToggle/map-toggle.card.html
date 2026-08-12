@@ -1,0 +1,20 @@
+<!-- @dsCard group="Components" viewport="700x260" name="MapToggle" subtitle="Measure switcher over pre-rendered variants" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../../styles.css"><style>body{padding:16px 20px;background:var(--canvas)}</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../../ds-dev.js?v=7"></script>
+</head><body><div id="root"></div>
+<script type="text/plain" data-card>
+const { MapToggle } = NS;
+const plate = (label,color) => (
+  <div style={{height:140,border:'1px solid var(--card-border)',borderRadius:8,background:'var(--surface)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <span className="t-meta" style={{fontWeight:700,color:color}}>{label}</span>
+  </div>
+);
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <MapToggle ariaLabel="Measure"
+    options={[{value:'count',label:'Count'},{value:'share',label:'Share'},{value:'pc',label:'Per capita'},{value:'lq',label:'Location quotient'}]}
+    views={{count:plate('Province map — count','var(--cat-1)'),share:plate('Province map — share','var(--cat-2)'),pc:plate('Province map — per capita','var(--cat-3)'),lq:plate('Province map — LQ','var(--cat-4)')}} />
+);
+</script></body></html>

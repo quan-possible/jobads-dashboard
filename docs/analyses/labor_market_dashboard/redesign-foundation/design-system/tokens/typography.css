@@ -1,0 +1,58 @@
+/* ACLMR — typography tokens + heading/text classes.
+   PT Sans everywhere. Uppercase headings with NO letter-spacing (ACLMR signature). */
+:root {
+  --font-sans: var(--font-pt-sans, "PT Sans"), ui-sans-serif, system-ui, sans-serif;
+  --t-figure-title: 1.05rem;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--orange-deep);
+  line-height: 1.2;
+}
+.h-display {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  line-height: 1.04;
+  color: var(--navy-deep);
+  font-size: clamp(2rem, 4.6vw, 3rem);
+}
+.h-section {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  line-height: 1.1;
+  color: var(--navy-deep);
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+}
+.h-card {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--navy);
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+.lede {
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* Small-text scale — one source of truth (mirrors the app's U01 scale) */
+.t-label   { font-size: 0.625rem; }
+.t-caption { font-size: 0.72rem; }
+.t-meta    { font-size: 0.8rem; }
+.t-body-sm { font-size: 0.86rem; }
+.t-body    { font-size: 0.92rem; }
+.t-figure-title { font-size: var(--t-figure-title); }
+
+/* Tabular numerals for any figure */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}

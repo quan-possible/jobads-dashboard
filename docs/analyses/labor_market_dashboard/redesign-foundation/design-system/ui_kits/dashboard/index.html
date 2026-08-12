@@ -1,0 +1,33 @@
+<!-- @dsCard group="Dashboard" viewport="1280x820" subtitle="Pulse, Geography and Explore — click-through recreation" -->
+<!-- @startingPoint section="Dashboard" subtitle="Full dashboard page shell (nav + page + footer)" viewport="1280x820" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ACLMR — Canadian Labour Market Pulse</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>body{background:var(--canvas)}</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../ds-dev.js?v=7" data-screens="./PulseScreen.jsx,./GeographyScreen.jsx,./ExploreScreen.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/plain" data-card>
+function App() {
+  const { TopNav, Footer } = NS;
+  const [route, setRoute] = React.useState("/");
+  const Screen = route === "/geography" ? window.GeographyScreen : route === "/explore" ? window.ExploreScreen : window.PulseScreen;
+  return (
+    <div>
+      <TopNav authenticated activeHref={route} onNavigate={setRoute} />
+      <main>{Screen ? <Screen /> : null}</main>
+      <Footer asOf="July 2026" />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

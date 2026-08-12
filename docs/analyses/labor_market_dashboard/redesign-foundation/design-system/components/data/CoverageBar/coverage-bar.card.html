@@ -1,0 +1,18 @@
+<!-- @dsCard group="Components" viewport="700x210" name="CoverageBar" subtitle="Well-covered (teal) vs sparse <40% (orange)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../../styles.css"><style>body{padding:16px 20px;background:var(--canvas)}</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../../ds-dev.js?v=7"></script>
+</head><body><div id="root"></div>
+<script type="text/plain" data-card>
+const { CoverageBar } = NS;
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,maxWidth:620}}>
+    <CoverageBar label="Wage" share={0.62} count={212000} />
+    <CoverageBar label="Occupation (NOC)" share={0.96} count={412800} />
+    <CoverageBar label="Education" share={0.28} count={94000} />
+    <CoverageBar label="Experience" share={0.38} count={128400} />
+  </div>
+);
+</script></body></html>

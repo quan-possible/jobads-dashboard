@@ -1,0 +1,20 @@
+<!-- @dsCard group="Components" viewport="700x170" name="PixelTiles" subtitle="Brand mosaic — 3x3 lockup to wide decoration" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../../styles.css"><style>body{padding:16px 20px;background:var(--canvas)}</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../../ds-dev.js?v=7"></script>
+</head><body><div id="root"></div>
+<script type="text/plain" data-card>
+const { PixelTiles } = NS;
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <div style={{display:'flex',alignItems:'center',gap:36}}>
+    <div style={{display:'flex',alignItems:'center',gap:10}}>
+      <PixelTiles rows={3} cols={3} size={8} />
+      <span style={{fontWeight:700,fontSize:'1.05rem',textTransform:'uppercase',color:'var(--navy-deep)'}}>ACLMR</span>
+    </div>
+    <PixelTiles rows={3} cols={8} size={9} />
+    <PixelTiles rows={2} cols={14} size={12} gap={3} />
+  </div>
+);
+</script></body></html>

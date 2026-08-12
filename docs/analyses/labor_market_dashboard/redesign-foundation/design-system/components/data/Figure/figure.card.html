@@ -1,0 +1,19 @@
+<!-- @dsCard group="Components" viewport="700x330" name="Figure" subtitle="Eyebrow, finding-first title, as-of, source note" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../../styles.css"><style>body{padding:16px 20px;background:var(--canvas)}</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../../ds-dev.js?v=7"></script>
+</head><body><div id="root"></div>
+<script type="text/plain" data-card>
+const { Figure } = NS;
+const bars = Array.from({length:24},(_,i)=>{const v=13-1.5*i+5*Math.sin(i*1.3);const h=Math.max(Math.abs(v)*2.4,1.5);return <rect key={i} x={8+i*27} y={v>0?90-h:90} width={18} height={h} rx={1} fill={v>0?'var(--pos)':'var(--neg)'} />;});
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Figure eyebrow="Year over year" title="Growth and decline in postings, year over year" asOf="Jul 2026" note="Each bar compares a month with the same month a year earlier.">
+    <svg viewBox="0 0 660 180" style={{width:'100%',height:'auto',display:'block'}} aria-label="Year-over-year percentage change in postings, by month">
+      <line x1="0" y1="90" x2="660" y2="90" stroke="var(--chart-axis)" strokeWidth="1" />
+      {bars}
+    </svg>
+  </Figure>
+);
+</script></body></html>

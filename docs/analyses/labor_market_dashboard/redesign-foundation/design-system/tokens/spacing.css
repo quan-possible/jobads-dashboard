@@ -1,0 +1,20 @@
+/* ACLMR — radius, elevation, layout, motion tokens. */
+:root {
+  /* Radius — soft cards, square analytical controls, ACLMR pill CTAs */
+  --radius-card: 14px;
+  --radius-sm: 8px;
+  --radius-control: 0px;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-card: 0 18px 40px rgba(6, 31, 47, 0.10);
+  --shadow-soft: 0 2px 10px rgba(6, 31, 47, 0.06);
+  --shadow-pop: 0 24px 60px rgba(6, 31, 47, 0.18);
+
+  /* Layout */
+  --container: 1140px;
+  --gutter: clamp(20px, 5vw, 44px);
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}

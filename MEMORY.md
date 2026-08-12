@@ -46,6 +46,11 @@ Last condensed: 2026-08-11
 - The 14 presentational `web/components/` were imported into Claude Design so design work starts from the real shipped components. Because `web/` is an application rather than a package, the import needs hand-maintained inputs (`.design-sync/`, four dot-prefixed files in `web/`); `.design-sync/NOTES.md` owns that detail.
 - The import surfaced a long-standing product bug: `PixelTiles` renders the brand mark solid navy, so the signature mosaic has never appeared anywhere in the product.
 
+## 2026-08-11 | Dashboard redesign groundwork preserved
+
+- The downloaded design exploration became the durable `docs/analyses/labor_market_dashboard/redesign-foundation/` package, separating the Pulse and Explore desktop targets, earlier directions, portable design system, source-state UI kit, provenance, and ACLMR brand audit.
+- The groundwork clarified ACLMR pill CTAs versus square analytical controls and made the prototypes use vendored PT Sans. It did not change the current application or deployment; mobile target design remains required before implementation.
+
 ## Rebuild rule
 
 - Rebuild from dated records and owning evidence. When over budget, condense the oldest adjacent spans first and preserve exact claims with direct links where they materially aid verification.

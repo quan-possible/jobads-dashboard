@@ -1,0 +1,25 @@
+<!-- @dsCard group="Components" viewport="700x170" name="Sparkline" subtitle="In its KPI lockup — orange lead, teal secondary" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../../styles.css"><style>body{padding:16px 20px;background:var(--canvas)}</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../../ds-dev.js?v=7"></script>
+</head><body><div id="root"></div>
+<script type="text/plain" data-card>
+const { Sparkline } = NS;
+const down = Array.from({length:24},(_,i)=>30-i*0.8+2.5*Math.sin(i*0.9));
+const up = Array.from({length:24},(_,i)=>10+i*0.5+3*Math.sin(i*0.7));
+const cell = (label,value,color,data) => (
+  <div style={{flex:1}}>
+    <div className="t-caption" style={{fontWeight:700,textTransform:'uppercase',letterSpacing:'.05em',color:'var(--ink-soft)'}}>{label}</div>
+    <div className="num" style={{fontSize:'2.05rem',fontWeight:700,lineHeight:1,color:'var(--navy-deep)',margin:'6px 0 8px'}}>{value}</div>
+    <Sparkline data={data} stroke={color} />
+  </div>
+);
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <div style={{display:'flex',gap:40,maxWidth:640}}>
+    {cell('Postings index','88','var(--orange)',down)}
+    {cell('Active postings','412K','var(--teal)',up)}
+  </div>
+);
+</script></body></html>
