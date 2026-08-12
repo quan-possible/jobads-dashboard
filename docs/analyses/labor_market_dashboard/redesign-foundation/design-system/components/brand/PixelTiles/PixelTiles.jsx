@@ -1,9 +1,9 @@
 import React from "react";
 
-// The signature pixel-tile mark — a mosaic of small squares painted from the
-// four gradient stops, biased navy(left) -> orange(right). Decorative, aria-hidden.
-// NOTE: implements the INTENDED four-stop mosaic (the product build has a clamp
-// bug that renders every tile navy — see readme.md).
+// Decorative pixel motif painted from the four gradient stops and biased
+// navy(left) -> orange(right). It is aria-hidden and never substitutes for the
+// official ACLMR identity mark. This intentionally previews the corrected
+// mosaic; the production component's current clamp bug remains out of scope.
 const STOPS = ["#041c2c", "#345961", "#c39e80", "#cf7730"];
 
 function pick(r, c, cols) {

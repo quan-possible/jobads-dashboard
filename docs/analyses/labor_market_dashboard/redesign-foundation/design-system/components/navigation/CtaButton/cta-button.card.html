@@ -1,0 +1,16 @@
+<!-- @dsCard group="Components" viewport="700x150" name="CTA button" subtitle="Live ACLMR gradient-ring and solid-orange pill families" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../../styles.css">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../../ds-dev.js?v=8"></script>
+</head><body style="padding:28px;background:var(--navy)"><div id="root"></div>
+<script type="text/plain" data-card>
+const { CtaButton } = NS;
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <div style={{display:'flex',gap:16,alignItems:'center'}}>
+    <CtaButton>Gradient action →</CtaButton>
+    <CtaButton variant="orange">Orange action →</CtaButton>
+  </div>
+);
+</script></body></html>

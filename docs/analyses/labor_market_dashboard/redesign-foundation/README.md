@@ -14,8 +14,8 @@ with the production Next.js application.
 | `prototypes/Pulse Hifi.dc.html` | Primary desktop visual target for the public Pulse redesign | Visual direction, not production code |
 | `prototypes/Explore Hifi.dc.html` | Primary desktop visual target for the authenticated Explore surface | Visual direction, not production code |
 | `prototypes/Dashboard Directions.dc.html` | Earlier alternatives and the reasoning that led to the high-fidelity direction | Exploration history |
-| `design-system/` | Portable ACLMR dashboard tokens, components, specimen cards, fonts, and agent guidance | Design reference derived from the shipped app |
-| `design-system/ui_kits/dashboard/` | Click-through recreation of the source dashboard at export time | Current-state reference, not the redesign target |
+| `design-system/` | Portable ACLMR dashboard tokens, official brand asset, redesign-aligned components, specimens, fonts, and agent guidance | Dashboard design reference; not general brand authority or runtime code |
+| `design-system/ui_kits/dashboard/` | Click-through source-layout and behavior comparison at export time | Prior-product reference rendered through explicitly marked comparison chrome, not the redesign target |
 | `SOURCE.md` | Export provenance and source-file map | Provenance |
 | `BRAND_AUDIT.md` | ACLMR.ca comparison, corrections, intentional adaptations, and unresolved design scope | Redesign handoff |
 | `evidence/screenshots/` | Current rendered evidence for the durable package | Verification evidence |
@@ -42,6 +42,9 @@ headings, pixel accents, and restrained institutional tone. It adapts those
 elements to dense data reading instead of copying the public site's marketing
 layout.
 
+Identity uses the official ACLMR wordmark geometry vendored from the live site.
+Pixel tiles remain a decorative dashboard motif and never replace the logo.
+
 ## Implementation boundary
 
 - The `.dc.html` files are fixed-width desktop composition references. They do
@@ -56,9 +59,14 @@ layout.
 - The click-through UI kit recreates the source product and is useful for
   behavior/component comparison. It must not override the two high-fidelity
   redesign targets.
+- `Dashboard Directions.dc.html` preserves exploration history, including
+  rejected experiments such as monospace operational figures. Those variants
+  are not design-system rules; the two high-fidelity targets govern.
 - Do not copy design-system component files back into `web/` mechanically.
   Reconcile each redesigned production component against current behavior,
   accessibility, data, authentication, and i18n requirements.
+- `TopNav` defaults to the selected dark redesign. Its `tone="source"` option is
+  reserved for the prior-product comparison kit.
 
 ## Preview
 

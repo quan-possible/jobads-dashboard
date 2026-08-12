@@ -8,6 +8,8 @@ the runtime source of truth. Production tokens and components remain in
 ## Essential visual language
 
 - Use PT Sans throughout.
+- Use the official ACLMR wordmark for identity. Pixel tiles are a sparse
+  decorative motif, not a substitute logo.
 - Anchor the interface with dark navy; keep the analytical workspace cream and
   white.
 - Use the navy–teal–sand–orange gradient as a thin accent or transition, never
@@ -19,18 +21,20 @@ the runtime source of truth. Production tokens and components remain in
 - Use the pixel mosaic sparingly as the identifying decorative motif.
 - Keep figure cards softly rounded and lightly bordered. Avoid glass effects,
   heavy shadows, and generic SaaS card walls.
-- Keep analytical controls square; use rounded pills for primary navigation or
-  access actions.
+- Keep analytical controls square. Use the live gradient-ring or solid-orange
+  pill families for meaningful navigation, access, or promotional actions.
 - Design for English and French, including longer French labels.
 
 ## Package map
 
 - `styles.css`, `tokens/`, `assets/fonts/` — portable foundations
-- `components/` — exported presentational components and usage prompts
+- `components/` — redesign-aligned presentational components and usage prompts;
+  `TopNav` defaults to the selected navy treatment
 - `guidelines/` — visual specimens
 - `ui_kits/dashboard/` — source-dashboard recreation for comparison, not the
-  redesign target
+  redesign target; its explicit `tone="source"` is comparison-only
 - `SKILL.md` — short agent-facing entry point
 
 For product meaning, data limits, authentication, accessibility, and runtime
 behavior, follow the repository's canonical specification and implementation.
+Do not mechanically copy this package into production.

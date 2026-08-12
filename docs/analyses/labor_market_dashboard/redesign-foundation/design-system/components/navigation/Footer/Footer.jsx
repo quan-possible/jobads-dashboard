@@ -1,5 +1,5 @@
 import React from "react";
-import { PixelTiles } from "../../brand/PixelTiles/PixelTiles";
+import { Brand } from "../../brand/Brand/Brand";
 
 const NAV_LABELS = ["Pulse", "Occupations", "Industries", "Geography", "Wages", "Skills", "Method", "Developers"];
 
@@ -18,10 +18,7 @@ export function Footer({
       <div className="gradient-bar" />
       <div className="container-x" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1.2fr", gap: 40, padding: "56px var(--gutter)" }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <PixelTiles rows={3} cols={3} size={8} gap={2} />
-            <span style={{ fontSize: "1.125rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.01em" }}>ACLMR</span>
-          </div>
+          <Brand compact inverted href="https://www.aclmr.ca/" />
           <p className="t-body" style={Object.assign({ margin: "16px 0 0", maxWidth: "24rem", lineHeight: 1.65 }, soft)}>{tagline}</p>
         </div>
         <nav aria-label="Sections" style={{ display: "flex", flexDirection: "column", gap: 8 }}>

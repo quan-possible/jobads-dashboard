@@ -32,7 +32,7 @@ export function MapToggle({ options = [], views = {}, ariaLabel = "Measure", hei
           return (
             <button key={o.value} id={tabId(o.value)} type="button" role="tab" aria-selected={on} aria-controls={panelId}
               tabIndex={on ? 0 : -1} onClick={() => setActive(o.value)} onKeyDown={onKeyDown} className="t-meta"
-              style={{ borderRadius: 4, border: 0, cursor: "pointer", padding: "4px 12px", whiteSpace: "nowrap", fontWeight: 700, fontFamily: "inherit", transition: "color .15s var(--ease)", background: on ? "var(--orange)" : "transparent", color: on ? "#fff" : "var(--ink-soft)" }}>
+              style={{ borderRadius: 4, border: 0, cursor: "pointer", padding: "4px 12px", whiteSpace: "nowrap", fontWeight: 700, fontFamily: "inherit", transition: "color .15s var(--ease)", background: on ? "var(--orange)" : "transparent", color: on ? "var(--navy-deep)" : "var(--ink-soft)" }}>
               {o.label}
             </button>
           );

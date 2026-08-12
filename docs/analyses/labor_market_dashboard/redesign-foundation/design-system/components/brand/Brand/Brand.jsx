@@ -1,20 +1,33 @@
 import React from "react";
-import { PixelTiles } from "../PixelTiles/PixelTiles";
 
-// Wordmark lockup: 3x3 pixel tiles + ACLMR + optional tagline. The dashboard's
-// stand-in for the aclmr.ca logo (the real SVG is not vendored here).
-export function Brand({ compact = false, tagline = "Labour Market Pulse", href = "#", inverted = false }) {
+// Official ACLMR wordmark geometry from aclmr.ca. PixelTiles is a separate
+// decorative motif and must never substitute for this identity mark.
+function OfficialLogo({ color }) {
+  return (
+    <svg aria-hidden viewBox="0 0 499.29 110.96" style={{ display: "block", width: 152, height: "auto", color }}>
+      <g fill="currentColor">
+        <path d="M269.63,87.36h-41.42c-1.06,0-2.2-.13-3.42-.38-1.22-.25-2.43-.64-3.62-1.17-1.19-.53-2.33-1.21-3.42-2.05-1.09-.84-2.05-1.85-2.89-3.05-.84-1.19-1.51-2.58-2.01-4.15-.5-1.57-.75-3.35-.75-5.32v-31.09c0-1.06.13-2.2.38-3.42.25-1.22.64-2.43,1.17-3.62.53-1.19,1.22-2.33,2.07-3.42.85-1.09,1.88-2.05,3.07-2.89,1.19-.84,2.57-1.51,4.13-2.01,1.56-.5,3.33-.75,5.3-.75h41.42v11.48h-41.42c-1.5,0-2.65.4-3.44,1.19-.79.79-1.19,1.97-1.19,3.53v31c0,1.47.4,2.61,1.21,3.42.81.81,1.95,1.21,3.42,1.21h41.42v11.48Z" />
+        <path d="M338.65,87.36h-52.37c-.82,0-1.59-.15-2.3-.44-.71-.29-1.32-.7-1.83-1.21-.52-.51-.92-1.13-1.21-1.83-.29-.71-.44-1.47-.44-2.3V24.04h11.48v51.84h46.67v11.48Z" />
+        <path d="M420.78,87.36h-11.57v-37.71l-20.36,35.81c-.5.91-1.2,1.6-2.1,2.07-.9.47-1.86.71-2.89.71s-1.94-.24-2.8-.71c-.87-.47-1.55-1.16-2.05-2.07l-20.44-35.81v37.71h-11.48V28.94c0-1.32.39-2.5,1.17-3.53.78-1.03,1.8-1.72,3.07-2.07.62-.15,1.24-.2,1.86-.16.62.04,1.21.18,1.79.4.57.22,1.1.53,1.57.93.47.4.87.88,1.19,1.43l26.14,45.44,26.14-45.44c.68-1.12,1.61-1.91,2.8-2.38,1.19-.47,2.43-.54,3.73-.22,1.24.35,2.25,1.04,3.05,2.07.79,1.03,1.19,2.21,1.19,3.53v58.42Z" />
+        <path d="M496.55,48.58c0,2.62-.32,4.96-.97,7.02-.65,2.06-1.52,3.88-2.63,5.45-1.1,1.58-2.38,2.92-3.82,4.04-1.44,1.12-2.95,2.04-4.53,2.76s-3.16,1.24-4.77,1.57c-1.6.32-3.11.49-4.53.49l23.98,17.45h-17.75l-23.93-17.45h-7.17v-11.48h24.88c1.44-.12,2.76-.42,3.95-.91,1.19-.49,2.22-1.14,3.09-1.96.87-.82,1.54-1.82,2.01-2.98.47-1.16.71-2.49.71-4v-10.5c0-.65-.08-1.14-.24-1.48-.16-.34-.37-.59-.62-.75-.25-.16-.52-.26-.79-.29-.28-.03-.54-.04-.77-.04h-37.89v51.84h-11.48V29.82c0-.79.15-1.55.44-2.25.29-.71.7-1.32,1.21-1.86.51-.53,1.13-.94,1.83-1.24.71-.29,1.47-.44,2.3-.44h43.58c2.56,0,4.72.46,6.49,1.39,1.77.93,3.2,2.09,4.31,3.49,1.1,1.4,1.9,2.91,2.38,4.53.49,1.62.73,3.13.73,4.55v10.59Z" />
+        <polygon points="88.72 0 0 0 0 23.77 64.58 23.77 68.85 23.77 88.72 23.77 88.72 0" />
+        <rect x="88.72" y="23.77" width="23.78" height="87.18" />
+        <path d="M25.25,60.82C9.65,76.48,2.91,96.42,0,110.96h23.71c1.33-5.34,3.3-11.29,6.21-17.17,9.51-19.22,25.42-30.32,47.37-33.11v-23.27c-21.08,2.06-38.56,9.89-52.03,23.41Z" />
+        <path d="M182.48,58.16v11.48h-34.72v17.71h-11.48v-31.66c0-4.62.79-8.88,2.38-12.76,1.59-3.89,3.8-7.23,6.62-10.02,2.83-2.8,6.17-4.97,10.02-6.54,3.86-1.56,8.07-2.34,12.63-2.34h25.88c.8,0,1.55.15,2.25.44.71.29,1.33.71,1.85,1.24.53.53.94,1.15,1.24,1.86.29.71.44,1.46.44,2.25v57.54h-11.48v-51.84h-20.18c-.35,0-1.1.05-2.23.16-1.13.1-2.44.36-3.93.77-1.49.41-3.05,1.04-4.7,1.9-1.65.85-3.17,2.03-4.55,3.53-1.38,1.5-2.52,3.38-3.42,5.63-.9,2.25-1.35,4.98-1.35,8.19v2.47h34.72Z" />
+      </g>
+    </svg>
+  );
+}
+
+export function Brand({ compact = false, tagline = "Labour Market Pulse", href = "/", inverted = false }) {
   const inkMain = inverted ? "var(--ink-invert)" : "var(--navy-deep)";
   const inkSub = inverted ? "rgba(244,238,231,.55)" : "var(--ink-soft)";
   return (
-    <a href={href} style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }} aria-label={"ACLMR " + tagline}>
-      <PixelTiles rows={3} cols={3} size={7} gap={2} />
-      <span style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
-        <span style={{ fontSize: "1.05rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.01em", color: inkMain }}>ACLMR</span>
-        {!compact && (
-          <span className="t-caption" style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: inkSub, marginTop: 3, whiteSpace: "nowrap" }}>{tagline}</span>
-        )}
-      </span>
+    <a href={href} style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-start", gap: 5, textDecoration: "none" }} aria-label={"ACLMR " + tagline}>
+      <OfficialLogo color={inkMain} />
+      {!compact && (
+        <span className="t-caption" style={{ paddingLeft: 1, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: inkSub, whiteSpace: "nowrap" }}>{tagline}</span>
+      )}
     </a>
   );
 }

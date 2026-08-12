@@ -1,4 +1,4 @@
-/** Sticky top navigation: gradient ribbon, brand, uppercase links with orange active underline, EN/FR toggle.
+/** Sticky navy redesign navigation: official brand, uppercase links, orange active underline, EN/FR toggle.
  * @startingPoint section="Navigation" subtitle="Dashboard header chrome" viewport="1280x140"
  */
 export interface TopNavItem { label: string; href: string; teamOnly?: boolean; }
@@ -11,5 +11,7 @@ export interface TopNavProps {
   authenticated?: boolean;
   locale?: "en" | "fr";
   onNavigate?: (href: string) => void;
+  /** Default "redesign". Use "source" only in the source-state comparison kit. */
+  tone?: "redesign" | "source";
 }
 export declare function TopNav(props: TopNavProps): JSX.Element;

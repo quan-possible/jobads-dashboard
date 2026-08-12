@@ -2,18 +2,18 @@
 
 ## Verdict
 
-The redesign foundation is recognizably ACLMR and is a strong starting point
-for the dashboard redesign. Its navy masthead, PT Sans typography, warm
-four-stop gradient, pixel motif, white reading surfaces, and restrained orange
-emphasis preserve the institutional/editorial character of the live ACLMR
-site. The dashboard-specific cream workspace and analytical cards are
-appropriate adaptations for sustained data reading.
+The redesign foundation is recognizably ACLMR and is a strong desktop starting
+point for the dashboard redesign. Its official wordmark, navy masthead, PT Sans
+typography, warm four-stop gradient, decorative pixel motif, white reading
+surfaces, and restrained orange emphasis preserve the institutional/editorial
+character of the live ACLMR site. The dashboard-specific cream workspace and
+analytical cards are appropriate adaptations for sustained data reading.
 
-The audit corrected one material design-contract ambiguity before the package
-became durable: the export called every square control an “ACLMR signature,”
-even though the live site uses rounded pill CTAs. The contract now distinguishes
-square analytical controls from pill-shaped primary navigation or access
-actions. Editorial content is preserved from the supplied designs.
+The durable package separates official identity from decorative pixels,
+distinguishes square analytical controls from ACLMR's gradient-ring and
+solid-orange pill CTAs, keeps PT Sans across both selected targets, and makes
+the reusable navigation default to the selected navy redesign. Editorial
+content is preserved from the supplied designs.
 
 ## Reference hierarchy
 
@@ -21,7 +21,7 @@ actions. Editorial content is preserved from the supplied designs.
    redesign direction.
 2. The live [ACLMR site](https://www.aclmr.ca/) establishes the institutional
    brand language: dark navy structure, PT Sans, multi-stop warm gradient,
-   pixel accents, rounded primary CTAs, editorial image cards, and curved
+   pixel accents, rounded CTAs, editorial image cards, and curved
    section transitions.
 3. `web/app/globals.css`, `.design-sync/`, and the current components establish
    the dashboard's existing token and component vocabulary.
@@ -34,6 +34,7 @@ actions. Editorial content is preserved from the supplied designs.
 - The gradient is a rail or transition, not a page-wide wallpaper or chart
   fill.
 - PT Sans is the only product typeface; numerals remain tabular.
+- The official ACLMR wordmark carries identity; pixel tiles are decorative.
 - Warm cream and white surfaces keep dense analytical content readable.
 - Orange identifies brand emphasis and primary focus; semantic and categorical
   chart colours retain their separate data roles.
@@ -55,8 +56,23 @@ figure cards preserve the warm palette while improving long-form chart reading.
 
 Selects, filter fields, segmented analytical tabs, and compact toolbar actions
 stay square. Their geometry communicates precision and supports dense alignment.
-Meaningful navigation, access, or promotional CTAs use ACLMR's rounded pill
-family. Do not turn every button into a pill or every CTA into a square control.
+Meaningful navigation, access, or promotional CTAs use ACLMR's two rounded
+pill families: gradient-ring institutional/promotional actions and
+solid-orange direct actions. These describe treatments, not a universal
+primary/secondary hierarchy. Do not turn every button into a pill or every CTA
+into a square control.
+
+The live solid-orange CTA uses white text and a sand hover. This package keeps
+the treatment but sets its bold label at 20 px so the orange state clears the
+large-text contrast threshold, then switches to navy text on sand for the
+interactive state.
+
+### Official identity and decorative pixels
+
+The live ACLMR site uses the official white wordmark in its dark shell and
+keeps pixel clusters as a separate motif. The dashboard follows that boundary:
+headers and footers use the official geometry; `PixelTiles` may decorate
+summaries and separators but must not be presented as a logo.
 
 ### Dark authenticated Explore surface
 
@@ -78,6 +94,8 @@ and Explore, then verify the assembled app at desktop and mobile viewports.
 The UI kit uses illustrative SVG charts and fake values, and its auth gate
 accepts any input. It is a visual/interaction reference only. Production must
 continue to use the real figure bridge, authentication, i18n, and data caveats.
+Its explicit source-tone header exists only to compare the prior light chrome;
+the portable `TopNav` defaults to the selected dark redesign.
 
 ## Redesign acceptance baseline
 

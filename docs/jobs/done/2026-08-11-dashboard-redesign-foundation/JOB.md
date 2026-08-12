@@ -18,9 +18,19 @@ foundation for the next dashboard redesign.
   the preserved package while retaining the supplied editorial content;
 - do not implement the redesign in the production Next.js app in this job.
 
-## Final state
+## Current state
 
-- Complete on 2026-08-11.
+- Completed on 2026-08-11 after repairing the portable package and passing a
+  fresh-context adversarial verification of the combined candidate.
+- The official live ACLMR logo is now vendored with provenance and an exact
+  source checksum; pixel tiles are decorative only.
+- The portable navigation, CTA, typography, and accessibility guidance now
+  agree with the selected desktop direction and the live ACLMR language.
+- The current app and public deployment were not modified.
+
+## Prior completed state
+
+- Initially completed on 2026-08-11.
 - The permanent package is
   `docs/analyses/labor_market_dashboard/redesign-foundation/`.
 - Its top-level README separates the high-fidelity visual targets, earlier
@@ -48,17 +58,28 @@ foundation for the next dashboard redesign.
 ## Verification
 
 - Inspected the live ACLMR site and its primary CTA geometry at desktop size.
-- Rendered the durable Pulse target, Explore target, revised controls specimen,
-  and source-state UI kit through a local server.
+- Rendered and directly inspected the durable Pulse target, Explore target, and
+  revised controls specimen through a local server; refreshed their evidence
+  and removed the stale source-kit screenshot that showed the retired lockup.
 - Confirmed the prototypes load PT Sans locally and no longer depend on Google
   Fonts; the design-document renderer itself still loads its runtime from
   `unpkg.com`.
-- Confirmed the Pulse and Explore desktop compositions remain visually intact
-  after relocation.
+- Confirmed the live and vendored official logo assets have the same SHA-256:
+  `bd308c4d221076e515bad78093e68b460967180b96c5765855d9ea3a691a8217`.
+- Parsed all 18 JSX files, resolved every local HTML reference and CSS token,
+  ran `git diff --check`, and confirmed no change under `web/`, `api/`, or
+  `src/jobads_dashboard/`.
+- Rechecked CTA contrast (3.32:1 at 20 px bold; 7.06:1 on hover), MapToggle
+  active contrast (5.25:1), KPI direction text, and the absence of unsupported
+  colour-vision-safety claims.
 - Confirmed the high-fidelity prototypes are fixed-width desktop targets. The
   production redesign still needs project-specific mobile targets before
   implementation; this is recorded in `BRAND_AUDIT.md` and is not treated as a
   completed responsive design.
+- Fresh-context adversarial verification concluded the frozen package is ready
+  as durable desktop redesign groundwork. It rejected the supplied Pulse hero
+  wording as a task finding because the user explicitly excluded that copy from
+  revision, and confirmed that no other readiness defect remained.
 
 ## Remaining work
 

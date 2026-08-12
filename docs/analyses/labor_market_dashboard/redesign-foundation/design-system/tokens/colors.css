@@ -33,11 +33,12 @@
   --chart-grid: #e6e0da;
   --chart-axis: #b9ab9d;
 
-  /* Status (CVD-distinct, AA) */
+  /* Status pair for light surfaces. Always pair colour with arrows or words. */
   --pos: #2c765c;
   --neg: #b54e33;
 
-  /* CVD-safe categorical sequence */
+  /* Dashboard categorical sequence. Do not rely on colour alone; verify each
+     assembled chart for contrast and colour-vision distinguishability. */
   --cat-1: #345961;
   --cat-2: #cf7730;
   --cat-3: #6f93a0;

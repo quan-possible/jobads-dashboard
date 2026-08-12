@@ -19,6 +19,7 @@
     "components/brand/PixelTiles/PixelTiles.jsx",
     "components/brand/Brand/Brand.jsx",
     "components/navigation/LocaleToggle/LocaleToggle.jsx",
+    "components/navigation/CtaButton/CtaButton.jsx",
     "components/navigation/TopNav/TopNav.jsx",
     "components/navigation/Footer/Footer.jsx",
     "components/forms/Select/Select.jsx",

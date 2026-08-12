@@ -12,7 +12,7 @@ export interface KpiTileProps {
   /** Delta in PERCENTAGE POINTS (18 → "18%"). */
   delta?: number | null;
   deltaLabel?: string;
-  /** When set, the headline value itself is a trend metric and gets ▲/▼ + pos/neg colour. */
+  /** When set, the headline value gets visible ▲/▼ + colour and an accessible direction word. */
   valueTrend?: number | null;
   spark?: number[];
   sparkColor?: string;

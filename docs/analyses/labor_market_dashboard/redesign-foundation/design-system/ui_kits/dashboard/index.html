@@ -21,7 +21,7 @@ function App() {
   const Screen = route === "/geography" ? window.GeographyScreen : route === "/explore" ? window.ExploreScreen : window.PulseScreen;
   return (
     <div>
-      <TopNav authenticated activeHref={route} onNavigate={setRoute} />
+      <TopNav tone="source" authenticated activeHref={route} onNavigate={setRoute} />
       <main>{Screen ? <Screen /> : null}</main>
       <Footer asOf="July 2026" />
     </div>

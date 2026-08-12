@@ -1,4 +1,4 @@
-/** The signature pixel-tile mosaic mark, painted from the four gradient stops. Decorative only.
+/** Decorative pixel-tile mosaic painted from the four gradient stops; never an identity mark.
  * @startingPoint section="Brand" subtitle="Pixel mosaic brand motif" viewport="700x160"
  */
 export interface PixelTilesProps {

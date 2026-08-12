@@ -67,7 +67,7 @@ function ExploreScreen() {
         <div className="container-x" style={{ paddingBlock: 56 }}>
           <div className="eyebrow" style={{ marginBottom: 12 }}>Team access · Explore</div>
           <h1 className="h-display" style={{ margin: 0, maxWidth: "44rem", textWrap: "balance" }}>Query the postings behind the aggregates</h1>
-          <p className="lede" style={{ marginTop: 16, maxWidth: "42rem" }}>Build a chart from any breakdown and measure, or search the individual job postings behind the ACLMR aggregates. Bounded lookup index — no raw text browsing.</p>
+          <p className="lede" style={{ marginTop: 16, maxWidth: "42rem" }}>Build a chart from any breakdown and measure, or search the individual job postings behind the ACLMR aggregates. Bounded lookup index — no bulk raw-text browsing.</p>
         </div>
       </section>
 

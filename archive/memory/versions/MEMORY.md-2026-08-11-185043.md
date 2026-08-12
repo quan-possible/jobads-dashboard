@@ -49,8 +49,7 @@ Last condensed: 2026-08-11
 ## 2026-08-11 | Dashboard redesign groundwork preserved
 
 - The downloaded design exploration became the durable `docs/analyses/labor_market_dashboard/redesign-foundation/` package, separating the Pulse and Explore desktop targets, earlier directions, portable design system, source-state UI kit, provenance, and ACLMR brand audit.
-- A repair pass made the package safe as redesign guidance: it vendors the exact live ACLMR logo with checksum provenance, keeps pixel tiles decorative, uses PT Sans throughout the selected targets, aligns the reusable navy navigation and both live CTA families, restores accessible trend and contrast cues, and removes unsupported colour-vision-safety claims.
-- Fresh-context adversarial verification passed the combined desktop package. The current application and deployment remained unchanged; separate mobile Pulse and Explore targets are still required before implementation.
+- The groundwork clarified ACLMR pill CTAs versus square analytical controls and made the prototypes use vendored PT Sans. It did not change the current application or deployment; mobile target design remains required before implementation.
 
 ## Rebuild rule
 

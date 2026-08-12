@@ -4,5 +4,7 @@ export interface LocaleToggleProps {
   locale?: "en" | "fr";
   onChange?: (locale: "en" | "fr") => void;
   ariaLabel?: string;
+  /** Dark-shell treatment for navy headers. Default false. */
+  inverted?: boolean;
 }
 export declare function LocaleToggle(props: LocaleToggleProps): JSX.Element;

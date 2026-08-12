@@ -7,9 +7,12 @@ import { Sparkline } from "../Sparkline/Sparkline";
 export function KpiTile({ label, value, unit, context, delta, deltaLabel, valueTrend, spark, sparkColor, accent = false }) {
   const hasDelta = delta !== null && delta !== undefined;
   const up = (delta || 0) >= 0;
+  const deltaFlat = delta === 0;
   const hasValueTrend = valueTrend !== null && valueTrend !== undefined;
-  const valueUp = (valueTrend || 0) >= 0;
+  const valueUp = (valueTrend || 0) > 0;
+  const valueFlat = valueTrend === 0;
   const pct = (n) => Math.abs(n).toFixed(1).replace(/\.0$/, "") + "%";
+  const direction = (n) => n > 0 ? "Increase" : n < 0 ? "Decrease" : "No change";
   return (
     <div className="card" style={{ position: "relative", display: "flex", flexDirection: "column", gap: 12, overflow: "hidden", padding: 20, boxShadow: accent ? "var(--shadow-card)" : "var(--shadow-soft)" }}>
       {accent && <span aria-hidden style={{ position: "absolute", insetInline: 0, top: 0, height: 4, background: "var(--orange)" }} />}
@@ -19,15 +22,19 @@ export function KpiTile({ label, value, unit, context, delta, deltaLabel, valueT
       </div>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 6 }}>
         {hasValueTrend && (
-          <span aria-hidden style={{ fontSize: "1.5rem", lineHeight: 1, color: valueUp ? "var(--pos)" : "var(--neg)" }}>{valueUp ? "▲" : "▼"}</span>
+          <span aria-hidden style={{ fontSize: "1.5rem", lineHeight: 1, color: valueFlat ? "var(--ink-soft)" : (valueUp ? "var(--pos)" : "var(--neg)") }}>{valueFlat ? "—" : (valueUp ? "▲" : "▼")}</span>
         )}
-        <span className="num" style={{ fontSize: "2.05rem", fontWeight: 700, lineHeight: 1, color: hasValueTrend ? (valueUp ? "var(--pos)" : "var(--neg)") : "var(--navy-deep)" }}>{value}</span>
+        <span className="num" style={{ fontSize: "2.05rem", fontWeight: 700, lineHeight: 1, color: hasValueTrend ? (valueFlat ? "var(--ink)" : (valueUp ? "var(--pos)" : "var(--neg)")) : "var(--navy-deep)" }}>
+          {hasValueTrend && <span className="sr-only">{direction(valueTrend)}: </span>}
+          {value}
+        </span>
         {unit && <span className="t-body-sm" style={{ marginBottom: 2, fontWeight: 700, color: "var(--ink-soft)" }}>{unit}</span>}
       </div>
       <div style={{ marginTop: "auto", display: "flex", alignItems: "flex-end", gap: 8 }}>
         {hasDelta ? (
-          <span className="num t-meta" style={{ display: "inline-flex", flexShrink: 0, alignItems: "center", gap: 4, whiteSpace: "nowrap", fontWeight: 700, color: up ? "var(--pos)" : "var(--neg)" }}>
-            <span aria-hidden>{up ? "▲" : "▼"}</span>
+          <span className="num t-meta" style={{ display: "inline-flex", flexShrink: 0, alignItems: "center", gap: 4, whiteSpace: "nowrap", fontWeight: 700, color: deltaFlat ? "var(--ink-soft)" : (up ? "var(--pos)" : "var(--neg)") }}>
+            <span aria-hidden>{delta === 0 ? "—" : (up ? "▲" : "▼")}</span>
+            <span className="sr-only">{direction(delta)}: </span>
             {pct(delta)}
             {deltaLabel && <span style={{ fontWeight: 400, color: "var(--ink-faint)" }}>{deltaLabel}</span>}
           </span>

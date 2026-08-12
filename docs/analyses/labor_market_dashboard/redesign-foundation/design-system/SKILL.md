@@ -1,11 +1,25 @@
 ---
-name: aclmr-design
-description: Use this skill to generate well-branded interfaces and assets for ACLMR (Alberta Centre for Labour Market Research) and its Labour Market Pulse dashboard, either for production or throwaway prototypes/mocks/etc. Contains essential design guidelines, colors, type, fonts, assets, and UI kit components for prototyping.
+name: aclmr-dashboard-design
+description: Use this package when designing or implementing ACLMR Labour Market Pulse dashboard surfaces from the preserved redesign foundation. It contains dashboard-specific tokens, official brand geometry, redesign-aligned components, desktop targets, and a source-state comparison kit; it is not a general ACLMR brand authority or the production runtime source of truth.
 user-invocable: true
 ---
 
-Read the README.md file within this skill, and explore the other available files.
-If creating visual artifacts (slides, mocks, throwaway prototypes, etc), copy assets out and create static HTML files for the user to view. If working on production code, you can copy assets and read the rules here to become an expert in designing with this brand.
-If the user invokes this skill without any other guidance, ask them what they want to build or design, ask some questions, and act as an expert designer who outputs HTML artifacts _or_ production code, depending on the need.
+Before production work, read this directory's `README.md`, the parent
+`BRAND_AUDIT.md`, and the repository's canonical dashboard specification. Treat
+the high-fidelity Pulse and Explore files as desktop visual targets, the default
+components here as redesign grammar, and the UI kit's explicit source tone as a
+comparison with the prior product—not as the selected redesign.
 
-Key rules: PT Sans only; use a dark navy structural anchor; keep the ACLMR gradient sparse; uppercase headings use zero letter-spacing; orange is the single brand emphasis colour; analytical controls are square while meaningful primary navigation/access actions use rounded pills; every figure uses tabular numerals; copy describes posted demand, never employment or causes; public charts show at most 10 categories; production is EN/FR bilingual.
+Use the official ACLMR wordmark for identity and keep pixel tiles decorative.
+Use PT Sans throughout, including operational numbers; use tabular numerals
+rather than a second typeface. Anchor the redesign with the navy shell, use the
+four-stop gradient sparingly, and keep orange meaningful. Dense analytical
+controls stay square. Meaningful navigation, access, or promotional actions use
+the live ACLMR gradient-ring or solid-orange pill families.
+
+Do not copy the static prototypes or exported components mechanically into
+production. Reconcile them with current behavior, accessibility, data,
+authentication, and i18n. Copy must describe posted demand rather than
+employment or causes; public charts retain the shared category-cap behavior;
+production remains EN/FR bilingual. The preserved targets settle desktop only:
+create and inspect separate mobile targets before responsive implementation.
