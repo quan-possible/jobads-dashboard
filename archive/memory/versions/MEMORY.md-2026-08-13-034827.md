@@ -1,6 +1,6 @@
 # MEMORY
 
-Last condensed: 2026-08-13
+Last condensed: 2026-08-12
 
 <!-- Bounded historical index. Read STATUS.md for live state. -->
 <!-- Oldest to newest; inspect dated files within a section's range for detail. -->
@@ -79,15 +79,6 @@ Last condensed: 2026-08-13
   page, and aligned primary navy-surface text with live ACLMR white. Live QA
   also found persistent Next public fetch data, so production builds now clear
   only `.next/cache/fetch-cache` before building. [Release record.](memory/2026-08-12.md)
-
-## 2026-08-13 | Public takedown
-
-- At Bruce's request, the local Next/FastAPI service and both public tunnels
-  were disabled and unloaded. Their former Cloudflare and ngrok URLs now fail.
-- A separate historical Streamlit service on Render remains reachable because
-  the local Render token is expired. No indexed result was found for the two
-  tunnel hostnames, and available local tunnel records do not establish any
-  external dashboard page view. [Takedown record.](memory/2026-08-13.md)
 
 ## Rebuild rule
 

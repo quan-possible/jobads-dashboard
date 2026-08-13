@@ -1,7 +1,7 @@
 # Dashboard redesign implementation
 
-Status: deployed through the existing local public stack; remote publication
-remains blocked pending Render authority.
+Status: implementation complete; the local public release was taken offline by
+user request. The historical Render service remains blocked on Render authority.
 
 ## Objective
 
@@ -21,10 +21,11 @@ category-cap, bilingual, accessibility, or deployment contracts.
 
 - The preserved Pulse and Explore desktop targets are verified redesign
   groundwork.
-- The deployed app is healthy at `127.0.0.1:8522`, the API is healthy at
-  `127.0.0.1:8530`, and the public tunnel serves the corrected mobile Explore
-  release plus the verified copy/palette pass (Next build ID
-  `Yr_bsL_RHqDGbg96bezak`).
+- The local app and API are stopped, and the public, Cloudflare, and ngrok
+  LaunchAgents are disabled and unloaded. The former tunnel URLs return `530`
+  and `404`.
+- The separate historical Streamlit service on Render remains reachable. The
+  local Render token is expired, so its takedown requires restored ownership.
 - Mobile Pulse and Explore targets plus four Mobbin interaction references are
   preserved under this job's `evidence/` directory.
 - The intended Keychain password lookup still exits 44. The existing mode-600
@@ -34,10 +35,8 @@ category-cap, bilingual, accessibility, or deployment contracts.
 - Branch `codex/dashboard-redesign-production` remains at release `b7bebe5b`;
   canonical local `main` contains that release plus this cutover record. Rollback is preserved at
   `backup/main-pre-dashboard-redesign-20260812-463d919a`.
-- The existing `8522`/`8530` LaunchAgent was rebuilt and restarted; its plist
-  was backed up and hardened with `--no-proxy-headers`. The Cloudflare agent
-  was left running and retained
-  `https://topics-marion-although-restore.trycloudflare.com`.
+- The hardened `8522`/`8530` LaunchAgent and both tunnel agents remain installed
+  for recovery but are disabled and unloaded.
 - All nine routes, the shell, shared charts, and Explore workspace have been
   migrated to the ACLMR design language. The design-system inputs now enumerate
   16 reusable components locally; the remote Claude Design package is not yet
@@ -58,12 +57,20 @@ category-cap, bilingual, accessibility, or deployment contracts.
 
 ## Next action
 
-Keep the local public release in service. Resolve Render ownership and its
-auto-deploy behavior before pushing local `main` to `origin/main`; restore the
-Keychain credential owner and republish the 16-component Claude Design package
-as separately authorized follow-ups.
+Keep the local public release and both tunnels disabled unless Bruce explicitly
+authorizes a new launch. Restore Render ownership and suspend or delete the
+historical Streamlit service if the takedown is meant to cover every endpoint;
+do not push local `main` while its auto-deploy behavior is unresolved.
 
 ## Verification evidence
+
+- On 2026-08-13, `com.aclmr.jobads-dashboard-public`,
+  `com.aclmr.jobads-dashboard-cloudflared`, and
+  `com.aclmr.jobads-dashboard-ngrok` were disabled and unloaded. No dashboard
+  process or listener remained on `8522`/`8530`; the former Cloudflare URL
+  returned `530` and the former ngrok URL returned `404`. The separate Render
+  health endpoint still returned `200`, and `render whoami` reported
+  unauthorized.
 
 - `349 passed` in the complete Python suite; one upstream Starlette deprecation
   warning only.
