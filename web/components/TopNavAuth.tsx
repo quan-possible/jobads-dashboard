@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth/provider";
-import { AuthError } from "@/lib/explore";
 import { useI18n } from "@/lib/i18n/provider";
 
 // Site-wide team login, in the top nav. Logged out (and access is configured):
@@ -93,8 +92,8 @@ export function TopNavAuth() {
       await login(password);
       setPassword("");
       setOpen(false);
-    } catch (err) {
-      setError(err instanceof AuthError ? err.message : t.explore.signinFailed);
+    } catch {
+      setError(t.explore.signinFailed);
     } finally {
       setSubmitting(false);
     }

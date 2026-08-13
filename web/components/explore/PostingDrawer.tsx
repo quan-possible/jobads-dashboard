@@ -24,6 +24,33 @@ function wageLine(detail: PostingDetail, locale: Locale, perHour: string): strin
   return null;
 }
 
+const DETAIL_VALUES_FR: Record<string, string> = {
+  "full-time": "temps plein",
+  "part-time": "temps partiel",
+  "full-time or part-time": "temps plein ou partiel",
+  "Unknown": "Inconnu",
+  "Not reported": "Non indiqué",
+  "Hybrid": "Hybride",
+  "Remote": "Télétravail",
+  "On-site / unspecified": "Sur place / non précisé",
+  "Permanent": "Permanent",
+  "Temporary": "Temporaire",
+  "experience required": "expérience requise",
+  "no experience required": "aucune expérience requise",
+  "College Diploma or Certification": "Diplôme collégial ou certificat",
+  "High School Completion": "Études secondaires",
+  "Undergraduate Degree (Bachelors)": "Baccalauréat",
+  "No Education Required": "Aucun diplôme requis",
+  "Graduate Degree - Masters": "Maîtrise",
+  "Post-Graduate Degree - Doctorate": "Doctorat",
+  "en": "Anglais",
+  "fr": "Français",
+};
+
+function detailValue(value: string | null, locale: Locale): string | null {
+  return value && locale === "fr" ? DETAIL_VALUES_FR[value] ?? value : value;
+}
+
 export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () => void }) {
   const { t, locale } = useI18n();
   const lock = useExploreLock();
@@ -57,7 +84,7 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
           lockRef.current();
           return;
         }
-        setError(reason?.message ?? t.explore.loadingPostingError);
+        setError(t.explore.loadingPostingError);
       });
     return () => { cancelled = true; };
   }, [id, t.explore.loadingPostingError]);
@@ -130,10 +157,10 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
           {detail && (
             <div className={styles.drawerContent}>
               <div className={styles.chipList}>
-                {detail.noc_code && <span className={styles.chip}>NOC {detail.noc_code}</span>}
+                {detail.noc_code && <span className={styles.chip}>{t.explore.nocChip} {detail.noc_code}</span>}
                 {detail.province && <span className={styles.chip}>{detail.province}{detail.market ? ` · ${detail.market}` : ""}</span>}
-                {detail.employment_type && <span className={styles.chip}>{detail.employment_type}</span>}
-                {detail.remote_class && detail.remote_class !== "Not reported" && <span className={styles.chip}>{detail.remote_class}</span>}
+                {detail.employment_type && <span className={styles.chip}>{detailValue(detail.employment_type, locale)}</span>}
+                {detail.remote_class && detail.remote_class !== "Not reported" && <span className={styles.chip}>{detailValue(detail.remote_class, locale)}</span>}
                 {wage && <span className={`${styles.chip} ${styles.chipAccent}`}>{wage}</span>}
               </div>
 
@@ -141,11 +168,11 @@ export function PostingDrawer({ id, onClose }: { id: string | null; onClose: () 
                 <Field label={t.explore.fPosted} value={detail.date_found ? fmtMonth(detail.date_found, locale) : null} />
                 <Field label={t.explore.fRefMonth} value={fmtMonth(detail.month, locale)} />
                 <Field label={t.explore.fWage} value={wage} />
-                <Field label={t.explore.fEmployment} value={detail.employment_type} />
-                <Field label={t.explore.fDuration} value={detail.duration} />
-                <Field label={t.explore.fExperience} value={detail.experience} />
-                <Field label={t.explore.fEducation} value={detail.education} />
-                <Field label={t.explore.fLanguage} value={detail.primary_posting_language} />
+                <Field label={t.explore.fEmployment} value={detailValue(detail.employment_type, locale)} />
+                <Field label={t.explore.fDuration} value={detailValue(detail.duration, locale)} />
+                <Field label={t.explore.fExperience} value={detailValue(detail.experience, locale)} />
+                <Field label={t.explore.fEducation} value={detailValue(detail.education, locale)} />
+                <Field label={t.explore.fLanguage} value={detailValue(detail.primary_posting_language, locale)} />
                 <Field label={t.explore.fOccupation} value={detail.noc_label} />
                 <Field label={t.explore.fIndustry} value={detail.naics_label} />
               </dl>

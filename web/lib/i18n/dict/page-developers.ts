@@ -39,7 +39,7 @@ const FR_SCOPE = scopeParams({
 
 const EN_ENDPOINTS: Endpoint[] = [
   { method: "GET", path: "/api/meta", purpose: "Dataset metadata: date window, total posting count, field coverage rates, caveats, and glossary.", params: [] },
-  { method: "GET", path: "/api/overview", purpose: "High-level snapshot of postings for the active scope: current level, YoY change, and context.", params: EN_SCOPE },
+  { method: "GET", path: "/api/overview", purpose: "Posting level and annual change for the active scope.", params: EN_SCOPE },
 ];
 
 const FR_ENDPOINTS: Endpoint[] = [

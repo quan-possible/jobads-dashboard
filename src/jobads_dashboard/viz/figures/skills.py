@@ -53,8 +53,8 @@ def top_skills_trend(ds: DataSource, base_year: int = BASE_YEAR, top: int = 8,
     add_covid_band(fig)
     add_provisional_band(fig)
     fig.update_yaxes(title_text="index (base year = 100)")
-    return titled(fig, "The most-requested skills, and how each has trended",
-                  f"Top skills by posting volume, each indexed to its {base_year} average · fastest/slowest movers highlighted")
+    return titled(fig, "Skill index over time",
+                  f"{base_year} average = 100")
 
 
 def ai_skill_diffusion(ds: DataSource) -> go.Figure:
@@ -72,13 +72,13 @@ def ai_skill_diffusion(ds: DataSource) -> go.Figure:
     fig.add_trace(go.Scatter(
         x=d["month"], y=d["smooth"], mode="lines", name="3-month average",
         line=dict(color=BRAND, width=2.8),
-        hovertemplate="%{x|%b %Y}: %{y:.2f}%<extra>3-mo avg</extra>"))
+        hovertemplate="%{x|%b %Y}: %{y:.2f}%<extra>3-month average</extra>"))
     add_covid_band(fig)
     add_provisional_band(fig)
     fig.update_yaxes(title_text="% of all skill mentions", ticksuffix="%", rangemode="tozero")
     fig.update_layout(showlegend=False)
-    return titled(fig, "The rise of AI skills in postings",
-                  "AI-related skills (machine learning, generative AI, LLMs, …) as a share of all skill mentions · faint = monthly, bold = 3-month average")
+    return titled(fig, "AI-related skill mentions",
+                  "Share of all skill mentions")
 
 
 # --------------------------------------------------------------------------- DEEP
@@ -95,13 +95,13 @@ def skill_lift_bars(ds: DataSource, occupation_scope: str | None = None,
     display_names = [localize_skill(n, locale) for n in df["skill_name"]]
     fig = go.Figure(go.Bar(
         x=df["lift"], y=display_names, orientation="h", marker_color=BRAND,
-        hovertemplate="%{y}: lift %{x:.1f}×<extra></extra>"))
+        hovertemplate="%{y}: %{x:.1f}× national share<extra></extra>"))
     add_reference_line(fig, 1, text="national rate")
-    fig.update_xaxes(title_text="lift (occupation share ÷ national share)", ticksuffix="×")
+    fig.update_xaxes(title_text="occupation share ÷ national share", ticksuffix="×")
     fig.update_yaxes(type="category", title_text="")
     fig.update_layout(height=440, margin=dict(l=180))
-    return titled(fig, f"Distinctive skills for {noc_short(occupation_scope)}",
-                  "Skills most over-represented vs the whole market — what sets this occupation group apart")
+    return titled(fig, f"Skills more common in {noc_short(occupation_scope)}",
+                  "Occupation share divided by national share")
 
 
 def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
@@ -121,8 +121,8 @@ def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
         hovertemplate="%{y} in %{x}: %{z:.0f}% of the group's top-skill mentions<extra></extra>"))
     fig.update_xaxes(title_text="", tickangle=-30)
     fig.update_layout(height=520, margin=dict(l=190, b=120))
-    return titled(fig, "What each occupation group requires: skills × occupations",
-                  "Column-normalised: each occupation's mentions of the top skills (latest month)")
+    return titled(fig, "Skill share by occupation",
+                  "Latest month")
 
 
 def education_composition(ds: DataSource, locale: str = "en") -> go.Figure:

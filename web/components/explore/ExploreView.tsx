@@ -26,6 +26,16 @@ function rowWage(row: PostingRow, locale: Locale): string {
   return "—";
 }
 
+function employmentType(value: string | null, locale: Locale): string {
+  if (!value || locale !== "fr") return value ?? "—";
+  return {
+    "full-time": "temps plein",
+    "part-time": "temps partiel",
+    "full-time or part-time": "temps plein ou partiel",
+    "Unknown": "Inconnu",
+  }[value] ?? value;
+}
+
 export function ExploreView() {
   const { filters } = useFilters();
   const { t, locale } = useI18n();
@@ -96,7 +106,7 @@ export function ExploreView() {
           return;
         }
         setData(null);
-        setError({ key: requestKey, message: reason?.message ?? loadingErrorMsg });
+        setError({ key: requestKey, message: loadingErrorMsg });
         setResolvedKey(requestKey);
       })
       .finally(() => {
@@ -197,7 +207,7 @@ export function ExploreView() {
 
       <section className={styles.resultsCard} aria-labelledby="explore-results-heading">
         <div className={styles.resultsHeader}>
-          <h2 id="explore-results-heading" className={styles.resultsHeading}>{t.explore.colTitle}</h2>
+          <h2 id="explore-results-heading" className={styles.resultsHeading}>{t.explore.resultsTitle}</h2>
           <span className={styles.resultsCount}>{total > 0 ? `${fmtInt(from, locale)}–${fmtInt(to, locale)} ${t.common.of} ${fmtInt(total, locale)}` : "—"}</span>
         </div>
 
@@ -241,7 +251,7 @@ export function ExploreView() {
                   <td className={styles.regionCell}>{row.province ?? "—"}</td>
                   <td>{row.occupation ? shortScope(row.occupation) : "—"}</td>
                   <td className={styles.wageCell}>{rowWage(row, locale)}</td>
-                  <td className={styles.dateCell}>{row.employment_type ?? "—"}</td>
+                  <td className={styles.dateCell}>{employmentType(row.employment_type, locale)}</td>
                 </tr>
               ))}
             </tbody>

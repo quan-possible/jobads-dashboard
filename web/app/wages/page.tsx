@@ -21,13 +21,7 @@ function ApiDown({ t }: { t: WagesDictEntry }) {
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
         <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
-        <p className="text-ink-soft">
-          {t.apiDownBody}{" "}
-          <code className="bg-surface-alt px-1">
-            uvicorn api.main:app --port 8530 --no-proxy-headers
-          </code>
-          .
-        </p>
+        <p className="text-ink-soft">{t.apiDownBody}</p>
       </div>
     </div>
   );
@@ -82,7 +76,7 @@ export default async function WagesPage() {
 
       {/* Deep: the conditioned wage premium — credential ladder + pay vs demand */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="02" label={locale === "fr" ? "Scolarité et offres" : "Education and postings"} asOf={asOf} locale={locale} />
+        <SectionLead number="02" label={locale === "fr" ? "Scolarité" : "Education"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure
             eyebrow={c.wageByEducation.eyebrow}
@@ -105,7 +99,7 @@ export default async function WagesPage() {
 
       {/* Deep: pay vs demand quadrant */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="03" label={locale === "fr" ? "Salaire et volume" : "Pay and volume"} asOf={asOf} locale={locale} />
+        <SectionLead number="03" label={locale === "fr" ? "Salaire et variation" : "Wages and change"} asOf={asOf} locale={locale} />
         <Figure
           eyebrow={c.wageDemandQuadrant.eyebrow}
           title={c.wageDemandQuadrant.title}
@@ -118,7 +112,7 @@ export default async function WagesPage() {
 
       {/* Deep: posting conditions */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="04" label={locale === "fr" ? "Conditions annoncées" : "Advertised conditions"} asOf={asOf} locale={locale} />
+        <SectionLead number="04" label={locale === "fr" ? "Conditions" : "Conditions"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.conditionsMix.eyebrow} title={c.conditionsMix.title} asOf={asOf} note={c.conditionsMix.note}>
             <RemoteFigure fig={figs.conditionsMix} height={360} ariaLabel={c.conditionsMix.aria} />

@@ -24,7 +24,7 @@ category-cap, bilingual, accessibility, or deployment contracts.
 - The deployed app is healthy at `127.0.0.1:8522`, the API is healthy at
   `127.0.0.1:8530`, and the public tunnel serves the corrected mobile Explore
   release plus the verified copy/palette pass (Next build ID
-  `ifCthJv9b7_bykFttVtY1`).
+  `Yr_bsL_RHqDGbg96bezak`).
 - Mobile Pulse and Explore targets plus four Mobbin interaction references are
   preserved under this job's `evidence/` directory.
 - The intended Keychain password lookup still exits 44. The existing mode-600
@@ -177,3 +177,20 @@ as separately authorized follow-ups.
   Curated complete labels replaced raw slicing, the live public legend was
   rechecked, and the independent final verdict is `READY` with 223 focused
   figure/golden tests, no overflow, and no console errors.
+- The final dashboard-language pass removed the Pulse conclusion headline and
+  Summary panel, made every page and chart measure-first, expanded reader-facing
+  statistical shorthand, removed repeated nonessential notes, and retained only
+  boundaries that change interpretation (advertised wages, coded-industry
+  denominators, sample gates, accounting decompositions, and task exposure).
+  The same rules now cover the Python figure factories, Plotly hover/axis chrome,
+  Explore states and errors, Method, Developers, navigation, and footer in EN/FR.
+- Current verification: 383 Python tests passed (one upstream Starlette warning),
+  focused figure/Explore runs passed 255 tests, ESLint and TypeScript passed, and
+  the Next 16.3 webpack production build succeeded. Live Browser checks covered
+  every route at EN desktop and FR mobile widths with no banned narrative copy or
+  page overflow; the affected final Pulse build was rechecked at 1440 and 390 px.
+  A 390 px French capture caught clipped KPI comparison labels before release;
+  the card layout now wraps cleanly. The final adversarial reviewer returned
+  `READY`; its only non-blocking note, a truncated mobile seasonality colorbar
+  title, was shortened and rechecked as `moyenne annuelle`. Local web, API, and public health are 200 on
+  build `Yr_bsL_RHqDGbg96bezak` through the unchanged tunnel.

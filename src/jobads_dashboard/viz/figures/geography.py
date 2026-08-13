@@ -50,17 +50,17 @@ def _window(base_year: int, end_year: int) -> tuple[pd.Timestamp, pd.Timestamp]:
 #: a value formatter, the colour language, and the editorial frame.
 _MEASURES = {
     "count": dict(cb="postings", scale=SEQUENTIAL, div=False, fmt=",.0f", suf="",
-                  head="Where the postings are: by province",
-                  sub="Raw posting count by year — big provinces dominate; switch to per-capita to compare intensity"),
+                  head="Postings by province",
+                  sub="Posting count by year"),
     "share": dict(cb="% of national", scale=SEQUENTIAL, div=False, fmt=".1f", suf="%",
                   head="Share of national postings by province",
-                  sub="Each province's share of all postings that year (normalised — the honest default for a choropleth)"),
-    "percap": dict(cb="postings / 10k LF", scale=SEQUENTIAL, div=False, fmt=",.0f", suf="",
-                   head="Posting intensity: postings per 10,000 in the labour force",
-                   sub="Posting count ÷ provincial labour force (StatCan LFS 2024) — controls for province size"),
-    "lq": dict(cb="posting LQ", scale=DIVERGING, div=True, fmt=".2f", suf="",
-               head="Postings relative to workforce size: a province location quotient",
-               sub="Posting share ÷ labour-force share · >1 (orange) = more job ads than its workforce share, 1 = on par"),
+                  sub="Each province’s share of national postings"),
+    "percap": dict(cb="per 10,000 workers", scale=SEQUENTIAL, div=False, fmt=",.0f", suf="",
+                   head="Postings per 10,000 workers",
+                   sub="Posting count divided by provincial labour force"),
+    "lq": dict(cb="concentration", scale=DIVERGING, div=True, fmt=".2f", suf="",
+               head="Posting concentration by province",
+               sub="Posting share divided by labour-force share"),
 }
 
 
@@ -139,8 +139,8 @@ def ranked_provinces(ds: DataSource) -> go.Figure:
         textposition="auto", hovertemplate="%{y}: %{x:,.0f}<extra></extra>"))
     fig.update_xaxes(title_text="postings (last 12 months)")
     fig.update_layout(height=420)
-    return titled(fig, "Ranked: provinces by posting volume",
-                  "The list carries the precise ranking the map cannot")
+    return titled(fig, "Postings by province",
+                  "Last 12 months")
 
 
 def cma_demand(ds: DataSource, top: int = 10, locale: str = "en") -> go.Figure:
@@ -172,12 +172,12 @@ def cma_demand(ds: DataSource, top: int = 10, locale: str = "en") -> go.Figure:
         x=mk["postings_total"], y=mk["label"], orientation="h",
         marker_color=colors,
         customdata=mk["prov"],
-        hovertemplate="%{y} (%{customdata}): %{x:,.0f} postings (12 mo)<extra></extra>"))
+        hovertemplate="%{y} (%{customdata}): %{x:,.0f} postings (last 12 months)<extra></extra>"))
     fig.update_xaxes(title_text="postings (last 12 months)")
     fig.update_layout(height=520, margin=dict(l=170))
     shown = len(mk)
-    return titled(fig, f"The biggest metropolitan labour markets (top {shown} CMAs)",
-                  "City-level postings from the census-metropolitan-area cut — finer than the province totals above")
+    return titled(fig, f"Metropolitan areas by postings (top {shown})",
+                  "Last 12 months")
 
 
 # --------------------------------------------------------------------------- DEEP
@@ -201,19 +201,19 @@ def shift_share_bars(ds: DataSource, base_year: int = BASE_YEAR,
     fig = go.Figure()
     comps = [("national_share", "National trend", CONTEXT),
              ("industry_mix", "Occupation mix", "#7b6b8d"),
-             ("competitive_shift", "Local (competitive)", BRAND)]
+             ("competitive_shift", "Remaining local component", BRAND)]
     for col, name, color in comps:
         fig.add_trace(go.Bar(y=ss["province_name"], x=ss[col], name=name, orientation="h",
                              marker_color=color,
                              hovertemplate="%{y} · " + name + ": %{x:,.0f}<extra></extra>"))
-    fig.add_trace(go.Scatter(y=ss["province_name"], x=ss["actual_change"], name="Actual change",
+    fig.add_trace(go.Scatter(y=ss["province_name"], x=ss["actual_change"], name="Total change",
                              mode="markers", marker=dict(symbol="diamond", size=9, color="#132330"),
-                             hovertemplate="%{y} · actual: %{x:,.0f}<extra></extra>"))
+                             hovertemplate="%{y} · total: %{x:,.0f}<extra></extra>"))
     fig.update_layout(barmode="relative", height=460, margin=dict(b=96),
                       legend=dict(y=-0.26))
-    fig.update_xaxes(title_text="change in postings, decomposed")
-    return titled(fig, f"Why provinces grew or shrank: shift-share, {base_year}→{end_year}",
-                  "Secondary cut. Accounting identity (not causation): national trend + occupation mix + local shift = actual change")
+    fig.update_xaxes(title_text="components of posting change")
+    return titled(fig, f"Components of posting change, {base_year}–{end_year}",
+                  "Accounting breakdown, not a causal estimate")
 
 
 def _yoy_by_month(prov: pd.DataFrame, month: pd.Timestamp) -> pd.DataFrame:
@@ -240,8 +240,8 @@ def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en
         kw = dict(locations=df["code"], z=df["yoy"], featureidkey="properties.code",
                   colorscale=DIVERGING, zmid=0.0, zmin=-40, zmax=40,
                   marker_line_color="white", marker_line_width=0.6,
-                  colorbar=dict(title="YoY %", ticksuffix="%"), text=df["name"],
-                  hovertemplate="%{text}: %{z:+.1f}% YoY<extra></extra>")
+                  colorbar=dict(title="change from a year earlier (%)", ticksuffix="%"), text=df["name"],
+                  hovertemplate="%{text}: %{z:+.1f}% from a year earlier<extra></extra>")
         if with_geo:
             kw["geojson"] = ds.geojson
         return go.Choropleth(**kw)
@@ -274,15 +274,15 @@ def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en
             slider["prefix"] = "Date : " if locale == "fr" else "Date: "
         add_time_slider(fig, labels, **slider)
         fig.update_layout(height=480, margin=dict(l=10, r=10, t=10, b=44))
-        return titled(fig, "Momentum: year-over-year change by province",
-                      "Diverging fill pinned at 0 — orange growing, teal cooling. Drag the slider or press play to move through time.")
+        return titled(fig, "Annual posting change by province",
+                      "Compared with the same month a year earlier")
 
     df = _yoy_by_month(prov, prov["month"].max())
     fig = go.Figure(_trace(df, with_geo=True))
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(height=460, margin=dict(l=10, r=10, t=64, b=10))
-    return titled(fig, "Momentum: year-over-year change by province (provisional)",
-                  "Diverging fill pinned at 0 — orange growing, teal cooling. Latest month is provisional")
+    return titled(fig, "Annual posting change by province",
+                  "Latest month is provisional")
 
 
 def ai_exposure_map(ds: DataSource) -> go.Figure:
@@ -304,9 +304,9 @@ def ai_exposure_map(ds: DataSource) -> go.Figure:
     fig = go.Figure(go.Choropleth(
         geojson=ds.geojson, locations=df["code"], z=df["z"], featureidkey="properties.code",
         colorscale=SEQUENTIAL, marker_line_color="white", marker_line_width=0.6,
-        colorbar=dict(title="mean AI exposure (β)"), text=df["name"],
-        hovertemplate="%{text}: mean exposure β %{z:.3f}<extra></extra>"))
+        colorbar=dict(title="task-exposure score"), text=df["name"],
+        hovertemplate="%{text}: task-exposure score %{z:.3f}<extra></extra>"))
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(height=460, margin=dict(l=10, r=10, t=64, b=10))
-    return titled(fig, "AI exposure of provincial postings",
-                  "Posting-weighted mean of broad-NOC task exposure (Eloundou β) · a potential-exposure signal, not realized automation")
+    return titled(fig, "Task exposure by province",
+                  "Posting-weighted task-exposure score; not observed automation")

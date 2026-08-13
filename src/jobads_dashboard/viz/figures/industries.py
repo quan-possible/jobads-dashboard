@@ -34,9 +34,9 @@ def coverage_line(ds: DataSource) -> go.Figure:
         hovertemplate="%{x|%b %Y}: %{y:.0f}% have an industry code<extra></extra>"))
     add_covid_band(fig, label=False)
     add_provisional_band(fig)
-    fig.update_yaxes(title_text="% of postings with NAICS", ticksuffix="%", range=[0, 100])
-    return titled(fig, "Read industries with care: NAICS coverage over time",
-                  "Only this share of postings carries an industry code — every sector total below is conditional on it")
+    fig.update_yaxes(title_text="postings with an industry code (%)", ticksuffix="%", range=[0, 100])
+    return titled(fig, "Industry-code coverage",
+                  "Share of postings with an industry code")
 
 
 def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> go.Figure:
@@ -56,15 +56,15 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
         add_time_slider(fig, years, prefix="Année : " if fr else "Year: ",
                         play="▶ Lecture" if fr else "▶ Play")
         fig.update_layout(height=480, margin=dict(l=8, r=8, t=64, b=44))
-        return titled(fig, "Postings by industry sector (where coded)",
-                      "Area ∝ postings with a NAICS code in the selected year — drag or press play")
+        return titled(fig, "Postings by industry",
+                      "Postings with an industry code in the selected year")
     cut = nb["month"].max() - pd.DateOffset(months=12)
     g = nb[nb["month"] > cut].groupby("naics_name", as_index=False)["postings_total"].sum()
     g = cap_other(g, "postings_total", "naics_name", other_label=_OTHER_SECTORS)
     fig = go.Figure(treemap_trace(g, "naics_name", "All industries"))
     fig.update_layout(height=460, margin=dict(l=8, r=8, t=64, b=8))
-    return titled(fig, "Demand by industry sector (where coded)",
-                  "Area ∝ postings with a NAICS code, last 12 months")
+    return titled(fig, "Postings by industry",
+                  "Postings with an industry code in the last 12 months")
 
 
 def share_over_time(ds: DataSource, top: int = 7) -> go.Figure:
@@ -85,8 +85,8 @@ def share_over_time(ds: DataSource, top: int = 7) -> go.Figure:
                                  line=dict(width=0.5, color=COLORWAY[i % len(COLORWAY)]),
                                  hovertemplate="%{x|%b %Y}: %{y:.1f}%<extra></extra>"))
     fig.update_yaxes(title_text="share of coded postings", ticksuffix="%", range=[0, 100])
-    return titled(fig, "How the industry mix shifts (among coded postings)",
-                  "Share of postings with a NAICS code, by sector")
+    return titled(fig, "Posting share by industry",
+                  "Among postings with an industry code")
 
 
 def contribution_bars(ds: DataSource, base_year: int = BASE_YEAR,
@@ -106,9 +106,9 @@ def contribution_bars(ds: DataSource, base_year: int = BASE_YEAR,
     c = c.sort_values("contribution_pp")
     colors = np.where(c["contribution_pp"] >= 0, UP, DOWN)
     fig = go.Figure(go.Bar(x=c["contribution_pp"], y=c["short"], orientation="h",
-                           marker_color=colors, hovertemplate="%{y}: %{x:+.1f} pp<extra></extra>"))
+                           marker_color=colors, hovertemplate="%{y}: %{x:+.1f} percentage points<extra></extra>"))
     add_reference_line(fig, 0)
-    fig.update_xaxes(title_text="contribution to growth (pp)", ticksuffix=" pp")
+    fig.update_xaxes(title_text="contribution to posting change (percentage points)")
     fig.update_layout(height=480)
-    return titled(fig, f"Which sectors drove the change, {base_year}→{end_year}",
-                  "Contribution to growth among coded postings (accounting identity)")
+    return titled(fig, f"Contributions to posting change, {base_year}–{end_year}",
+                  "Among postings with an industry code")

@@ -98,7 +98,7 @@ export default async function GeographyPage() {
 
       {/* Core: authoritative map (measure toggle) + ranked list */}
       <section className="container-x py-8 md:py-10">
-        <SectionLead number="01" label={locale === "fr" ? "Carte et classement" : "Map and ranking"} asOf={asOf} locale={locale} />
+        <SectionLead number="01" label={locale === "fr" ? "Provinces" : "Provinces"} asOf={asOf} locale={locale} />
         <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(260px,1fr)]">
           <Figure eyebrow={c.demandMap.eyebrow} title={c.demandMap.title} asOf={asOf} note={c.demandMap.note}>
             <MapToggle
@@ -131,7 +131,7 @@ export default async function GeographyPage() {
 
       {/* Deep: momentum + AI exposure */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="03" label={locale === "fr" ? "Dynamique régionale" : "Regional momentum"} asOf={asOf} locale={locale} />
+        <SectionLead number="03" label={locale === "fr" ? "Variation annuelle et exposition des tâches" : "Annual change and task exposure"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.yoyChoropleth.eyebrow} title={c.yoyChoropleth.title} asOf={asOf} note={c.yoyChoropleth.note}>
             <RemoteFigure fig={figs.yoyChoropleth} height={460} ariaLabel={c.yoyChoropleth.aria} />

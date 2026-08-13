@@ -6,8 +6,8 @@ export const geographyDict = {
   en: {
     // Hero section
     eyebrow: "Geography",
-    hero: "Job postings across Canada",
-    lede: "Compare posting volume, intensity and concentration by region.",
+    hero: "Job postings by region",
+    lede: "Volume, postings per 10,000 workers and regional concentration.",
 
     // Figure section
     figureEyebrow: "By province",
@@ -43,14 +43,14 @@ export const geographyDict = {
 
     // Time-scrubbed choropleth
     timeEyebrow: "Postings over time · by province",
-    timeTitle: "How postings changed across Canada",
+    timeTitle: "Posting change across Canada",
     timeNote: "The colour scale is fixed across months.",
     playLabel: "▶ Play",
     monthPrefix: "Month: ",
 
     // Cumulative concentration
     cumEyebrow: "Market concentration",
-    cumTitle: "How concentrated postings are across provinces",
+    cumTitle: "Posting concentration by province",
     cumNote: "Cumulative share of all postings as provinces are added largest-first.",
     cumUnit: "provinces",
 
@@ -71,47 +71,47 @@ export const geographyDict = {
     apiDownBody: "Try again shortly.",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "More detail",
-    deepLede: "Metropolitan markets, momentum and regional structure.",
+    deepEyebrow: "Regional detail",
+    deepLede: "Metropolitan areas, annual change and exposure.",
 
     // Measure-toggle labels for the authoritative postings map.
-    mapMeasures: { share: "Share", count: "Count", percap: "Per 10k", lq: "Posting LQ" },
+    mapMeasures: { share: "Share", count: "Count", percap: "Per 10k", lq: "Concentration" },
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       demandMap: {
         eyebrow: "By province · through time",
         title: "Postings by province",
-        note: "Per 10,000 uses the 2024 labour force. Location quotient = posting share ÷ labour-force share.",
+        note: "Per 10,000 uses the 2024 labour force. Concentration = posting share ÷ labour-force share.",
         aria: "Animated choropleth map of job postings by province with a measure toggle and a year slider",
       },
       rankedProvinces: {
         eyebrow: "Ranked · volume",
-        title: "Provinces by posting volume",
+        title: "Posting volume by province",
         note: "Last 12 months.",
         aria: "Horizontal bar chart ranking provinces by posting volume over the last 12 months",
       },
       cmaDemand: {
         eyebrow: "City level · CMAs",
-        title: "Largest metropolitan posting markets",
+        title: "Postings by metropolitan area",
         note: "Census metropolitan areas, last 12 months.",
         aria: "Horizontal bar chart ranking the largest census metropolitan areas by posting volume",
       },
       yoyChoropleth: {
         eyebrow: "Momentum · through time",
-        title: "Year-over-year change by province",
-        note: "Orange = increase · teal = decrease.",
+        title: "Annual posting change by province",
+        note: "",
         aria: "Choropleth map of year-over-year percentage change in postings by province, with a year slider to scrub through time",
       },
       shiftShare: {
-        eyebrow: "Shift-share",
-        title: "What accounts for regional change",
-        note: "National trend + occupation mix + local shift = total change; not causal.",
+        eyebrow: "Accounting breakdown",
+        title: "Components of regional change",
+        note: "National trend + occupation mix + local component = total change; not causal.",
         aria: "Stacked bar chart decomposing each province’s change into national, mix and local components",
       },
       aiExposure: {
-        eyebrow: "AI exposure · Eloundou β",
-        title: "AI exposure by province",
+        eyebrow: "Task exposure",
+        title: "Task exposure by province",
         note: "Posting-weighted task exposure, not realized automation.",
         aria: "Choropleth map of posting-weighted mean AI task exposure by province",
       },
@@ -120,8 +120,8 @@ export const geographyDict = {
   fr: {
     // Hero section
     eyebrow: "Géographie",
-    hero: "Offres d’emploi au Canada",
-    lede: "Comparez le volume, l’intensité et la concentration des offres par région.",
+    hero: "Offres d’emploi par région",
+    lede: "Volume, offres pour 10 000 actifs et concentration régionale.",
 
     // Figure section
     figureEyebrow: "Par province",
@@ -165,7 +165,7 @@ export const geographyDict = {
 
     // Cumulative concentration
     cumEyebrow: "Concentration du marché",
-    cumTitle: "À quel point les offres sont concentrées entre provinces",
+    cumTitle: "Concentration des offres par province",
     cumNote: "Part cumulée de toutes les offres à mesure que les provinces s'ajoutent, des plus grandes aux plus petites.",
     cumUnit: "provinces",
 
@@ -186,47 +186,47 @@ export const geographyDict = {
     apiDownBody: "Réessayez dans quelques instants.",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Plus de détails",
-    deepLede: "Marchés métropolitains, dynamique et structure régionale.",
+    deepEyebrow: "Détail régional",
+    deepLede: "Régions métropolitaines, variation annuelle et exposition.",
 
     // Measure-toggle labels for the authoritative postings map.
-    mapMeasures: { share: "Part", count: "Nombre", percap: "Pour 10 000", lq: "QL des offres" },
+    mapMeasures: { share: "Part", count: "Nombre", percap: "Pour 10 000", lq: "Concentration" },
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       demandMap: {
         eyebrow: "Par province · au fil du temps",
         title: "Offres par province",
-        note: "La mesure pour 10 000 utilise la population active de 2024. Quotient = part des offres ÷ part de la population active.",
+        note: "La mesure pour 10 000 utilise la population active de 2024. Concentration = part des offres ÷ part de la population active.",
         aria: "Carte choroplèthe animée des offres par province avec un sélecteur de mesure et un curseur annuel",
       },
       rankedProvinces: {
         eyebrow: "Classement · volume",
-        title: "Provinces par volume d’offres",
+        title: "Volume des offres par province",
         note: "12 derniers mois.",
         aria: "Diagramme à barres horizontales classant les provinces par volume d'offres sur les 12 derniers mois",
       },
       cmaDemand: {
         eyebrow: "Niveau ville · RMR",
-        title: "Principaux marchés métropolitains",
+        title: "Offres par région métropolitaine",
         note: "Régions métropolitaines de recensement, 12 derniers mois.",
         aria: "Diagramme à barres horizontales classant les plus grandes régions métropolitaines de recensement par volume d'offres",
       },
       yoyChoropleth: {
         eyebrow: "Dynamique · au fil du temps",
-        title: "Variation sur un an par province",
-        note: "Orange = hausse · sarcelle = baisse.",
+        title: "Variation annuelle des offres par province",
+        note: "",
         aria: "Carte choroplèthe de la variation en pourcentage des offres sur un an par province, avec un curseur annuel pour parcourir le temps",
       },
       shiftShare: {
-        eyebrow: "Analyse structurelle-résiduelle",
-        title: "Ce qui compose la variation régionale",
-        note: "Tendance nationale + composition + écart local = variation totale; non causal.",
+        eyebrow: "Décomposition comptable",
+        title: "Composantes de la variation régionale",
+        note: "Tendance nationale + composition professionnelle + composante locale = variation totale; non causale.",
         aria: "Diagramme à barres empilées décomposant la variation de chaque province en composantes nationale, de composition et locale",
       },
       aiExposure: {
-        eyebrow: "Exposition à l'IA · β Eloundou",
-        title: "Exposition à l’IA par province",
+        eyebrow: "Exposition des tâches",
+        title: "Exposition des tâches par province",
         note: "Exposition des tâches pondérée par les offres; ce n’est pas un taux d’automatisation.",
         aria: "Carte choroplèthe de l'exposition moyenne des tâches à l'IA pondérée par les offres, par province",
       },

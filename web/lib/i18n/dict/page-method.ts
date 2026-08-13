@@ -13,19 +13,19 @@ export const methodDict = {
 
     // Hero
     heroEyebrow: "Method & data",
-    heroTitle: "How to read this dashboard.",
-    heroIntro: "The dashboard describes Canadian online job postings.",
+    heroTitle: "Dashboard methodology",
+    heroIntro: "Sources, measures and limitations.",
 
     // What it measures
-    measuresTitle: "What this measures",
+    measuresTitle: "Measures",
     measuresItems: [
-      "Monthly postings by region, occupation (NOC), and industry (NAICS)",
+      "Monthly postings by region, occupation, and industry",
       "Advertised wage ranges",
       "Skills and requirements named in postings",
     ],
 
     // What it does NOT measure
-    notMeasuresTitle: "What it does not measure",
+    notMeasuresTitle: "Not measured",
     notMeasuresItems: [
       "Employment or unemployment",
       "Statistics Canada job vacancies",
@@ -35,7 +35,7 @@ export const methodDict = {
 
     // Field coverage figure
     coverageEyebrow: "Data coverage",
-    coverageTitle: "Field coverage",
+    coverageTitle: "Available fields",
     coverageNote:
       "Share of postings that report each field.",
     coverageBuiltFrom: "Built from",
@@ -45,7 +45,7 @@ export const methodDict = {
 
     // Caveats figure
     caveatsEyebrow: "Caveats",
-    caveatsTitle: "Key limitations",
+    caveatsTitle: "Limitations",
     caveatTranslations: {
       "Job ads measure posted labor demand, not employment or unemployment.":
         "Job ads measure posted labour demand, not employment or unemployment.",
@@ -53,13 +53,13 @@ export const methodDict = {
 
     // Category cap figure
     capEyebrow: "Category limit",
-    capTitle: "Why charts show up to 10 categories",
+    capTitle: "Public chart limit",
     capBody:
       "Public charts show up to 10 categories under the Vicinity Jobs API terms. Other preserves the remaining total. Team sessions show full detail.",
 
     // Glossary figure
     glossaryEyebrow: "Glossary",
-    glossaryTitle: "Key terms",
+    glossaryTitle: "Definitions",
     glossaryTerms: [
       {
         term: "Postings index",
@@ -71,27 +71,22 @@ export const methodDict = {
       },
       {
         term: "Wage range",
-        def: "25th percentile, median and 75th percentile of advertised hourly wages; n ≥ 100.",
+        def: "25th percentile, median and 75th percentile of advertised hourly wages. At least 100 postings.",
       },
       {
-        term: "Location quotient",
+        term: "Posting concentration",
         def: "Posting share divided by labour-force share. Above 1 means higher concentration.",
       },
       {
-        term: "Distinctive skills / lift",
+        term: "Skills more common in a selected group",
         def: "Skill share in the selected scope divided by its national share.",
       },
       {
-        term: "Sample gate, n",
+        term: "Minimum sample",
         def: 'Statistics with fewer than 100 supporting postings are shown as “—”.',
       },
     ],
 
-    // Version / changelog figure
-    versionEyebrow: "Version",
-    versionTitle: "Changelog",
-    versionRelease: "initial public release",
-    versionGenerated: "generated",
   },
 
   fr: {
@@ -102,19 +97,19 @@ export const methodDict = {
 
     // Hero
     heroEyebrow: "Méthode et données",
-    heroTitle: "Comment lire ce tableau de bord.",
-    heroIntro: "Le tableau de bord décrit les offres d’emploi en ligne au Canada.",
+    heroTitle: "Méthodologie du tableau de bord",
+    heroIntro: "Sources, mesures et limites.",
 
     // What it measures
-    measuresTitle: "Ce que cela mesure",
+    measuresTitle: "Mesures",
     measuresItems: [
-      "Offres mensuelles par région, profession (CNP) et industrie (SCIAN)",
+      "Offres mensuelles par région, profession et industrie",
       "Fourchettes salariales affichées",
       "Compétences et exigences mentionnées dans les offres",
     ],
 
     // What it does NOT measure
-    notMeasuresTitle: "Ce que cela ne mesure pas",
+    notMeasuresTitle: "Éléments non mesurés",
     notMeasuresItems: [
       "L’emploi ou le chômage",
       "Les postes vacants de Statistique Canada",
@@ -124,7 +119,7 @@ export const methodDict = {
 
     // Field coverage figure
     coverageEyebrow: "Couverture des données",
-    coverageTitle: "Couverture des champs",
+    coverageTitle: "Champs disponibles",
     coverageNote:
       "Part des offres qui renseignent chaque champ.",
     coverageBuiltFrom: "Calculé à partir de",
@@ -139,7 +134,7 @@ export const methodDict = {
 
     // Caveats figure
     caveatsEyebrow: "Mises en garde",
-    caveatsTitle: "Principales limites",
+    caveatsTitle: "Limites",
     caveatTranslations: {
       "Job ads measure posted labour demand, not employment or unemployment.":
         "Les offres d’emploi mesurent la demande de main-d’œuvre affichée, non l’emploi ni le chômage.",
@@ -155,13 +150,13 @@ export const methodDict = {
 
     // Category cap figure
     capEyebrow: "Limite de catégories",
-    capTitle: "Pourquoi les graphiques affichent jusqu’à 10 catégories",
+    capTitle: "Limite des graphiques publics",
     capBody:
       "Les graphiques publics montrent jusqu’à 10 catégories selon les conditions de l’API Vicinity Jobs. La catégorie « Autres » conserve le total restant. Les sessions d’équipe affichent le détail complet.",
 
     // Glossary figure
     glossaryEyebrow: "Glossaire",
-    glossaryTitle: "Termes clés",
+    glossaryTitle: "Définitions",
     glossaryTerms: [
       {
         term: "Indice des offres",
@@ -173,26 +168,21 @@ export const methodDict = {
       },
       {
         term: "Fourchette salariale",
-        def: "25e centile, médiane et 75e centile des salaires horaires affichés; n ≥ 100.",
+        def: "25e centile, médiane et 75e centile des salaires horaires affichés. Au moins 100 offres.",
       },
       {
-        term: "Quotient de localisation",
+        term: "Concentration des offres",
         def: "Part des offres divisée par la part de la population active. Plus de 1 indique une concentration élevée.",
       },
       {
-        term: "Compétences distinctives / indice de surreprésentation",
+        term: "Compétences plus courantes dans un groupe",
         def: "Part d’une compétence dans la sélection divisée par sa part nationale.",
       },
       {
-        term: "Seuil d'échantillon, n",
+        term: "Échantillon minimal",
         def: 'Les statistiques appuyées par moins de 100 offres sont affichées comme « — ».',
       },
     ],
 
-    // Version / changelog figure
-    versionEyebrow: "Version",
-    versionTitle: "Historique des versions",
-    versionRelease: "première publication",
-    versionGenerated: "généré le",
   },
 } as const;

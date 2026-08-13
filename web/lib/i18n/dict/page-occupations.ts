@@ -9,7 +9,7 @@ export const occupationsDict = {
     // Hero
     eyebrow: "Occupations",
     hero: "Job postings by occupation",
-    lede: "Compare volume, growth and skills across broad NOC groups.",
+    lede: "Volume, change and skills by broad occupation group.",
 
     // ApiDown error card (copied from page-pulse.ts)
     apiDownTitle: "Data service unavailable",
@@ -17,51 +17,51 @@ export const occupationsDict = {
     apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "More detail",
-    deepLede: "Contributions, skills and industry links.",
+    deepEyebrow: "Related measures",
+    deepLede: "Change, skills and industries.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       treemap: {
         eyebrow: "Volume over time",
         title: "Postings by occupation",
-        note: "Area = postings. “Unknown” has no assigned NOC code.",
+        note: "Area = postings. “Unknown” has no occupation code.",
         aria: "Treemap of occupation groups by postings, with a year slider to scrub through time",
       },
       indexedLines: {
         eyebrow: "Indexed growth",
-        title: "Posting growth by occupation",
+        title: "Posting index by occupation",
         note: "Base-year average = 100.",
         aria: "Indexed lines of each occupation group’s postings relative to its base-year average",
       },
       contributionBars: {
         eyebrow: "Contribution to growth",
-        title: "Contribution to posting growth",
-        note: "Bars sum to the total change; accounting, not causation.",
-        aria: "Horizontal bars showing each occupation group’s contribution in percentage points to the total change",
+        title: "Contributions to posting change",
+        note: "Percentage-point contributions sum to the total change.",
+        aria: "Horizontal bars showing each occupation group’s percentage-point contribution to the total posting change",
       },
       waterfall: {
-        eyebrow: "Reconciling the change",
-        title: "Change by occupation",
-        note: "Start total + group changes = end total.",
+        eyebrow: "Posting change",
+        title: "Posting change by occupation",
+        note: "Start + occupation changes = end.",
         aria: "Waterfall from the base-year total through each group’s change to the end-year total",
       },
       dumbbell: {
-        eyebrow: "Then versus now",
-        title: "Postings by occupation: then and now",
-        note: "Each line connects the selected years.",
+        eyebrow: "Selected years",
+        title: "Postings in selected years",
+        note: "",
         aria: "Dumbbell chart connecting each occupation group’s base-year and end-year monthly postings",
       },
       skillChurn: {
-        eyebrow: "Skill churn",
-        title: "Skills gaining and losing share",
-        note: "Change in mention share; at least 150 mentions in either year.",
+        eyebrow: "Skill share",
+        title: "Changes in skill share",
+        note: "At least 150 mentions in either year.",
         aria: "Diverging bar chart of the skills gaining and losing the most share of skill mentions between the chosen years",
       },
       aiExposure: {
-        eyebrow: "AI exposure · Eloundou β",
-        title: "AI exposure and posting change",
-        note: "Bubble = volume. Exposure is task-based, not realized automation or a forecast.",
+        eyebrow: "Task exposure",
+        title: "Task exposure and posting change",
+        note: "Bubble size = postings. Task exposure, not automation.",
         aria: "Scatter plot of AI task exposure against posting change for each broad occupation group, with quadrant reference lines",
       },
       nocNaicsHeatmap: {
@@ -76,7 +76,7 @@ export const occupationsDict = {
     // Hero
     eyebrow: "Professions",
     hero: "Offres d’emploi par profession",
-    lede: "Comparez le volume, la croissance et les compétences par grand groupe CNP.",
+    lede: "Volume, variation et compétences par grand groupe professionnel.",
 
     // ApiDown error card (copied from page-pulse.ts)
     apiDownTitle: "Service de données indisponible",
@@ -84,51 +84,51 @@ export const occupationsDict = {
     apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Plus de détails",
-    deepLede: "Contributions, compétences et liens sectoriels.",
+    deepEyebrow: "Mesures connexes",
+    deepLede: "Variation, compétences et industries.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       treemap: {
         eyebrow: "Volume au fil du temps",
         title: "Offres par profession",
-        note: "Surface = offres. « Inconnu » signifie qu’aucun code CNP n’est attribué.",
+        note: "Surface = offres. « Inconnu » signifie qu’aucun code de profession n’est attribué.",
         aria: "Carte proportionnelle des groupes professionnels par offres, avec un curseur annuel pour parcourir le temps",
       },
       indexedLines: {
         eyebrow: "Croissance indexée",
-        title: "Croissance des offres par profession",
+        title: "Indice des offres par profession",
         note: "Moyenne de l’année de base = 100.",
         aria: "Lignes indexées des offres de chaque groupe professionnel par rapport à sa moyenne de l’année de base",
       },
       contributionBars: {
         eyebrow: "Contribution à la croissance",
-        title: "Contribution à la croissance des offres",
-        note: "Les barres totalisent la variation; identité comptable, non causale.",
-        aria: "Barres horizontales montrant la contribution de chaque groupe professionnel, en points de pourcentage, à la variation totale",
+        title: "Contributions à la variation des offres",
+        note: "Les contributions en points de pourcentage totalisent la variation.",
+        aria: "Barres horizontales montrant la contribution de chaque groupe professionnel à la variation totale des offres, en points de pourcentage",
       },
       waterfall: {
-        eyebrow: "Réconcilier la variation",
-        title: "Variation par profession",
-        note: "Total initial + variations des groupes = total final.",
+        eyebrow: "Variation des offres",
+        title: "Variation des offres par profession",
+        note: "Début + variations des professions = fin.",
         aria: "Cascade allant du total de l’année de base, par la variation de chaque groupe, jusqu’au total de l’année finale",
       },
       dumbbell: {
-        eyebrow: "Avant et maintenant",
-        title: "Offres par profession : avant et maintenant",
-        note: "Chaque ligne relie les années choisies.",
+        eyebrow: "Années choisies",
+        title: "Offres pendant les années choisies",
+        note: "",
         aria: "Graphique en haltères reliant les offres mensuelles de chaque groupe professionnel pour l’année de base et l’année finale",
       },
       skillChurn: {
-        eyebrow: "Renouvellement des compétences",
-        title: "Compétences en hausse et en baisse",
-        note: "Variation de la part des mentions; au moins 150 mentions dans l’une ou l’autre année.",
+        eyebrow: "Part des compétences",
+        title: "Variation de la part des compétences",
+        note: "Au moins 150 mentions dans l’une ou l’autre année.",
         aria: "Diagramme à barres divergentes des compétences qui gagnent et perdent le plus de part des mentions entre les années choisies",
       },
       aiExposure: {
-        eyebrow: "Exposition à l'IA · β Eloundou",
-        title: "Exposition à l’IA et variation des offres",
-        note: "Bulle = volume. L’exposition repose sur les tâches; ce n’est ni une prévision ni un taux d’automatisation.",
+        eyebrow: "Exposition des tâches",
+        title: "Exposition des tâches et variation des offres",
+        note: "Taille des bulles = offres. Exposition des tâches, pas l’automatisation.",
         aria: "Nuage de points de l'exposition des tâches à l'IA en fonction de la variation des offres pour chaque grand groupe professionnel, avec des lignes de référence en quadrants",
       },
       nocNaicsHeatmap: {

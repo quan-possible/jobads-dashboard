@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { AuthError } from "@/lib/explore";
 import { useAuth } from "@/lib/auth/provider";
 import { useI18n } from "@/lib/i18n/provider";
 import { PixelTiles } from "@/components/PixelTiles";
@@ -29,8 +28,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     try {
       await login(password);
       setPassword("");
-    } catch (err) {
-      setAuthError(err instanceof AuthError ? err.message : t.explore.signinFailed);
+    } catch {
+      setAuthError(t.explore.signinFailed);
     } finally {
       setSubmitting(false);
     }

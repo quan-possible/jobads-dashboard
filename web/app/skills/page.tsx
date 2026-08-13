@@ -67,7 +67,7 @@ export default async function SkillsPage() {
 
       {/* Core: most-demanded skills and their trend (rebaseable index) */}
       <section className="container-x py-8 md:py-10">
-        <SectionLead number="01" label={locale === "fr" ? "Compétences les plus demandées" : "Most-requested skills"} asOf={asOf} locale={locale} />
+        <SectionLead number="01" label={locale === "fr" ? "Tendances" : "Trends"} asOf={asOf} locale={locale} />
         <TunableFigure
           chartId="skills.top_skills_trend" initialFig={figs.topSkillsTrend} mode="base"
           minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR}
@@ -77,7 +77,7 @@ export default async function SkillsPage() {
 
       {/* Core: the AI-skill surge */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="02" label={locale === "fr" ? "Diffusion des compétences" : "Skill diffusion"} asOf={asOf} locale={locale} />
+        <SectionLead number="02" label={locale === "fr" ? "Compétences en IA" : "AI skills"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.aiSkillDiffusion.eyebrow} title={c.aiSkillDiffusion.title} asOf={asOf} note={c.aiSkillDiffusion.note}>
           <RemoteFigure fig={figs.aiSkillDiffusion} height={380} ariaLabel={c.aiSkillDiffusion.aria} />
         </Figure>
@@ -85,7 +85,7 @@ export default async function SkillsPage() {
 
       {/* Core: what each occupation demands */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="03" label={locale === "fr" ? "Professions et compétences" : "Occupations and skills"} asOf={asOf} locale={locale} />
+        <SectionLead number="03" label={locale === "fr" ? "Par profession" : "By occupation"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.skillOccupationHeatmap.eyebrow} title={c.skillOccupationHeatmap.title} asOf={asOf} note={c.skillOccupationHeatmap.note}>
           <RemoteFigure fig={figs.skillOccupationHeatmap} height={520} ariaLabel={c.skillOccupationHeatmap.aria} />
         </Figure>
@@ -95,7 +95,7 @@ export default async function SkillsPage() {
 
       {/* Deep: distinctive skills by lift */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="04" label={locale === "fr" ? "Compétences distinctives" : "Distinctive skills"} asOf={asOf} locale={locale} />
+        <SectionLead number="04" label={locale === "fr" ? "Par rapport à la part nationale" : "Compared with national share"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.skillLift.eyebrow} title={c.skillLift.title} asOf={asOf} note={c.skillLift.note}>
           <RemoteFigure fig={figs.skillLift} height={440} ariaLabel={c.skillLift.aria} />
         </Figure>
@@ -103,7 +103,7 @@ export default async function SkillsPage() {
 
       {/* Deep: education + experience requirements over time */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="05" label={locale === "fr" ? "Exigences annoncées" : "Advertised requirements"} asOf={asOf} locale={locale} />
+        <SectionLead number="05" label={locale === "fr" ? "Scolarité et expérience" : "Education and experience"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.education.eyebrow} title={c.education.title} asOf={asOf} note={c.education.note}>
             <RemoteFigure fig={figs.education} height={360} ariaLabel={c.education.aria} />

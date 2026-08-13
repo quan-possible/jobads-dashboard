@@ -14,9 +14,9 @@ from ..theme import COLORWAY
 
 # Friendly labels for the raw field names in coverage_by_field_monthly.
 _FIELD_LABELS = {
-    "noc": "Occupation (NOC)", "naics": "Industry (NAICS)", "remunerationHrly": "Hourly wage",
+    "noc": "Occupation", "naics": "Industry", "remunerationHrly": "Hourly wage",
     "remoteWorkOptions": "Remote work", "primaryPostingLanguage": "Posting language",
-    "englishLanguageRequirement": "English req.", "frenchLanguageRequirement": "French req.",
+    "englishLanguageRequirement": "English requirement", "frenchLanguageRequirement": "French requirement",
     "experienceDetails": "Experience detail", "education": "Education", "skills": "Skills",
     "type": "Employment type", "duration": "Duration", "advertisedBy": "Advertised by",
 }
@@ -35,8 +35,8 @@ def coverage_lines(ds: DataSource) -> go.Figure:
     add_unstable_band(fig)
     add_provisional_band(fig)
     fig.update_yaxes(title_text="% of postings with the field", ticksuffix="%", range=[0, 100])
-    return titled(fig, "How complete is each field? Coverage over time",
-                  "Sparse fields (wage, remote, skills) are honest only where coverage is high")
+    return titled(fig, "Field availability over time",
+                  "Share of postings with each field")
 
 
 def coverage_latest_bars(ds: DataSource) -> go.Figure:
@@ -60,5 +60,5 @@ def coverage_latest_bars(ds: DataSource) -> go.Figure:
     fig.update_xaxes(title_text="% of postings with the field (latest month)", ticksuffix="%",
                      range=[0, 100])
     fig.update_layout(height=440)
-    return titled(fig, "Field completeness today",
-                  "Green ≥80% · grey 40–80% · red <40% — read sparse fields with their denominator")
+    return titled(fig, "Available fields",
+                  "Share of postings with each field in the latest month")

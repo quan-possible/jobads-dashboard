@@ -59,15 +59,15 @@ def treemap(ds: DataSource, animate: str | None = None, locale: str = "en") -> g
         add_time_slider(fig, years, prefix="Année : " if fr else "Year: ",
                         play="▶ Lecture" if fr else "▶ Play")
         fig.update_layout(height=480, margin=dict(l=8, r=8, t=64, b=44))
-        return titled(fig, "What work is posted most: occupation groups by volume",
-                      "Area ∝ postings in the selected year — drag the slider or press play")
+        return titled(fig, "Postings by occupation",
+                      "Posting count in the selected year")
     cut = nb["month"].max() - pd.DateOffset(months=12)
     g = nb[nb["month"] > cut].groupby("noc_name", as_index=False)["postings_total"].sum()
     g = cap_other(g, "postings_total", "noc_name", other_label="Other")
     fig = go.Figure(treemap_trace(g, "noc_name", "All occupations"))
     fig.update_layout(height=460, margin=dict(l=8, r=8, t=64, b=8))
-    return titled(fig, "What work is posted most: occupation groups by volume",
-                  "Area ∝ postings (last 12 months); click a tile to zoom")
+    return titled(fig, "Postings by occupation",
+                  "Last 12 months")
 
 
 def indexed_lines(ds: DataSource, base_year: int = BASE_YEAR) -> go.Figure:
@@ -95,8 +95,8 @@ def indexed_lines(ds: DataSource, base_year: int = BASE_YEAR) -> go.Figure:
     add_reference_line(fig, 100, text=f"{base_year}=100")
     add_covid_band(fig)
     fig.update_yaxes(title_text="index (base year = 100)")
-    return titled(fig, "Which occupation groups grew fastest, indexed to a base year",
-                  f"Each group indexed to its {base_year} average; fastest/slowest movers highlighted")
+    return titled(fig, "Posting index by occupation",
+                  f"{base_year} average = 100")
 
 
 # --------------------------------------------------------------------------- DEEP
@@ -114,14 +114,14 @@ def contribution_bars(ds: DataSource, base_year: int = BASE_YEAR,
     net = c["contribution_pp"].sum()
     fig = go.Figure(go.Bar(
         x=c["contribution_pp"], y=c["short"], orientation="h", marker_color=colors,
-        hovertemplate="%{y}: %{x:+.1f} pp<extra></extra>"))
+        hovertemplate="%{y}: %{x:+.1f} percentage points<extra></extra>"))
     add_reference_line(fig, 0)
     fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.96, showarrow=False,
-                       text=f"net {net:+.1f} pp", font=dict(size=12, color=MUTED))
-    fig.update_xaxes(title_text="contribution to total growth (pp)", ticksuffix=" pp")
+                       text=f"total {net:+.1f} percentage points", font=dict(size=12, color=MUTED))
+    fig.update_xaxes(title_text="contribution to posting change (percentage points)")
     fig.update_layout(height=420)
-    return titled(fig, f"What drove the change: contribution to growth, {base_year}→{end_year}",
-                  "Each group's share of the total change in postings; bars sum to the headline (accounting, not causation)")
+    return titled(fig, f"Contributions to posting change, {base_year}–{end_year}",
+                  "Percentage-point contributions sum to the total change")
 
 
 def waterfall(ds: DataSource, base_year: int = BASE_YEAR,
@@ -145,8 +145,8 @@ def waterfall(ds: DataSource, base_year: int = BASE_YEAR,
     fig.update_yaxes(title_text="postings / month", rangemode="tozero")
     fig.update_xaxes(tickangle=-35)
     fig.update_layout(height=440)
-    return titled(fig, f"Reconciling the change: {base_year} to {end_year}, group by group",
-                  "Visual proof the parts sum to the whole — start, each group's delta, end")
+    return titled(fig, f"Posting change by occupation, {base_year}–{end_year}",
+                  "Start + occupation changes = end")
 
 
 def dumbbell(ds: DataSource, base_year: int = BASE_YEAR,
@@ -171,8 +171,8 @@ def dumbbell(ds: DataSource, base_year: int = BASE_YEAR,
                              marker=dict(color=BRAND, size=9)))
     fig.update_xaxes(title_text="postings / month")
     fig.update_layout(height=440, margin=dict(b=92), legend=dict(y=-0.24))
-    return titled(fig, f"Shift in postings by occupation group, {base_year} → {end_year}",
-                  "Each line connects the two periods; colour shows direction")
+    return titled(fig, f"Postings in {base_year} and {end_year}",
+                  "By occupation group")
 
 
 def noc_naics_heatmap(ds: DataSource) -> go.Figure:
@@ -194,11 +194,11 @@ def noc_naics_heatmap(ds: DataSource) -> go.Figure:
     fig = go.Figure(go.Heatmap(
         z=norm.values, x=list(norm.columns), y=list(norm.index), customdata=customdata,
         colorscale=SEQUENTIAL, colorbar=dict(title="% of sector", ticksuffix="%"), xgap=1, ygap=1,
-        hovertemplate="%{y} in %{customdata} (NAICS %{x}): %{z:.0f}% of sector postings<extra></extra>"))
-    fig.update_xaxes(title_text="industry sector (NAICS code · hover for name)", type="category")
+        hovertemplate="%{y} in %{customdata}: %{z:.0f}% of industry postings<extra></extra>"))
+    fig.update_xaxes(title_text="industry", type="category")
     fig.update_layout(height=460, margin=dict(l=190))
-    return titled(fig, "Which occupations each sector posts",
-                  "Column-normalised: each industry's postings split across occupation groups (last 12 months)")
+    return titled(fig, "Occupation share by industry",
+                  "Last 12 months")
 
 
 def skill_churn(ds: DataSource, base_year: int = BASE_YEAR,
@@ -217,15 +217,15 @@ def skill_churn(ds: DataSource, base_year: int = BASE_YEAR,
     fig = go.Figure(go.Bar(
         x=df["share_delta_pp"], y=labels, orientation="h", marker_color=colors,
         customdata=np.stack([df["base_share"], df["end_share"], df["end"]], axis=-1),
-        hovertemplate="%{y}: %{x:+.2f} pp · "
+        hovertemplate="%{y}: %{x:+.2f} percentage points · "
                       + f"{base_year} " + "%{customdata[0]:.2f}%"
                       + f" → {end_year} " + "%{customdata[1]:.2f}%"
                       + " · %{customdata[2]:,.0f} postings<extra></extra>"))
     add_reference_line(fig, 0)
-    fig.update_xaxes(title_text="change in share of skill mentions (pp)", ticksuffix=" pp")
+    fig.update_xaxes(title_text="change in skill-mention share (percentage points)")
     fig.update_layout(height=460, margin=dict(l=180))
-    return titled(fig, f"Which skills are entering vs leaving, {base_year} → {end_year}",
-                  "Biggest gainers (teal) and losers (orange) by change in share of skill mentions · skills with ≥150 mentions in either year")
+    return titled(fig, f"Changes in skill share, {base_year}–{end_year}",
+                  "At least 150 mentions in either year")
 
 
 def ai_exposure_scatter(ds: DataSource, base_year: int = BASE_YEAR,
@@ -251,12 +251,12 @@ def ai_exposure_scatter(ds: DataSource, base_year: int = BASE_YEAR,
         marker=dict(size=np.sqrt(df["vol"]) / np.sqrt(df["vol"]).max() * 46 + 10,
                     color=colors, opacity=0.85, line=dict(width=1, color="white")),
         customdata=df["vol"],
-        hovertemplate="%{text}<br>exposure β %{x:.2f} · postings %{y:+.0f}% vs "
+        hovertemplate="%{text}<br>task-exposure score %{x:.2f} · postings %{y:+.0f}% vs "
                       + str(base_year) + "<br>%{customdata:,.0f} postings (12 mo)<extra></extra>"))
     add_reference_line(fig, 0)
     fig.add_vline(x=float(df["beta"].median()), line=dict(color=MUTED, width=1, dash="dash"))
-    fig.update_xaxes(title_text="AI exposure (β)")
+    fig.update_xaxes(title_text="task-exposure score")
     fig.update_yaxes(title_text="change in postings", ticksuffix="%")
     fig.update_layout(height=480, margin=dict(t=40))
-    return titled(fig, "AI exposure and posting change",
-                  "Eloundou et al. β (US task-based, mapped to NOC) vs posting change · bubble ∝ volume · right of the line = higher-exposure groups")
+    return titled(fig, "Task exposure and posting change",
+                  "Task-exposure score; not observed automation")

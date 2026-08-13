@@ -31,14 +31,14 @@ def wage_band(ds: DataSource) -> go.Figure:
                               suffixes=("", "_all"))
     w["coverage"] = w["wage_postings"] / w["postings_total"] * 100
     fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig.add_trace(go.Scatter(x=w["month"], y=w["wage_p75"], mode="lines", name="P75",
+    fig.add_trace(go.Scatter(x=w["month"], y=w["wage_p75"], mode="lines", name="75th percentile",
                              line=dict(width=0), showlegend=False,
-                             hovertemplate="%{x|%b %Y} · P75: %{y:$,.0f}<extra></extra>"),
+                             hovertemplate="%{x|%b %Y} · 75th percentile: %{y:$,.0f}<extra></extra>"),
                   secondary_y=False)
-    fig.add_trace(go.Scatter(x=w["month"], y=w["wage_p25"], mode="lines", name="P25–P75",
+    fig.add_trace(go.Scatter(x=w["month"], y=w["wage_p25"], mode="lines", name="25th–75th percentile",
                              line=dict(width=0), fill="tonexty",
                              fillcolor="rgba(52,89,97,0.16)",
-                             hovertemplate="%{x|%b %Y} · P25: %{y:$,.0f}<extra></extra>"),
+                             hovertemplate="%{x|%b %Y} · 25th percentile: %{y:$,.0f}<extra></extra>"),
                   secondary_y=False)
     fig.add_trace(go.Scatter(x=w["month"], y=w["wage_median"], mode="lines", name="Median",
                              line=dict(color=BRAND, width=2.8),
@@ -53,8 +53,8 @@ def wage_band(ds: DataSource) -> go.Figure:
     fig.update_yaxes(title_text="advertised hourly wage", tickprefix="$", secondary_y=False)
     fig.update_yaxes(title_text="% of postings with a wage", ticksuffix="%", range=[0, 100],
                      secondary_y=True, showgrid=False)
-    return titled(fig, "Advertised hourly wage: median and P25–P75 band",
-                  "Wages are advertised, not paid · dotted line = share of postings carrying a wage (right axis)")
+    return titled(fig, "Advertised hourly wages",
+                  "Median, 25th–75th percentile and wage coverage")
 
 
 # --------------------------------------------------------------------------- DEEP
@@ -74,8 +74,8 @@ def wage_dumbbell(ds: DataSource) -> go.Figure:
                              hovertemplate="%{y}: median %{x:$,.0f}<extra></extra>"))
     fig.update_xaxes(title_text="advertised hourly wage", tickprefix="$")
     fig.update_layout(height=440, margin=dict(b=92), legend=dict(y=-0.24))
-    return titled(fig, f"Advertised wage spread by province ({_STABLE_END:%b %Y})",
-                  "Bar = P25→P75 range, dot = median · provinces with ≥200 wage-bearing postings")
+    return titled(fig, "Advertised wages by province",
+                  "25th–75th percentile and median; at least 200 postings with wages")
 
 
 def wage_demand_quadrant(ds: DataSource) -> go.Figure:
@@ -103,14 +103,14 @@ def wage_demand_quadrant(ds: DataSource) -> go.Figure:
                     color=df["yoy"], colorscale="RdYlGn", cmid=0, line=dict(width=1, color="white"),
                     showscale=False),
         customdata=df["short"],
-        hovertemplate="%{customdata}<br>median %{x:$,.0f} · YoY %{y:.1f}%<extra></extra>"))
+        hovertemplate="%{customdata}<br>median %{x:$,.0f} · change from a year earlier %{y:.1f}%<extra></extra>"))
     add_reference_line(fig, 0)
     fig.add_vline(x=xmid, line=dict(color=MUTED, width=1, dash="dash"))
     fig.update_xaxes(title_text="advertised median wage", tickprefix="$")
-    fig.update_yaxes(title_text="YoY posting growth", ticksuffix="%")
+    fig.update_yaxes(title_text="year-over-year posting change", ticksuffix="%")
     fig.update_layout(height=460)
-    return titled(fig, f"Pay vs momentum: the wage × postings quadrant ({_STABLE_END:%b %Y})",
-                  "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation)")
+    return titled(fig, "Advertised wages and annual posting change",
+                  "Bubble size = postings; descriptive association only")
 
 
 _DEGREE_CATEGORIES = (
@@ -146,8 +146,8 @@ def education_wage_proxy(ds: DataSource) -> go.Figure:
     fig.update_xaxes(title_text="share of postings asking for a university degree", ticksuffix="%")
     fig.update_yaxes(title_text="median advertised wage", tickprefix="$")
     fig.update_layout(height=460)
-    return titled(fig, f"Do credential-heavy occupations pay more? ({_STABLE_END:%b %Y})",
-                  "Each broad occupation group: degree-requirement share vs median advertised wage · bubble ∝ volume (correlation, not causation)")
+    return titled(fig, "Degree requirements and advertised wages",
+                  "Bubble size = postings; descriptive association only")
 
 
 def wage_by_education(ds: DataSource) -> go.Figure:
@@ -173,11 +173,11 @@ def wage_by_education(ds: DataSource) -> go.Figure:
     fig.add_trace(go.Scatter(
         x=w["wage_median"], y=w["label"], mode="markers", name="Median",
         marker=dict(color=BRAND, size=12), customdata=w["n"],
-        hovertemplate="%{y}: median %{x:$,.2f}/hr (P25–P75 band · n=%{customdata:,})<extra></extra>"))
+        hovertemplate="%{y}: median %{x:$,.2f} per hour (25th–75th percentile · %{customdata:,} postings)<extra></extra>"))
     fig.update_xaxes(title_text="advertised hourly wage", tickprefix="$")
     fig.update_layout(height=420, showlegend=False)
-    return titled(fig, "The credential ladder: advertised wage by education level",
-                  "P25–P75 band, dot = median · latest-month posting sample with both a wage and a stated education requirement (correlation, not causation)")
+    return titled(fig, "Advertised wages by education requirement",
+                  "25th–75th percentile and median")
 
 
 def conditions_mix(ds: DataSource) -> go.Figure:
@@ -193,7 +193,7 @@ def conditions_mix(ds: DataSource) -> go.Figure:
                                  mode="lines", line=dict(width=0.5, color=COLORWAY[i % len(COLORWAY)]),
                                  hovertemplate="%{x|%b %Y} · " + cat + ": %{y:.1f}%<extra></extra>"))
     fig.update_yaxes(title_text="share of postings", ticksuffix="%", range=[0, 100])
-    return titled(fig, "Employment-type mix over time",
+    return titled(fig, "Employment type over time",
                   "Share of postings by advertised employment type")
 
 
@@ -210,5 +210,5 @@ def language_gap(ds: DataSource) -> go.Figure:
                                  hovertemplate="%{x|%b %Y} · " + name + ": %{y:.1f}%<extra></extra>"))
     add_unstable_band(fig)
     fig.update_yaxes(title_text="% of postings", ticksuffix="%")
-    return titled(fig, "Language requirements: English vs French (mandatory)",
-                  "Share of postings flagging a mandatory language · unstable before 2021 (shaded)")
+    return titled(fig, "Language requirements",
+                  "Share of postings; unstable before 2021")

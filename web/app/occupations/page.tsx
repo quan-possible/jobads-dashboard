@@ -85,11 +85,11 @@ export default async function OccupationsPage() {
 
   return (
     <div className="pb-4">
-      <RouteMasthead eyebrow={t.eyebrow} title={`${t.hero}.`} lede={t.lede} asOf={asOf} locale={locale} />
+      <RouteMasthead eyebrow={t.eyebrow} title={t.hero} lede={t.lede} asOf={asOf} locale={locale} />
 
       {/* Core: what's in demand, and who grew */}
       <section className="container-x py-8 md:py-10">
-        <SectionLead number="01" label={locale === "fr" ? "Offres par profession" : "Postings by occupation"} asOf={asOf} locale={locale} />
+        <SectionLead number="01" label={locale === "fr" ? "Volume et indice" : "Volume and index"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.treemap.eyebrow} title={c.treemap.title} asOf={asOf} note={c.treemap.note}>
           <RemoteFigure fig={figs.treemap} height={460} ariaLabel={c.treemap.aria} />
         </Figure>
@@ -107,7 +107,7 @@ export default async function OccupationsPage() {
 
       {/* Deep: contribution + reconciliation */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="02" label={locale === "fr" ? "Composition et variation" : "Composition and change"} asOf={asOf} locale={locale} />
+        <SectionLead number="02" label={locale === "fr" ? "Contributions" : "Contributions"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <TunableFigure
             chartId="occupations.contribution_bars" initialFig={figs.contributionBars} mode="baseEnd"
@@ -124,7 +124,7 @@ export default async function OccupationsPage() {
 
       {/* Deep: then-vs-now + skill churn */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="03" label={locale === "fr" ? "Trajectoires et renouvellement" : "Trajectories and skill churn"} asOf={asOf} locale={locale} />
+        <SectionLead number="03" label={locale === "fr" ? "Années choisies et compétences" : "Selected years and skills"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <TunableFigure
             chartId="occupations.dumbbell" initialFig={figs.dumbbell} mode="baseEnd"
@@ -141,7 +141,7 @@ export default async function OccupationsPage() {
 
       {/* Deep: occupation-by-sector + AI exposure (the ceiling) */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="04" label={locale === "fr" ? "Professions par secteur" : "Occupation by sector"} asOf={asOf} locale={locale} />
+        <SectionLead number="04" label={locale === "fr" ? "Industries et exposition des tâches" : "Industries and task exposure"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.nocNaicsHeatmap.eyebrow} title={c.nocNaicsHeatmap.title} asOf={asOf} note={c.nocNaicsHeatmap.note}>
             <RemoteFigure fig={figs.nocNaicsHeatmap} height={460} ariaLabel={c.nocNaicsHeatmap.aria} />

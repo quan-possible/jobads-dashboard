@@ -472,6 +472,10 @@ textarea {
 }
 
 @media (max-width: 520px) {
+  .kpi-tile {
+    padding: 16px;
+  }
+
   .figure-heading {
     flex-direction: column;
     align-items: stretch;

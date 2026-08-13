@@ -60,11 +60,11 @@ export default async function IndustriesPage() {
 
   return (
     <div className="pb-4">
-      <RouteMasthead eyebrow={t.eyebrow} title={`${t.hero}.`} lede={t.lede} asOf={asOf} locale={locale} />
+      <RouteMasthead eyebrow={t.eyebrow} title={t.hero} lede={t.lede} asOf={asOf} locale={locale} />
 
       {/* Core: coverage + industry mix over time */}
       <section className="container-x py-8 md:py-10">
-        <SectionLead number="01" label={locale === "fr" ? "Couverture et composition" : "Coverage and composition"} asOf={asOf} locale={locale} />
+        <SectionLead number="01" label={locale === "fr" ? "Couverture et parts" : "Coverage and shares"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.coverageLine.eyebrow} title={c.coverageLine.title} asOf={asOf} note={c.coverageLine.note}>
             <RemoteFigure fig={figs.coverageLine} height={360} ariaLabel={c.coverageLine.aria} />
@@ -77,7 +77,7 @@ export default async function IndustriesPage() {
 
       {/* Core: sector treemap */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="02" label={locale === "fr" ? "Structure sectorielle" : "Sector structure"} asOf={asOf} locale={locale} />
+        <SectionLead number="02" label={locale === "fr" ? "Volume" : "Volume"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.treemap.eyebrow} title={c.treemap.title} asOf={asOf} note={c.treemap.note}>
           <RemoteFigure fig={figs.treemap} height={460} ariaLabel={c.treemap.aria} />
         </Figure>
@@ -87,7 +87,7 @@ export default async function IndustriesPage() {
 
       {/* Deep: contribution to growth (general window) */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="03" label={locale === "fr" ? "Contribution à la variation" : "Contribution to change"} asOf={asOf} locale={locale} />
+        <SectionLead number="03" label={locale === "fr" ? "Variation" : "Change"} asOf={asOf} locale={locale} />
         <TunableFigure
           chartId="industries.contribution_bars" initialFig={figs.contributionBars} mode="baseEnd"
           minYear={FIRST_YEAR} maxYear={latestComplete} defaultBaseYear={BASE_YEAR} defaultEndYear={latestComplete}

@@ -311,8 +311,8 @@ def test_geo_shift_share_identity_and_national_trend(_fig_ds):
     prov = list(bn["National trend"].y)
     ns = dict(zip(prov, np.asarray(bn["National trend"].x, dtype=float)))
     im = dict(zip(prov, np.asarray(bn["Occupation mix"].x, dtype=float)))
-    rs = dict(zip(prov, np.asarray(bn["Local (competitive)"].x, dtype=float)))
-    actual = dict(zip(prov, np.asarray(bn["Actual change"].x, dtype=float)))
+    rs = dict(zip(prov, np.asarray(bn["Remaining local component"].x, dtype=float)))
+    actual = dict(zip(prov, np.asarray(bn["Total change"].x, dtype=float)))
     for p in prov:
         assert np.isclose(ns[p] + im[p] + rs[p], actual[p])   # accounting identity
     assert np.isclose(ns["Ontario"], 5) and np.isclose(ns["Alberta"], 3) and np.isclose(ns["British Columbia"], 2)
@@ -381,7 +381,7 @@ def test_decomposition_base_equals_end_is_zero(_fig_ds):
     ind = I.contribution_bars(_fig_ds, base_year=2024, end_year=2024).data[0]
     assert np.allclose(np.asarray(ind.x, dtype=float), 0.0)
     ss = by_name(G.shift_share_bars(_fig_ds, base_year=2024, end_year=2024))
-    assert np.allclose(np.asarray(ss["Actual change"].x, dtype=float), 0.0)
+    assert np.allclose(np.asarray(ss["Total change"].x, dtype=float), 0.0)
 
 
 def test_occ_waterfall_reconciles(_fig_ds):
@@ -480,8 +480,8 @@ def test_pay_wage_band_quantiles_and_coverage(_fig_ds):
     f = fig("pay.wage_band")
     bn = by_name(f)
     assert xy_by_month(bn["Median"])[DEC24] == 20.0
-    assert xy_by_month(bn["P75"])[DEC24] == 25.0
-    assert xy_by_month(bn["P25–P75"])[DEC24] == 15.0
+    assert xy_by_month(bn["75th percentile"])[DEC24] == 25.0
+    assert xy_by_month(bn["25th–75th percentile"])[DEC24] == 15.0
     cov = xy_by_month(bn["Wage coverage"])
     assert cov[JUN19] == 30.0 and cov[DEC24] == 15.0   # 3/10 then 3/20
 
@@ -580,8 +580,8 @@ def test_skills_experience_not_reported(_fig_ds):
 def test_quality_coverage_lines_latest(_fig_ds):
     bn = by_name(fig("quality.coverage_lines"))
     latest = {n: xy_by_month(tr)[DEC24] for n, tr in bn.items()}
-    assert np.isclose(latest["Occupation (NOC)"], 100.0)
-    assert np.isclose(latest["Industry (NAICS)"], 80.0)
+    assert np.isclose(latest["Occupation"], 100.0)
+    assert np.isclose(latest["Industry"], 80.0)
     assert np.isclose(latest["Hourly wage"], 15.0)
     assert np.isclose(latest["Education"], 70.0)
     assert np.isclose(latest["Skills"], 15.0)
@@ -592,7 +592,7 @@ def test_quality_coverage_latest_bars_and_thresholds(_fig_ds):
     tr = fig("quality.coverage_latest").data[0]
     cov = dict(zip(list(tr.y), np.asarray(tr.x, dtype=float)))
     colors = dict(zip(list(tr.y), list(tr.marker.color)))
-    assert np.isclose(cov["Industry (NAICS)"], 80.0) and colors["Industry (NAICS)"] == "#cf7730"  # ≥80 brand
+    assert np.isclose(cov["Industry"], 80.0) and colors["Industry"] == "#cf7730"  # ≥80 brand
     assert np.isclose(cov["Education"], 70.0) and colors["Education"] == "#9aa7b0"                 # 40–80 grey
     assert np.isclose(cov["Hourly wage"], 15.0) and colors["Hourly wage"] == "#b54e33"            # <40 decline/status red
 

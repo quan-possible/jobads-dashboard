@@ -38,13 +38,10 @@ export function Footer({ source }: { source?: string }) {
         <div className="flex flex-col gap-3 t-meta text-ink-invert/65">
           <span className="eyebrow text-orange-soft!">{t.footer.aboutData}</span>
           <p>{source ?? t.footer.sourceDefault}</p>
-          <p>{t.footer.categoryCap}</p>
           <p>
-            {t.footer.readMethodPre}{" "}
             <Link href="/method" className="font-bold text-orange-soft underline-offset-2 hover:underline">
               {t.footer.readMethodLink}
-            </Link>{" "}
-            {t.footer.readMethodPost}
+            </Link>
           </p>
           <a href="https://www.aclmr.ca/" className="mt-2 w-fit text-ink-invert/80 transition-colors hover:text-orange-soft">
             aclmr.ca →

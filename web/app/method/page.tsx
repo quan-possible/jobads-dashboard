@@ -1,7 +1,6 @@
 import { CoverageBar } from "@/components/CoverageBar";
 import { Figure } from "@/components/Figure";
 import { RouteMasthead } from "@/components/RouteMasthead";
-import { SectionLead } from "@/components/SectionLead";
 import { api } from "@/lib/api";
 import { fmtInt, fmtMonth } from "@/lib/format";
 import { methodDict } from "@/lib/i18n/dict/page-method";
@@ -44,7 +43,6 @@ export default async function MethodPage() {
 
       {/* What it measures / what it doesn't */}
       <section className="container-x py-8 md:py-10">
-        <SectionLead number="01" label={locale === "fr" ? "Portée et limites" : "Scope and limits"} />
         <div className="grid gap-5 md:grid-cols-2">
           <div className="border-l-4 border-teal bg-surface p-5 md:p-7">
             <h2 className="h-card mb-3">{t.measuresTitle}</h2>
@@ -74,7 +72,6 @@ export default async function MethodPage() {
 
       {/* Field coverage */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="02" label={locale === "fr" ? "Couverture des champs" : "Field coverage"} />
         <Figure
           eyebrow={t.coverageEyebrow}
           title={t.coverageTitle}
@@ -106,7 +103,6 @@ export default async function MethodPage() {
 
       {/* Category cap — public charts limited to 10 categories (Vicinity TOS) */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="03" label={locale === "fr" ? "Règles de présentation" : "Presentation rules"} />
         <Figure eyebrow={t.capEyebrow} title={t.capTitle}>
           <p className="t-body leading-relaxed text-ink-soft">{t.capBody}</p>
         </Figure>
@@ -114,7 +110,6 @@ export default async function MethodPage() {
 
       {/* Caveats — text comes from the API, no translation */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="04" label={locale === "fr" ? "Mises en garde" : "Caveats"} />
         <Figure eyebrow={t.caveatsEyebrow} title={t.caveatsTitle}>
           <ul className="flex flex-col gap-3.5">
             {meta.caveats.map((caveat, i) => (
@@ -129,7 +124,6 @@ export default async function MethodPage() {
 
       {/* Glossary */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="05" label={locale === "fr" ? "Glossaire" : "Glossary"} />
         <Figure eyebrow={t.glossaryEyebrow} title={t.glossaryTitle}>
           <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
             {t.glossaryTerms.map(({ term, def }) => (
@@ -142,15 +136,6 @@ export default async function MethodPage() {
         </Figure>
       </section>
 
-      {/* Version */}
-      <section className="container-x py-4 md:py-6">
-        <SectionLead number="06" label={locale === "fr" ? "Version" : "Version"} />
-        <Figure eyebrow={t.versionEyebrow} title={t.versionTitle}>
-          <p className="t-body text-ink-soft">
-            <span className="num font-bold text-navy">v1</span> · {t.versionRelease}.
-          </p>
-        </Figure>
-      </section>
     </div>
   );
 }

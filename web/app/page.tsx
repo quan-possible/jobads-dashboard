@@ -1,5 +1,4 @@
 import { Figure } from "@/components/Figure";
-import { KeyPoints } from "@/components/KeyPoints";
 import { KpiTile } from "@/components/KpiTile";
 import { RemoteFigure } from "@/components/RemoteFigure";
 import { DeepDivider } from "@/components/DeepDivider";
@@ -33,9 +32,9 @@ export default async function PulsePage() {
   const t = pulseDict[locale];
   const c = t.charts;
 
-  // National only (the figure bridge is national by construction). KPIs + key
-  // points come from the overview endpoint; every chart body comes from the
-  // figure bridge, fetched (and cached) server-side in parallel.
+  // National only (the figure bridge is national by construction). KPIs come
+  // from the overview endpoint; every chart body comes from the figure bridge,
+  // fetched (and cached) server-side in parallel.
   let data;
   let figs;
   try {
@@ -56,7 +55,7 @@ export default async function PulsePage() {
     return <ApiDown t={t} />;
   }
 
-  const { kpis, series, key_points, as_of } = data;
+  const { kpis, series, as_of } = data;
 
   const indexSpark = series.slice(-24).map((p) => p.index ?? 0);
   const postingsSpark = series.slice(-24).map((p) => p.postings);
@@ -67,24 +66,16 @@ export default async function PulsePage() {
   const wageSpark = kpis.median_wage_trend ?? undefined;
 
   const baselineGap = kpis.demand_index !== null ? kpis.demand_index - 100 : null;
-  // Headline composed from the demand index, localized via the page dict (S18).
-  const headline =
-    baselineGap === null
-      ? t.heroFallback
-      : t.heroTemplate
-          .replace("{pct}", String(Math.abs(Math.round(baselineGap))))
-          .replace("{dir}", baselineGap >= 0 ? t.heroAbove : t.heroBelow);
 
   return (
     <div className="pb-8">
-      {/* Dark institutional hero. The headline and lede remain composed from
-          the real overview response and bilingual dictionary. */}
+      {/* Neutral masthead: the KPI strip and charts carry the interpretation. */}
       <section className="pulse-hero">
         <div className="container-x py-12 md:py-16">
           <div className="eyebrow mb-3">
             {t.eyebrowPrefix} · {fmtMonth(as_of, locale)}
           </div>
-          <h1 className="h-display max-w-4xl text-balance">{headline}.</h1>
+          <h1 className="h-display max-w-4xl text-balance">{t.heroFallback}</h1>
           <p className="lede mt-4 max-w-2xl">{t.lede}</p>
         </div>
       </section>
@@ -125,7 +116,7 @@ export default async function PulsePage() {
             label={t.kpiWageLabel}
             value={fmtWage(kpis.median_wage, locale)}
             unit={kpis.median_wage ? t.kpiWageUnit : undefined}
-            context={kpis.wage_n ? `n = ${fmtCompact(kpis.wage_n, locale)}` : t.kpiWageInsufficient}
+            context={kpis.wage_n ? `${fmtCompact(kpis.wage_n, locale)} ${t.kpiWageSample}` : t.kpiWageInsufficient}
             spark={wageSpark && wageSpark.length > 1 ? wageSpark : undefined}
             sparkColor="var(--teal)"
           />
@@ -138,19 +129,16 @@ export default async function PulsePage() {
           <span className="pulse-section-number">01</span>
           <span className="pulse-section-title">{c.demandRibbon.eyebrow}</span>
         </div>
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Figure eyebrow={c.demandRibbon.eyebrow} title={c.demandRibbon.title} asOf={as_of} note={c.demandRibbon.note}>
-            <RemoteFigure fig={figs.demand} height={420} ariaLabel={c.demandRibbon.aria} />
-          </Figure>
-          <KeyPoints points={key_points} title={t.keyPointsTitle} tone="navy" />
-        </div>
+        <Figure eyebrow={c.demandRibbon.eyebrow} title={c.demandRibbon.title} asOf={as_of} note={c.demandRibbon.note}>
+          <RemoteFigure fig={figs.demand} height={420} ariaLabel={c.demandRibbon.aria} />
+        </Figure>
       </section>
 
       {/* Composition and seasonality */}
       <section className="container-x pulse-section pt-4">
         <div className="pulse-section-header">
           <span className="pulse-section-number">02</span>
-          <span className="pulse-section-title">{c.composition.eyebrow} &amp; {c.seasonality.eyebrow}</span>
+          <span className="pulse-section-title">{locale === "fr" ? "Variation annuelle et composition" : "Annual change and composition"}</span>
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.yoyBars.eyebrow} title={c.yoyBars.title} asOf={as_of} note={c.yoyBars.note}>

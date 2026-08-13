@@ -46,7 +46,7 @@ export function KpiTile({
       ].join(" ")}
     >
       {accent && <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-orange" />}
-      <div className="flex items-baseline justify-between gap-2">
+      <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
         <span className="t-caption font-bold uppercase tracking-[0.05em] text-ink-soft">{label}</span>
         {context && <span className="t-caption text-ink-faint">{context}</span>}
       </div>
@@ -70,13 +70,13 @@ export function KpiTile({
         {hasDelta ? (
           <span
             className={[
-              "num inline-flex shrink-0 items-center gap-1 whitespace-nowrap t-meta font-bold",
+              "num inline-flex min-w-0 flex-wrap items-center gap-x-1 gap-y-0.5 t-meta font-bold sm:shrink-0 sm:flex-nowrap sm:whitespace-nowrap",
               up ? "text-pos" : "text-neg",
             ].join(" ")}
           >
             <span className="sr-only">{up ? common[locale].up : common[locale].down}{" "}</span>
             <span aria-hidden>{up ? "▲" : "▼"}</span>
-            {fmtPct(Math.abs(delta as number), { locale })}
+            <span className="whitespace-nowrap">{fmtPct(Math.abs(delta as number), { locale })}</span>
             {deltaLabel && <span className="font-normal text-ink-faint">{deltaLabel}</span>}
           </span>
         ) : (

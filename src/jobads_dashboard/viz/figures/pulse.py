@@ -31,7 +31,7 @@ def demand_ribbon(ds: DataSource) -> go.Figure:
                              opacity=0.5, hovertemplate="%{x|%b %Y}: %{y:,.0f}<extra></extra>"))
     fig.add_trace(go.Scatter(x=solid["month"], y=solid["ma3"], name="3-month average",
                              mode="lines", line=dict(color=BRAND, width=3),
-                             hovertemplate="%{x|%b %Y}: %{y:,.0f}<extra>3-mo avg</extra>"))
+                             hovertemplate="%{x|%b %Y}: %{y:,.0f}<extra>3-month average</extra>"))
     fig.add_trace(go.Scatter(x=prov["month"], y=prov["ma3"], name="provisional",
                              mode="lines", line=dict(color=BRAND, width=3, dash="dot"),
                              showlegend=False, hovertemplate="%{x|%b %Y}: %{y:,.0f}<extra>provisional</extra>"))
@@ -39,8 +39,8 @@ def demand_ribbon(ds: DataSource) -> go.Figure:
     add_provisional_band(fig)
     fig.update_yaxes(title_text="postings / month", rangemode="tozero")
     fig.update_layout(showlegend=False)
-    return titled(fig, "Job-ad postings: monthly, 2016–2026",
-                  "Faint line = raw monthly count · bold = 3-month average · dotted tail = provisional")
+    return titled(fig, "Monthly job postings",
+                  "Monthly count, 3-month average and provisional period")
 
 
 def yoy_bars(ds: DataSource) -> go.Figure:
@@ -52,9 +52,9 @@ def yoy_bars(ds: DataSource) -> go.Figure:
     add_reference_line(fig, 0)
     add_covid_band(fig)
     add_provisional_band(fig)
-    fig.update_yaxes(title_text="year-over-year %", ticksuffix="%")
-    return titled(fig, "Growth and decline: year-over-year change in postings",
-                  "Each bar compares a month with the same month a year earlier")
+    fig.update_yaxes(title_text="change from a year earlier (%)", ticksuffix="%")
+    return titled(fig, "Annual posting change",
+                  "Compared with the same month a year earlier")
 
 
 def seasonality_heatmap(ds: DataSource) -> go.Figure:
@@ -67,11 +67,11 @@ def seasonality_heatmap(ds: DataSource) -> go.Figure:
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     fig = go.Figure(go.Heatmap(
         z=piv.values, x=piv.columns.astype(str), y=[months[m - 1] for m in piv.index],
-        colorscale=DIVERGING, zmid=1.0, colorbar=dict(title="vs year avg", tickformat=".0%"),
-        hovertemplate="%{y} %{x}: %{z:.0%} of year avg<extra></extra>"))
+        colorscale=DIVERGING, zmid=1.0, colorbar=dict(title="annual average", tickformat=".0%"),
+        hovertemplate="%{y} %{x}: %{z:.0%} of annual average<extra></extra>"))
     fig.update_yaxes(autorange="reversed")
-    return titled(fig, "When in the year are postings? Seasonal shape by month",
-                  "Each cell = that month relative to its own year's average (controls for the trend)")
+    return titled(fig, "Seasonality by month",
+                  "Each month relative to its annual average")
 
 
 def composition_area(ds: DataSource, top: int = 6) -> go.Figure:
@@ -95,8 +95,8 @@ def composition_area(ds: DataSource, top: int = 6) -> go.Figure:
     fig.update_yaxes(title_text="share of postings", ticksuffix="%", range=[0, 100])
     add_covid_band(fig, label=False)
     add_provisional_band(fig, label=False)
-    return titled(fig, "How the occupational mix shifts over time",
-                  "Share of monthly postings by broad occupation group (top groups + Other)")
+    return titled(fig, "Posting share by occupation",
+                  "Monthly share by broad occupation group")
 
 
 # --------------------------------------------------------------------------- DEEP
@@ -111,11 +111,11 @@ def diffusion_index(ds: DataSource) -> go.Figure:
                              line=dict(color=BRAND, width=2.5, shape="spline", smoothing=0.5),
                              hovertemplate="%{x|%b %Y}: %{y:.0f}<extra></extra>"))
     fig.add_hrect(y0=50, y1=100, fillcolor="rgba(47,111,119,0.06)", line_width=0, layer="below")
-    add_reference_line(fig, 50, text="balanced")
+    add_reference_line(fig, 50, text="half of groups")
     add_covid_band(fig)
-    fig.update_yaxes(title_text="% of groups growing (YoY)", range=[0, 100])
-    return titled(fig, "Is growth broad or narrow? Diffusion across occupation groups",
-                  "Share of broad occupation groups with positive year-over-year posting growth; 50 = evenly split (3-month smoothed)")
+    fig.update_yaxes(title_text="occupation groups with annual growth (%)", range=[0, 100])
+    return titled(fig, "Occupations with annual posting growth",
+                  "Share of broad occupation groups; 3-month average")
 
 
 def occupation_trends_grid(ds: DataSource) -> go.Figure:
@@ -145,8 +145,8 @@ def occupation_trends_grid(ds: DataSource) -> go.Figure:
     for ann in fig.layout.annotations:
         ann.font.size = 11
         ann.font.color = "#132330"
-    return titled(fig, "Every occupation group's posting trajectory at a glance",
-                  "Monthly postings 2016–2026, one panel per broad NOC group (each panel scaled to its own peak)")
+    return titled(fig, "Posting index by occupation",
+                  "One panel per broad occupation group")
 
 
 def momentum(ds: DataSource) -> go.Figure:
@@ -164,6 +164,6 @@ def momentum(ds: DataSource) -> go.Figure:
     add_reference_line(fig, 0)
     add_covid_band(fig)
     add_provisional_band(fig)
-    fig.update_yaxes(title_text="3-month avg − 12-month avg (postings)")
-    return titled(fig, "Momentum: are postings speeding up or cooling?",
-                  "Gap between the 3-month and 12-month averages · teal = accelerating, orange = cooling")
+    fig.update_yaxes(title_text="postings: 3-month average − 12-month average")
+    return titled(fig, "Short-term and long-term postings",
+                  "3-month average minus 12-month average")
