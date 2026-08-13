@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 
 from .. import compute as C
 from ..datasource import BASE_YEAR, DataSource
+from ..labels import localize_skill
 from ..theme import (
     BRAND, CONTEXT, MUTED, SEQUENTIAL, UP, DOWN,
     add_covid_band, add_reference_line,
@@ -81,7 +82,6 @@ def indexed_lines(ds: DataSource, base_year: int = BASE_YEAR) -> go.Figure:
     def _line_color(lbl: str) -> str:
         return UP if latest.get(lbl, 100) >= 100 else DOWN
 
-    annotations = []
     fig = go.Figure()
     for lbl, sub in idx.groupby("noc_name"):
         on = lbl in highlight_names
@@ -92,23 +92,9 @@ def indexed_lines(ds: DataSource, base_year: int = BASE_YEAR) -> go.Figure:
             mode="lines", line=dict(color=color, width=2.6 if on else 1),
             opacity=1 if on else 0.35, showlegend=on,
             hovertemplate="%{x|%b %Y} · " + lbl + ": %{y:.0f}<extra></extra>"))
-        if on:
-            last_row = sub[sub["month"] == last_month]
-            if not last_row.empty:
-                y_end = float(last_row["index"].iloc[0])
-                annotations.append(dict(
-                    x=last_month, y=y_end,
-                    xref="x", yref="y",
-                    xanchor="left", yanchor="middle",
-                    text=f"<b>{lbl}</b>",
-                    showarrow=False,
-                    font=dict(size=10, color=color),
-                    xshift=6,
-                ))
     add_reference_line(fig, 100, text=f"{base_year}=100")
     add_covid_band(fig)
     fig.update_yaxes(title_text="index (base year = 100)")
-    fig.update_layout(annotations=annotations)
     return titled(fig, "Which occupation groups grew fastest, indexed to a base year",
                   f"Each group indexed to its {base_year} average; fastest/slowest movers highlighted")
 
@@ -216,7 +202,7 @@ def noc_naics_heatmap(ds: DataSource) -> go.Figure:
 
 
 def skill_churn(ds: DataSource, base_year: int = BASE_YEAR,
-                end_year: int | None = None) -> go.Figure:
+                end_year: int | None = None, locale: str = "en") -> go.Figure:
     """Which skills are entering vs leaving: the biggest national gainers and losers
     in *share of skill mentions* between two years. Share-based so a genuinely new
     skill surfaces without a small-base blow-up. Descriptive 'what's changing in the
@@ -227,8 +213,9 @@ def skill_churn(ds: DataSource, base_year: int = BASE_YEAR,
     df = ds.skill_churn(base_year=base_year, end_year=end_year, top=category_cap(5, 12))
     end_year = int(end_year) if end_year is not None else ds.latest_complete_year
     colors = np.where(df["direction"].values == "rising", UP, DOWN)
+    labels = [localize_skill(name, locale) for name in df["skill_name"]]
     fig = go.Figure(go.Bar(
-        x=df["share_delta_pp"], y=df["skill_name"], orientation="h", marker_color=colors,
+        x=df["share_delta_pp"], y=labels, orientation="h", marker_color=colors,
         customdata=np.stack([df["base_share"], df["end_share"], df["end"]], axis=-1),
         hovertemplate="%{y}: %{x:+.2f} pp · "
                       + f"{base_year} " + "%{customdata[0]:.2f}%"
@@ -244,7 +231,7 @@ def skill_churn(ds: DataSource, base_year: int = BASE_YEAR,
 def ai_exposure_scatter(ds: DataSource, base_year: int = BASE_YEAR,
                         end_year: int | None = None) -> go.Figure:
     """AI exposure vs posting change, by broad occupation group. The deepest cut:
-    where is hiring moving relative to each group's task-based exposure to generative
+    where are postings moving relative to each group's task-based exposure to generative
     AI? Quadrants are descriptive, not predictive. Both years are selectable."""
     end_year = int(end_year) if end_year is not None else ds.latest_complete_year
     ex = ds.ai_exposure.set_index("noc_code")["exposure_beta"]
@@ -271,5 +258,5 @@ def ai_exposure_scatter(ds: DataSource, base_year: int = BASE_YEAR,
     fig.update_xaxes(title_text="AI exposure (β)")
     fig.update_yaxes(title_text="change in postings", ticksuffix="%")
     fig.update_layout(height=480, margin=dict(t=40))
-    return titled(fig, "AI exposure vs postings: where hiring is moving",
+    return titled(fig, "AI exposure and posting change",
                   "Eloundou et al. β (US task-based, mapped to NOC) vs posting change · bubble ∝ volume · right of the line = higher-exposure groups")

@@ -8,39 +8,36 @@ export const methodDict = {
   en: {
     // ApiDown fallback
     apiDownTitle: "Data service unavailable",
-    apiDownBody: "The API isn't responding. Start it with",
+    apiDownBody: "Try again shortly.",
     apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Hero
     heroEyebrow: "Method & data",
     heroTitle: "How to read this dashboard.",
-    heroIntro:
-      "These figures come from online job postings and describe posted hiring demand — not employment, unemployment, vacancies, or hires.",
+    heroIntro: "The dashboard describes Canadian online job postings.",
 
     // What it measures
     measuresTitle: "What this measures",
     measuresItems: [
-      "Posted hiring from Canadian online job ads",
-      "Postings by month, region, occupation (NOC), and industry (NAICS)",
-      "Wage ranges posted in ads (25th / median / 75th percentile)",
-      "Skills mentioned in postings and their relative frequency",
+      "Monthly postings by region, occupation (NOC), and industry (NAICS)",
+      "Advertised wage ranges",
+      "Skills and requirements named in postings",
     ],
 
     // What it does NOT measure
-    notMeasuresTitle: "What it does NOT measure",
+    notMeasuresTitle: "What it does not measure",
     notMeasuresItems: [
-      "Not employment — how many people hold jobs",
-      "Not the unemployment rate",
-      "Not job vacancies as defined by Statistics Canada (JVWS)",
-      "Not actual hires — a posting may never lead to a hire",
-      "A single ad may not equal one open job",
+      "Employment or unemployment",
+      "Statistics Canada job vacancies",
+      "Actual hires",
+      "Open positions: one ad may represent zero, one or several jobs",
     ],
 
     // Field coverage figure
-    coverageEyebrow: "How complete each field is",
+    coverageEyebrow: "Data coverage",
     coverageTitle: "Field coverage",
     coverageNote:
-      "Share of all postings that report each field. Wage, remote-work and similar fields are sparse — read them with care.",
+      "Share of postings that report each field.",
     coverageBuiltFrom: "Built from",
     coveragePostingsSpanning: "postings spanning",
     coveragePostingsLabel: "postings",
@@ -48,22 +45,25 @@ export const methodDict = {
 
     // Caveats figure
     caveatsEyebrow: "Caveats",
-    caveatsTitle: "Things to keep in mind",
-    caveatTranslations: {} as Record<string, string>,
+    caveatsTitle: "Key limitations",
+    caveatTranslations: {
+      "Job ads measure posted labor demand, not employment or unemployment.":
+        "Job ads measure posted labour demand, not employment or unemployment.",
+    } as Record<string, string>,
 
     // Category cap figure
     capEyebrow: "Category limit",
     capTitle: "Why charts show up to 10 categories",
     capBody:
-      "Public charts display at most 10 categories — the largest groups, with the remainder folded into a single “Other” bar (totals are preserved, never dropped). This limit is a condition of the Vicinity Jobs API terms of service. Signed-in team members see full, uncapped detail on every chart.",
+      "Public charts show up to 10 categories under the Vicinity Jobs API terms. Other preserves the remaining total. Team sessions show full detail.",
 
     // Glossary figure
     glossaryEyebrow: "Glossary",
-    glossaryTitle: "Key terms defined",
+    glossaryTitle: "Key terms",
     glossaryTerms: [
       {
         term: "Postings index",
-        def: "Monthly active postings indexed to January 2019 = 100. A value of 110 means 10% more postings than in the 2019 baseline.",
+        def: "Monthly postings indexed to January 2019 = 100. A value of 110 is 10% above the baseline.",
       },
       {
         term: "Year over year",
@@ -71,65 +71,62 @@ export const methodDict = {
       },
       {
         term: "Wage range",
-        def: "25th percentile / median / 75th percentile of posted hourly wages. Shown only when at least 100 postings list a wage.",
+        def: "25th percentile, median and 75th percentile of advertised hourly wages; n ≥ 100.",
       },
       {
         term: "Location quotient",
-        def: "A region's share of postings divided by its share of the labour force. Values above 1 mean the region is over-represented in that type of posting.",
+        def: "Posting share divided by labour-force share. Above 1 means higher concentration.",
       },
       {
         term: "Distinctive skills / lift",
-        def: "A scope's skill share divided by the national share. High lift means a skill appears disproportionately often in this filter.",
+        def: "Skill share in the selected scope divided by its national share.",
       },
       {
         term: "Sample gate, n",
-        def: 'Statistics are withheld when fewer than 100 postings support them. Shown as "—" with a note indicating insufficient sample.',
+        def: 'Statistics with fewer than 100 supporting postings are shown as “—”.',
       },
     ],
 
     // Version / changelog figure
     versionEyebrow: "Version",
     versionTitle: "Changelog",
-    versionRelease: "initial public release. Data current through",
+    versionRelease: "initial public release",
     versionGenerated: "generated",
   },
 
   fr: {
     // ApiDown fallback
     apiDownTitle: "Service de données indisponible",
-    apiDownBody: "L'API ne répond pas. Démarrez-la avec",
+    apiDownBody: "Réessayez dans quelques instants.",
     apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Hero
     heroEyebrow: "Méthode et données",
     heroTitle: "Comment lire ce tableau de bord.",
-    heroIntro:
-      "Ces chiffres proviennent d'offres d'emploi en ligne et décrivent la demande d'embauche affichée — non l'emploi, le chômage, les postes vacants ou les embauches.",
+    heroIntro: "Le tableau de bord décrit les offres d’emploi en ligne au Canada.",
 
     // What it measures
     measuresTitle: "Ce que cela mesure",
     measuresItems: [
-      "Embauche affichée dans les offres d'emploi en ligne au Canada",
-      "Offres par mois, région, profession (CNP) et industrie (SCIAN)",
-      "Fourchettes salariales affichées dans les offres (25e centile / médiane / 75e centile)",
-      "Compétences mentionnées dans les offres et leur fréquence relative",
+      "Offres mensuelles par région, profession (CNP) et industrie (SCIAN)",
+      "Fourchettes salariales affichées",
+      "Compétences et exigences mentionnées dans les offres",
     ],
 
     // What it does NOT measure
-    notMeasuresTitle: "Ce que cela ne mesure PAS",
+    notMeasuresTitle: "Ce que cela ne mesure pas",
     notMeasuresItems: [
-      "Pas l'emploi — le nombre de personnes en poste",
-      "Pas le taux de chômage",
-      "Pas les postes vacants au sens de Statistique Canada (EPVS)",
-      "Pas les embauches réelles — une offre peut ne mener à aucune embauche",
-      "Une seule annonce ne correspond pas nécessairement à un seul poste",
+      "L’emploi ou le chômage",
+      "Les postes vacants de Statistique Canada",
+      "Les embauches réelles",
+      "Les postes ouverts : une annonce peut représenter zéro, un ou plusieurs emplois",
     ],
 
     // Field coverage figure
-    coverageEyebrow: "Complétude de chaque champ",
+    coverageEyebrow: "Couverture des données",
     coverageTitle: "Couverture des champs",
     coverageNote:
-      "Part de l'ensemble des offres qui renseignent chaque champ. Les champs salaire, télétravail et similaires sont peu renseignés — interprétez-les avec prudence.",
+      "Part des offres qui renseignent chaque champ.",
     coverageBuiltFrom: "Calculé à partir de",
     coveragePostingsSpanning: "offres couvrant",
     coveragePostingsLabel: "offres",
@@ -142,8 +139,10 @@ export const methodDict = {
 
     // Caveats figure
     caveatsEyebrow: "Mises en garde",
-    caveatsTitle: "Points importants à retenir",
+    caveatsTitle: "Principales limites",
     caveatTranslations: {
+      "Job ads measure posted labour demand, not employment or unemployment.":
+        "Les offres d’emploi mesurent la demande de main-d’œuvre affichée, non l’emploi ni le chômage.",
       "Job ads measure posted labor demand, not employment or unemployment.":
         "Les offres d’emploi mesurent la demande de main-d’œuvre affichée, non l’emploi ni le chômage.",
       "The 2025 upstream raw fetch provenance remains under audit; freshness should be read with caution.":
@@ -158,15 +157,15 @@ export const methodDict = {
     capEyebrow: "Limite de catégories",
     capTitle: "Pourquoi les graphiques affichent jusqu’à 10 catégories",
     capBody:
-      "Les graphiques publics affichent au plus 10 catégories — les plus grands groupes, le reste étant regroupé dans une seule barre « Autres » (les totaux sont préservés, jamais supprimés). Cette limite découle des conditions d’utilisation de l’API Vicinity Jobs. Les membres de l’équipe connectés voient le détail complet, sans plafond, sur chaque graphique.",
+      "Les graphiques publics montrent jusqu’à 10 catégories selon les conditions de l’API Vicinity Jobs. La catégorie « Autres » conserve le total restant. Les sessions d’équipe affichent le détail complet.",
 
     // Glossary figure
     glossaryEyebrow: "Glossaire",
-    glossaryTitle: "Définition des termes clés",
+    glossaryTitle: "Termes clés",
     glossaryTerms: [
       {
         term: "Indice des offres",
-        def: "Offres actives mensuelles indexées à janvier 2019 = 100. Une valeur de 110 signifie 10 % d'offres de plus que dans la période de référence de 2019.",
+        def: "Offres mensuelles indexées à janvier 2019 = 100. Une valeur de 110 dépasse la référence de 10 %.",
       },
       {
         term: "Variation annuelle",
@@ -174,26 +173,26 @@ export const methodDict = {
       },
       {
         term: "Fourchette salariale",
-        def: "25e centile / médiane / 75e centile des salaires horaires affichés. Affiché seulement lorsqu'au moins 100 offres indiquent un salaire.",
+        def: "25e centile, médiane et 75e centile des salaires horaires affichés; n ≥ 100.",
       },
       {
         term: "Quotient de localisation",
-        def: "Part des offres d'une région divisée par sa part de la population active. Une valeur supérieure à 1 signifie que la région est surreprésentée dans ce type d'offres.",
+        def: "Part des offres divisée par la part de la population active. Plus de 1 indique une concentration élevée.",
       },
       {
         term: "Compétences distinctives / indice de surreprésentation",
-        def: "Part de la compétence dans la portée divisée par la part nationale. Un indice élevé signifie que la compétence apparaît de façon disproportionnée dans ce filtre.",
+        def: "Part d’une compétence dans la sélection divisée par sa part nationale.",
       },
       {
         term: "Seuil d'échantillon, n",
-        def: 'Les statistiques sont retenues lorsque moins de 100 offres les supportent. Affichées comme « — » avec une note indiquant un échantillon insuffisant.',
+        def: 'Les statistiques appuyées par moins de 100 offres sont affichées comme « — ».',
       },
     ],
 
     // Version / changelog figure
     versionEyebrow: "Version",
     versionTitle: "Historique des versions",
-    versionRelease: "première publication. Données à jour jusqu'au",
+    versionRelease: "première publication",
     versionGenerated: "généré le",
   },
 } as const;

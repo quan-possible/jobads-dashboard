@@ -83,6 +83,45 @@ def test_fr_localizes_pulse_residual_legend():
     assert "Other groups" not in names
 
 
+@pytest.mark.parametrize(("chart_id", "english_leaks"), [
+    ("occupations.treemap", ("All occupations", "Sales & service", "Unknown<br>")),
+    ("occupations.indexed_lines", ("Manufacturing & utilities", "Sciences & engineering")),
+    ("occupations.skill_churn", ("Communication skills", "Customer Service", "Interpersonal Skills")),
+    ("pulse.composition", ("Sales & service", "Business & finance", "Trades & transport")),
+    ("pulse.occupation_trends", ("Sales & service", "Business & finance", "Trades & transport")),
+    ("industries.treemap", ("All industries", "Health care & social", "Other sectors<br>")),
+    ("geography.ranked_provinces", ("British Columbia", "Quebec", "Atlantic Canada")),
+    ("geography.cma_demand", ("(CMA)",)),
+    ("geography.shift_share", ("National trend", "Occupation mix", "Local (competitive)", "Quebec")),
+    ("geography.yoy_choropleth", ("March 2026", "British Columbia", "Quebec")),
+    ("pay.wage_dumbbell", ("British Columbia", "Quebec", "Newfoundland & Labrador")),
+    ("pay.wage_by_education", ("No requirement", "High school", "Doctorate")),
+    ("pay.conditions_mix", ("full-time", "part-time", "Unknown")),
+    ("skills.education", ("Graduate Degree", "High School", "No Education")),
+    ("skills.experience", ("1-3 years", "Not reported", "Other specified")),
+    ("skills.skill_occupation_heatmap", ("Teamwork", "Customer Service", "Decision-Making")),
+    ("skills.skill_lift", ("Splints", "Physical Assessment", "Intensive Care")),
+])
+def test_fr_figures_do_not_leak_known_english_labels(chart_id, english_leaks):
+    blob = figures.build(chart_id, locale="fr")
+    assert not [text for text in english_leaks if text in blob]
+
+
+@pytest.mark.parametrize("chart_id", ["occupations.indexed_lines", "skills.top_skills_trend"])
+def test_indexed_lines_do_not_use_endpoint_text_annotations(chart_id):
+    """Endpoint labels duplicate the legend and make Plotly extend mobile time axes years past the data."""
+    payload = json.loads(figures.build(chart_id))
+    annotations = payload["layout"].get("annotations") or []
+    assert all("<b>" not in str(item.get("text", "")) for item in annotations)
+
+
+def test_education_legend_uses_complete_short_labels():
+    payload = json.loads(figures.build("skills.education"))
+    names = {trace.get("name") for trace in payload["data"]}
+    assert {"Doctorate", "Master’s", "Bachelor’s", "College / certificate"} <= names
+    assert not any(name and name.endswith(("Doctora", "Bachelor", "Certificati")) for name in names)
+
+
 @pytest.mark.parametrize("chart_id", [
     "geography.yoy_choropleth", "geography.demand_map_share",
     "geography.demand_map_count", "geography.demand_map_percap", "geography.demand_map_lq",

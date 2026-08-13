@@ -302,6 +302,11 @@ def test_cross_filter_active_postings_smaller_than_national(
     assert filtered_ap < national_ap, (
         f"filtered active_postings ({filtered_ap}) should be < national ({national_ap})"
     )
+
+
+def test_french_key_points_use_french_decimal_separator(client: TestClient) -> None:
+    points = client.get("/api/overview", params={"locale": "fr"}).json()["key_points"]
+    assert all(not re.search(r"\d\.\d+ %", point) for point in points)
 # ---------------------------------------------------------------------------
 # 11. Malformed date params degrade gracefully (S04)
 # ---------------------------------------------------------------------------

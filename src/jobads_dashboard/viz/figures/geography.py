@@ -143,7 +143,7 @@ def ranked_provinces(ds: DataSource) -> go.Figure:
                   "The list carries the precise ranking the map cannot")
 
 
-def cma_demand(ds: DataSource, top: int = 10) -> go.Figure:
+def cma_demand(ds: DataSource, top: int = 10, locale: str = "en") -> go.Figure:
     """City / CMA-level postings — finer than province. The largest metropolitan
     labour markets by posting volume over the last 12 months."""
     _non_metro = r"unknown market|rural area not in a cma"
@@ -156,6 +156,8 @@ def cma_demand(ds: DataSource, top: int = 10) -> go.Figure:
     mk = mk.sort_values("postings_total", ascending=False).head(eff_top).sort_values("postings_total")
     mk["prov"] = mk["market_label"].str.split("|").str[0].str.strip()
     mk["city"] = mk["market_label"].str.split("|").str[1].str.strip()
+    if locale == "fr":
+        mk["city"] = mk["city"].str.replace("(CMA)", "(RMR)", regex=False)
     # Disambiguate any city name shared by more than one province — the "Rural
     # area not in a CMA/CA" catch-all repeats per province — by suffixing the
     # province, so no two bars carry an identical tick label (S18).
@@ -254,15 +256,23 @@ def yoy_choropleth(ds: DataSource, animate: str | None = None, locale: str = "en
         decembers = [prov2[prov2["year"] == y]["month"].max() for y in sorted(prov2["year"].unique())]
         decembers = [m for m in decembers if not prov[prov["month"] == m - pd.DateOffset(months=12)].empty]
         last_m = decembers[-1]
+        month_names = {
+            1: "janvier", 2: "février", 3: "mars", 4: "avril", 5: "mai", 6: "juin",
+            7: "juillet", 8: "août", 9: "septembre", 10: "octobre", 11: "novembre", 12: "décembre",
+        }
         labels = [
-            (m.strftime("%B %Y") if m == last_m and m.month != 12 else str(m.year))
+            ((f"{month_names[m.month]} {m.year}" if locale == "fr" else m.strftime("%B %Y"))
+             if m == last_m and m.month != 12 else str(m.year))
             for m in decembers
         ]
         frames = [go.Frame(name=lbl, data=[_trace(_yoy_by_month(prov, m), with_geo=False)])
                   for lbl, m in zip(labels, decembers)]
         fig = go.Figure(data=[_trace(_yoy_by_month(prov, decembers[-1]), with_geo=True)], frames=frames)
         fig.update_geos(fitbounds="locations", visible=False)
-        add_time_slider(fig, labels, **_slider_chrome(locale))
+        slider = _slider_chrome(locale)
+        if labels and not labels[-1].isdigit():
+            slider["prefix"] = "Date : " if locale == "fr" else "Date: "
+        add_time_slider(fig, labels, **slider)
         fig.update_layout(height=480, margin=dict(l=10, r=10, t=10, b=44))
         return titled(fig, "Momentum: year-over-year change by province",
                       "Diverging fill pinned at 0 — orange growing, teal cooling. Drag the slider or press play to move through time.")

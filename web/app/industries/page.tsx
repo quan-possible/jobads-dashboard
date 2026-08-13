@@ -22,10 +22,7 @@ function ApiDown({ t }: { t: (typeof industriesDict)[keyof typeof industriesDict
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
         <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
-        <p className="text-ink-soft">
-          {t.apiDownBody}{" "}
-          <code className="bg-surface-alt px-1">{t.apiDownCmd}</code>.
-        </p>
+        <p className="text-ink-soft">{t.apiDownBody}</p>
       </div>
     </div>
   );

@@ -12,8 +12,8 @@ const COPY = {
     retry: "Retry",
     titles: { view: "This view couldn’t load", explore: "Explore couldn’t load", page: "This page couldn’t load" },
     bodies: {
-      service: "The data service may be unavailable. Confirm the API is running on port 8530, then try again.",
-      generic: "An unexpected error occurred. Please try again.",
+      service: "Try again shortly.",
+      generic: "Try again.",
     },
   },
   fr: {
@@ -21,8 +21,8 @@ const COPY = {
     retry: "Réessayer",
     titles: { view: "Cette vue n’a pas pu se charger", explore: "Explorer n’a pas pu se charger", page: "Cette page n’a pas pu se charger" },
     bodies: {
-      service: "Le service de données est peut-être indisponible. Vérifiez que l’API tourne sur le port 8530, puis réessayez.",
-      generic: "Une erreur inattendue s’est produite. Veuillez réessayer.",
+      service: "Réessayez dans quelques instants.",
+      generic: "Réessayez.",
     },
   },
 } as const;

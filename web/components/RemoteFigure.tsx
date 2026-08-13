@@ -43,7 +43,7 @@ export function RemoteFigure({
   loading?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [failedFor, setFailedFor] = useState<FigJSON | null>(null);
 
   // The factory's own height is the authored intent; fall back to the prop.
@@ -161,7 +161,7 @@ export function RemoteFigure({
             margin: { ...authoredMargin, t: Math.max(Number(authoredMargin.t ?? 0), 62) },
           } : {}),
         };
-        void newPlot(el, data, layout, { ...baseConfig })
+        void newPlot(el, data, layout, { ...baseConfig, locale })
           .then(() => {
             if (!disposed && fig.frames?.length) void addFrames(el, fig.frames);
           })
@@ -178,7 +178,7 @@ export function RemoteFigure({
       ro?.disconnect();
       if (plotly && el) plotly.purge(el);
     };
-  }, [fig, figHeight]);
+  }, [fig, figHeight, locale]);
 
   // While a fetch is in flight and nothing has rendered yet, show a neutral
   // loading skeleton — not the error notice — so a normal load never reads as

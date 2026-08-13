@@ -22,10 +22,7 @@ function ApiDown({ t }: { t: (typeof pulseDict)[keyof typeof pulseDict] }) {
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
         <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
-        <p className="text-ink-soft">
-          {t.apiDownBody}{" "}
-          <code className="bg-surface-alt px-1">{t.apiDownCmd}</code>.
-        </p>
+        <p className="text-ink-soft">{t.apiDownBody}</p>
       </div>
     </div>
   );
@@ -140,13 +137,12 @@ export default async function PulsePage() {
         <div className="pulse-section-header">
           <span className="pulse-section-number">01</span>
           <span className="pulse-section-title">{c.demandRibbon.eyebrow}</span>
-          <span className="pulse-section-asof">{fmtMonth(as_of, locale)}</span>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
           <Figure eyebrow={c.demandRibbon.eyebrow} title={c.demandRibbon.title} asOf={as_of} note={c.demandRibbon.note}>
             <RemoteFigure fig={figs.demand} height={420} ariaLabel={c.demandRibbon.aria} />
           </Figure>
-          <KeyPoints points={key_points} title={t.keyPointsTitle} note={t.keyPointsNote} tone="navy" />
+          <KeyPoints points={key_points} title={t.keyPointsTitle} tone="navy" />
         </div>
       </section>
 
@@ -155,7 +151,6 @@ export default async function PulsePage() {
         <div className="pulse-section-header">
           <span className="pulse-section-number">02</span>
           <span className="pulse-section-title">{c.composition.eyebrow} &amp; {c.seasonality.eyebrow}</span>
-          <span className="pulse-section-asof">{fmtMonth(as_of, locale)}</span>
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure eyebrow={c.yoyBars.eyebrow} title={c.yoyBars.title} asOf={as_of} note={c.yoyBars.note}>

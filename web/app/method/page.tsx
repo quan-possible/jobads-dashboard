@@ -21,10 +21,7 @@ function ApiDown({ t }: { t: (typeof methodDict)[keyof typeof methodDict] }) {
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
         <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
-        <p className="text-ink-soft">
-          {t.apiDownBody}{" "}
-          <code className="bg-surface-alt px-1">{t.apiDownCmd}</code>.
-        </p>
+        <p className="text-ink-soft">{t.apiDownBody}</p>
       </div>
     </div>
   );
@@ -150,10 +147,7 @@ export default async function MethodPage() {
         <SectionLead number="06" label={locale === "fr" ? "Version" : "Version"} />
         <Figure eyebrow={t.versionEyebrow} title={t.versionTitle}>
           <p className="t-body text-ink-soft">
-            <span className="num font-bold text-navy">v1</span> ·{" "}
-            {fmtMonth(meta.latest_month, locale)} — {t.versionRelease}{" "}
-            {fmtMonth(meta.latest_month, locale)}; {t.versionGenerated}{" "}
-            {fmtMonth(meta.generated_at_utc.slice(0, 7), locale)}.
+            <span className="num font-bold text-navy">v1</span> · {t.versionRelease}.
           </p>
         </Figure>
       </section>

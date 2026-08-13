@@ -1,4 +1,4 @@
-import { fmtCompact } from "@/lib/format";
+import { fmtCompact, fmtPct } from "@/lib/format";
 import type { Locale } from "@/lib/i18n/locale";
 
 // A single row showing how completely a field is populated across postings.
@@ -18,7 +18,8 @@ export function CoverageBar({
   postingsLabel?: string;
   locale?: Locale;
 }) {
-  const pct = (share * 100).toFixed(0);
+  const pct = fmtPct(share * 100, { locale });
+  const coverageWord = locale === "fr" ? "couverture" : "coverage";
   const isSparse = share < 0.4;
   const accentClass = isSparse ? "text-orange-deep" : "text-teal";
   const barClass = isSparse ? "bg-orange" : "bg-teal";
@@ -26,12 +27,12 @@ export function CoverageBar({
   return (
     <div
       role="img"
-      aria-label={`${label}: ${pct}% coverage, ${fmtCompact(count, locale)} ${postingsLabel}`}
+      aria-label={`${label}: ${pct} ${coverageWord}, ${fmtCompact(count, locale)} ${postingsLabel}`}
       className="min-w-0"
     >
       <div className="mb-1 grid grid-cols-[1fr_auto] items-baseline gap-2">
         <span className="t-body-sm font-bold text-navy">{label}</span>
-        <span className={`num t-body-sm font-bold ${accentClass}`}>{pct}%</span>
+        <span className={`num t-body-sm font-bold ${accentClass}`}>{pct}</span>
       </div>
       <div className="h-2.5 w-full overflow-hidden rounded-sm bg-surface-alt">
         <div

@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 from .. import compute as C
 from .._capctx import category_cap
 from ..datasource import BASE_YEAR, DataSource
-from ..labels import localize_skill, noc_short
+from ..labels import localize_requirement, localize_skill, noc_short
 from ..theme import BRAND, CONTEXT, MUTED, SEQUENTIAL, UP, DOWN, add_covid_band, add_provisional_band, add_reference_line
 from ._common import titled
 
@@ -38,7 +38,6 @@ def top_skills_trend(ds: DataSource, base_year: int = BASE_YEAR, top: int = 8,
     def _line_color(skill: str) -> str:
         return UP if latest.get(skill, 100) >= 100 else DOWN
 
-    annotations = []
     fig = go.Figure()
     for name, sub in idx.groupby("skill_name"):
         on = name in highlight_names
@@ -50,30 +49,16 @@ def top_skills_trend(ds: DataSource, base_year: int = BASE_YEAR, top: int = 8,
             line=dict(color=color, width=2.6 if on else 1),
             opacity=1 if on else 0.35, showlegend=on,
             hovertemplate="%{x|%b %Y} · " + display + ": %{y:.0f}<extra></extra>"))
-        if on:
-            last_row = sub[sub["month"] == last_month]
-            if not last_row.empty:
-                y_end = float(last_row["index"].iloc[0])
-                annotations.append(dict(
-                    x=last_month, y=y_end,
-                    xref="x", yref="y",
-                    xanchor="left", yanchor="middle",
-                    text=f"<b>{display}</b>",
-                    showarrow=False,
-                    font=dict(size=10, color=color),
-                    xshift=6,
-                ))
     add_reference_line(fig, 100, text=f"{base_year}=100")
     add_covid_band(fig)
     add_provisional_band(fig)
     fig.update_yaxes(title_text="index (base year = 100)")
-    fig.update_layout(annotations=annotations)
     return titled(fig, "The most-requested skills, and how each has trended",
                   f"Top skills by posting volume, each indexed to its {base_year} average · fastest/slowest movers highlighted")
 
 
 def ai_skill_diffusion(ds: DataSource) -> go.Figure:
-    """The rise of AI skills in hiring: AI skills as a share of all skill
+    """AI skills in job postings: AI skills as a share of all skill
     mentions over time. AI skills = the reference taxonomy's 'Artificial Intelligence'
     sub-group. Mention-share, smoothed; the generative-AI surge shows from 2024."""
     d = ds.ai_skill_diffusion()
@@ -140,7 +125,7 @@ def skill_occupation_heatmap(ds: DataSource) -> go.Figure:
                   "Column-normalised: each occupation's mentions of the top skills (latest month)")
 
 
-def education_composition(ds: DataSource) -> go.Figure:
+def education_composition(ds: DataSource, locale: str = "en") -> go.Figure:
     e = ds.requirements("Education")
     tot = e.groupby("month")["postings_total"].transform("sum")
     e = e.assign(share=e["postings_total"] / tot * 100)
@@ -148,15 +133,16 @@ def education_composition(ds: DataSource) -> go.Figure:
     fig = go.Figure()
     for i, cat in enumerate(cats):
         sub = e[e["category"] == cat]
-        fig.add_trace(go.Scatter(x=sub["month"], y=sub["share"], name=cat[:30], stackgroup="one",
+        label = localize_requirement(cat, locale)
+        fig.add_trace(go.Scatter(x=sub["month"], y=sub["share"], name=label, stackgroup="one",
                                  mode="lines", line=dict(width=0.5, color=COLORWAY[i % len(COLORWAY)]),
-                                 hovertemplate="%{x|%b %Y} · " + cat[:24] + ": %{y:.1f}%<extra></extra>"))
+                                 hovertemplate="%{x|%b %Y} · " + label + ": %{y:.1f}%<extra></extra>"))
     fig.update_yaxes(title_text="share of postings", ticksuffix="%", range=[0, 100])
     return titled(fig, "Education requirements over time",
                   "Share of postings by stated education requirement")
 
 
-def experience_mix(ds: DataSource) -> go.Figure:
+def experience_mix(ds: DataSource, locale: str = "en") -> go.Figure:
     x = ds.requirements("Experience details band")
     tot = x.groupby("month")["postings_total"].transform("sum")
     x = x.assign(share=x["postings_total"] / tot * 100)
@@ -165,9 +151,10 @@ def experience_mix(ds: DataSource) -> go.Figure:
     fig = go.Figure()
     for i, cat in enumerate(present):
         sub = x[x["category"] == cat]
-        fig.add_trace(go.Scatter(x=sub["month"], y=sub["share"], name=cat, stackgroup="one",
+        label = localize_requirement(cat, locale)
+        fig.add_trace(go.Scatter(x=sub["month"], y=sub["share"], name=label, stackgroup="one",
                                  mode="lines", line=dict(width=0.5, color=COLORWAY[i % len(COLORWAY)]),
-                                 hovertemplate="%{x|%b %Y} · " + cat + ": %{y:.1f}%<extra></extra>"))
+                                 hovertemplate="%{x|%b %Y} · " + label + ": %{y:.1f}%<extra></extra>"))
     fig.update_yaxes(title_text="share of postings", ticksuffix="%", range=[0, 100])
     return titled(fig, "Experience bands over time",
                   "Share of postings by advertised years-of-experience band")

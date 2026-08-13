@@ -30,3 +30,8 @@ declare module "plotly.js/lib/waterfall" {
   const trace: unknown;
   export default trace;
 }
+
+declare module "plotly.js/lib/locales/fr" {
+  const locale: unknown;
+  export default locale;
+}

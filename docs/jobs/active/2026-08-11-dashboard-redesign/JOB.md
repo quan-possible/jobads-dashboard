@@ -22,8 +22,9 @@ category-cap, bilingual, accessibility, or deployment contracts.
 - The preserved Pulse and Explore desktop targets are verified redesign
   groundwork.
 - The deployed app is healthy at `127.0.0.1:8522`, the API is healthy at
-  `127.0.0.1:8530`, and the public tunnel serves the exact canonical build from
-  release commit `b7bebe5b` (Next build ID `R1XRrat8L-kJFQH4OLwqr`).
+  `127.0.0.1:8530`, and the public tunnel serves the corrected mobile Explore
+  release plus the verified copy/palette pass (Next build ID
+  `ifCthJv9b7_bykFttVtY1`).
 - Mobile Pulse and Explore targets plus four Mobbin interaction references are
   preserved under this job's `evidence/` directory.
 - The intended Keychain password lookup still exits 44. The existing mode-600
@@ -53,7 +54,7 @@ category-cap, bilingual, accessibility, or deployment contracts.
 | Figure language | Worker | `src/jobads_dashboard/viz/`, figure goldens | Complete |
 | Public routes | Worker | seven remaining routes and shared route grammar | Complete |
 | Explore workspace | Worker | authenticated builder, posting lookup, responsive detail | Complete |
-| Integration and acceptance | Parent | combined worktree, job state, visual judgment | Complete; fresh reviewer returned `READY` at `229c9ae2` |
+| Integration and acceptance | Parent | combined worktree, job state, visual judgment | Complete after reopening and repairing the missed mobile Explore target |
 
 ## Next action
 
@@ -123,3 +124,56 @@ as separately authorized follow-ups.
   public health passed, all nine EN/FR routes returned 200, anonymous `full=1`
   stayed capped, protected endpoints stayed protected, the running LaunchAgent
   included `--no-proxy-headers`, and all four deployed captures were coherent.
+- That verdict was retracted when a direct comparison exposed an authoritative
+  390 px Explore mismatch: the deployed page permanently expanded all filters,
+  omitted the target KPI strip, and hid team state in the closed masthead. The
+  audit's claim that the KPI rhythm could be waived was not authorized by the
+  target owner.
+- Corrected release `cc2ec4f7` collapses the mobile scope behind a 44 px filter
+  disclosure, uses unique mobile/desktop control IDs, shows four truthful
+  current-scope metrics, and keeps an authenticated team badge beside the
+  mobile menu. ESLint, TypeScript, and two Next 16.3 production builds passed.
+- An isolated 8531 API with a disposable credential exercised login, live
+  filter changes, EN/FR KPIs, results, and the posting bottom sheet in Chrome.
+  The isolated service was stopped and production was rebuilt against 8530.
+- The existing LaunchAgent now serves build `ifCthJv9b7_bykFttVtY1`.
+  Local/public health, all nine EN/FR routes, protected posting access,
+  deployed mobile disclosure, French state, desktop toolbar, zero duplicate
+  IDs, no console errors, and no page overflow passed. Corrective screenshots
+  are `candidate-explore-auth-390-fr-repair.png` and
+  `deployed-explore-locked-390-en-repair.png`.
+- The whole-dashboard copy pass reviewed every public route in English and
+  French against ONS/Government Analysis Function chart-text guidance. Page
+  descriptions and chart titles were shortened, `hiring` was replaced with
+  posting-accurate terms, repeated chart/section dates and generic caveats were
+  removed, and French metadata, hover text, labels, and narrative grammar were
+  repaired. The page masthead now owns the single data date.
+- The palette pass checked live `aclmr.ca`: primary text on navy now uses exact
+  white while secondary text remains muted. Fresh 1440 px English and 390 px
+  French captures show the intended ACLMR shell with no page overflow.
+- ESLint, TypeScript, the Next 16.3 webpack build, all 382 Python tests,
+  and `git diff --check` passed. A live nine-route EN desktop and FR mobile sweep
+  returned 200 everywhere, no banned copy, chart titles no longer than seven
+  words, one data date per analytical page, white hero headings, no page-level
+  overflow, and no console errors. Generated build
+  `ifCthJv9b7_bykFttVtY1` is healthy locally and through the unchanged tunnel.
+- Live QA exposed Next's persistent public fetch cache retaining a prior API
+  narrative across rebuilds. `web/package.json` now clears only
+  `.next/cache/fetch-cache` before production builds; the deployed HTML serves
+  the current concise narrative after restart.
+- The first independent copy review rejected the release for English taxonomy,
+  geography, education, experience, and control text inside French Plotly
+  figures; wrong footer identity; active-listing language; and locale number/date
+  formatting. The repaired runtime localizes those generated labels, identifies
+  the Alberta Centre correctly, names the latest-month metric accurately, and
+  adds regression coverage for the known leaks. The complete EN desktop and FR
+  mobile route sweeps then passed again on the public build.
+- A second fresh reviewer found redundant endpoint annotations stretching two
+  390 px time axes years past the March 2026 data. Removing those duplicate
+  labels restored both Occupations and Skills to the exact 2016-01–2026-03
+  range; the live DOM, 222 focused figure/golden tests, and a regression guard
+  now cover the fix.
+- The same reviewer then found mechanically truncated English education labels.
+  Curated complete labels replaced raw slicing, the live public legend was
+  rechecked, and the independent final verdict is `READY` with 223 focused
+  figure/golden tests, no overflow, and no console errors.

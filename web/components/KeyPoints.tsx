@@ -6,7 +6,7 @@ import { PixelTiles } from "./PixelTiles";
 export function KeyPoints({
   points,
   title = "What stands out",
-  note = "Descriptive signals only — postings show posted demand, not causes.",
+  note,
   tone = "navy",
 }: {
   points: string[];
@@ -29,7 +29,9 @@ export function KeyPoints({
           </li>
         ))}
       </ul>
-      <p className={`mt-auto pt-4 t-caption leading-relaxed ${tone === "navy" ? "text-ink-invert/70" : "text-ink-faint"}`}>{note}</p>
+      {note ? (
+        <p className={`mt-auto pt-4 t-caption leading-relaxed ${tone === "navy" ? "text-ink-invert/70" : "text-ink-faint"}`}>{note}</p>
+      ) : null}
     </div>
   );
 }

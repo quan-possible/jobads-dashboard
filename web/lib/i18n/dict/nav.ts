@@ -17,8 +17,7 @@ export const nav = {
       logIn: "Team log in",
       signIn: "Sign in",
       title: "Team sign-in",
-      blurb:
-        "Sign in with the team password to open Explore and see full, uncapped detail on every chart.",
+      blurb: "Sign in to open Explore and full chart detail.",
       teamView: "Team view",
       fullDetail: "Full detail",
       teamBadge: "Team",
@@ -43,8 +42,7 @@ export const nav = {
       logIn: "Connexion équipe",
       signIn: "Se connecter",
       title: "Connexion de l’équipe",
-      blurb:
-        "Connectez-vous avec le mot de passe d’équipe pour ouvrir Explorer et voir le détail complet, sans plafond, sur chaque graphique.",
+      blurb: "Connectez-vous pour ouvrir Explorer et le détail complet des graphiques.",
       teamView: "Vue équipe",
       fullDetail: "Détail complet",
       teamBadge: "Équipe",

@@ -13,7 +13,8 @@ import choropleth from "plotly.js/lib/choropleth";
 import heatmap from "plotly.js/lib/heatmap";
 import treemap from "plotly.js/lib/treemap";
 import waterfall from "plotly.js/lib/waterfall";
+import fr from "plotly.js/lib/locales/fr";
 
-Plotly.register([bar, scatter, choropleth, heatmap, treemap, waterfall]);
+Plotly.register([bar, scatter, choropleth, heatmap, treemap, waterfall, fr]);
 
 export default Plotly;

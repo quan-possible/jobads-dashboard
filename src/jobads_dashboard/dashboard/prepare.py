@@ -874,7 +874,7 @@ FROM normalized_postings
             "remote_field_postings": int(summary[6]),
         },
         "known_caveats": [
-            "Job ads measure posted labor demand, not employment or unemployment.",
+            "Job ads measure posted labour demand, not employment or unemployment.",
             f"The {max_date.year if hasattr(max_date, 'year') else str(max_date)[:4]} upstream raw fetch provenance remains under audit; freshness should be read with caution.",
             "Wages, remote work, language, and detailed experience fields are sparse or historically unstable.",
             "Posting-level lookup is private and may be bounded by the configured lookup window and row limit.",

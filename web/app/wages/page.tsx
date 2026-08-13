@@ -82,7 +82,7 @@ export default async function WagesPage() {
 
       {/* Deep: the conditioned wage premium — credential ladder + pay vs demand */}
       <section className="container-x py-4 md:py-6">
-        <SectionLead number="02" label={locale === "fr" ? "Scolarité et demande" : "Education and demand"} asOf={asOf} locale={locale} />
+        <SectionLead number="02" label={locale === "fr" ? "Scolarité et offres" : "Education and postings"} asOf={asOf} locale={locale} />
         <div className="grid gap-5 lg:grid-cols-2">
           <Figure
             eyebrow={c.wageByEducation.eyebrow}

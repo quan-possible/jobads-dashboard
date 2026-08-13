@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Canadian Labour Market Pulse — ACLMR";
+export const alt = "ACLMR Labour Market · Marché du travail";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -98,7 +98,7 @@ export default function Image() {
                 maxWidth: 680,
               }}
             >
-              Canadian Labour Market Pulse
+              ACLMR
             </div>
 
             {/* Subtitle */}
@@ -111,7 +111,7 @@ export default function Image() {
                 maxWidth: 560,
               }}
             >
-              Posted demand, wages, skills and geography — from ACLMR aggregates.
+              Labour Market · Marché du travail
             </div>
 
             {/* Domain strip */}

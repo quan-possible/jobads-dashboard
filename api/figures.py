@@ -24,6 +24,7 @@ Design notes:
 from __future__ import annotations
 
 import json
+import re
 from functools import lru_cache
 from typing import Callable
 
@@ -37,6 +38,7 @@ from jobads_dashboard.viz.labels import (
     NAICS_SHORT_FR,
     NOC_SHORT,
     NOC_SHORT_FR,
+    localize_skill,
 )
 from jobads_dashboard.viz.figures import (
     geography,
@@ -79,7 +81,7 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "geography.demand_map_percap": lambda ds, **k: geography.demand_map(ds, measure="percap", animate="by-year", locale=k.get("locale", "en")),
     "geography.demand_map_lq": lambda ds, **k: geography.demand_map(ds, measure="lq", animate="by-year", locale=k.get("locale", "en")),
     "geography.ranked_provinces": lambda ds, **k: geography.ranked_provinces(ds),
-    "geography.cma_demand": lambda ds, **k: geography.cma_demand(ds),
+    "geography.cma_demand": lambda ds, **k: geography.cma_demand(ds, locale=k.get("locale", "en")),
     "geography.shift_share": lambda ds, **k: geography.shift_share_bars(ds, **_year_kw(k, "base_year", "end_year")),
     "geography.yoy_choropleth": lambda ds, **k: geography.yoy_choropleth(ds, animate="by-year", locale=k.get("locale", "en")),
     "geography.ai_exposure": lambda ds, **k: geography.ai_exposure_map(ds),
@@ -89,7 +91,7 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "occupations.contribution_bars": lambda ds, **k: occupations.contribution_bars(ds, **_year_kw(k, "base_year", "end_year")),
     "occupations.waterfall": lambda ds, **k: occupations.waterfall(ds, **_year_kw(k, "base_year", "end_year")),
     "occupations.dumbbell": lambda ds, **k: occupations.dumbbell(ds, **_year_kw(k, "base_year", "end_year")),
-    "occupations.skill_churn": lambda ds, **k: occupations.skill_churn(ds, **_year_kw(k, "base_year", "end_year")),
+    "occupations.skill_churn": lambda ds, **k: occupations.skill_churn(ds, locale=k.get("locale", "en"), **_year_kw(k, "base_year", "end_year")),
     "occupations.ai_exposure": lambda ds, **k: occupations.ai_exposure_scatter(ds, **_year_kw(k, "base_year", "end_year")),
     "occupations.noc_naics_heatmap": lambda ds, **k: occupations.noc_naics_heatmap(ds),
     # --- Industries ---------------------------------------------------------
@@ -110,8 +112,8 @@ REGISTRY: dict[str, Callable[..., go.Figure]] = {
     "skills.ai_skill_diffusion": lambda ds, **k: skills.ai_skill_diffusion(ds),
     "skills.skill_lift": lambda ds, **k: skills.skill_lift_bars(ds, locale=k.get("locale", "en")),
     "skills.skill_occupation_heatmap": lambda ds, **k: skills.skill_occupation_heatmap(ds),
-    "skills.education": lambda ds, **k: skills.education_composition(ds),
-    "skills.experience": lambda ds, **k: skills.experience_mix(ds),
+    "skills.education": lambda ds, **k: skills.education_composition(ds, locale=k.get("locale", "en")),
+    "skills.experience": lambda ds, **k: skills.experience_mix(ds, locale=k.get("locale", "en")),
     # --- Data quality -------------------------------------------------------
     "quality.coverage_lines": lambda ds, **k: quality.coverage_lines(ds),
     "quality.coverage_latest": lambda ds, **k: quality.coverage_latest_bars(ds),
@@ -144,11 +146,11 @@ _FR_CHROME: dict[str, str] = {
     "market rank": "rang du marché",
     "postings (last 12 months)": "offres (12 derniers mois)",
     "postings / month": "offres / mois",
-    "province (ordered by demand volume)": "province (classée par volume de demande)",
+    "province (ordered by demand volume)": "province (classée par volume d’offres)",
     "rank (1 = most postings)": "rang (1 = plus d’offres)",
     "robust z of remainder": "cote z robuste du résidu",
     "share of coded postings": "part des offres codées",
-    "share of demand": "part de la demande",
+    "share of demand": "part des offres",
     "share of markets": "part des marchés",
     "share of postings": "part des offres",
     "skill code": "code de compétence",
@@ -171,7 +173,8 @@ _FR_CHROME: dict[str, str] = {
     "mean AI exposure (β)": "exposition moyenne à l’IA (β)",
     "YoY %": "% a/a",
     "postings": "offres",
-    "vs year avg": "vs moy. annuelle",
+    "vs year avg": "par rapport à la moy. annuelle",
+    "%": " %",
     # band / reference annotations
     "provisional": "provisoire",
     "pre-2021 unstable": "instable avant 2021",
@@ -188,6 +191,11 @@ _FR_CHROME: dict[str, str] = {
     "Other": "Autres",
     "Other groups": "Autres groupes",
     "Other sectors": "Autres secteurs",
+    "All occupations": "Toutes les professions",
+    "All industries": "Toutes les industries",
+    "National trend": "Tendance nationale",
+    "Occupation mix": "Composition professionnelle",
+    "Local (competitive)": "Écart local",
     # subplot titles
     "Observed": "Observé",
     "Trend": "Tendance",
@@ -195,6 +203,41 @@ _FR_CHROME: dict[str, str] = {
     "Remainder": "Résidu",
     "HHI over time (markets)": "IHH au fil du temps (marchés)",
     "Top-20 cumulative share": "Part cumulée du top 20",
+    # geography labels
+    "British Columbia": "Colombie-Britannique",
+    "Quebec": "Québec",
+    "Atlantic Canada": "Canada atlantique",
+    "Northwest Territories": "Territoires du Nord-Ouest",
+    "Newfoundland and Labrador": "Terre-Neuve-et-Labrador",
+    "Newfoundland & Labrador": "Terre-Neuve-et-Labrador",
+    "New Brunswick": "Nouveau-Brunswick",
+    "Nova Scotia": "Nouvelle-Écosse",
+    "Prince Edward Island": "Île-du-Prince-Édouard",
+    "Yukon Territory": "Yukon",
+    # education, experience, employment and language categories
+    "No Education Required": "Aucun diplôme requis",
+    "High School Completion": "Études secondaires",
+    "College Diploma or Certification": "Diplôme collégial ou certificat",
+    "Undergraduate Degree (Bachelors)": "Baccalauréat",
+    "Graduate Degree - Masters": "Maîtrise",
+    "Post-Graduate Degree - Doctorate": "Doctorat",
+    "No requirement": "Aucun diplôme requis",
+    "High school": "Études secondaires",
+    "College": "Collège",
+    "Bachelor's": "Baccalauréat",
+    "Master's": "Maîtrise",
+    "Doctorate": "Doctorat",
+    "<1 year": "Moins d’un an",
+    "1-3 years": "1 à 3 ans",
+    "3-5 years": "3 à 5 ans",
+    "5+ years": "5 ans ou plus",
+    "Not reported": "Non indiqué",
+    "Other specified": "Autre durée indiquée",
+    "full-time or part-time": "temps plein ou partiel",
+    "full-time": "temps plein",
+    "part-time": "temps partiel",
+    "English mandatory": "anglais obligatoire",
+    "French mandatory": "français obligatoire",
     # month ticks (cycle plot + seasonality)
     "Jan": "Janv", "Feb": "Févr", "Mar": "Mars", "Apr": "Avr", "May": "Mai",
     "Jun": "Juin", "Jul": "Juil", "Aug": "Août", "Sep": "Sept",
@@ -211,7 +254,43 @@ _FR_CHROME.setdefault("Unknown", "Inconnu")
 
 
 def _fr(s: str) -> str:
-    return _FR_CHROME.get(s, s)
+    translated = _FR_CHROME.get(s)
+    if translated is not None:
+        return translated
+    skill = localize_skill(s, "fr")
+    if skill != s:
+        return skill
+    for en, fr in {
+        "January ": "Janvier ", "February ": "Février ", "March ": "Mars ",
+        "April ": "Avril ", "May ": "Mai ", "June ": "Juin ",
+        "July ": "Juillet ", "August ": "Août ", "September ": "Septembre ",
+        "October ": "Octobre ", "November ": "Novembre ", "December ": "Décembre ",
+    }.items():
+        if s.startswith(en) and s[len(en):].isdigit():
+            return fr + s[len(en):]
+    net = re.fullmatch(r"net ([+−-]?\d+(?:\.\d+)?) pp", s)
+    if net:
+        value = net.group(1).replace("-", "−").replace(".", ",")
+        return f"solde {value} pp"
+    if re.fullmatch(r"\d{1,3}(,\d{3})+", s):
+        return s.replace(",", " ")
+    return s
+
+
+# Some Plotly fields combine a label with a value or HTML (treemap tile text,
+# hover templates). Translate their embedded labels longest-first while leaving
+# format directives intact.
+_FR_EMBEDDED = {
+    **{NOC_SHORT[c]: NOC_SHORT_FR[c] for c in NOC_SHORT},
+    **{NAICS_SHORT[c]: NAICS_SHORT_FR[c] for c in NAICS_SHORT},
+    **{k: v for k, v in _FR_CHROME.items() if len(k) > 5 and k not in {"Actual change"}},
+}
+
+
+def _fr_embedded(s: str) -> str:
+    for en in sorted(_FR_EMBEDDED, key=len, reverse=True):
+        s = s.replace(en, _FR_EMBEDDED[en])
+    return s
 
 
 # Literal phrases that appear *inside* hovertemplate / texttemplate strings (not
@@ -219,26 +298,44 @@ def _fr(s: str) -> str:
 # longest-first, and only within hover keys, so Plotly format directives
 # (%{...|...}) elsewhere are never touched (S21). Keep these unambiguous literals.
 _FR_HOVER: dict[str, str] = {
+    "of the group's top-skill mentions": "des principales mentions de compétences du groupe",
+    "have an industry code": "avec un code SCIAN",
+    "Local (competitive)": "écart local",
+    "P25–P75 band": "bande P25–P75",
+    "National trend": "tendance nationale",
+    "Occupation mix": "composition professionnelle",
     "of sector postings": "des offres du secteur",
+    "mean exposure": "exposition moyenne",
+    "ask a degree": "exigent un diplôme",
     "3-month average": "moyenne sur 3 mois",
     "of year avg": "de la moyenne annuelle",
     "3-mo avg": "moy. 3 mois",
+    "exposure β": "exposition β",
+    "(12 mo)": "(12 mois)",
     "of sector": "du secteur",
     "coverage": "couverture",
     "median": "médiane",
     "provisional": "provisoire",
     "postings": "offres",
+    "covered": "couvert",
+    "actual": "réel",
+    "lift": "indice",
+    "YoY": "sur un an",
+    " vs ": " par rapport à ",
+    " in ": " dans ",
+    "/hr": "/h",
 }
 
 
 def _fr_hover(s: str) -> str:
+    s = _fr_embedded(s)
     for en in sorted(_FR_HOVER, key=len, reverse=True):
         if en in s:
             s = s.replace(en, _FR_HOVER[en])
-    return s
+    return s.replace("}%", "} %")
 
 
-def _localize_chrome(node) -> None:
+def _localize_chrome(node, parent_key: str | None = None) -> None:
     """Recursively translate known English chrome strings in a figure JSON dict.
 
     Whole-string chrome (axis titles, legends, …) is exact-matched; hover
@@ -246,15 +343,20 @@ def _localize_chrome(node) -> None:
     if isinstance(node, dict):
         for k, v in node.items():
             if isinstance(v, str):
-                node[k] = _fr_hover(_fr(v)) if k in ("hovertemplate", "texttemplate") else _fr(v)
+                if k in ("hovertemplate", "texttemplate"):
+                    node[k] = _fr_hover(_fr(v))
+                elif k in ("text", "hovertext"):
+                    node[k] = _fr_embedded(_fr(v))
+                else:
+                    node[k] = _fr(v)
             else:
-                _localize_chrome(v)
+                _localize_chrome(v, k)
     elif isinstance(node, list):
         for i, v in enumerate(node):
             if isinstance(v, str):
-                node[i] = _fr(v)
+                node[i] = _fr_embedded(_fr(v)) if parent_key in {"text", "hovertext"} else _fr(v)
             else:
-                _localize_chrome(v)
+                _localize_chrome(v, parent_key)
 
 
 def apply_house_style(fig: go.Figure, *, locale: str = "en") -> str:

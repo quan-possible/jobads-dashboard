@@ -120,6 +120,24 @@ SKILL_NAME_FR: dict[str, str] = {
     "Writing": "Rédaction",
     "Research": "Recherche",
     "Planning": "Planification",
+    "Decision-Making": "Prise de décision",
+    "Fast-paced Setting": "Milieu au rythme soutenu",
+    "Interpersonal Skills": "Compétences interpersonnelles",
+    "Computer skills": "Compétences informatiques",
+    "Inventory Management": "Gestion des stocks",
+    "Inspections": "Inspection",
+    "Handling heavy loads": "Manutention de charges lourdes",
+    "Records management": "Gestion des dossiers",
+    "Splints": "Attelles",
+    "Physical Assessment": "Évaluation physique",
+    "PALS (Pediatric Advanced Life Support)": "PALS (réanimation pédiatrique avancée)",
+    "Charge Nurse Expertise": "Expertise d’infirmière responsable",
+    "Holter monitors": "Moniteurs Holter",
+    "Perioperative Nursing": "Soins infirmiers périopératoires",
+    "Intravenous Therapy": "Thérapie intraveineuse",
+    "Intensive Care": "Soins intensifs",
+    "Basic Life Support": "Soins immédiats en réanimation",
+    "Geriatrics": "Gériatrie",
     # AI-skill display labels
     "Machine learning": "Apprentissage automatique",
     "Artificial intelligence": "Intelligence artificielle",
@@ -129,6 +147,30 @@ SKILL_NAME_FR: dict[str, str] = {
     "Data science": "Science des données",
     "Generative AI": "IA générative",
     "Large language models": "Grands modèles de langage",
+}
+
+REQUIREMENT_NAME_EN: dict[str, str] = {
+    "No Education Required": "No requirement",
+    "High School Completion": "High school",
+    "College Diploma or Certification": "College / certificate",
+    "Undergraduate Degree (Bachelors)": "Bachelor’s",
+    "Graduate Degree - Masters": "Master’s",
+    "Post-Graduate Degree - Doctorate": "Doctorate",
+}
+
+REQUIREMENT_NAME_FR: dict[str, str] = {
+    "No Education Required": "Aucun diplôme requis",
+    "High School Completion": "Études secondaires",
+    "College Diploma or Certification": "Diplôme collégial ou certificat",
+    "Undergraduate Degree (Bachelors)": "Baccalauréat",
+    "Graduate Degree - Masters": "Maîtrise",
+    "Post-Graduate Degree - Doctorate": "Doctorat",
+    "<1 year": "Moins d’un an",
+    "1-3 years": "1 à 3 ans",
+    "3-5 years": "3 à 5 ans",
+    "5+ years": "5 ans ou plus",
+    "Not reported": "Non indiqué",
+    "Other specified": "Autre durée indiquée",
 }
 
 
@@ -161,6 +203,12 @@ def localize_skill(name: str, locale: str = "en") -> str:
     if locale != "fr" or not name:
         return name
     return _SKILL_NAME_FR_CI.get(name.lower(), name)
+
+
+def localize_requirement(name: str, locale: str = "en") -> str:
+    """Localize the finite education/experience categories used in charts."""
+    table = REQUIREMENT_NAME_FR if locale == "fr" else REQUIREMENT_NAME_EN
+    return table.get(name, name)
 
 
 def short_label(dim: str, value: str, locale: str = "en") -> str:

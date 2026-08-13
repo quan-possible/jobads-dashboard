@@ -22,10 +22,7 @@ function ApiDown({ t }: { t: (typeof occupationsDict)[keyof typeof occupationsDi
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
         <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
-        <p className="text-ink-soft">
-          {t.apiDownBody}{" "}
-          <code className="bg-surface-alt px-1">{t.apiDownCmd}</code>.
-        </p>
+        <p className="text-ink-soft">{t.apiDownBody}</p>
       </div>
     </div>
   );
@@ -92,7 +89,7 @@ export default async function OccupationsPage() {
 
       {/* Core: what's in demand, and who grew */}
       <section className="container-x py-8 md:py-10">
-        <SectionLead number="01" label={locale === "fr" ? "Demande par profession" : "Occupation demand"} asOf={asOf} locale={locale} />
+        <SectionLead number="01" label={locale === "fr" ? "Offres par profession" : "Postings by occupation"} asOf={asOf} locale={locale} />
         <Figure eyebrow={c.treemap.eyebrow} title={c.treemap.title} asOf={asOf} note={c.treemap.note}>
           <RemoteFigure fig={figs.treemap} height={460} ariaLabel={c.treemap.aria} />
         </Figure>

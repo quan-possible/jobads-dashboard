@@ -85,19 +85,14 @@ def annual_means(df: pd.DataFrame, value: str, *group_cols: str,
 def treemap_trace(g: pd.DataFrame, name_col: str, root: str) -> go.Treemap:
     """Shared treemap trace for the occupation / industry volume treemaps.
 
-    Large tiles (>=3% of root) show label+value+percent; small tiles show only
-    the label so cramped text does not overflow. Value and percent always appear
-    on hover regardless of tile size.
+    Tiles show labels only so the hierarchy stays legible. Value and percent
+    remain available on hover.
     """
     g = g.copy()
     g["short"] = g[name_col].map(lambda s: s.split("|")[-1].strip() or s.strip())
     total = g["postings_total"].sum()
-    # Per-tile text: full detail for large tiles, label-only for small ones.
-    threshold = 0.03 * total
-    tile_text = [
-        lbl if val < threshold else f"{lbl}<br>{val:,.0f} ({val/total:.1%})"
-        for lbl, val in zip(g["short"].tolist(), g["postings_total"].tolist())
-    ]
+    # Keep the tiles quiet: labels only. Exact values and shares remain on hover.
+    tile_text = g["short"].tolist()
     return go.Treemap(
         labels=[root] + g["short"].tolist(),
         parents=[""] + [root] * len(g),

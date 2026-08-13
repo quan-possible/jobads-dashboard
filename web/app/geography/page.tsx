@@ -23,7 +23,7 @@ function ApiDown({ t }: { t: (typeof geographyDict)[keyof typeof geographyDict] 
     <div className="container-x py-24">
       <div className="card card-pad mx-auto max-w-xl text-center">
         <h1 className="h-section mb-2">{t.apiDownTitle}</h1>
-        <p className="text-ink-soft">{t.apiDownBody} <code className="bg-surface-alt px-1">uvicorn api.main:app --port 8530 --no-proxy-headers</code>.</p>
+        <p className="text-ink-soft">{t.apiDownBody}</p>
       </div>
     </div>
   );

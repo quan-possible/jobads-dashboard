@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth/provider";
 import { usePathname } from "next/navigation";
 import { Brand } from "./Brand";
 
-export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
+export function Footer({ source }: { source?: string }) {
   const { t } = useI18n();
   const { authenticated } = useAuth();
   const pathname = usePathname();
@@ -39,11 +39,6 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
           <span className="eyebrow text-orange-soft!">{t.footer.aboutData}</span>
           <p>{source ?? t.footer.sourceDefault}</p>
           <p>{t.footer.categoryCap}</p>
-          {asOf && (
-            <p className="num">
-              {t.footer.dataThrough} {asOf}.
-            </p>
-          )}
           <p>
             {t.footer.readMethodPre}{" "}
             <Link href="/method" className="font-bold text-orange-soft underline-offset-2 hover:underline">
@@ -59,7 +54,6 @@ export function Footer({ asOf, source }: { asOf?: string; source?: string }) {
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col items-start justify-between gap-2 py-5 t-caption text-ink-invert/50 sm:flex-row sm:items-center">
           <span>© {year} {t.footer.rights}</span>
-          <span className="uppercase tracking-[0.04em]">{t.footer.disclaimer}</span>
         </div>
       </div>
     </footer>

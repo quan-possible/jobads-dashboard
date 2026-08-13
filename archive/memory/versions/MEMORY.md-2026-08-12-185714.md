@@ -74,11 +74,6 @@ Last condensed: 2026-08-12
 - `origin/main` was not pushed because Render authority is expired and its
   reachable hostname appears to serve an older Streamlit build. The missing
   Keychain entry remains a credential-ownership hardening follow-up.
-- A deployed copy/palette pass shortened all EN/FR route and chart language,
-  restored posting-accurate terminology, reduced dates to one per analytical
-  page, and aligned primary navy-surface text with live ACLMR white. Live QA
-  also found persistent Next public fetch data, so production builds now clear
-  only `.next/cache/fetch-cache` before building. [Release record.](memory/2026-08-12.md)
 
 ## Rebuild rule
 

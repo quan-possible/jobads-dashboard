@@ -3,9 +3,7 @@ import { PT_Sans } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/TopNav";
 import { Footer } from "@/components/Footer";
-import { api } from "@/lib/api";
-import { fmtMonth } from "@/lib/format";
-import { getServerDict } from "@/lib/i18n/server";
+import { getLocale, getServerDict } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { AuthProvider } from "@/lib/auth/provider";
 
@@ -22,40 +20,32 @@ const ptSans = PT_Sans({
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? process.env.RENDER_EXTERNAL_URL ?? "http://localhost:3000";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "Canadian Labour Market Pulse · ACLMR",
-    template: "%s · ACLMR",
-  },
-  description:
-    "An interactive view of Canada's online job postings — demand, wages, skills and geography — from the ACLMR aggregates.",
-  applicationName: "ACLMR Labour Market",
-  authors: [{ name: "ACLMR", url: "https://aclmr.ca" }],
-  openGraph: {
-    type: "website",
-    title: "Canadian Labour Market Pulse · ACLMR",
-    description:
-      "An interactive view of Canada's online job postings — demand, wages, skills and geography — from the ACLMR aggregates.",
-    siteName: "ACLMR Labour Market",
-  },
-  twitter: {
-    card: "summary_large_image",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const fr = (await getLocale()) === "fr";
+  const title = fr ? "Tableau de bord du marché du travail · ACLMR" : "Canadian Labour Market Dashboard · ACLMR";
+  const description = fr
+    ? "Tendances des offres d’emploi au Canada par région, profession, industrie, salaire et compétence."
+    : "Canadian job-posting trends by region, occupation, industry, wage and skill.";
+  return {
+    metadataBase: new URL(siteUrl),
+    title: { default: title, template: "%s · ACLMR" },
+    description,
+    applicationName: fr ? "Marché du travail de l’ACLMR" : "ACLMR Labour Market",
+    authors: [{ name: "ACLMR", url: "https://aclmr.ca" }],
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      siteName: fr ? "Marché du travail de l’ACLMR" : "ACLMR Labour Market",
+    },
+    twitter: { card: "summary_large_image" },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const { locale, t } = await getServerDict();
-
-  let asOf: string | undefined;
-  try {
-    const meta = await api.meta();
-    asOf = fmtMonth(meta.latest_month, locale);
-  } catch {
-    asOf = undefined;
-  }
 
   return (
     <html lang={locale} className={`${ptSans.variable} h-full`}>
@@ -70,7 +60,7 @@ export default async function RootLayout({
             </a>
             <TopNav />
             <main id="main" tabIndex={-1} className="flex-1 outline-none">{children}</main>
-            <Footer asOf={asOf} />
+            <Footer />
           </AuthProvider>
         </I18nProvider>
       </body>

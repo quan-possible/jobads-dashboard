@@ -7,16 +7,15 @@ export const wagesDict = {
   en: {
     // Hero
     eyebrowPrefix: "Wages",
-    heroTitle: "What job ads say about pay.",
-    heroLede:
-      "Only a share of postings list a wage, so coverage is partial and skewed toward roles where pay is a recruitment signal. This dashboard shows hourly ranges — the 25th percentile, median, and 75th percentile of posted wages — not single point estimates.",
+    heroTitle: "Advertised wages in job postings",
+    heroLede: "Compare hourly wage levels, ranges and coverage.",
 
     // Coverage callout
-    coverageOf: "of postings in the current window include a wage field.",
+    coverageOf: "of postings include a wage.",
     coverageWithheld:
       "Any occupation or province with fewer than",
     coverageWithheldSuffix:
-      "wage observations is withheld from the charts below to avoid unreliable estimates.",
+      "wage observations is withheld.",
 
     // Wage band over time
     bandEyebrow: "Advertised hourly pay over time",
@@ -34,69 +33,67 @@ export const wagesDict = {
     // Figure — province
     provTitle: "Hourly wage range by province",
 
-    // Wage vs hiring scatter
-    scatterEyebrow: "Pay vs hiring · by occupation",
-    scatterTitle: "Where pay and hiring meet",
-    scatterNote: "Each bubble is a broad occupational group: horizontal = postings, vertical = median advertised wage, size = volume. Dashed lines mark the medians.",
-    scatterNotEnough: "Not enough paired wage-and-hiring data for this selection.",
+    // Wage vs postings scatter
+    scatterEyebrow: "Pay vs postings · by occupation",
+    scatterTitle: "Pay and posting volume",
+    scatterNote: "Each bubble is a broad NOC group; size = posting volume.",
+    scatterNotEnough: "Not enough paired wage and posting data for this selection.",
 
     // Figure — shared note (minSample interpolated by the page)
     notePrefix:
-      "Dot = median posted wage. Bar spans the 25th to 75th percentile of wages listed in job ads. Groups with fewer than",
+      "Dot = median. Bar = 25th–75th percentile. Groups with fewer than",
     noteSuffix: "wage observations are withheld.",
 
     // API-down fallback
     apiDownTitle: "Data service unavailable",
-    apiDownBody:
-      "The API isn't responding. Start it with",
+    apiDownBody: "Try again shortly.",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Going deeper",
-    deepLede:
-      "Provincial spread, the pay-versus-hiring quadrant, and posting conditions for readers who want the texture behind the headline pay.",
+    deepEyebrow: "More detail",
+    deepLede: "Provincial ranges, credentials and posting conditions.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       wageBand: {
         eyebrow: "Advertised hourly pay over time",
-        title: "Advertised hourly wage: median and P25–P75 band",
-        note: "Wages are advertised, not paid · dotted line = share of postings carrying a wage (right axis).",
+        title: "Advertised hourly wages over time",
+        note: "Band = 25th–75th percentile · line = median · dotted = coverage.",
         aria: "Median advertised hourly wage with a 25th-to-75th percentile band and a wage-coverage line",
       },
       wageDumbbell: {
         eyebrow: "Advertised pay spread · by province",
-        title: "Advertised wage spread by province",
-        note: "Bar = P25→P75 range, dot = median · provinces with at least 200 wage-bearing postings.",
+        title: "Advertised wages by province",
+        note: "Bar = 25th–75th percentile · dot = median · n ≥ 200.",
         aria: "Dumbbell chart of advertised hourly wage spread by province, P25 to P75 with the median marked",
       },
       wageDemandQuadrant: {
-        eyebrow: "Pay vs hiring · by occupation",
-        title: "Pay vs momentum: the wage × hiring quadrant (Dec 2024)",
-        note: "Bubble area ∝ volume · upper-right = well-paid and growing (correlation, not causation). Median wage shown only for groups that clear the wage-sample floor.",
+        eyebrow: "Pay vs growth · by occupation",
+        title: "Advertised pay and posting growth",
+        note: "Bubble = volume. Correlation, not causation.",
         aria: "Quadrant scatter of occupations by advertised median wage and year-over-year posting growth, bubble size by volume",
       },
       educationWageProxy: {
         eyebrow: "Credentials vs pay · by occupation",
-        title: "Do credential-heavy occupations pay more? (Dec 2024)",
-        note: "Each broad occupation group: share of postings asking for a university degree vs median advertised wage · bubble ∝ volume (correlation, not causation). Median wage shown only for groups that clear the wage-sample floor.",
+        title: "Credentials and advertised pay",
+        note: "Bubble = volume. Correlation, not causation.",
         aria: "Scatter of broad occupation groups by degree-requirement share and median advertised wage, bubble size by volume",
       },
       wageByEducation: {
         eyebrow: "Credential ladder · by education",
-        title: "The credential ladder: advertised wage by education level",
-        note: "P25–P75 band, dot = median · latest-month posting sample with both a wage and a stated education requirement (correlation, not causation).",
+        title: "Advertised pay by education level",
+        note: "Band = 25th–75th percentile · dot = median. Latest month.",
         aria: "Dumbbell ladder of advertised hourly wage P25–P75 band and median by education level",
       },
       conditionsMix: {
         eyebrow: "Posting conditions over time",
-        title: "Employment-type mix over time",
+        title: "Employment types over time",
         note: "Share of postings by advertised employment type.",
         aria: "Stacked area of the advertised employment-type mix over time",
       },
       languageGap: {
         eyebrow: "Language requirements over time",
-        title: "Language requirements: English vs French (mandatory)",
-        note: "Share of postings flagging a mandatory language · unstable before 2021 (shaded).",
+        title: "Mandatory language requirements",
+        note: "Share of postings; pre-2021 data are unstable.",
         aria: "Lines of the share of postings flagging a mandatory English or French requirement over time",
       },
     },
@@ -104,16 +101,15 @@ export const wagesDict = {
   fr: {
     // Hero
     eyebrowPrefix: "Salaires",
-    heroTitle: "Ce que les offres d'emploi révèlent sur la rémunération.",
-    heroLede:
-      "Seulement une partie des offres indiquent un salaire, donc la couverture est partielle et biaisée vers les postes où la rémunération est un signal de recrutement. Ce tableau de bord affiche les fourchettes horaires — le 25e centile, la médiane et le 75e centile des salaires affichés — et non des estimations ponctuelles.",
+    heroTitle: "Salaires affichés dans les offres d’emploi",
+    heroLede: "Comparez les niveaux, les fourchettes et la couverture des salaires horaires.",
 
     // Coverage callout
-    coverageOf: "des offres de la période courante indiquent un salaire horaire.",
+    coverageOf: "des offres indiquent un salaire.",
     coverageWithheld:
       "Toute profession ou province avec moins de",
     coverageWithheldSuffix:
-      "observations salariales est retenue des graphiques ci-dessous afin d'éviter des estimations peu fiables.",
+      "observations salariales est masquée.",
 
     // Wage band over time
     bandEyebrow: "Salaire horaire affiché au fil du temps",
@@ -131,69 +127,67 @@ export const wagesDict = {
     // Figure — province
     provTitle: "Fourchette salariale horaire par province",
 
-    // Wage vs hiring scatter
-    scatterEyebrow: "Salaire vs embauche · par profession",
-    scatterTitle: "Où le salaire et l'embauche se rencontrent",
-    scatterNote: "Chaque bulle est un grand groupe professionnel : horizontal = offres, vertical = salaire médian affiché, taille = volume. Les lignes pointillées marquent les médianes.",
-    scatterNotEnough: "Données appariées salaire-embauche insuffisantes pour cette sélection.",
+    // Wage vs postings scatter
+    scatterEyebrow: "Salaire vs offres · par profession",
+    scatterTitle: "Salaire et volume d’offres",
+    scatterNote: "Chaque bulle est un grand groupe CNP; taille = volume d’offres.",
+    scatterNotEnough: "Données appariées salaire-offres insuffisantes pour cette sélection.",
 
     // Figure — shared note (minSample interpolated by the page)
     notePrefix:
-      "Point = salaire horaire médian affiché. La barre couvre du 25e au 75e centile des salaires dans les offres d'emploi. Les groupes de moins de",
-    noteSuffix: "observations salariales sont retenus.",
+      "Point = médiane. Barre = 25e–75e centile. Les groupes comptant moins de",
+    noteSuffix: "observations salariales ne sont pas affichés.",
 
     // API-down fallback
     apiDownTitle: "Service de données indisponible",
-    apiDownBody:
-      "L'API ne répond pas. Démarrez-la avec",
+    apiDownBody: "Réessayez dans quelques instants.",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Pour aller plus loin",
-    deepLede:
-      "L'écart entre provinces, le quadrant salaire-embauche et les conditions des offres, pour qui veut la texture derrière la rémunération principale.",
+    deepEyebrow: "Plus de détails",
+    deepLede: "Fourchettes provinciales, diplômes et conditions des offres.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       wageBand: {
         eyebrow: "Salaire horaire affiché au fil du temps",
-        title: "Salaire horaire affiché : médiane et bande P25–P75",
-        note: "Les salaires sont affichés, non versés · ligne pointillée = part des offres indiquant un salaire (axe de droite).",
+        title: "Salaires horaires affichés au fil du temps",
+        note: "Bande = 25e–75e centile · ligne = médiane · pointillé = couverture.",
         aria: "Salaire horaire médian affiché avec une bande du 25e au 75e centile et une ligne de couverture salariale",
       },
       wageDumbbell: {
         eyebrow: "Écart de salaire affiché · par province",
-        title: "Écart de salaire affiché par province",
-        note: "Barre = fourchette P25→P75, point = médiane · provinces avec au moins 200 offres porteuses d'un salaire.",
+        title: "Salaires affichés par province",
+        note: "Barre = 25e–75e centile · point = médiane · n ≥ 200.",
         aria: "Graphique en haltère de l'écart de salaire horaire affiché par province, du P25 au P75 avec la médiane indiquée",
       },
       wageDemandQuadrant: {
-        eyebrow: "Salaire vs embauche · par profession",
-        title: "Salaire vs élan : le quadrant salaire × embauche (déc. 2024)",
-        note: "Aire des bulles ∝ volume · en haut à droite = bien payé et en hausse (corrélation, non causalité). Salaire médian affiché uniquement pour les groupes atteignant le seuil d’échantillon salarial.",
+        eyebrow: "Salaire vs croissance · par profession",
+        title: "Salaire affiché et croissance des offres",
+        note: "Bulle = volume. Corrélation, non causalité.",
         aria: "Nuage en quadrant des professions selon le salaire médian affiché et la croissance des offres sur un an, taille des bulles selon le volume",
       },
       educationWageProxy: {
         eyebrow: "Diplômes vs salaire · par profession",
-        title: "Les professions exigeantes en diplômes paient-elles plus ? (déc. 2024)",
-        note: "Chaque grand groupe professionnel : part des offres exigeant un diplôme universitaire vs salaire médian affiché · bulle ∝ volume (corrélation, non causalité). Salaire médian affiché uniquement pour les groupes atteignant le seuil d’échantillon salarial.",
+        title: "Diplômes et salaire affiché",
+        note: "Bulle = volume. Corrélation, non causalité.",
         aria: "Nuage de points des grands groupes professionnels selon la part d'exigence de diplôme et le salaire médian affiché, taille des bulles selon le volume",
       },
       wageByEducation: {
         eyebrow: "Échelle des diplômes · par scolarité",
-        title: "L'échelle des diplômes : salaire affiché par niveau de scolarité",
-        note: "Bande P25–P75, point = médiane · échantillon du dernier mois avec à la fois un salaire et une exigence de scolarité (corrélation, non causalité).",
+        title: "Salaire affiché par niveau de scolarité",
+        note: "Bande = 25e–75e centile · point = médiane. Dernier mois.",
         aria: "Graphique en haltères du salaire horaire affiché (bande P25–P75 et médiane) par niveau de scolarité",
       },
       conditionsMix: {
         eyebrow: "Conditions des offres au fil du temps",
-        title: "Composition des types d'emploi au fil du temps",
+        title: "Types d’emploi au fil du temps",
         note: "Part des offres par type d'emploi affiché.",
         aria: "Aires empilées de la composition des types d'emploi affichés au fil du temps",
       },
       languageGap: {
         eyebrow: "Exigences linguistiques au fil du temps",
-        title: "Exigences linguistiques : anglais vs français (obligatoire)",
-        note: "Part des offres signalant une langue obligatoire · instable avant 2021 (zone ombrée).",
+        title: "Exigences linguistiques obligatoires",
+        note: "Part des offres; données instables avant 2021.",
         aria: "Courbes de la part des offres signalant une exigence obligatoire d'anglais ou de français au fil du temps",
       },
     },

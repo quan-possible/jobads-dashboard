@@ -388,30 +388,30 @@ def _streak(series: list[SeriesPoint]) -> tuple[int, str]:
 # no causal verbs (guarded by test_no_causal_language).
 _KEY_POINT_I18N: dict[str, dict[str, str]] = {
     "en": {
-        "baseline": "Posting demand is {pct}% {dir} its January 2019 baseline.",
+        "baseline": "Postings are {pct}% {dir} the January 2019 baseline.",
         "above": "above",
         "below": "below",
         "streak": "Postings have {dir} for {n} consecutive months.",
         "risen": "risen",
         "fallen": "fallen",
-        "yoy": "Active postings are {pct}% {dir} than a year ago.",
+        "yoy": "Postings are {pct}% {dir} than a year ago.",
         "higher": "higher",
         "lower": "lower",
-        "lead": "{label} shows the strongest year-over-year change at {yoy:+.0f}%.",
-        "cool": "{label} sits at the bottom of the range at {yoy:+.0f}% year over year.",
+        "lead": "Largest annual increase: {label}, {yoy:+.0f}%.",
+        "cool": "Largest annual decrease: {label}, {yoy:+.0f}%.",
     },
     "fr": {
-        "baseline": "La demande d’offres est {pct}% {dir} son niveau de référence de janvier 2019.",
-        "above": "au-dessus de",
-        "below": "en dessous de",
+        "baseline": "Les offres sont {pct} % {dir} niveau de janvier 2019.",
+        "above": "au-dessus du",
+        "below": "en dessous du",
         "streak": "Les offres ont {dir} pendant {n} mois consécutifs.",
         "risen": "augmenté",
         "fallen": "diminué",
-        "yoy": "Les offres actives sont {pct}% {dir} qu’il y a un an.",
+        "yoy": "Les offres sont {pct} % {dir} qu’il y a un an.",
         "higher": "plus élevées",
         "lower": "plus faibles",
-        "lead": "{label} affiche la plus forte variation sur un an à {yoy:+.0f}%.",
-        "cool": "{label} se situe au bas de la fourchette à {yoy:+.0f}% sur un an.",
+        "lead": "Plus forte hausse annuelle : {label}, {yoy:+.0f} %.",
+        "cool": "Plus forte baisse annuelle : {label}, {yoy:+.0f} %.",
     },
 }
 
@@ -426,17 +426,21 @@ def _key_points(
 ) -> list[str]:
     """Descriptive only. No causal verbs (guarded by test_no_causal_language)."""
     fr = _KEY_POINT_I18N.get(locale, _KEY_POINT_I18N["en"])
+    def _number(value: float | int) -> str:
+        text = f"{value:g}"
+        return text.replace(".", ",") if locale == "fr" else text
+
     pts: list[str] = []
     if kpis.demand_index is not None:
         delta = kpis.demand_index - 100
         direction = fr["above"] if delta >= 0 else fr["below"]
-        pts.append(fr["baseline"].format(pct=abs(round(delta)), dir=direction))
+        pts.append(fr["baseline"].format(pct=_number(abs(round(delta))), dir=direction))
     streak_n, streak_dir = _streak(series)
     if streak_n >= 2:
         pts.append(fr["streak"].format(dir=fr[streak_dir], n=streak_n))
     if kpis.active_yoy_pct is not None:
         d = fr["higher"] if kpis.active_yoy_pct >= 0 else fr["lower"]
-        pts.append(fr["yoy"].format(pct=abs(kpis.active_yoy_pct), dir=d))
+        pts.append(fr["yoy"].format(pct=_number(abs(kpis.active_yoy_pct)), dir=d))
     # In FR, use the localized short occupation name so the whole sentence reads
     # French (the ranking carries the English long label); EN keeps its label (S05/S07).
     def _lab(item: RankItem) -> str:

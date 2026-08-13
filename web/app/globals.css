@@ -23,7 +23,7 @@
   --ink: #16242f;           /* body text */
   --ink-soft: #5d6b74;      /* secondary text */
   --ink-faint: #616a71;     /* captions, axis labels — AA on cream + panels */
-  --ink-invert: #f4eee7;    /* text on navy */
+  --ink-invert: #ffffff;    /* primary text on navy; matches aclmr.ca */
 
   /* Brand */
   --navy: #061f2f;
@@ -272,13 +272,6 @@ textarea {
   letter-spacing: 0.03em;
 }
 
-.pulse-section-asof {
-  color: var(--ink-faint);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
 .card.dark-panel {
   border-color: var(--navy-deep);
   background: var(--surface-navy);
@@ -475,10 +468,6 @@ textarea {
     align-items: flex-start;
     flex-wrap: wrap;
     row-gap: 8px;
-  }
-
-  .pulse-section-asof {
-    margin-left: auto;
   }
 }
 

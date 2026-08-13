@@ -8,66 +8,66 @@ export const occupationsDict = {
   en: {
     // Hero
     eyebrow: "Occupations",
-    hero: "What work Canada is hiring for, and how the mix is shifting",
-    lede: "A national read on posted hiring across Canada’s broad occupational groups (NOC). Job ads measure posted demand — not employment or vacancies.",
+    hero: "Job postings by occupation",
+    lede: "Compare volume, growth and skills across broad NOC groups.",
 
     // ApiDown error card (copied from page-pulse.ts)
     apiDownTitle: "Data service unavailable",
-    apiDownBody: "The API isn’t responding. Start it with",
+    apiDownBody: "Try again shortly.",
     apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Going deeper",
-    deepLede: "Composition, contribution and concentration for readers who want the structure behind the headline.",
+    deepEyebrow: "More detail",
+    deepLede: "Contributions, skills and industry links.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       treemap: {
-        eyebrow: "Postings by volume · through time",
-        title: "What work is most posted: occupation groups by volume",
-        note: "Area ∝ postings in the selected year. Drag the slider or press play to move through time. “Unknown” = postings without an assigned NOC code, not an occupation group. Counts partly reflect scraping coverage over time, not hiring alone.",
+        eyebrow: "Volume over time",
+        title: "Postings by occupation",
+        note: "Area = postings. “Unknown” has no assigned NOC code.",
         aria: "Treemap of occupation groups by postings, with a year slider to scrub through time",
       },
       indexedLines: {
         eyebrow: "Indexed growth",
-        title: "Which occupation groups grew fastest",
-        note: "Each group indexed to its base-year average; fastest and slowest movers highlighted. Choose the base year, top-right.",
+        title: "Posting growth by occupation",
+        note: "Base-year average = 100.",
         aria: "Indexed lines of each occupation group’s postings relative to its base-year average",
       },
       contributionBars: {
         eyebrow: "Contribution to growth",
-        title: "What changed most: contribution to growth",
-        note: "Each group’s share of the total change in postings; bars sum to the headline (accounting, not causation).",
+        title: "Contribution to posting growth",
+        note: "Bars sum to the total change; accounting, not causation.",
         aria: "Horizontal bars showing each occupation group’s contribution in percentage points to the total change",
       },
       waterfall: {
         eyebrow: "Reconciling the change",
-        title: "Reconciling the change, group by group",
-        note: "The parts sum to the whole — start total, each group’s change, end total.",
+        title: "Change by occupation",
+        note: "Start total + group changes = end total.",
         aria: "Waterfall from the base-year total through each group’s change to the end-year total",
       },
       dumbbell: {
         eyebrow: "Then versus now",
-        title: "Shift in postings by occupation group",
-        note: "Each line connects the two chosen years; colour marks the direction of the shift.",
+        title: "Postings by occupation: then and now",
+        note: "Each line connects the selected years.",
         aria: "Dumbbell chart connecting each occupation group’s base-year and end-year monthly postings",
       },
       skillChurn: {
         eyebrow: "Skill churn",
-        title: "Which skills are gaining vs losing postings",
-        note: "Gainers (teal) and losers (orange) by change in share of skill mentions · skills with ≥150 mentions in either year. Choose the years, top-right.",
+        title: "Skills gaining and losing share",
+        note: "Change in mention share; at least 150 mentions in either year.",
         aria: "Diverging bar chart of the skills gaining and losing the most share of skill mentions between the chosen years",
       },
       aiExposure: {
         eyebrow: "AI exposure · Eloundou β",
-        title: "AI exposure vs postings: where hiring is moving",
-        note: "Eloundou et al. β (US task-based, mapped to NOC) vs posting change over the chosen window · bubble ∝ volume. A potential-exposure signal, not realized automation, and not a forecast.",
+        title: "AI exposure and posting change",
+        note: "Bubble = volume. Exposure is task-based, not realized automation or a forecast.",
         aria: "Scatter plot of AI task exposure against posting change for each broad occupation group, with quadrant reference lines",
       },
       nocNaicsHeatmap: {
         eyebrow: "Occupations by sector",
-        title: "Which sectors require which occupations",
-        note: "Column-normalised: each industry’s postings split across occupation groups (last 12 months).",
+        title: "Occupation mix by industry",
+        note: "Each column shows an industry’s posting mix.",
         aria: "Heatmap of how each industry sector’s postings split across occupation groups",
       },
     },
@@ -75,66 +75,66 @@ export const occupationsDict = {
   fr: {
     // Hero
     eyebrow: "Professions",
-    hero: "Pour quels métiers le Canada recrute, et comment la composition évolue",
-    lede: "Un bilan national de l’embauche affichée dans les grands groupes professionnels (CNP) au Canada. Les offres mesurent la demande affichée — non l’emploi ni les postes vacants.",
+    hero: "Offres d’emploi par profession",
+    lede: "Comparez le volume, la croissance et les compétences par grand groupe CNP.",
 
     // ApiDown error card (copied from page-pulse.ts)
     apiDownTitle: "Service de données indisponible",
-    apiDownBody: "L’API ne répond pas. Démarrez-la avec",
+    apiDownBody: "Réessayez dans quelques instants.",
     apiDownCmd: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Pour aller plus loin",
-    deepLede: "Composition, contribution et concentration pour qui veut la structure derrière le chiffre principal.",
+    deepEyebrow: "Plus de détails",
+    deepLede: "Contributions, compétences et liens sectoriels.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       treemap: {
-        eyebrow: "Offres par volume · au fil du temps",
-        title: "Quels métiers sont les plus affichés : groupes professionnels par volume",
-        note: "Surface ∝ offres de l’année sélectionnée. Utilisez le curseur ou lancez la lecture pour parcourir le temps. « Inconnu » = offres sans code CNP attribué, pas un groupe professionnel. Les nombres reflètent en partie la couverture de collecte au fil du temps, pas seulement l’embauche.",
+        eyebrow: "Volume au fil du temps",
+        title: "Offres par profession",
+        note: "Surface = offres. « Inconnu » signifie qu’aucun code CNP n’est attribué.",
         aria: "Carte proportionnelle des groupes professionnels par offres, avec un curseur annuel pour parcourir le temps",
       },
       indexedLines: {
         eyebrow: "Croissance indexée",
-        title: "Quels groupes professionnels ont le plus progressé",
-        note: "Chaque groupe indexé à sa moyenne de l’année de base ; les variations les plus fortes et les plus faibles sont mises en évidence. Choisissez l’année de base, en haut à droite.",
+        title: "Croissance des offres par profession",
+        note: "Moyenne de l’année de base = 100.",
         aria: "Lignes indexées des offres de chaque groupe professionnel par rapport à sa moyenne de l’année de base",
       },
       contributionBars: {
         eyebrow: "Contribution à la croissance",
-        title: "Ce qui a le plus changé : contribution à la croissance",
-        note: "Part de chaque groupe dans la variation totale des offres ; les barres somment au chiffre principal (comptabilité, non causalité).",
+        title: "Contribution à la croissance des offres",
+        note: "Les barres totalisent la variation; identité comptable, non causale.",
         aria: "Barres horizontales montrant la contribution de chaque groupe professionnel, en points de pourcentage, à la variation totale",
       },
       waterfall: {
         eyebrow: "Réconcilier la variation",
-        title: "Réconcilier la variation, groupe par groupe",
-        note: "Les parties somment au tout — total de départ, variation de chaque groupe, total final.",
+        title: "Variation par profession",
+        note: "Total initial + variations des groupes = total final.",
         aria: "Cascade allant du total de l’année de base, par la variation de chaque groupe, jusqu’au total de l’année finale",
       },
       dumbbell: {
         eyebrow: "Avant et maintenant",
-        title: "Évolution des offres par groupe professionnel",
-        note: "Chaque ligne relie les deux années choisies ; la couleur indique le sens de l’évolution.",
+        title: "Offres par profession : avant et maintenant",
+        note: "Chaque ligne relie les années choisies.",
         aria: "Graphique en haltères reliant les offres mensuelles de chaque groupe professionnel pour l’année de base et l’année finale",
       },
       skillChurn: {
         eyebrow: "Renouvellement des compétences",
-        title: "Quelles compétences gagnent ou perdent des offres",
-        note: "Hausses (sarcelle) et baisses (orange) selon la variation de la part des mentions · compétences avec ≥150 mentions dans l’une ou l’autre année. Choisissez les années, en haut à droite.",
+        title: "Compétences en hausse et en baisse",
+        note: "Variation de la part des mentions; au moins 150 mentions dans l’une ou l’autre année.",
         aria: "Diagramme à barres divergentes des compétences qui gagnent et perdent le plus de part des mentions entre les années choisies",
       },
       aiExposure: {
         eyebrow: "Exposition à l'IA · β Eloundou",
-        title: "Exposition à l'IA et offres : où l'embauche se déplace",
-        note: "β d'Eloundou et al. (basée sur les tâches aux É.-U., rattachée à la CNP) vs variation des offres sur la fenêtre choisie · bulle ∝ volume. Un signal d'exposition potentielle, non d'automatisation réalisée, et non une prévision.",
+        title: "Exposition à l’IA et variation des offres",
+        note: "Bulle = volume. L’exposition repose sur les tâches; ce n’est ni une prévision ni un taux d’automatisation.",
         aria: "Nuage de points de l'exposition des tâches à l'IA en fonction de la variation des offres pour chaque grand groupe professionnel, avec des lignes de référence en quadrants",
       },
       nocNaicsHeatmap: {
         eyebrow: "Professions par secteur",
-        title: "Quels secteurs requièrent quelles professions",
-        note: "Normalisé par colonne : la répartition des offres de chaque industrie entre les groupes professionnels (12 derniers mois).",
+        title: "Composition professionnelle par industrie",
+        note: "Chaque colonne montre la composition des offres d’une industrie.",
         aria: "Carte de chaleur de la répartition des offres de chaque secteur industriel entre les groupes professionnels",
       },
     },

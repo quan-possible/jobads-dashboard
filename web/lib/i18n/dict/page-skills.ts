@@ -8,9 +8,8 @@ export const skillsDict = {
   en: {
     // Hero section
     heroEyebrowPrefix: "Skills & requirements",
-    heroTitle: "What employers are asking for.",
-    heroLede:
-      "Skills and requirements drawn from job postings that explicitly list them. Coverage varies — education and remote-work fields are sparsely reported, so those figures reflect only the postings that include them.",
+    heroTitle: "Skills and requirements in job postings",
+    heroLede: "Compare requested skills, education, experience and work arrangements.",
 
     // Most-requested skills section
     mostRequestedEyebrow: "Share of postings · skills",
@@ -20,29 +19,24 @@ export const skillsDict = {
     // Distinctive skills section
     distinctiveEyebrow: "Vs the national mix",
     distinctiveTitle: "What’s distinctive here",
-    distinctiveNote:
-      "Skills more common here than across Canada (lift = local share ÷ national share).",
-    distinctiveHint:
-      "Select a region, occupation or industry in the filter bar to see the skills that set it apart.",
+    distinctiveNote: "Lift = local share ÷ national share.",
+    distinctiveHint: "Use the filters to compare groups.",
 
     // Requirements section
     reqEyebrowEducation: "Requirements · education",
     reqTitleEducation: "Education",
-    reqNoteEducation:
-      "Sparsely reported — reflects only postings that specify an education requirement.",
+    reqNoteEducation: "Postings with a stated education requirement only.",
     reqEyebrowExperience: "Requirements · experience",
     reqTitleExperience: "Experience",
     reqEyebrowLanguage: "Requirements · work language",
     reqTitleLanguage: "Work language",
     reqEyebrowRemote: "Requirements · remote work",
     reqTitleRemote: "Remote work",
-    reqNoteRemote:
-      "Sparsely reported — most postings do not specify a remote-work arrangement.",
+    reqNoteRemote: "Postings with a stated work arrangement only.",
 
     // API-down fallback
     apiDownTitle: "Data service unavailable",
-    apiDownBody:
-      "The API isn’t responding. Start it with ",
+    apiDownBody: "Try again shortly.",
     apiDownCode: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // SkillBars aria-labels
@@ -56,45 +50,44 @@ export const skillsDict = {
     shareBarsEmpty: "No data for this selection.",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Going deeper",
-    deepLede:
-      "How requirements break down for readers who want the detail behind the headline skills.",
+    deepEyebrow: "More detail",
+    deepLede: "Skill trends and requirement patterns.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       topSkillsTrend: {
         eyebrow: "Most-requested skills · trend",
-        title: "The most-requested skills, and how each has trended",
-        note: "Top skills by posting volume, each indexed to its base-year average so fast and slow movers are comparable. Choose the base year, top-right.",
+        title: "Trends in requested skills",
+        note: "Base-year average = 100.",
         aria: "Indexed line chart of the most-requested skills relative to a chosen base year",
       },
       aiSkillDiffusion: {
         eyebrow: "AI skills · diffusion",
-        title: "The rise of AI skills in hiring",
-        note: "AI-related skills (machine learning, generative AI, LLMs, …) as a share of all skill mentions · faint = monthly, bold = 3-month average. The generative-AI surge shows from 2024.",
+        title: "AI skills in job postings",
+        note: "Share of skill mentions · faint = monthly · bold = 3-month average.",
         aria: "Line chart of AI skills as a share of all skill mentions over time",
       },
       skillLift: {
         eyebrow: "Distinctive skills · lift",
-        title: "Distinctive skills for a specialised group",
-        note: "Skills most over-represented vs the whole market — what sets this occupation group apart.",
+        title: "Distinctive skills",
+        note: "Lift relative to the national posting mix.",
         aria: "Horizontal bars of skills ranked by lift over the national share",
       },
       skillOccupationHeatmap: {
         eyebrow: "Skills × occupations",
-        title: "What each occupation group requires",
-        note: "Column-normalised: each occupation’s mentions of the top skills (latest month).",
+        title: "Top skills by occupation",
+        note: "Each column shows an occupation’s skill mix.",
         aria: "Heatmap of the top skills against broad occupation groups, column-normalised",
       },
       education: {
         eyebrow: "Requirements · education",
-        title: "Education requirements over time",
+        title: "Education requirements",
         note: "Share of postings by stated education requirement.",
         aria: "Stacked area of posting share by stated education requirement over time",
       },
       experience: {
         eyebrow: "Requirements · experience",
-        title: "Experience bands over time",
+        title: "Experience requirements",
         note: "Share of postings by advertised years-of-experience band.",
         aria: "Stacked area of posting share by advertised years-of-experience band over time",
       },
@@ -104,9 +97,8 @@ export const skillsDict = {
   fr: {
     // Hero section
     heroEyebrowPrefix: "Compétences et exigences",
-    heroTitle: "Ce que les employeurs recherchent.",
-    heroLede:
-      "Compétences et exigences tirées des offres d’emploi qui les mentionnent explicitement. La couverture varie — les champs liés à la scolarité et au télétravail sont peu renseignés; ces chiffres ne reflètent donc que les offres qui les incluent.",
+    heroTitle: "Compétences et exigences des offres d’emploi",
+    heroLede: "Comparez les compétences, la scolarité, l’expérience et les modes de travail demandés.",
 
     // Most-requested skills section
     mostRequestedEyebrow: "Part des offres · compétences",
@@ -117,29 +109,24 @@ export const skillsDict = {
     // Distinctive skills section
     distinctiveEyebrow: "Par rapport à la moyenne nationale",
     distinctiveTitle: "Ce qui distingue cette sélection",
-    distinctiveNote:
-      "Compétences plus fréquentes ici qu’à l’échelle canadienne (indice = part locale ÷ part nationale).",
-    distinctiveHint:
-      "Sélectionnez une région, une profession ou une industrie dans la barre de filtres pour voir les compétences qui la distinguent.",
+    distinctiveNote: "Indice = part locale ÷ part nationale.",
+    distinctiveHint: "Utilisez les filtres pour comparer les groupes.",
 
     // Requirements section
     reqEyebrowEducation: "Exigences · scolarité",
     reqTitleEducation: "Scolarité",
-    reqNoteEducation:
-      "Peu renseigné — reflète uniquement les offres précisant une exigence de scolarité.",
+    reqNoteEducation: "Offres avec une exigence de scolarité seulement.",
     reqEyebrowExperience: "Exigences · expérience",
     reqTitleExperience: "Expérience",
     reqEyebrowLanguage: "Exigences · langue de travail",
     reqTitleLanguage: "Langue de travail",
     reqEyebrowRemote: "Exigences · télétravail",
     reqTitleRemote: "Télétravail",
-    reqNoteRemote:
-      "Peu renseigné — la plupart des offres ne précisent pas le mode de travail.",
+    reqNoteRemote: "Offres avec un mode de travail précisé seulement.",
 
     // API-down fallback
     apiDownTitle: "Service de données indisponible",
-    apiDownBody:
-      "L’API ne répond pas. Démarrez-la avec ",
+    apiDownBody: "Réessayez dans quelques instants.",
     apiDownCode: "uvicorn api.main:app --port 8530 --no-proxy-headers",
 
     // SkillBars aria-labels
@@ -153,45 +140,44 @@ export const skillsDict = {
     shareBarsEmpty: "Aucune donnée pour cette sélection.",
 
     // Section dividers (Core → Deep)
-    deepEyebrow: "Pour aller plus loin",
-    deepLede:
-      "Le détail des exigences pour qui veut le sous-jacent derrière les compétences principales.",
+    deepEyebrow: "Plus de détails",
+    deepLede: "Tendances des compétences et des exigences.",
 
     // Bridged figures (chrome only; the figure bodies come from the API)
     charts: {
       topSkillsTrend: {
         eyebrow: "Compétences les plus requises · tendance",
-        title: "Les compétences les plus requises, et leur évolution",
-        note: "Principales compétences par volume d’offres, chacune indexée à sa moyenne de l’année de base pour comparer les fortes et faibles variations. Choisissez l’année de base, en haut à droite.",
+        title: "Tendances des compétences demandées",
+        note: "Moyenne de l’année de base = 100.",
         aria: "Graphique linéaire indexé des compétences les plus requises par rapport à une année de base choisie",
       },
       aiSkillDiffusion: {
         eyebrow: "Compétences en IA · diffusion",
-        title: "L’essor des compétences en IA dans l’embauche",
-        note: "Compétences liées à l’IA (apprentissage automatique, IA générative, LLM, …) en part de toutes les mentions de compétences · pâle = mensuel, gras = moyenne sur 3 mois. La poussée de l’IA générative apparaît à partir de 2024.",
+        title: "Compétences en IA dans les offres",
+        note: "Part des mentions · pâle = mensuel · gras = moyenne sur 3 mois.",
         aria: "Graphique linéaire des compétences en IA en part de toutes les mentions de compétences au fil du temps",
       },
       skillLift: {
         eyebrow: "Compétences distinctives · indice",
-        title: "Compétences distinctives d’un groupe spécialisé",
-        note: "Compétences les plus surreprésentées par rapport à l’ensemble du marché — ce qui distingue ce groupe professionnel.",
+        title: "Compétences distinctives",
+        note: "Indice par rapport à la composition nationale des offres.",
         aria: "Barres horizontales des compétences classées par indice de spécificité vs la part nationale",
       },
       skillOccupationHeatmap: {
         eyebrow: "Compétences × professions",
-        title: "Ce que requiert chaque groupe professionnel",
-        note: "Normalisé par colonne : les mentions des principales compétences par profession (dernier mois).",
+        title: "Principales compétences par profession",
+        note: "Chaque colonne montre la composition des compétences d’une profession.",
         aria: "Carte de chaleur des principales compétences par grand groupe professionnel, normalisée par colonne",
       },
       education: {
         eyebrow: "Exigences · scolarité",
-        title: "Exigences de scolarité au fil du temps",
+        title: "Exigences de scolarité",
         note: "Part des offres par exigence de scolarité indiquée.",
         aria: "Aires empilées de la part des offres par exigence de scolarité indiquée dans le temps",
       },
       experience: {
         eyebrow: "Exigences · expérience",
-        title: "Bandes d’expérience au fil du temps",
+        title: "Exigences d’expérience",
         note: "Part des offres par bande d’années d’expérience annoncée.",
         aria: "Aires empilées de la part des offres par bande d’années d’expérience annoncée dans le temps",
       },
