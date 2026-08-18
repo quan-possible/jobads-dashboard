@@ -1,15 +1,15 @@
 # Dashboard redesign implementation
 
-Status: implementation complete; the local public release was taken offline by
-user request. The historical Render service remains blocked on Render authority.
+Status: implementation complete and every known dashboard endpoint is offline
+by user request.
 
-## Objective
+## Task
 
 Migrate the current nine-route Next.js/FastAPI dashboard to the approved ACLMR
 redesign without disrupting the current public site or weakening data, auth,
 category-cap, bilingual, accessibility, or deployment contracts.
 
-## Source of truth
+## Instructions
 
 - [`PLAN.md`](PLAN.md) owns the implementation and release plan.
 - [`../../../analyses/labor_market_dashboard/redesign-foundation/`](../../../analyses/labor_market_dashboard/redesign-foundation/)
@@ -17,15 +17,16 @@ category-cap, bilingual, accessibility, or deployment contracts.
 - [`../../../analyses/labor_market_dashboard_spec/report.md`](../../../analyses/labor_market_dashboard_spec/report.md)
   owns the product and metric contract.
 
-## Current position
+## Current state
 
 - The preserved Pulse and Explore desktop targets are verified redesign
   groundwork.
 - The local app and API are stopped, and the public, Cloudflare, and ngrok
   LaunchAgents are disabled and unloaded. The former tunnel URLs return `530`
   and `404`.
-- The separate historical Streamlit service on Render remains reachable. The
-  local Render token is expired, so its takedown requires restored ownership.
+- The historical Streamlit service is suspended in Render and its public URL
+  returns `503`. The browser session has service access; the CLI token remains
+  expired.
 - Mobile Pulse and Explore targets plus four Mobbin interaction references are
   preserved under this job's `evidence/` directory.
 - The intended Keychain password lookup still exits 44. The existing mode-600
@@ -42,7 +43,7 @@ category-cap, bilingual, accessibility, or deployment contracts.
   16 reusable components locally; the remote Claude Design package is not yet
   republished.
 
-## Orchestrator assignments
+### Orchestrator assignments
 
 | Scope | Owner | Paths | State |
 | --- | --- | --- | --- |
@@ -55,14 +56,21 @@ category-cap, bilingual, accessibility, or deployment contracts.
 | Explore workspace | Worker | authenticated builder, posting lookup, responsive detail | Complete |
 | Integration and acceptance | Parent | combined worktree, job state, visual judgment | Complete after reopening and repairing the missed mobile Explore target |
 
-## Next action
+### Next action
 
-Keep the local public release and both tunnels disabled unless Bruce explicitly
-authorizes a new launch. Restore Render ownership and suspend or delete the
-historical Streamlit service if the takedown is meant to cover every endpoint;
-do not push local `main` while its auto-deploy behavior is unresolved.
+Keep the local public release and both tunnels disabled, and keep the historical
+Render service suspended, unless Bruce explicitly authorizes a new launch. Do
+not push local `main` while publication is intentionally disabled.
 
-## Verification evidence
+## History
+
+- On 2026-08-18, Bruce explicitly asked to finish the takedown. The authorized
+  Chrome session opened Render service `srv-d74gjbc50q8c73dvqfdg`, confirmed the
+  service identity and repository, and suspended it. Render showed “Suspended
+  by you,” and both `/` and `/healthz` returned `503` afterward. The two former
+  tunnel URLs and local `8522`/`8530` endpoints also remained unreachable.
+
+### Verification evidence
 
 - On 2026-08-13, `com.aclmr.jobads-dashboard-public`,
   `com.aclmr.jobads-dashboard-cloudflared`, and

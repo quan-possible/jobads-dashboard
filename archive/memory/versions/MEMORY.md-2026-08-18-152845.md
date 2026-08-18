@@ -1,6 +1,6 @@
 # MEMORY
 
-Last condensed: 2026-08-18
+Last condensed: 2026-08-13
 
 <!-- Bounded historical index. Read STATUS.md for live state. -->
 <!-- Oldest to newest; inspect dated files within a section's range for detail. -->
@@ -80,16 +80,14 @@ Last condensed: 2026-08-18
   also found persistent Next public fetch data, so production builds now clear
   only `.next/cache/fetch-cache` before building. [Release record.](memory/2026-08-12.md)
 
-## 2026-08-13 to 2026-08-18 | Public takedown
+## 2026-08-13 | Public takedown
 
 - At Bruce's request, the local Next/FastAPI service and both public tunnels
   were disabled and unloaded. Their former Cloudflare and ngrok URLs now fail.
-- The historical Streamlit service was then suspended through the authorized
-  Render dashboard; its public URL returns `503`. All known dashboard endpoints
-  are offline. No indexed result was found for the tunnel hostnames, and
-  available local tunnel records do not establish any external dashboard page
-  view. [Initial takedown.](memory/2026-08-13.md)
-  [Completion.](memory/2026-08-18.md)
+- A separate historical Streamlit service on Render remains reachable because
+  the local Render token is expired. No indexed result was found for the two
+  tunnel hostnames, and available local tunnel records do not establish any
+  external dashboard page view. [Takedown record.](memory/2026-08-13.md)
 
 ## Rebuild rule
 

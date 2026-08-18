@@ -1,6 +1,6 @@
 # STATUS
 
-Last updated: 2026-08-13
+Last updated: 2026-08-18
 
 <!-- Live state only. Target: 80 lines / 6 KiB. Maximum: 100 lines / 8 KiB. -->
 
@@ -14,7 +14,7 @@ Maintain a descriptive Canadian labour-demand dashboard built from Vicinity job 
 - The current product is a Next.js web app backed by FastAPI and the Python Plotly figure layer. Runtime reads `data/derived/labor_market_dashboard_v1/`; refresh reads only canonical upstream parquet files under `../jobads-data/main/data/processed/<year>/`.
 - The derived bundle was generated on 2026-06-03 from 164 files, covers `2016-01-01` through `2026-03-31`, and records 25,356,735 postings. Upstream may have advanced.
 - The redesigned dashboard is offline by user request. The persistent public, Cloudflare, and ngrok LaunchAgents are disabled and unloaded; local ports `8522` and `8530` are closed. The former Cloudflare and ngrok URLs return `530` and `404`, respectively.
-- A separate older Streamlit service at `https://jobads-dashboard.onrender.com` remains reachable. The local Render token is expired, so this machine cannot suspend or delete that service until Render ownership is restored.
+- The historical Streamlit service at `https://jobads-dashboard.onrender.com` is suspended in Render and returns `503`. All known dashboard endpoints are now offline.
 - Claude Design still contains 14 components. The local package has 16; republishing remains a follow-up. `.design-sync/NOTES.md` owns the detail.
 - The verified redesign foundation lives at `docs/analyses/labor_market_dashboard/redesign-foundation/`: desktop targets, mobile gates, source-state UI kit, provenance, brand audit, exact ACLMR logo, and PT Sans.
 - The installed public LaunchAgent is hardened with `--no-proxy-headers`; prior live probes confirmed rate limits, public caps, and private no-store responses.
@@ -24,14 +24,14 @@ Maintain a descriptive Canadian labour-demand dashboard built from Vicinity job 
 ## Active priorities
 
 1. Keep the local dashboard and both tunnels disabled unless Bruce explicitly authorizes a new launch.
-2. Restore Render authority and take down the older Streamlit service if the takedown is intended to cover every historical dashboard endpoint.
-3. Restore the intended Keychain credential owner and remove reliance on the existing mode-600 local fallback when practical.
+2. Keep the Render service suspended; browser access is available through the authorized Chrome session, while the CLI token remains expired.
+3. Restore the intended Keychain credential owner only if the dashboard is explicitly relaunched.
 
 ## Next actions
 
-1. Restore Render access, identify the owner of service `srv-d74gjbc50q8c73dvqfdg`, and suspend or delete it if Bruce wants the historical Streamlit endpoint removed too.
-2. Do not re-enable `com.aclmr.jobads-dashboard-public`, `com.aclmr.jobads-dashboard-cloudflared`, or `com.aclmr.jobads-dashboard-ngrok` without explicit authorization.
-3. Do not push `main` until Render ownership and auto-deploy behavior are explicit.
+1. Do not resume Render service `srv-d74gjbc50q8c73dvqfdg` or re-enable `com.aclmr.jobads-dashboard-public`, `com.aclmr.jobads-dashboard-cloudflared`, or `com.aclmr.jobads-dashboard-ngrok` without explicit authorization.
+2. Do not push `main` while the dashboard is intentionally offline unless publication behavior is explicitly approved.
+3. If the dashboard is relaunched, restore the Keychain credential owner before any password-bearing handoff.
 
 ## Risks and blockers
 
@@ -42,7 +42,7 @@ Maintain a descriptive Canadian labour-demand dashboard built from Vicinity job 
 - Historical jobs include stale status wording. Preserve ambiguous jobs until their commits, branches, deployment state, and inbound links are reconciled.
 - The design-system export enumerates components by hand in `web/.ds-entry.tsx`, so a component added to `web/components/` will not reach the design system until it is added there.
 - The Keychain credential remains unavailable. A mode-600 local credential source matched the installed production hash and enabled live auth verification, but it is not the intended durable owner.
-- The Render CLI session is expired and the reachable Render hostname serves an older Streamlit surface. This blocks completing a takedown of every historical dashboard endpoint and also blocks safe remote publication/push.
+- The Render CLI session remains expired, but the service is controllable through the authorized Chrome session and is suspended. Resuming or republishing remains separately authorized work.
 
 ## Current owners
 
