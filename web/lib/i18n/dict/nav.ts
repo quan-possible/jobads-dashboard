@@ -14,10 +14,6 @@ export const nav = {
     skipToContent: "Skip to main content",
     brandTagline: "Labour Market",
     auth: {
-      logIn: "Team log in",
-      signIn: "Sign in",
-      title: "Team sign-in",
-      blurb: "Sign in to open Explore and full chart detail.",
       teamView: "Team view",
       fullDetail: "Full detail",
       teamBadge: "Team",
@@ -39,10 +35,6 @@ export const nav = {
     skipToContent: "Aller au contenu principal",
     brandTagline: "Marché du travail",
     auth: {
-      logIn: "Connexion équipe",
-      signIn: "Se connecter",
-      title: "Connexion de l’équipe",
-      blurb: "Connectez-vous pour ouvrir Explorer et le détail complet des graphiques.",
       teamView: "Vue équipe",
       fullDetail: "Détail complet",
       teamBadge: "Équipe",

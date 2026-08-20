@@ -1,6 +1,6 @@
 # MEMORY
 
-Last condensed: 2026-08-20
+Last condensed: 2026-08-18
 
 <!-- Bounded historical index. Read STATUS.md for live state. -->
 <!-- Oldest to newest; inspect dated files within a section's range for detail. -->
@@ -8,9 +8,11 @@ Last condensed: 2026-08-20
 
 ## 2026-03-24 to 2026-03-29 | Standalone foundation
 
-- `jobads-dashboard` became the independent implementation home, with canonical
-  upstream parquet inputs and runtime data under `data/derived/`. Streamlit first
-  established the aggregate, validation, filtering, and deployment contracts.
+- `jobads-dashboard` became the independent implementation home. Canonical
+  inputs remain `../jobads-data/main/data/processed/<year>/processed_*.parquet`;
+  runtime data stays under `data/derived/labor_market_dashboard_v1/`.
+- The first Streamlit version established aggregate refresh, validation,
+  denominator, filtering, failure-state, and Render deployment contracts.
 
 ## 2026-06-02 to 2026-06-11 | Explore, data, and hosting
 
@@ -28,14 +30,15 @@ Last condensed: 2026-08-20
   `8530`, Next `8522`, and a Cloudflare quick tunnel; `/healthz` is web health.
 - Public charts adopted the Vicinity Jobs 10-category limit through shared cap
   helpers. Only a verified session can request uncapped, private, no-store
-  figures. [Cap job.](docs/jobs/done/2026-06-25-ten-category-cap/JOB.md)
+  figures; Explore remains absent from public navigation. [Cap job.](docs/jobs/done/2026-06-25-ten-category-cap/JOB.md)
 - Audit remediation hardened escaping, Markdown, schema validation,
   partial-bundle behavior, denominators, and visual craft.
 
 ## 2026-06-29 to 2026-07-06 | Tunnel recovery
 
-- The Cloudflare LaunchAgent uses `--config /dev/null`; quick-tunnel hostnames
-  rotate and must be recovered from the live log rather than memory.
+- The Cloudflare LaunchAgent now uses `--config /dev/null` so unrelated named
+  tunnel configuration cannot hijack this service. Quick-tunnel hostnames rotate;
+  recover them from the live log rather than memory.
 - Keychain lookup failures blocked password-bearing outreach; plaintext
   passwords and password hashes remain forbidden from project records.
 
@@ -87,12 +90,6 @@ Last condensed: 2026-08-20
   available local tunnel records do not establish any external dashboard page
   view. [Initial takedown.](memory/2026-08-13.md)
   [Completion.](memory/2026-08-18.md)
-
-## 2026-08-20 | Explore discoverability
-
-- Explore is visible in public navigation but opens the existing team sign-in
-  gate; private APIs and uncapped figures remain session-protected. The local
-  stack was relaunched without enabling public tunnels. [Record.](memory/2026-08-20.md)
 
 ## Rebuild rule
 

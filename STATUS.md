@@ -1,6 +1,6 @@
 # STATUS
 
-Last updated: 2026-08-18
+Last updated: 2026-08-20
 
 <!-- Live state only. Target: 80 lines / 6 KiB. Maximum: 100 lines / 8 KiB. -->
 
@@ -10,11 +10,11 @@ Maintain a descriptive Canadian labour-demand dashboard built from Vicinity job 
 
 ## Current position
 
-- Local `main` contains the redesigned release, the corrected mobile Explore workspace, and the verified copy/palette pass; `origin/main` remains at `98edbe04` because the unresolved Render auto-deploy boundary makes a push unsafe. The prior production source is preserved at `backup/main-pre-dashboard-redesign-20260812-463d919a`.
+- Local `main` contains the redesigned release, the corrected mobile Explore workspace, and the verified copy/palette pass; the current product also exposes a Team-tagged Explore tab to signed-out visitors and gates the workspace after they open it. `origin/main` remains at `98edbe04` because the unresolved Render auto-deploy boundary makes a push unsafe. The prior production source is preserved at `backup/main-pre-dashboard-redesign-20260812-463d919a`.
 - The current product is a Next.js web app backed by FastAPI and the Python Plotly figure layer. Runtime reads `data/derived/labor_market_dashboard_v1/`; refresh reads only canonical upstream parquet files under `../jobads-data/main/data/processed/<year>/`.
 - The derived bundle was generated on 2026-06-03 from 164 files, covers `2016-01-01` through `2026-03-31`, and records 25,356,735 postings. Upstream may have advanced.
-- The redesigned dashboard is offline by user request. The persistent public, Cloudflare, and ngrok LaunchAgents are disabled and unloaded; local ports `8522` and `8530` are closed. The former Cloudflare and ngrok URLs return `530` and `404`, respectively.
-- The historical Streamlit service at `https://jobads-dashboard.onrender.com` is suspended in Render and returns `503`. All known dashboard endpoints are now offline.
+- The dashboard is running locally for the current Codex task with FastAPI on `127.0.0.1:8530` and Next.js on `127.0.0.1:8522`. The persistent public, Cloudflare, and ngrok LaunchAgents remain disabled and unloaded; no public tunnel was relaunched.
+- The historical Streamlit service at `https://jobads-dashboard.onrender.com` is suspended in Render and returns `503`. All known public dashboard endpoints remain offline.
 - Claude Design still contains 14 components. The local package has 16; republishing remains a follow-up. `.design-sync/NOTES.md` owns the detail.
 - The verified redesign foundation lives at `docs/analyses/labor_market_dashboard/redesign-foundation/`: desktop targets, mobile gates, source-state UI kit, provenance, brand audit, exact ACLMR logo, and PT Sans.
 - The installed public LaunchAgent is hardened with `--no-proxy-headers`; prior live probes confirmed rate limits, public caps, and private no-store responses.
@@ -23,9 +23,9 @@ Maintain a descriptive Canadian labour-demand dashboard built from Vicinity job 
 
 ## Active priorities
 
-1. Keep the local dashboard and both tunnels disabled unless Bruce explicitly authorizes a new launch.
+1. Keep both public tunnels disabled; the current local task runtime is explicitly authorized and may remain available for Bruce.
 2. Keep the Render service suspended; browser access is available through the authorized Chrome session, while the CLI token remains expired.
-3. Restore the intended Keychain credential owner only if the dashboard is explicitly relaunched.
+3. Restore the intended Keychain credential owner only before a password-bearing handoff or separately authorized public relaunch.
 
 ## Next actions
 

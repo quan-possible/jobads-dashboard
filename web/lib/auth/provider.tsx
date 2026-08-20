@@ -6,9 +6,9 @@ import { authStatus, login as apiLogin, logout as apiLogout } from "@/lib/explor
 import type { AuthStatus } from "@/lib/types";
 
 // Site-wide auth state. One team session (the Explore password) is the single
-// switch: when authenticated, the Explore tab is reachable AND every chart is
-// served uncapped (full detail). Mounted once in the root layout so the top-nav
-// login affordance and the Explore gate share one source of truth.
+// switch: when authenticated, the Explore workspace unlocks and every chart is
+// served uncapped (full detail). Mounted once in the root layout so team status
+// and the Explore gate share one source of truth.
 //
 // After login/logout we call `router.refresh()` so the server components
 // re-render: their figures are fetched server-side with (or without) the session

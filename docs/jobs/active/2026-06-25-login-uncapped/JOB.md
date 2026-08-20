@@ -2,7 +2,7 @@
 
 - **Created:** 2026-06-25
 - **Branch:** `feat/login-uncapped` (based on `redesign2`)
-- **Status:** IMPLEMENTED, VERIFIED, COMMITTED, AND PROMOTED TO `main` on 2026-08-11. Deployment verification and credential-owned rollout remain. See "Implementation outcome" at the end.
+- **Status:** IMPLEMENTED, VERIFIED, AND PROMOTED TO `main`; the Explore discovery flow was refined and verified locally on 2026-08-20. Public deployment and credential-owned rollout remain. See "Implementation outcome" and "Navigation refinement" at the end.
 - **Depends on:** [2026-06-25-ten-category-cap](../../done/2026-06-25-ten-category-cap/JOB.md) (this job makes that completed cap conditional on auth)
 
 ## Goal
@@ -10,8 +10,9 @@
 Today every chart is capped at 10 categories for everyone, and the Explore tab is
 behind the team password. Change the model so that **logging in with the existing
 team password removes the 10-category cap on every chart, site-wide** — the public
-sees the capped view, the logged-in team sees full detail. The login must be
-reachable from anywhere (the top nav), not only buried inside Explore.
+sees the capped view, the logged-in team sees full detail. Explore must remain
+visible in the top navigation; signed-out visitors reach the password gate by
+opening that tab.
 
 Second, smaller ask: relabel one text block on the Pulse page (see Workstream B).
 
@@ -311,3 +312,23 @@ production Next.js build, including TypeScript and static page generation.
 `JOBADS_API_SESSION_SECRET` through the deployment's secret owner; then rebuild/restart
 the deployed stack as required. Current service health alone does not prove that its
 compiled web bundle matches these commits.
+
+## Navigation refinement (2026-08-20)
+
+The user replaced the signed-out global login popover with one direct discovery path:
+Explore is visible in the primary navigation, mobile menu, and footer; opening it shows
+the existing page-level password gate. Authenticated sessions still show the site-wide
+team status and sign-out control. This supersedes the original implementation detail
+that offered a separate signed-out login button in `TopNavAuth`.
+
+Security behavior did not change. The Explore workspace and private posting APIs still
+require a verified session, and public chart caps still require `full AND authed` before
+returning uncapped private, no-store figures.
+
+Verification used the approved desktop Explore treatment and the existing mobile gate
+reference. Signed-out desktop and mobile browser checks confirmed the visible Team-tagged
+Explore entry, the page gate, no duplicate login control, no horizontal overflow, and no
+console warning or error. The full Python suite passed (`383 passed`), the production
+Next build passed, the derived bundle reconciled 25,356,735 postings, and an anonymous
+`/api/postings` request returned `401`. The production bundle was restarted locally on
+`127.0.0.1:8522` with FastAPI on `127.0.0.1:8530`; public tunnels remain disabled.

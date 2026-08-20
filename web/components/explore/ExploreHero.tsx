@@ -4,8 +4,8 @@ import { useAuth } from "@/lib/auth/provider";
 import { useI18n } from "@/lib/i18n/provider";
 import styles from "./explore.module.css";
 
-/** Keeps the direct-access gate explanatory while giving verified sessions a
- * concise workspace frame. Explore remains absent from public navigation. */
+/** Keeps the signed-out gate explanatory while giving verified sessions a
+ * concise workspace frame. */
 export function ExploreHero() {
   const { authenticated } = useAuth();
   const { t } = useI18n();

@@ -14,8 +14,8 @@ export type NavKey =
 export interface NavItem {
   href: string;
   key: NavKey;
-  /** Team-only: hidden from the public nav, revealed only for an authenticated
-   *  session and shown with a distinct (outlined) treatment. */
+  /** Opens a team-only surface and uses a distinct treatment. The link stays
+   *  visible so signed-out visitors can reach its sign-in gate. */
   teamOnly?: boolean;
 }
 

@@ -21,7 +21,6 @@ export function TopNav() {
   const { authenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
-  const navItems = NAV.filter((item) => !item.teamOnly || authenticated);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -42,7 +41,7 @@ export function TopNav() {
 
         <div className="flex min-w-0 items-center gap-2 md:gap-3">
           <nav aria-label={t.nav.primary} className="-mx-2 hidden min-w-0 items-center overflow-x-auto lg:flex">
-            {navItems.map((item) => {
+            {NAV.map((item) => {
               const active = isActive(pathname, item.href);
               if (item.teamOnly) {
                 return (
@@ -113,7 +112,7 @@ export function TopNav() {
         style={{ transitionTimingFunction: "var(--ease)" }}
       >
         <div className="container-x py-2">
-          {navItems.map((item) => {
+          {NAV.map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <Link
