@@ -1,9 +1,8 @@
-"""Framework-agnostic visualization core for the job-ads dashboard.
+"""Visualization core for the job-ads dashboard.
 
 Everything in this package returns plain ``plotly.graph_objects.Figure`` objects
-(or pure data), so the same factories drop into Streamlit, Dash, or a static
-HTML export without modification. The live site renders them through the FastAPI
-figure bridge (``api/figures.py``).
+(or pure data). The live Next.js site renders them through the FastAPI figure
+bridge (``api/figures.py``).
 
 Layout
 ------

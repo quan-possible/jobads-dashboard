@@ -1,10 +1,8 @@
 # `jobads_dashboard.viz` — visualization core
 
-A framework-agnostic implementation of the from-scratch visualization plan
-(`docs/jobs/.../dashboard-viz-from-scratch/plan.md`). Every chart is a pure
-`plotly.graph_objects.Figure` factory, so the same functions render in a static
-page, Streamlit, or Dash without modification. The live site renders them through
-the FastAPI figure bridge (`api/figures.py`).
+The analytical chart source for the supported dashboard. Every chart is a pure
+`plotly.graph_objects.Figure` factory rendered by the Next.js application
+through the FastAPI figure bridge (`api/figures.py`).
 
 ## Layout
 
@@ -23,10 +21,6 @@ from jobads_dashboard.viz.figures import pulse
 
 ds = DataSource()
 fig = pulse.demand_ribbon(ds)      # plain go.Figure
-
-# Streamlit:  st.plotly_chart(fig, use_container_width=True)
-# Dash:       dcc.Graph(figure=fig)
-# Static:     fig.write_html(...) / fig.to_html(full_html=False)
 ```
 
 `theme.register_templates()` is called automatically by the figure modules; call

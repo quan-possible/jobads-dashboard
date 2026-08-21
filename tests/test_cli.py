@@ -13,9 +13,9 @@ def test_parse_args_supports_data_pipeline_commands() -> None:
     assert parse_args(["posting-lookup"]).command == "posting-lookup"
 
 
-def test_parse_args_rejects_the_removed_streamlit_app_command() -> None:
-    # The Streamlit UI was replaced by the Next.js + FastAPI app; the CLI now
-    # only builds/validates the derived data package.
+def test_parse_args_rejects_the_removed_app_command() -> None:
+    # The CLI only builds and validates the derived data package; the supported
+    # app is launched through its Next.js and FastAPI processes.
     with pytest.raises(SystemExit):
         parse_args(["app"])
 

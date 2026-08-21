@@ -1,5 +1,5 @@
 // Static UI copy for app/occupations/page.tsx (the Occupations page).
-// Figure bodies come from the API (the redesign2 Plotly factories, served via
+// Figure bodies come from the API (the dashboard Plotly factories, served via
 // the figure bridge); only the page chrome and figure framing live here.
 // EN titles/notes mirror each factory's titled() HEADLINE/SUBTITLE; FR matches
 // the voice of page-pulse.ts. Descriptive posting signals only — no causal claims.

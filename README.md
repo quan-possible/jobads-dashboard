@@ -152,7 +152,7 @@ The refresh step reads only from:
 
 ## Refresh Contract
 
-The version 1 workflow is intentionally two-step:
+The runtime workflow is intentionally two-step:
 
 1. Build local aggregate tables under `data/derived/labor_market_dashboard_v1/`.
 2. Serve the dashboard only from those local aggregates.
@@ -182,10 +182,10 @@ Direct UI verification should inspect the actual Next.js UI in the browser, not 
   - `../jobads-data/main/docs/plans/README.md`
 
 ## Project Layout
-- `docs/analyses/labor_market_dashboard_spec/`: product and metric contract plus the original version 1 implementation baseline.
+- `docs/analyses/labor_market_dashboard_spec/`: current product, metric, data, and architecture contract.
 - `docs/jobs/active/`: unfinished job continuity.
 - `docs/jobs/done/`: completed job records and verification evidence.
-- `docs/jobs/archive/`: legacy job records kept for recovery.
+- `docs/jobs/archive/`: superseded job records kept only for recovery.
 - `src/jobads_dashboard/`: reusable dashboard implementation code.
 - `data/derived/`: project-local aggregated dashboard data products.
 - `memory/`: chronological project-history source records.
@@ -197,9 +197,9 @@ Direct UI verification should inspect the actual Next.js UI in the browser, not 
 - `STATUS.md`: current position, priorities, next actions, risks, and owners.
 - `MEMORY.md`: bounded, progressively condensed historical index.
 - `memory/YYYY-MM-DD.md`: chronological source records for history and reconstruction.
-- `docs/analyses/labor_market_dashboard_spec/report.md`: canonical product and metric contract and original version 1 baseline.
-- `docs/analyses/labor_market_dashboard/README.md`: dashboard runbook, screenshots, and operator notes.
-- `docs/jobs/active/`, `docs/jobs/done/`, `docs/jobs/archive/`: unfinished, completed, and legacy job records. Loose `docs/jobs/*-ongoing.md` files are pre-migration records awaiting reconciliation.
+- `docs/analyses/labor_market_dashboard_spec/report.md`: canonical product, metric, data, and architecture contract.
+- `docs/analyses/labor_market_dashboard/README.md`: current design reference and operator notes.
+- `docs/jobs/active/`, `docs/jobs/done/`, `docs/jobs/archive/`: unfinished, completed, and superseded job records.
 
 ## Current Runtime Surface
 
@@ -208,3 +208,9 @@ Direct UI verification should inspect the actual Next.js UI in the browser, not 
 - Web UI: `web/` (Next.js)
 - API + figure bridge: `api/` (FastAPI), figures from `src/jobads_dashboard/viz/`
 - Shared loaders/constants/metrics: `src/jobads_dashboard/dashboard/{data,constants,metrics}.py`
+
+The repository has one supported dashboard implementation: `web/` plus `api/`
+and the Python aggregate/Plotly layer. Historical implementations remain only
+in Git history and completed or archived evidence; they are not runnable
+alternatives. The `_v1` suffix on the derived-data directory names the current
+aggregate schema, not an app version.

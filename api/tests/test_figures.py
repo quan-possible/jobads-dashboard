@@ -27,7 +27,7 @@ def test_every_chart_builds(chart_id: str):
     payload = json.loads(figures.build(chart_id))
     assert isinstance(payload.get("data"), list) and payload["data"], chart_id
     layout = payload["layout"]
-    # The redesign2 template must travel to the browser.
+    # The house template must travel to the browser.
     assert layout.get("template", {}).get("layout"), f"{chart_id}: template missing"
     # Headline stripped; backgrounds transparent so the figure floats on the card.
     assert not (layout.get("title") or {}).get("text"), f"{chart_id}: title not stripped"

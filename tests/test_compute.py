@@ -1,6 +1,6 @@
 """Unit tests for the dependency-free decomposition / indexing math.
 
-Guards two correctness fixes from the redesign2 audit:
+Guards two correctness fixes from the visualization audit:
   * S08 — the even-period centred MA must not shift the trend by a month.
   * S09 — a genuine zero base-year mean must yield NaN, not a fabricated index
           anchored to the first observation.

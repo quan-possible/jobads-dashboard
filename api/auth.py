@@ -1,9 +1,8 @@
 """Authentication for the private Explore surface.
 
-The posting-level lookup is sensitive, so it sits behind a password. We reuse the
-same PBKDF2 scheme as the Streamlit app (`pbkdf2_sha256$iterations$salt$digest`)
-so a single configured hash works for both. Nothing secret is committed: the
-verifier is sourced, in order, from
+The posting-level lookup is sensitive, so it sits behind a password. Passwords
+use the project's PBKDF2 format (`pbkdf2_sha256$iterations$salt$digest`). Nothing
+secret is committed: the verifier is sourced, in order, from
 
   1. ``JOBADS_DASHBOARD_PASSWORD_HASH``  (production — a salted PBKDF2 hash)
   2. ``JOBADS_DASHBOARD_PASSWORD``       (plain password, convenient for local dev)
@@ -30,7 +29,7 @@ import time
 _log = logging.getLogger("api.auth")
 
 # --------------------------------------------------------------------------- #
-# Password verification (PBKDF2, matching src/jobads_dashboard/dashboard/app.py)
+# Password verification (PBKDF2)
 # --------------------------------------------------------------------------- #
 
 PASSWORD_HASH_PREFIX = "pbkdf2_sha256"

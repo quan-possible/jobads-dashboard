@@ -1,4 +1,4 @@
-"""Figure endpoint — serve a redesign2 Plotly factory as figure JSON.
+"""Figure endpoint — serve a dashboard Plotly factory as figure JSON.
 
 ``GET /api/figure/{chart_id}?locale=en|fr`` returns ``{data, layout, frames?}``
 ready for ``Plotly.newPlot``. The response is the Plotly-encoded JSON string

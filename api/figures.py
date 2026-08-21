@@ -1,4 +1,4 @@
-"""Figure bridge — serve redesign2's Plotly factories as figure JSON.
+"""Figure bridge — serve the dashboard's Plotly factories as figure JSON.
 
 The dashboard's charts are authored once as Python ``plotly.graph_objects``
 factories in :mod:`jobads_dashboard.viz` (the single source of truth). This
@@ -13,7 +13,7 @@ Design notes:
   ``locale`` (and chart-specific options like ``animate`` for time sliders).
 - The headline lives in the editorial ``<Figure>`` frame on the web side, so we
   strip the baked-in title before serializing.
-- The redesign2 look is a registered Plotly *template* set as the process
+- The house look is a registered Plotly *template* set as the process
   default; a bare ``to_json()`` would not guarantee it travels, so we inline the
   template explicitly. Backgrounds are forced transparent so figures sit flush on
   the cream cards.
@@ -374,7 +374,7 @@ def _localize_chrome(node, parent_key: str | None = None) -> None:
 
 
 def apply_house_style(fig: go.Figure, *, locale: str = "en") -> str:
-    """Strip the editorial title, inline the redesign2 look, reclaim the title
+    """Strip the editorial title, inline the house look, reclaim the title
     margin, and serialise to a (locale-aware) Plotly JSON string.
 
     Shared by the registry bridge (:func:`build`) and the Explore endpoint so a
@@ -382,7 +382,7 @@ def apply_house_style(fig: go.Figure, *, locale: str = "en") -> str:
     """
     # The editorial <Figure> frame owns the localized headline.
     fig.update_layout(title=None)
-    # Inline the redesign2 look so it travels to a browser that has no
+    # Inline the house look so it travels to a browser that has no
     # 'aclmr_light' template registered, and float the figure on the card.
     fig.update_layout(
         template=pio.templates["aclmr_light"],

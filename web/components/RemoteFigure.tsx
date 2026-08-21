@@ -18,7 +18,7 @@ function wrapCompactAnnotation(text: unknown): unknown {
   return lines.join("<br>");
 }
 
-// Client host for a figure authored in Python (the redesign2 Plotly factories,
+// Client host for a figure authored in Python (the dashboard Plotly factories,
 // served as figure JSON by /api/figure and fetched server-side by the page).
 // Unlike PlotlyFigure it does NOT inject the web template — the figure already
 // carries its own inlined `aclmr_light` look from the bridge — and it renders
